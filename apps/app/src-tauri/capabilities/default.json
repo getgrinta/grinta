@@ -1,0 +1,66 @@
+{
+	"$schema": "../gen/schemas/desktop-schema.json",
+	"identifier": "default",
+	"description": "Capability for the main window",
+	"windows": ["main"],
+	"permissions": [
+		"core:default",
+		"core:window:default",
+		"core:window:allow-start-dragging",
+		"core:window:allow-set-size",
+		"core:window:allow-set-position",
+		"core:window:allow-center",
+		"core:window:allow-hide",
+		"core:window:allow-show",
+		"core:window:allow-set-focus",
+		"opener:default",
+		"fs:default",
+		{
+			"identifier": "fs:read-all",
+			"allow": [
+				{
+					"path": "*/**"
+				}
+			]
+		},
+		"fs:scope-home-recursive",
+		"fs:allow-home-write-recursive",
+		"global-shortcut:default",
+		"global-shortcut:allow-is-registered",
+		"global-shortcut:allow-register",
+		"global-shortcut:allow-unregister",
+		"global-shortcut:allow-unregister-all",
+		"positioner:default",
+		"shell:default",
+		{
+			"identifier": "shell:allow-execute",
+			"allow": [
+				{
+					"name": "open",
+					"cmd": "open",
+					"args": true
+				},
+				{
+					"name": "shortcuts",
+					"cmd": "shortcuts",
+					"args": true
+				}
+			]
+		},
+		{
+			"identifier": "http:default",
+			"allow": [
+				{
+					"url": "https://*.startpage.com"
+				}
+			]
+		},
+		"store:default",
+		"autostart:default",
+		"clipboard-manager:allow-read-text",
+		"dialog:default",
+		"updater:default",
+		"process:default",
+		"core:app:allow-default-window-icon"
+	]
+}
