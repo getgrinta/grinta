@@ -1,7 +1,8 @@
 <script lang="ts">
+import clsx from "clsx";
 import { ChevronLeftIcon } from "lucide-svelte";
 
-const { goBack } = $props();
+const { goBack, fancyMode = false } = $props();
 
 function defaultGoBack() {
 	return window.history.back();
@@ -20,9 +21,9 @@ function scrollDown() {
 <button type="button" onclick={scrollDown} class="hidden" data-hotkey="j">Scroll Down</button>
 
 <div class="fixed flex flex-row left-4 top-4 right-4 z-10 items-center gap-2">
-  <label tabindex={-1} class="input flex-1 flex items-center gap-4 w-full backdrop-blur-lg bg-base-100/20 border-neutral-800 !outline-none px-6 h-14">
+  <label class={clsx("input flex-1 flex items-center gap-4 w-full backdrop-blur-lg bg-base-100/20 border-neutral-800 !outline-none px-6 h-14", fancyMode && "border-gradient")}>
   	<slot name="indicator">
-	    <button tabindex={0} type="button" onclick={goBack ?? defaultGoBack} class="btn btn-sm text-primary btn-square" data-hotkey="Escape,h">
+	    <button type="button" onclick={goBack ?? defaultGoBack} class="btn btn-sm text-primary btn-square" data-hotkey="Escape,h">
 	      <ChevronLeftIcon size={16} />
 	    </button>
     </slot>

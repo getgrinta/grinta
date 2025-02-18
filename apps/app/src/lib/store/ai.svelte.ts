@@ -1,5 +1,9 @@
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
+import { generateText, smoothStream, streamText } from "ai";
+import dedent from "dedent";
 import { settingsStore } from "./settings.svelte";
+
+const RESPONSE_REGEX = /<response>(.*?)<\/response>/;
 
 export class AiStore {
 	bearerToken = $derived(`Bearer ${settingsStore.settings.aiSecretKey}`);
@@ -12,6 +16,59 @@ export class AiStore {
 			baseURL: settingsStore.settings.aiEndpointUrl,
 		}),
 	);
+	model = $derived(this.client(settingsStore.settings.aiModelName));
+
+	async generateText(prompt: string) {
+		return generateText({
+			model: this.model,
+			prompt,
+		});
+	}
+
+	streamText(prompt: string) {
+		return streamText({
+			model: this.model,
+			prompt,
+			experimental_transform: smoothStream({
+				chunking: "line",
+			}),
+		});
+	}
+
+	getAutocompletePrompt({
+		query,
+		context,
+	}: { query: string; context: string }) {
+		return dedent`
+			You are a highly intelligent note-taking AI assistant. 
+			Your task is to suggest the most likely continuation of a paragraph based on the user's input provided in the <request> tag and the preceding context provided in the <context> tag.
+
+			Guidelines:
+			1. Completion Length: Until you are confident about how to complete the paragraph, provide only up to 3 words.
+			2. Language and Punctuation: Ensure correct punctuation and grammar for the given language.
+				- If the user's input ends with a punctuation mark, prepend a whitespace to your response.
+				- If you autocomplete a word, do not include a trailing whitespace.
+			3. Whitespace Handling: Pay attention to preceding whitespaces to ensure proper formatting.
+			4. Nonsensical Input: If the user's input is incoherent or nonsensical, do not generate a response.
+			5. Output Format: Return only the continuation of the paragraph wrapped in an XML <response> tag. Do not include any additional text or explanations.
+
+			Example Input:
+			<request>${query}</request>
+			<context>${context}</context>
+
+			Example Output:
+			<response>Your continuation here</response>
+		`;
+	}
+
+	async generateAutocompletion(completeProps: {
+		query: string;
+		context: string;
+	}) {
+		const prompt = this.getAutocompletePrompt(completeProps);
+		const { text } = await this.generateText(prompt);
+		return text.match(RESPONSE_REGEX)?.[1] ?? "";
+	}
 }
 
 export const aiStore = new AiStore();

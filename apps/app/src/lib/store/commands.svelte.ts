@@ -11,7 +11,7 @@ import { parse } from "equation-parser";
 import { resolve } from "equation-resolver";
 import { matchSorter } from "match-sorter";
 import { uniq } from "rambda";
-import { match } from "ts-pattern";
+import { P, match } from "ts-pattern";
 import { z } from "zod";
 import { BAR_MODE, type BarMode, appStore } from "./app.svelte";
 import { type Note, notesStore } from "./notes.svelte";
@@ -30,6 +30,7 @@ export const COMMAND_HANDLER = {
 	SYSTEM: "SYSTEM",
 	APP: "APP",
 	CHANGE_MODE: "CHANGE_MODE",
+	FORMULA_RESULT: "FORMULA_RESULT",
 	COPY_TO_CLIPBOARD: "COPY_TO_CLIPBOARD",
 	RUN_SHORTCUT: "RUN_SHORTCUT",
 	OPEN_NOTE: "OPEN_NOTE",
@@ -95,9 +96,9 @@ function buildFormulaCommands(currentQuery: string): ExecutableCommand[] {
 	const value = resolved.value.toString();
 	return [
 		{
-			label: `= ${value}`,
+			label: value,
 			value,
-			handler: COMMAND_HANDLER.COPY_TO_CLIPBOARD,
+			handler: COMMAND_HANDLER.FORMULA_RESULT,
 		},
 	];
 }
@@ -316,7 +317,12 @@ export class CommandsStore {
 				return goto(`/commands/${value}`);
 			})
 			.with(
-				{ handler: COMMAND_HANDLER.COPY_TO_CLIPBOARD },
+				{
+					handler: P.union(
+						COMMAND_HANDLER.COPY_TO_CLIPBOARD,
+						COMMAND_HANDLER.FORMULA_RESULT,
+					),
+				},
 				async ({ value }) => {
 					await navigator.clipboard.writeText(value);
 					return appStore.appWindow?.hide();
@@ -347,15 +353,19 @@ export class CommandsStore {
 					.exhaustive();
 			})
 			.with({ handler: COMMAND_HANDLER.OPEN_NOTE }, async ({ value }) => {
-				return goto(`/notes/${value}`);
+				const filename = encodeURIComponent(value);
+				return goto(`/notes/${filename}`);
 			})
 			.with({ handler: COMMAND_HANDLER.CREATE_NOTE }, async ({ value }) => {
 				const filename = await notesStore.createNote(value);
-				return goto(`/notes/${filename}`);
+				const encodedFilename = encodeURIComponent(filename);
+				return goto(`/notes/${encodedFilename}`);
 			})
 			.with({ handler: COMMAND_HANDLER.COMPLETE_NOTE }, async ({ value }) => {
 				const filename = await notesStore.createNote(value);
-				return goto(`/notes/${filename}`);
+				const encodedFilename = encodeURIComponent(filename);
+				await notesStore.updateNote({ filename, content: "%G4TW%" });
+				return goto(`/notes/${encodedFilename}`);
 			})
 			.with({ handler: COMMAND_HANDLER.RUN_SHORTCUT }, async ({ value }) => {
 				const result = await Command.create("shortcuts", [

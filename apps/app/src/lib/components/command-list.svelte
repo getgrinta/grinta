@@ -5,17 +5,20 @@ import {
 	type CommandHandler,
 	commandsStore,
 } from "$lib/store/commands.svelte";
+import { highlightText } from "$lib/utils.svelte";
 import { clsx } from "clsx";
 import {
 	AppWindowIcon,
+	ArrowDownLeftIcon,
 	ChevronRightIcon,
+	EqualIcon,
 	GlobeIcon,
 	SparklesIcon,
 	StickyNoteIcon,
 } from "lucide-svelte";
 import { circOut } from "svelte/easing";
 import { fly } from "svelte/transition";
-import { match } from "ts-pattern";
+import { P, match } from "ts-pattern";
 
 type GetHelperProps = {
 	value: string;
@@ -28,7 +31,13 @@ function getHelperText({ value, handler }: GetHelperProps) {
 		.with(COMMAND_HANDLER.URL, () => "Web")
 		.with(COMMAND_HANDLER.SYSTEM, () => "Bar Command")
 		.with(COMMAND_HANDLER.CHANGE_MODE, () => "Change Mode")
-		.with(COMMAND_HANDLER.COPY_TO_CLIPBOARD, () => "Copy to clipboard")
+		.with(
+			P.union(
+				COMMAND_HANDLER.COPY_TO_CLIPBOARD,
+				COMMAND_HANDLER.FORMULA_RESULT,
+			),
+			() => "Copy to clipboard",
+		)
 		.with(COMMAND_HANDLER.OPEN_NOTE, () => "Open Note")
 		.with(COMMAND_HANDLER.CREATE_NOTE, () => "Create Note")
 		.with(COMMAND_HANDLER.COMPLETE_NOTE, () => "Ask AI")
@@ -44,6 +53,7 @@ function getIcon(handler: CommandHandler) {
 		.with(COMMAND_HANDLER.OPEN_NOTE, () => StickyNoteIcon)
 		.with(COMMAND_HANDLER.CREATE_NOTE, () => StickyNoteIcon)
 		.with(COMMAND_HANDLER.COMPLETE_NOTE, () => SparklesIcon)
+		.with(COMMAND_HANDLER.FORMULA_RESULT, () => EqualIcon)
 		.otherwise(() => ChevronRightIcon);
 }
 
@@ -74,14 +84,29 @@ $effect(() => {
   >
     {#each commandsStore.commands as command, index (index)}
     	{@const active = commandsStore.selectedIndex === index}
+    	{@const labelChunks = highlightText(command.label, appStore.query)}
+		{@const IconComponent = getIcon(command.handler)}
       <li class="w-full" data-command-index={index} transition:fly={{ duration: 150, y: -5, delay: index * 20, easing: circOut }}>
-          <a onclick={() => commandsStore.handleCommand(index)} class={clsx("justify-between gap-4 py-[0.75rem] px-6 border-1 border-transparent text-neutral-300", active && 'menu-active !bg-base-100/40 !text-primary !border-neutral-600')}>
-            <div class="flex gap-4 items-center overflow-hidden">
-              <svelte:component this={getIcon(command.handler)} size={24} />
-              <h2 class={clsx("flex-1 font-semibold truncate")}>{command.label}</h2>
+          <div class={clsx("flex justify-between gap-4 py-[0.75rem] px-6 border-1 border-transparent text-neutral-300", active && 'menu-active !bg-base-100/40 !text-primary !border-neutral-600')}>
+            <button type="button" onclick={() => commandsStore.handleCommand(index)} class="flex flex-1 h-full gap-4 items-center overflow-hidden cursor-pointer">
+              <IconComponent size={24} />
+              <h2 class={clsx("flex-1 text-left truncate")}>
+              	{#if appStore.query.length > 0}
+	              	{#each labelChunks as chunk}
+		              	<span class={clsx(chunk.highlight ? "text-neutral-300" : "text-primary font-semibold")}>{chunk.text}</span>
+		              {/each}
+	              {:else}
+					<span>{command.label}</span>
+	              {/if}
+			  </h2>
+            </button>
+            <div class="flex gap-1 items-center">
+	            <span class={clsx("badge", active ? "badge-outline !text-primary !border-primary" : "badge-soft text-neutral-300")}>{getHelperText({ value: command.value, handler: command.handler })}</span>
+            	<button type="button" class="btn btn-square btn-ghost btn-sm" onclick={() => appStore.setQuery(command.label)}>
+            		<ArrowDownLeftIcon size={16} />
+          		</button>
             </div>
-            <span class={clsx("badge", active ? "badge-outline !text-primary !border-primary" : "badge-soft text-neutral-300")}>{getHelperText({ value: command.value, handler: command.handler })}</span>
-          </a>
+		</div>
       </li>
     {/each}
   </ul>

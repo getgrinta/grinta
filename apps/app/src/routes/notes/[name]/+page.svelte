@@ -1,60 +1,70 @@
 <script lang="ts">
-import { goto, replaceState } from "$app/navigation";
-import { page } from "$app/stores";
-import NoteEditor from "$lib/components/note-editor.svelte";
+import { goto, invalidateAll } from "$app/navigation";
+import { page } from "$app/state";
+import NoteEditor from "$lib/components/editor.svelte";
 import TopBar from "$lib/components/top-bar.svelte";
+import { BAR_MODE } from "$lib/store/app.svelte";
 import { type ExtendedNote, notesStore } from "$lib/store/notes.svelte";
-import { settingsStore } from "$lib/store/settings.svelte";
-import { swr } from "@svelte-drama/swr";
-import { clsx } from "clsx";
-import { MoreVerticalIcon, ShareIcon, TrashIcon } from "lucide-svelte";
+import { BaseDirectory, type UnwatchFn, watch } from "@tauri-apps/plugin-fs";
+import clsx from "clsx";
+import { MoreVerticalIcon } from "lucide-svelte";
 import { marked } from "marked";
-import pDebounce from "p-debounce";
+import { PressedKeys } from "runed";
 import { onMount } from "svelte";
-import type { FocusEventHandler } from "svelte/elements";
+import { toast } from "svelte-sonner";
 
-const { name } = $page.params;
+const TO_COMPLETE_PROMPT = "%G4TW%";
+const pressedKeys = new PressedKeys();
+
+const filename = $derived(decodeURIComponent(page.params.name));
+let deleteConfirmationMode = $state(false);
 let note = $state<ExtendedNote>();
+let noteTitle = $state<string>();
+let unsubWatcher = $state<UnwatchFn>();
 let sidebarOpened = $state(false);
 const content = $derived(note ? marked.parse(note.content) : "");
 
 function toggleSidebar() {
 	sidebarOpened = !sidebarOpened;
+	deleteConfirmationMode = false;
 }
 
-const model = swr<string, ExtendedNote>({
-	key: () => name,
-	async fetcher(_, name) {
-		return notesStore.fetchNote(name);
-	},
-	maxAge: 1800000,
-	name: `note-${name}`,
-});
-
 async function fetchNote() {
-	note = await model.get(name);
+	note = await notesStore.fetchNote(filename);
+	noteTitle = note?.title ?? "";
 }
 
 async function onContentUpdate(markdownContent: string) {
-	await notesStore.updateNote({ filename: name, content: markdownContent });
-	return model.refresh(name);
+	await notesStore.updateNote({ filename, content: markdownContent });
 }
 
-async function onNameUpdate(event: any) {
-	const nextFilename = `${event.target.value}.md`;
-	await notesStore.renameNote({ filename: name, nextFilename });
-	return replaceState(`/notes/${nextFilename}`);
+async function onNameUpdate() {
+	try {
+		unsubWatcher?.();
+		const nextFilename = `${noteTitle}.md`;
+		// Wait for the rename operation to complete
+		await notesStore.renameNote({ filename, nextFilename });
+		// Navigate to the new URL
+		await goto(`/notes/${encodeURIComponent(nextFilename)}`, {
+			replaceState: true,
+		});
+		return setupNoteWatcher();
+	} catch (error) {
+		console.error("Failed to rename note:", error);
+		toast.error("Failed to rename note");
+	}
 }
 
 async function copyMarkdown() {
 	if (!note) return;
 	await navigator.clipboard.writeText(note.content);
+	toast.success("Markdown was copied.");
 	return toggleSidebar();
 }
 
 function handleNavigation(event: KeyboardEvent) {
 	if (event.key === "Escape") {
-		return event.target.blur();
+		return (event.target as HTMLElement)?.blur();
 	}
 }
 
@@ -65,44 +75,105 @@ function goBack() {
 	return window.history.back();
 }
 
+async function completePrompt() {
+	if (!note) return;
+	await notesStore.updateNote({ filename: note.filename, content: "" });
+	note.content = "";
+	await notesStore.completePrompt({
+		filename: note.filename,
+		prompt: note.filename,
+		callback(text: string) {
+			if (!note) return;
+			note.content = text;
+		},
+	});
+}
+
+async function deleteNote() {
+	if (!deleteConfirmationMode) {
+		deleteConfirmationMode = true;
+		return;
+	}
+	await notesStore.deleteNote(filename);
+	toast.success("Note deleted");
+	return goto(`/commands/${BAR_MODE.NOTES}`);
+}
+
+const isCmdPressed = $derived(pressedKeys.has("Meta"));
+
+async function setupNoteWatcher() {
+	await fetchNote();
+	const fullPath = await notesStore.getFullNotePath(filename);
+	unsubWatcher = await watch(fullPath, fetchNote, {
+		baseDir: BaseDirectory.Home,
+	});
+}
+
+async function regenerateNote() {
+	if (!note) return;
+	await notesStore.updateNote({
+		filename: note.filename,
+		content: TO_COMPLETE_PROMPT,
+	});
+	note.content = TO_COMPLETE_PROMPT;
+	return toggleSidebar();
+}
+
 onMount(() => {
-	fetchNote();
-	window.addEventListener("focus", fetchNote);
+	setupNoteWatcher();
 	return () => {
-		window.removeEventListener("focus", fetchNote);
+		unsubWatcher?.();
 	};
+});
+
+$effect(() => {
+	if (!note) return;
+	if (note.content !== TO_COMPLETE_PROMPT) return;
+	completePrompt();
 });
 </script>
 
 <div class="drawer drawer-end">
 	<input id="sidebar" type="checkbox" class="drawer-toggle" bind:checked={sidebarOpened} />
-  <div class="drawer-content">
+  	<div class="drawer-content">
 		<div class="flex flex-1 flex-col">
 			<TopBar goBack={goBack}>
-		    <input slot="input" class="grow h-8 font-semibold text-lg" value={note?.title ?? ""} onkeydown={handleNavigation} onchange={onNameUpdate} placeholder="Note name" />
-		    <label for="sidebar" slot="addon" class="btn btn-sm btn-neutral btn-square drawer-button text-primary" data-hotkey="Mod+j">
-		      <MoreVerticalIcon size={16} />
-		    </label>
+				<input bind:value={noteTitle} slot="input" class="grow h-8 font-semibold text-lg" onkeydown={handleNavigation} onchange={onNameUpdate} placeholder="Note name" />
+				<label for="sidebar" slot="addon" class="btn btn-sm btn-neutral drawer-button text-primary" data-hotkey="Mod+j">
+				<MoreVerticalIcon size={16} />
+				{#if isCmdPressed}
+					<span>⌘J</span>
+				{/if}
+				</label>
 			</TopBar>
-		  <div class="pt-20 px-8 pb-8">
-		  {#if note}
-		    <NoteEditor {content} onUpdate={onContentUpdate} {toggleSidebar} />
-		  {/if}
+		  	<div class="pt-20 px-8 pb-8">
+				{#if note} 
+					<NoteEditor {content} onUpdate={onContentUpdate} {toggleSidebar} />
+				{/if}
 			</div>
 		</div>
   </div>
   <div id="sidebarContent" class="drawer-side z-20">
     <label for="sidebar" aria-label="close sidebar" class="drawer-overlay"></label>
-    <ul class="menu menu-lg bg-base-200 text-base-content min-h-full w-80 p-4" data-hotkey="c">
-      <li><a class="justify-between" onclick={copyMarkdown}>
-      	<span>Copy Markdown</span>
-      	<kbd class="kbd">c</kbd>
-      </a></li>
-      <li class="text-red-300"><a class="justify-between" data-hotkey="d">
-      	<span>Delete Note</span>
-      	<kbd class="kbd">d</kbd>
-      </a></li>
+    <ul class="menu menu-lg bg-base-200 text-base-content min-h-full w-80 p-4">
+		<li>
+			<button type="button" class="justify-between" onclick={regenerateNote} data-hotkey="a">
+      			<span>Regenerate with AI</span>
+      			<kbd class="kbd">a</kbd>
+	  		</button>
+		</li>
+      	<li>
+			<button type="button" class="justify-between" onclick={copyMarkdown} data-hotkey="c">
+      			<span>Copy Markdown</span>
+      			<kbd class="kbd">c</kbd>
+	  		</button>
+		</li>
+      	<li class="text-red-300">
+			<button type="button" class={clsx("justify-between", deleteConfirmationMode && "btn btn-soft btn-error")} onclick={deleteNote} data-hotkey="d">
+      			<span>{deleteConfirmationMode ? "Confirm Delete" : "Delete Note"}</span>
+      			<kbd class="kbd">d</kbd>
+      		</button>
+		</li>
     </ul>
   </div>
 </div>
-

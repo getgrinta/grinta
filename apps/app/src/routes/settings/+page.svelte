@@ -10,9 +10,9 @@ import packageJson from "../../../package.json" with { type: "json" };
 const pressedKeys = new PressedKeys();
 
 const tabs = [
-	{ label: "General ⌘1", value: "general" },
-	{ label: "AI ⌘2", value: "ai" },
-	{ label: "Notes ⌘3", value: "notes" },
+	{ label: "General", value: "general", hotkey: "⌘1" },
+	{ label: "AI", value: "ai", hotkey: "⌘2" },
+	{ label: "Notes", value: "notes", hotkey: "⌘3" },
 ];
 
 let newToggleShortcut = $state<string[]>([]);
@@ -37,9 +37,7 @@ const toggleShortcut = $derived(
 );
 
 const recordShortcutLabel = $derived(
-	recordingShortcut
-		? `${toggleShortcut} (Press to save)`
-		: `${toggleShortcut} (Press to change)`,
+	recordingShortcut ? "Press to save" : "Press to change",
 );
 
 function processShortcut(keys: string[]) {
@@ -47,6 +45,7 @@ function processShortcut(keys: string[]) {
 		.map((key) => {
 			if (key === "meta") return "CommandOrControl";
 			if (key === "space") return "Space";
+			if (key === " ") return "Space";
 			if (key === "alt") return "Alt";
 			if (key === "shift") return "Shift";
 			return key;
@@ -76,7 +75,7 @@ $effect(() => {
 $effect(() => {
 	// Save new shortcut when theres a new toggle combo and user lifted up all keys
 	if (!recordingShortcut) return;
-	if (newToggleShortcut.length < 2) return;
+	if (newToggleShortcut.length < 1) return;
 	if (pressedKeys.all.length !== 0) return;
 	const processedShortcut = processShortcut(newToggleShortcut);
 	settingsStore.setToggleShortcut(processedShortcut);
@@ -90,15 +89,23 @@ watch(
 		settingsStore.persist();
 	},
 );
+
+const isCmdPressed = $derived(pressedKeys.has("Meta"));
 </script>
 
 <div class="flex flex-1 flex-col">
   <TopBar>
     <div slot="input" class="grow flex-1 truncate text-lg font-semibold">Settings</div>
-    <div slot="addon" role="tablist" class="tabs tabs-box">
+    <div slot="addon" role="tablist" class="join">
       {#each tabs as tab, index}
+      	{@const active = currentTab === tab.value}
       	{@const hotkey = `Meta+${index + 1}`}
-        <a role="tab" class={clsx("tab", currentTab === tab.value && 'tab-active')} onclick={() => changeTab(tab.value)} data-hotkey={hotkey}>{tab.label}</a>
+        <button type="button" class={clsx("btn join-item", active && 'text-primary')} onclick={() => changeTab(tab.value)} data-hotkey={hotkey}>
+        	<span>{tab.label}</span>
+        	{#if isCmdPressed}
+	        	<span>{tab.hotkey}</span>
+        	{/if}
+        </button>
       {/each}
     </div>
   </TopBar>
@@ -106,8 +113,16 @@ watch(
     {#if currentTab === 'general'}
       <form class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center">
         <label class="text-sm">Shortcut</label>
-        <input type="hidden" name="toggleShortcut" value={toggleShortcut} />
-        <button type="button" class="btn justify-start" onclick={toggleShortcutRecording}>{recordShortcutLabel}</button>
+        <div class="flex gap-2 items-center">
+          <input type="hidden" name="toggleShortcut" value={toggleShortcut} />
+          <button type="button" class="btn flex-1" disabled>{toggleShortcut}</button>
+          <button type="button" class="btn flex-1" onclick={toggleShortcutRecording}>{recordShortcutLabel}</button>
+        </div>
+        <label class="text-sm">Version</label>
+        <div class="flex gap-2 items-center">
+          <button type="button" class="btn flex-1" disabled>{packageJson.version}</button>
+          <button type="button" class="btn flex-1">Check for update</button>
+        </div>
         <label class="text-sm">Theme</label>
         <select name="theme" bind:value={settingsStore.settings.theme} class="select select-bordered w-full">
         	{#each themes as theme}
@@ -120,11 +135,6 @@ watch(
           	<option value={color}>{humanizeString(color)}</option>
           {/each}
         </select>
-        <label class="text-sm">Version</label>
-        <div class="flex gap-2 items-center">
-          <button type="button" class="btn flex-1" disabled>{packageJson.version}</button>
-          <button type="button" class="btn flex-1">Check for update</button>
-        </div>
         <label class="text-sm">Danger Zone</label>
         <button type="button" class="btn btn-warning" onclick={wipeLocalData}>Wipe All Local Data</button>
       </form>

@@ -10,10 +10,7 @@ type FsFile = {
 
 type SetItemProps = {
 	filename: string;
-	update: {
-		filename: string;
-		content?: string;
-	};
+	content: string;
 };
 
 const DEFAULT_OPTS = {
@@ -84,21 +81,22 @@ export function createFsStorage(path: string) {
 			});
 			await ensurePath();
 		},
-		async setItem({ filename, update }: SetItemProps): Promise<void> {
-			const originalPath = await PathApi.join(path, filename);
-			const newPath = await PathApi.join(path, update.filename);
+		async setItem({ filename, content }: SetItemProps): Promise<void> {
+			const newPath = await PathApi.join(path, filename);
 			await ensurePath();
-			const originalItem = await this.getItem(filename);
-			if (filename !== update.filename && originalItem) {
-				await TauriFs.rename(originalPath, newPath, {
-					oldPathBaseDir: DEFAULT_OPTS.baseDir,
-					newPathBaseDir: DEFAULT_OPTS.baseDir,
-				});
-			}
-			const content = originalItem
-				? (update.content ?? originalItem.content ?? "")
-				: "";
 			return TauriFs.writeTextFile(newPath, content, DEFAULT_OPTS);
+		},
+		async renameItem({
+			filename,
+			nextFilename,
+		}: { filename: string; nextFilename: string }) {
+			const originalPath = await PathApi.join(path, filename);
+			const newPath = await PathApi.join(path, nextFilename);
+			await ensurePath();
+			return TauriFs.rename(originalPath, newPath, {
+				oldPathBaseDir: DEFAULT_OPTS.baseDir,
+				newPathBaseDir: DEFAULT_OPTS.baseDir,
+			});
 		},
 		async exists(filename: string) {
 			return getFileExists(filename);

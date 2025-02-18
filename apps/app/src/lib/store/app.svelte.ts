@@ -21,8 +21,12 @@ export class AppStore {
 		this.barMode = barMode;
 	}
 
+	setQuery(query: string) {
+		this.query = query;
+	}
+
 	clearQuery() {
-		this.query = "";
+		return this.setQuery("");
 	}
 }
 

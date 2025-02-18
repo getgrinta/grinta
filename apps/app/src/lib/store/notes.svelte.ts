@@ -1,6 +1,7 @@
 import { createFsStorage } from "$lib/storage";
 import * as PathApi from "@tauri-apps/api/path";
 import dayjs from "dayjs";
+import { aiStore } from "./ai.svelte";
 import { COMMAND_HANDLER, commandsStore } from "./commands.svelte";
 import { settingsStore } from "./settings.svelte";
 
@@ -81,7 +82,7 @@ export class NotesStore {
 		const ensuredName = name ?? dayjs().format("ll");
 		const uniqueName = await findUnusedFilename(ensuredName);
 		const filename = `${uniqueName}.md`;
-		await fsStorage.setItem({ filename, update: { filename, content: "" } });
+		await fsStorage.setItem({ filename, content: "" });
 		return filename;
 	}
 
@@ -89,41 +90,55 @@ export class NotesStore {
 		const fsStorage = createFsStorage(
 			await PathApi.join(...settingsStore.settings.notesDir),
 		);
-		return fsStorage.setItem({ filename, update: { filename, content } });
+		return fsStorage.setItem({ filename, content });
 	}
 
 	async renameNote({ filename, nextFilename }: RenameNoteProps) {
 		const fsStorage = createFsStorage(
 			await PathApi.join(...settingsStore.settings.notesDir),
 		);
-		await fsStorage.setItem({ filename, update: { filename: nextFilename } });
+		await fsStorage.renameItem({ filename, nextFilename });
 		return commandsStore.removeHistoryEntry({
 			value: filename,
 			handler: COMMAND_HANDLER.OPEN_NOTE,
 		});
 	}
 
-	async completePrompt(id: string) {
-		// const index = this.chats.findIndex((chat) => chat.id === id);
-		// const chat = this.chats[index];
-		// if (chat.state !== "idle") throw new Error("Chat already completed");
-		// this.chats[index].state = "responding";
-		// await this.persist();
-		// const { textStream } = streamText({
-		// 	model: this.aiClient(settingsStore.settings.aiModelName),
-		// 	prompt: chat.prompt,
-		// });
-		// for await (const textPart of textStream) {
-		// 	this.addPartToResponse({ id, part: textPart });
-		// }
-		// this.chats[index].state = "responded";
-		// await this.persist();
+	async completePrompt({
+		filename,
+		prompt,
+		callback,
+	}: { filename: string; prompt: string; callback: (text: string) => void }) {
+		const note = await this.fetchNote(filename);
+		const result = aiStore.streamText(prompt);
+		let content = note.content;
+
+		for await (const chunk of result.textStream) {
+			content = note.content + chunk;
+			await this.updateNote({
+				filename,
+				content,
+			});
+			note.content = content;
+			callback(content);
+		}
+
+		await this.updateNote({
+			filename,
+			content,
+		});
+
+		return note;
 	}
 
 	async deleteNote(filename: string) {
 		const fsStorage = createFsStorage(
 			await PathApi.join(...settingsStore.settings.notesDir),
 		);
+		commandsStore.removeHistoryEntry({
+			value: filename,
+			handler: COMMAND_HANDLER.OPEN_NOTE,
+		});
 		return fsStorage.removeItem(filename);
 	}
 
@@ -132,6 +147,10 @@ export class NotesStore {
 			await PathApi.join(...settingsStore.settings.notesDir),
 		);
 		await fsStorage.removeAll();
+	}
+
+	async getFullNotePath(filename: string) {
+		return PathApi.join(...settingsStore.settings.notesDir, filename);
 	}
 }
 

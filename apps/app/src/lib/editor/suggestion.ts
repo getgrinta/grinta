@@ -5,14 +5,14 @@ import { Decoration, DecorationSet } from "prosemirror-view";
 const suggestionPluginKey = new PluginKey("textSuggestion");
 
 // This helper will create (or clear) a widget decoration displaying the suggestion.
-function createSuggestionDecoration(from, suggestionText) {
+function createSuggestionDecoration(from: number, suggestionText: string) {
 	return Decoration.widget(
 		from,
 		() => {
 			const span = document.createElement("span");
 			span.className = "inline-suggestion";
 			// style the suggested text as grey
-			span.style.opacity = 0.5;
+			span.style.opacity = "0.5";
 			span.style.pointerEvents = "none";
 			span.textContent = suggestionText;
 			return span;
@@ -52,7 +52,7 @@ export const TextSuggestion = Extension.create({
 					},
 				},
 				view: (view) => {
-					let debounceTimer;
+					let debounceTimer: number | undefined;
 					let lastQuery = "";
 					let inputByMouse = false;
 					let navigationByArrow = false;
@@ -94,6 +94,21 @@ export const TextSuggestion = Extension.create({
 								return;
 							}
 
+							// Clear suggestion if cursor position changed without text changes
+							if (
+								prevState?.doc.eq(state.doc) &&
+								!prevState.selection.eq(state.selection)
+							) {
+								view.dispatch(
+									state.tr.setMeta(suggestionPluginKey, {
+										deco: DecorationSet.empty,
+										suggestion: null,
+										query: "",
+									}),
+								);
+								return;
+							}
+
 							// Process only when the selection is collapsed.
 							if (!state.selection.empty) return;
 
@@ -101,7 +116,7 @@ export const TextSuggestion = Extension.create({
 							if (navigationByArrow) {
 								if (debounceTimer) {
 									clearTimeout(debounceTimer);
-									debounceTimer = null;
+									debounceTimer = undefined;
 								}
 								view.dispatch(
 									state.tr.setMeta(suggestionPluginKey, {
@@ -118,7 +133,7 @@ export const TextSuggestion = Extension.create({
 							if ($from.pos !== $from.end()) {
 								if (debounceTimer) {
 									clearTimeout(debounceTimer);
-									debounceTimer = null;
+									debounceTimer = undefined;
 								}
 								view.dispatch(
 									state.tr.setMeta(suggestionPluginKey, {
@@ -137,7 +152,7 @@ export const TextSuggestion = Extension.create({
 							if (!query.trim()) {
 								if (debounceTimer) {
 									clearTimeout(debounceTimer);
-									debounceTimer = null;
+									debounceTimer = undefined;
 								}
 								lastQuery = "";
 								view.dispatch(
@@ -154,7 +169,7 @@ export const TextSuggestion = Extension.create({
 							if (lastKeyWasBackspace && query === lastQuery) {
 								if (debounceTimer) {
 									clearTimeout(debounceTimer);
-									debounceTimer = null;
+									debounceTimer = undefined;
 								}
 								view.dispatch(
 									state.tr.setMeta(suggestionPluginKey, {
@@ -172,7 +187,10 @@ export const TextSuggestion = Extension.create({
 
 							if (debounceTimer) clearTimeout(debounceTimer);
 							debounceTimer = setTimeout(async () => {
-								const suggestion = await fetchAutocompletion(query);
+								const suggestion = await fetchAutocompletion({
+									query,
+									context: state.doc.textContent,
+								});
 								let deco = DecorationSet.empty;
 								if (suggestion && suggestion.length > 0) {
 									const pos = view.state.selection.$from.pos;
@@ -187,7 +205,7 @@ export const TextSuggestion = Extension.create({
 										query,
 									}),
 								);
-							}, 500);
+							}, 600);
 						},
 						destroy() {
 							if (debounceTimer) clearTimeout(debounceTimer);
@@ -228,19 +246,24 @@ export const TextSuggestion = Extension.create({
 				return false; // Allow default behavior if no suggestion exists
 			},
 
-			// Handle Escape key to reject suggestion
+			// Handle Escape key to reject suggestion and blur editor
 			Escape: () => {
 				const { state, view } = this.editor;
+				const pluginState = suggestionPluginKey.getState(state);
 
-				// Clear any existing suggestion
-				view.dispatch(
-					state.tr.setMeta(suggestionPluginKey, {
-						deco: DecorationSet.empty,
-						suggestion: null,
-					}),
-				);
-
-				return true; // Prevent default behavior
+				if (pluginState?.suggestion) {
+					// Clear any existing suggestion
+					view.dispatch(
+						state.tr.setMeta(suggestionPluginKey, {
+							deco: DecorationSet.empty,
+							suggestion: null,
+						}),
+					);
+					return true;
+				}
+				// If no suggestion exists, blur the editor
+				(view.dom as HTMLElement).blur();
+				return true;
 			},
 		};
 	},

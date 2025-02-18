@@ -1,3 +1,4 @@
+import { activateWindow } from "$lib/utils.svelte";
 // import { appStore } from "$lib/store/app.svelte";
 import {
 	type ShortcutEvent,
@@ -47,13 +48,7 @@ async function toggleShortcutHandler(event: ShortcutEvent) {
 	if (event.state !== "Pressed") return;
 	const visible = await appStore.appWindow.isVisible();
 	if (!visible) {
-		await appStore.appWindow.show();
-		await appStore.appWindow.setFocus();
-		moveWindow(Position.TopCenter);
-		const queryInput = document.querySelector(
-			"#queryInput",
-		) as HTMLInputElement;
-		return queryInput?.focus();
+		return activateWindow();
 	}
 	return appStore.appWindow.hide();
 }

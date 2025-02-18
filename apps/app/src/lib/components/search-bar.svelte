@@ -115,8 +115,10 @@ async function handleNavigation(event: KeyboardEvent) {
 	}
 	if (event.key === "Escape") {
 		event.preventDefault();
-		appStore.appWindow?.hide();
-		return;
+		if (appStore.barMode !== BAR_MODE.INITIAL) {
+			return switchMode(BAR_MODE.INITIAL);
+		}
+		return appStore.appWindow?.hide();
 	}
 	if (event.key === "Backspace" && appStore.query.length === 0) {
 		appStore.barMode = BAR_MODE.INITIAL;
@@ -190,7 +192,7 @@ const actionButton = $derived(
 
 <form use:form>
 	<TopBar>
-		<div slot="indicator"></div>
+		<div slot="indicator" class="hidden"></div>
     <input
       id="queryInput"
       slot="input"
@@ -205,7 +207,7 @@ const actionButton = $derived(
   	<div slot="addon" class="join">
   		{#each INDICATOR_MODES as mode, i}
   			{@const active = mode.value === appStore.barMode}
-			  <button type="button" class={clsx("btn btn-sm join-item border-neutral-800", active ? "text-primary bg-base-300" : "text-neutral-500", i === 0 ? "rounded-l-lg" : i === 2 ? "rounded-r-lg" : "")}>
+			  <button type="button" onclick={() => switchMode(mode.value)} class={clsx("btn btn-sm join-item border-neutral-800", active ? "text-primary bg-base-300" : "text-neutral-500")}>
 		  		<mode.icon size={24} class="w-6 h-6" />
 		  		{#if isCmdPressed}
 			  		<span>{mode.shortcut}</span>

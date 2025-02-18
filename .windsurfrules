@@ -1,0 +1,8 @@
+// General guidelines
+Always use Markdown for documentation and README files
+Maintain the existing structure of the README.md file
+This project uses Bun as the JavaScript and TypeScript runtime.
+Turborepo is used to run scripts and cache outputs.
+Use Biome as linter and formatter with the global "format" and "lint" commands.
+Use /apps/website/src/content/docs as the main documentation directory.
+Use kebab-case for file names. Example: navigation-bar.svelte.
