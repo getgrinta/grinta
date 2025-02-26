@@ -26,6 +26,7 @@ export const TextSuggestion = Extension.create({
 
 	addProseMirrorPlugins() {
 		const fetchAutocompletion = this.options.fetchAutocompletion;
+		
 
 		return [
 			new Plugin({
@@ -186,10 +187,10 @@ export const TextSuggestion = Extension.create({
 							lastQuery = query;
 
 							if (debounceTimer) clearTimeout(debounceTimer);
+							
 							debounceTimer = setTimeout(async () => {
 								const suggestion = await fetchAutocompletion({
 									query,
-									context: state.doc.textContent,
 								});
 								let deco = DecorationSet.empty;
 								if (suggestion && suggestion.length > 0) {

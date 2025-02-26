@@ -41,7 +41,7 @@ export class AiStore {
 	}: { query: string; context: string }) {
 		return dedent`
 			You are a highly intelligent note-taking AI assistant. 
-			Your task is to suggest the most likely continuation of a paragraph based on the user's input provided in the <request> tag and the preceding context provided in the <context> tag.
+			Your task is to suggest the most likely continuation of a paragraph based on the user's input provided in the <request></request> tag taking into account additional context provided in the <context></context> tag, which should affect your response.
 
 			Guidelines:
 			1. Completion Length: Until you are confident about how to complete the paragraph, provide only up to 3 words.
@@ -51,6 +51,7 @@ export class AiStore {
 			3. Whitespace Handling: Pay attention to preceding whitespaces to ensure proper formatting.
 			4. Nonsensical Input: If the user's input is incoherent or nonsensical, do not generate a response.
 			5. Output Format: Return only the continuation of the paragraph wrapped in an XML <response> tag. Do not include any additional text or explanations.
+			6. Context: If the context is provided, take it into account when generating the response.
 
 			Example Input:
 			<request>${query}</request>
@@ -63,9 +64,11 @@ export class AiStore {
 
 	async generateAutocompletion(completeProps: {
 		query: string;
-		context: string;
 	}) {
-		const prompt = this.getAutocompletePrompt(completeProps);
+		const prompt = this.getAutocompletePrompt({ 
+			query: completeProps.query,
+			context: settingsStore.settings.aiAdditionalContext 
+		});
 		const { text } = await this.generateText(prompt);
 		return text.match(RESPONSE_REGEX)?.[1] ?? "";
 	}
