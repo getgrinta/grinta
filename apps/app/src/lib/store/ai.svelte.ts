@@ -72,6 +72,30 @@ export class AiStore {
 		const { text } = await this.generateText(prompt);
 		return text.match(RESPONSE_REGEX)?.[1] ?? "";
 	}
+
+	async testConnection(): Promise<{ success: boolean; message: string }> {
+		try {
+			const testPrompt = "Hello, this is a connection test.";
+			
+			if (!settingsStore.settings.aiEndpointUrl) {
+				return { success: false, message: "AI endpoint URL is not configured" };
+			}
+			
+			if (!settingsStore.settings.aiSecretKey) {
+				return { success: false, message: "API secret key is not configured" };
+			}
+			
+			if (!settingsStore.settings.aiModelName) {
+				return { success: false, message: "AI model name is not configured" };
+			}
+			
+			await this.generateText(testPrompt);
+			return { success: true, message: "Connection successful" };
+		} catch (error) {
+			const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+			return { success: false, message: `Connection failed: ${errorMessage}` };
+		}
+	}
 }
 
 export const aiStore = new AiStore();

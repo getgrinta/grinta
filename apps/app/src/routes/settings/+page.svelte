@@ -1,6 +1,7 @@
 <script lang="ts">
 import { goto } from "$app/navigation";
 import TopBar from "$lib/components/top-bar.svelte";
+import { aiStore } from "$lib/store/ai.svelte";
 import { ACCENT_COLOR, THEME, settingsStore } from "$lib/store/settings.svelte";
 import { clsx } from "clsx";
 import humanizeString from "humanize-string";
@@ -15,8 +16,10 @@ const tabs = [
 	{ label: "Notes", value: "notes", hotkey: "⌘3" },
 ];
 
+
 let newToggleShortcut = $state<string[]>([]);
 let recordingShortcut = $state(false);
+let connectionStatus = $state<{ status: 'loading' | 'error' | 'success'; text?: string; } | null>(null);
 let currentTab = $state("general");
 const themes = Object.keys(THEME);
 const accentColors = Object.keys(ACCENT_COLOR);
@@ -63,6 +66,12 @@ const notesDirString = $derived(settingsStore.settings.notesDir.join("/"));
 async function wipeLocalData() {
 	await settingsStore.wipeLocalData();
 	return goto("/");
+}
+
+async function testConnection() {
+  connectionStatus = { status: 'loading', text: 'Testing connection...' };
+  const result = await aiStore.testConnection();
+  connectionStatus = { status: result.success ? 'success' : 'error', text: result.message };
 }
 
 $effect(() => {
@@ -148,6 +157,15 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
         <input class="input w-full" type="password" name="secretKey" bind:value={settingsStore.settings.aiSecretKey} />
         <label class="text-sm">Additional Context</label>
         <textarea class="textarea w-full resize-none" placeholder="e.g. Respond in professional style. Be concise." bind:value={settingsStore.settings.aiAdditionalContext} />
+        <span></span>
+        <div>
+        <button type="button" class="btn btn-warning w-[100%]" onclick={testConnection}>Test Connection</button>
+        <div class={clsx("text-sm text-center mt-2", {
+          "text-success": connectionStatus?.status === "success",
+          "text-error": connectionStatus?.status === "error"
+        })}>{connectionStatus?.text}</div>
+      </div>
+    
       </form>
     {:else if currentTab === 'notes'}
       <form class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center">
