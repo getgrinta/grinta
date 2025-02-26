@@ -141,13 +141,13 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
     {:else if currentTab === 'ai'}
       <form class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center"> 
         <label class="text-sm">Model Name</label>
-        <input class="input w-full" name="modelName" bind:value={settingsStore.settings.aiModelName} />
+        <input class="input w-full" name="modelName" placeholder="gpt-4o" bind:value={settingsStore.settings.aiModelName} />
         <label class="text-sm">Custom Endpoint</label>
-        <input class="input w-full" name="endpointUrl" bind:value={settingsStore.settings.aiEndpointUrl} />
+        <input class="input w-full" name="endpointUrl" placeholder="https://api.openai.com/v1/chat/completions" bind:value={settingsStore.settings.aiEndpointUrl} />
         <label class="text-sm">Token Secret</label>
         <input class="input w-full" type="password" name="secretKey" bind:value={settingsStore.settings.aiSecretKey} />
         <label class="text-sm">Additional Context</label>
-        <textarea class="textarea w-full resize-none" bind:value={settingsStore.settings.aiAdditionalContext} />
+        <textarea class="textarea w-full resize-none" placeholder="e.g. Try answer the question as best as you can. Be verbose." bind:value={settingsStore.settings.aiAdditionalContext} />
       </form>
     {:else if currentTab === 'notes'}
       <form class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center">
