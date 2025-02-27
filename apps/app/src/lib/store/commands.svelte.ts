@@ -139,10 +139,20 @@ async function buildQueryCommands(query: string) {
 			handler: COMMAND_HANDLER.URL,
 		},
 	];
+
 	if (query.length < 3) return queryMatchSearch;
+
+	let completions: [string, string[]]
 	const completionUrl = `https://www.startpage.com/osuggestions?q=${encodedQuery}`;
-	const request = await fetch(completionUrl);
-	const completions = await request.json();
+
+	try {
+		// Might fail because of no connection or proxy
+		const response = await fetch(completionUrl);
+		completions = await response.json();
+	} catch (error) {
+		completions = [encodedQuery, []];
+	}
+
 	const completionList = completions[1].map((completion: string) => {
 		const completionQuery = encodeURIComponent(completion);
 		return {
@@ -152,6 +162,7 @@ async function buildQueryCommands(query: string) {
 		};
 	});
 	const literalSearch = completionList.length > 0 ? [] : queryMatchSearch;
+
 	return [
 		...completionList,
 		...literalSearch,
@@ -165,7 +176,7 @@ async function buildQueryCommands(query: string) {
 			value: query,
 			handler: COMMAND_HANDLER.CREATE_NOTE,
 		},
-	];
+	];	
 }
 
 export class CommandsStore {
