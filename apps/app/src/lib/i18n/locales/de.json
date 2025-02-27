@@ -8,10 +8,7 @@
     },
     "fields": {
       "shortcut": "Tastenkürzel",
-      "changeShortcut": "Drücken zum Ändern",
-      "recordShortcut": "Drücken zum Speichern",
       "version": "Version",
-      "checkForUpdate": "Nach Updates suchen",
       "theme": "Thema",
       "accentColor": "Akzentfarbe",
       "dangerZone": "Gefahrenzone",
@@ -27,13 +24,71 @@
       "notes": {
         "aiEnabled": "KI aktiviert",
         "notesDirectory": "Notizverzeichnis"
-      }
+      },
+      "checkForUpdate": "Nach Updates suchen",
+      "recordShortcut": "Drücken zum Speichern",
+      "changeShortcut": "Drücken zum Ändern"
     },
     "language": "Sprache",
     "languages": {
       "en": "Englisch",
       "pl": "Polnisch",
       "de": "Deutsch"
+    }
+  },
+  "notes": {
+    "placeholder": "Notizname",
+    "regenerateWithAI": "Mit KI neu generieren",
+    "copyMarkdown": "Markdown kopieren",
+    "deleteNote": "Notiz löschen",
+    "confirmDelete": "Löschen bestätigen",
+    "noteDeleted": "Notiz gelöscht",
+    "markdownCopied": "Markdown wurde kopiert.",
+    "failedToRename": "Umbenennen der Notiz fehlgeschlagen",
+    "noteName": "Notizname",
+    "closeSidebar": "Seitenleiste schließen",
+    "createNote": "Notiz erstellen"
+  },
+  "commands": {
+    "helperText": {
+      "app": "App",
+      "web": "Web",
+      "barCommand": "Befehlsleiste",
+      "changeMode": "Modus ändern",
+      "copyToClipboard": "In die Zwischenablage kopieren",
+      "openNote": "Notiz öffnen",
+      "createNote": "Notiz erstellen",
+      "askAI": "KI fragen",
+      "runShortcut": "Tastenkürzel ausführen"
+    },
+    "menuItems": {
+      "clearNotes": "Notizen löschen",
+      "clearHistory": "Befehlsverlauf löschen",
+      "help": "Hilfe",
+      "settings": "Einstellungen",
+      "exit": "Beenden"
+    },
+    "actions": {
+      "search": "Nach \"{query}\" suchen",
+      "ask": "\"{query}\" fragen",
+      "createNote": "Notiz \"{query}\" erstellen"
+    }
+  },
+  "searchBar": {
+    "placeholder": {
+      "initial": "Web oder Apps durchsuchen",
+      "menu": "Menü",
+      "notes": "Notizen suchen oder erstellen"
+    },
+    "actions": {
+      "menu": "Menü",
+      "exitMenu": "Menü verlassen",
+      "createNote": "Notiz erstellen"
+    }
+  },
+  "editor": {
+    "floatingMenu": {
+      "askAI": "KI fragen"
     }
   },
   "additionalContextPlaceholder": "Zusätzlicher Kontext für die Notizgenerierung.\r\nz.B. \"Antworte im professionellen Stil. Sei präzise\"."

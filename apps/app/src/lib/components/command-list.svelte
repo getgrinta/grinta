@@ -19,6 +19,7 @@ import {
 import { circOut } from "svelte/easing";
 import { fly } from "svelte/transition";
 import { P, match } from "ts-pattern";
+import { _ } from "svelte-i18n";
 
 type GetHelperProps = {
 	value: string;
@@ -27,21 +28,21 @@ type GetHelperProps = {
 
 function getHelperText({ value, handler }: GetHelperProps) {
 	return match(handler)
-		.with(COMMAND_HANDLER.APP, () => "App")
-		.with(COMMAND_HANDLER.URL, () => "Web")
-		.with(COMMAND_HANDLER.SYSTEM, () => "Bar Command")
-		.with(COMMAND_HANDLER.CHANGE_MODE, () => "Change Mode")
+		.with(COMMAND_HANDLER.APP, () => $_("commands.helperText.app"))
+		.with(COMMAND_HANDLER.URL, () => $_("commands.helperText.web"))
+		.with(COMMAND_HANDLER.SYSTEM, () => $_("commands.helperText.barCommand"))
+		.with(COMMAND_HANDLER.CHANGE_MODE, () => $_("commands.helperText.changeMode"))
 		.with(
 			P.union(
 				COMMAND_HANDLER.COPY_TO_CLIPBOARD,
 				COMMAND_HANDLER.FORMULA_RESULT,
 			),
-			() => "Copy to clipboard",
+			() => $_("commands.helperText.copyToClipboard"),
 		)
-		.with(COMMAND_HANDLER.OPEN_NOTE, () => "Open Note")
-		.with(COMMAND_HANDLER.CREATE_NOTE, () => "Create Note")
-		.with(COMMAND_HANDLER.COMPLETE_NOTE, () => "Ask AI")
-		.with(COMMAND_HANDLER.RUN_SHORTCUT, () => "Run Shortcut")
+		.with(COMMAND_HANDLER.OPEN_NOTE, () => $_("commands.helperText.openNote"))
+		.with(COMMAND_HANDLER.CREATE_NOTE, () => $_("commands.helperText.createNote"))
+		.with(COMMAND_HANDLER.COMPLETE_NOTE, () => $_("commands.helperText.askAI"))
+		.with(COMMAND_HANDLER.RUN_SHORTCUT, () => $_("commands.helperText.runShortcut"))
 		.otherwise(() => value);
 }
 
@@ -111,4 +112,3 @@ $effect(() => {
     {/each}
   </ul>
 </div>
-

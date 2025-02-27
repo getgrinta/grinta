@@ -6,6 +6,7 @@ import SearchBar from "$lib/components/search-bar.svelte";
 import ViewActions from "$lib/components/view-actions.svelte";
 import { BAR_MODE, appStore } from "$lib/store/app.svelte";
 import { notesStore } from "$lib/store/notes.svelte";
+import { _ } from "svelte-i18n";
 
 async function createNote() {
 	const filename = await notesStore.createNote(
@@ -15,7 +16,7 @@ async function createNote() {
 }
 
 const viewActions = [
-	{ label: "Create Note", onclick: createNote, shortcut: "⌘N" },
+	{ label: $_("notes.createNote"), onclick: createNote, shortcut: "⌘N" },
 ];
 
 const showActions = $derived(appStore.barMode === BAR_MODE.NOTES);

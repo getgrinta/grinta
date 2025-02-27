@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { Editor } from "@tiptap/core";
 import { SparklesIcon } from "lucide-svelte";
+import { _ } from "svelte-i18n";
 
 let { editor } = $props<{ editor: Editor | undefined }>();
 
@@ -38,12 +39,12 @@ function handlePromptKeyDown(event: KeyboardEvent) {
     {#if menuState === "idle"}
         <button type="button" class="btn btn-sm rounded-full text-primary" onclick={toggleState}>
             <SparklesIcon size={16} />
-            <span>Ask AI</span>
+            <span>{$_("editor.floatingMenu.askAI")}</span>
         </button>
     {:else}
         <label class="input rounded-full !outline-none">
             <SparklesIcon size={16} />
-            <input bind:this={promptInput} bind:value={prompt} type="text" placeholder="Ask AI" onblur={toggleState} onkeydown={handlePromptKeyDown} />
+            <input bind:this={promptInput} bind:value={prompt} type="text" placeholder={$_("editor.floatingMenu.askAI")} onblur={toggleState} onkeydown={handlePromptKeyDown} />
         </label>
     {/if}
 </div>

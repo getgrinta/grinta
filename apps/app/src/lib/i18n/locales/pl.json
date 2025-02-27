@@ -20,13 +20,71 @@
       "testConnection": "Testuj połączenie",
       "aiEnabled": "AI",
       "notesDirectory": "Lokalizacja notatek",
-      "checkUpdate": "Sprawdź aktualizacje"
+      "checkUpdate": "Sprawdź aktualizacje",
+      "wipeAllLocalData": "Wyczyść wszystkie dane lokalne",
+      "changeShortcut": "Naciśnij, aby zmienić",
+      "recordShortcut": "Naciśnij, aby zapisać"
     },
     "language": "Język",
     "languages": {
       "en": "Angielski",
       "pl": "Polski",
       "de": "Niemiecki"
+    }
+  },
+  "notes": {
+    "placeholder": "Nazwa notatki",
+    "regenerateWithAI": "Wygeneruj ponownie z AI",
+    "copyMarkdown": "Kopiuj Markdown",
+    "deleteNote": "Usuń notatkę",
+    "confirmDelete": "Potwierdź usunięcie",
+    "noteDeleted": "Notatka usunięta",
+    "markdownCopied": "Markdown został skopiowany.",
+    "failedToRename": "Nie udało się zmienić nazwy notatki",
+    "noteName": "Nazwa notatki",
+    "closeSidebar": "zamknij panel boczny",
+    "createNote": "Utwórz notatkę"
+  },
+  "commands": {
+    "helperText": {
+      "app": "Aplikacja",
+      "web": "Sieć",
+      "barCommand": "Polecenie paska",
+      "changeMode": "Zmień tryb",
+      "copyToClipboard": "Kopiuj do schowka",
+      "openNote": "Otwórz notatkę",
+      "createNote": "Utwórz notatkę",
+      "askAI": "Zapytaj AI",
+      "runShortcut": "Uruchom skrót"
+    },
+    "menuItems": {
+      "clearNotes": "Wyczyść notatki",
+      "clearHistory": "Wyczyść historię poleceń",
+      "help": "Pomoc",
+      "settings": "Ustawienia",
+      "exit": "Wyjście"
+    },
+    "actions": {
+      "search": "Szukaj \"{query}\"",
+      "ask": "Zapytaj \"{query}\"",
+      "createNote": "Utwórz notatkę \"{query}\""
+    }
+  },
+  "searchBar": {
+    "placeholder": {
+      "initial": "Szukaj w sieci lub aplikacjach",
+      "menu": "Menu",
+      "notes": "Szukaj lub twórz notatki"
+    },
+    "actions": {
+      "menu": "Menu",
+      "exitMenu": "Wyjdź z menu",
+      "createNote": "Utwórz notatkę"
+    }
+  },
+  "editor": {
+    "floatingMenu": {
+      "askAI": "Zapytaj AI"
     }
   },
   "additionalContextPlaceholder": "Dodatkowy kontekst dla generowania notatek.\r\nnp. \"Odpowiadaj w profesjonalnym stylu. Bądź zwięzły\"."

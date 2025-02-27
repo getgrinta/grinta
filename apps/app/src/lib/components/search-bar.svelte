@@ -21,6 +21,7 @@ import { PressedKeys } from "runed";
 import { onMount } from "svelte";
 import { fly } from "svelte/transition";
 import { match } from "ts-pattern";
+import { _ } from "svelte-i18n";
 
 const pressedKeys = new PressedKeys();
 
@@ -155,18 +156,21 @@ const inputProps = $derived(
 	match(appStore.barMode)
 		.with(BAR_MODE.INITIAL, () => ({
 			icon: SearchIcon,
-			placeholder: "Search web or apps",
+			placeholder: $_("searchBar.placeholder.initial"),
 		}))
-		.with(BAR_MODE.MENU, () => ({ icon: MenuIcon, placeholder: "Menu" }))
+		.with(BAR_MODE.MENU, () => ({ 
+			icon: MenuIcon, 
+			placeholder: $_("searchBar.placeholder.menu") 
+		}))
 		.with(BAR_MODE.NOTES, () => ({
 			icon: StickyNoteIcon,
-			placeholder: "Search or create notes",
+			placeholder: $_("searchBar.placeholder.notes"),
 		}))
 		.exhaustive(),
 );
 
 const MENU_BUTTON = {
-	label: "Menu",
+	label: $_("searchBar.actions.menu"),
 	icon: MenuIcon,
 	shortcut: "⌘K",
 	action: () => switchMode(BAR_MODE.MENU),
@@ -175,13 +179,13 @@ const MENU_BUTTON = {
 const actionButton = $derived(
 	match(appStore.barMode)
 		.with(BAR_MODE.MENU, () => ({
-			label: "Exit Menu",
+			label: $_("searchBar.actions.exitMenu"),
 			icon: XIcon,
 			shortcut: "⌘K",
 			action: () => switchMode(BAR_MODE.INITIAL),
 		}))
 		.with(BAR_MODE.NOTES, () => ({
-			label: "Create Note",
+			label: $_("searchBar.actions.createNote"),
 			icon: PlusIcon,
 			shortcut: "⌘N",
 			action: createNote,
