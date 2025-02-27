@@ -15,8 +15,20 @@ import { P, match } from "ts-pattern";
 import { z } from "zod";
 import { BAR_MODE, type BarMode, appStore } from "./app.svelte";
 import { type Note, notesStore } from "./notes.svelte";
+import { _ } from "svelte-i18n";
+import { get } from "svelte/store";
+
 nlp.plugin(datePlugin);
 nlp.plugin(numbersPlugin);
+
+function t(key: string, params: Record<string, string> = {}) {
+  try {
+    const translationFn = get(_);
+    return translationFn(key, { values: params });
+  } catch (error) {
+    return key;
+  }
+}
 
 const APP_REGEX = /[^.]\.app$/;
 
@@ -60,34 +72,6 @@ export const SYSTEM_COMMAND = {
 export type SystemCommand = keyof typeof SYSTEM_COMMAND;
 
 type HistoryEntry = Omit<ExecutableCommand, "label">;
-
-const MENU_ITEMS: ExecutableCommand[] = [
-	{
-		label: "Clear notes",
-		value: SYSTEM_COMMAND.CLEAR_NOTES,
-		handler: COMMAND_HANDLER.SYSTEM,
-	},
-	{
-		label: "Clear commands history",
-		value: SYSTEM_COMMAND.CLEAR_HISTORY,
-		handler: COMMAND_HANDLER.SYSTEM,
-	},
-	{
-		label: "Help",
-		value: SYSTEM_COMMAND.HELP,
-		handler: COMMAND_HANDLER.SYSTEM,
-	},
-	{
-		label: "Settings",
-		value: SYSTEM_COMMAND.SETTINGS,
-		handler: COMMAND_HANDLER.SYSTEM,
-	},
-	{
-		label: "Exit",
-		value: SYSTEM_COMMAND.EXIT,
-		handler: COMMAND_HANDLER.SYSTEM,
-	},
-];
 
 function buildFormulaCommands(currentQuery: string): ExecutableCommand[] {
 	const parsed = parse(currentQuery);
@@ -134,7 +118,7 @@ async function buildQueryCommands(query: string) {
 	const encodedQuery = encodeURIComponent(query);
 	const queryMatchSearch = [
 		{
-			label: `Search for "${query}"`,
+			label: t("commands.actions.search", { query }),
 			value: `https://www.startpage.com/do/search?q=${encodedQuery}`,
 			handler: COMMAND_HANDLER.URL,
 		},
@@ -142,7 +126,7 @@ async function buildQueryCommands(query: string) {
 
 	if (query.length < 3) return queryMatchSearch;
 
-	let completions: [string, string[]]
+	let completions: [string, string[]];
 	const completionUrl = `https://www.startpage.com/osuggestions?q=${encodedQuery}`;
 
 	try {
@@ -167,12 +151,12 @@ async function buildQueryCommands(query: string) {
 		...completionList,
 		...literalSearch,
 		{
-			label: `Ask "${query}"`,
+			label: t("commands.actions.ask", { query }),
 			value: query,
 			handler: COMMAND_HANDLER.COMPLETE_NOTE,
 		},
 		{
-			label: `Create "${query}" note`,
+			label: t("commands.actions.createNote", { query }),
 			value: query,
 			handler: COMMAND_HANDLER.CREATE_NOTE,
 		},
@@ -183,6 +167,36 @@ export class CommandsStore {
 	commands = $state<ExecutableCommand[]>([]);
 	commandHistory = $state<ExecutableCommand[]>([]);
 	selectedIndex = $state<number>(0);
+
+	getMenuItems(): ExecutableCommand[] {
+		return [
+			{
+				label: t("commands.menuItems.clearNotes"),
+				value: SYSTEM_COMMAND.CLEAR_NOTES,
+				handler: COMMAND_HANDLER.SYSTEM,
+			},
+			{
+				label: t("commands.menuItems.clearHistory"),
+				value: SYSTEM_COMMAND.CLEAR_HISTORY,
+				handler: COMMAND_HANDLER.SYSTEM,
+			},
+			{
+				label: t("commands.menuItems.help"),
+				value: SYSTEM_COMMAND.HELP,
+				handler: COMMAND_HANDLER.SYSTEM,
+			},
+			{
+				label: t("commands.menuItems.settings"),
+				value: SYSTEM_COMMAND.SETTINGS,
+				handler: COMMAND_HANDLER.SYSTEM,
+			},
+			{
+				label: t("commands.menuItems.exit"),
+				value: SYSTEM_COMMAND.EXIT,
+				handler: COMMAND_HANDLER.SYSTEM,
+			},
+		];
+	}
 
 	async initialize() {
 		const store = await load("commands.json");
@@ -230,18 +244,18 @@ export class CommandsStore {
 					...webSearchCommands,
 					...commandHistory,
 					...shortcutCommands,
-					...MENU_ITEMS,
+					...this.getMenuItems(),
 				];
 			})
 			.with(BAR_MODE.MENU, () => {
-				return MENU_ITEMS;
+				return this.getMenuItems();
 			})
 			.with(BAR_MODE.NOTES, async () => {
 				const createNoteCommand =
 					query.length > 0
 						? [
 								{
-									label: `Create "${query}" note`,
+									label: t("commands.actions.createNote", { query }),
 									value: query,
 									handler: COMMAND_HANDLER.CREATE_NOTE,
 								},
