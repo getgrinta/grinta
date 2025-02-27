@@ -1,5 +1,5 @@
 import { Extension } from "@tiptap/core";
-import { Plugin, PluginKey } from "prosemirror-state";
+import { Plugin, PluginKey, TextSelection } from "prosemirror-state";
 import { Decoration, DecorationSet } from "prosemirror-view";
 
 const suggestionPluginKey = new PluginKey("textSuggestion");
@@ -71,6 +71,42 @@ export const TextSuggestion = Extension.create({
 							navigationByArrow = false;
 						}
 
+						if (e.key === "Tab") {
+							e.preventDefault();
+							e.stopPropagation();
+
+							const { state, view } = this.editor;
+							const pluginState = suggestionPluginKey.getState(state);
+
+							// Check if there is a suggestion available
+							if (pluginState?.suggestion) {
+								const { pos, suggestion } = pluginState;
+								
+								// Calculate the new cursor position after insertion
+								const newPos = pos + suggestion.length;
+								
+								// Create a single transaction that does both operations
+								const tr = state.tr
+									.insertText(suggestion, pos, pos)
+									.setMeta(suggestionPluginKey, {
+										deco: DecorationSet.empty,
+										suggestion: null,
+									});
+								
+								// Apply the transaction
+								view.dispatch(tr);
+								
+								// Set selection to the end of the inserted text
+								const newState = view.state;
+								const newSelection = TextSelection.create(newState.doc, newPos);
+								view.dispatch(newState.tr.setSelection(newSelection));
+								
+								// Focus immediately
+								view.focus();
+								
+								return true;
+							}
+						}
 						if (e.key === "Backspace") {
 							lastKeyWasBackspace = true;
 						} else {
@@ -221,32 +257,6 @@ export const TextSuggestion = Extension.create({
 
 	addKeyboardShortcuts() {
 		return {
-			// Handle Tab key to accept suggestion
-			"Mod-l": () => {
-				const { state, view } = this.editor;
-				const pluginState = suggestionPluginKey.getState(state);
-
-				// Check if there is a suggestion available
-				if (pluginState?.suggestion) {
-					const { pos, suggestion } = pluginState;
-
-					// Insert the suggested text at the cursor position
-					view.dispatch(state.tr.insertText(suggestion, pos, pos));
-
-					// Clear the suggestion after accepting it
-					view.dispatch(
-						state.tr.setMeta(suggestionPluginKey, {
-							deco: DecorationSet.empty,
-							suggestion: null,
-						}),
-					);
-
-					return true; // Prevent default Tab behavior
-				}
-
-				return false; // Allow default behavior if no suggestion exists
-			},
-
 			// Handle Escape key to reject suggestion and blur editor
 			Escape: () => {
 				const { state, view } = this.editor;
