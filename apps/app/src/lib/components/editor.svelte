@@ -19,7 +19,7 @@ import FloatingMenu from "./editor/floating-menu.svelte";
 
 const turndownService = new TurndownService({ headingStyle: "atx" });
 
-const { content, onUpdate, toggleSidebar } = $props();
+const { content, onUpdate, editable = true, toggleSidebar } = $props();
 
 let element = $state<Element>();
 let floatingMenu = $state<Element>();
@@ -58,6 +58,7 @@ function buildEditor() {
 	});
 	return new Editor({
 		element: element,
+		editable: editable,
 		extensions: [
 			StarterKit,
 			ChangeDefaultExtension,
@@ -125,6 +126,13 @@ onDestroy(() => {
 $effect(() => {
 	if (!editor) return;
 	editor.commands.setContent(content);
+
+	const currentIsEditable = editor.isEditable;
+
+	if (editable !== currentIsEditable) {
+		editor.setEditable(editable);
+		editor.commands.focus();
+	}
 });
 </script>
 

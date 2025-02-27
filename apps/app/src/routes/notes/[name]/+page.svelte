@@ -20,6 +20,7 @@ const filename = $derived(decodeURIComponent(page.params.name));
 let deleteConfirmationMode = $state(false);
 let note = $state<ExtendedNote>();
 let noteTitle = $state<string>();
+let editorLocked = $state<boolean>(false);
 let unsubWatcher = $state<UnwatchFn>();
 let sidebarOpened = $state(false);
 const content = $derived(note ? marked.parse(note.content) : "");
@@ -78,6 +79,7 @@ function goBack() {
 async function completePrompt() {
 	if (!note) return;
 	await notesStore.updateNote({ filename: note.filename, content: "" });
+	editorLocked = true;
 	note.content = "";
 	await notesStore.completePrompt({
 		filename: note.filename,
@@ -87,6 +89,7 @@ async function completePrompt() {
 			note.content = text;
 		},
 	});
+	editorLocked = false;
 }
 
 async function deleteNote() {
@@ -148,7 +151,7 @@ $effect(() => {
 			</TopBar>
 		  	<div class="pt-20 px-8 pb-8">
 				{#if note} 
-					<NoteEditor {content} onUpdate={onContentUpdate} {toggleSidebar} />
+					<NoteEditor {content} editable={!editorLocked} onUpdate={onContentUpdate} {toggleSidebar} />
 				{/if}
 			</div>
 		</div>
