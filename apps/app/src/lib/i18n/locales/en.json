@@ -1,0 +1,40 @@
+{
+  "settings": {
+    "title": "Settings",
+    "tabs": {
+      "general": "General",
+      "ai": "AI",
+      "notes": "Notes"
+    },
+    "fields": {
+      "shortcut": "Shortcut",
+      "changeShortcut": "Press to change",
+      "recordShortcut": "Press to save",
+      "version": "Version",
+      "checkForUpdate": "Check for update",
+      "theme": "Theme",
+      "accentColor": "Accent Color",
+      "dangerZone": "Danger Zone",
+      "wipeAllLocalData": "Wipe All Local Data",
+      "testingConnection": "Testing connection...",
+      "ai": {
+        "modelName": "Model Name",
+        "customEndpoint": "Custom Endpoint",
+        "tokenSecret": "Token Secret",
+        "additionalContext": "Additional Context",
+        "testConnection": "Test Connection"
+      },
+      "notes": {
+        "aiEnabled": "AI Enabled",
+        "notesDirectory": "Notes Directory"
+      }
+    },
+    "language": "Language",
+    "languages": {
+      "en": "English",
+      "pl": "Polish",
+      "de": "German"
+    }
+  },
+  "additionalContextPlaceholder": "Additional context for note generation.\r\ne.g. \"Respond in professional style. Be concise\"."
+}

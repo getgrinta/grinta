@@ -2,28 +2,32 @@
 import { goto } from "$app/navigation";
 import TopBar from "$lib/components/top-bar.svelte";
 import { aiStore } from "$lib/store/ai.svelte";
-import { ACCENT_COLOR, THEME, settingsStore } from "$lib/store/settings.svelte";
+import { ACCENT_COLOR, LANGUAGE, THEME, settingsStore } from "$lib/store/settings.svelte";
 import { clsx } from "clsx";
 import humanizeString from "humanize-string";
 import { PressedKeys, watch } from "runed";
 import packageJson from "../../../package.json" with { type: "json" };
+import { _ } from "svelte-i18n";
 
 const pressedKeys = new PressedKeys();
 
 const tabs = [
-	{ label: "General", value: "general", hotkey: "⌘1" },
-	{ label: "AI", value: "ai", hotkey: "⌘2" },
-	{ label: "Notes", value: "notes", hotkey: "⌘3" },
+	{ label: $_("settings.tabs.general"), value: "general", hotkey: "⌘1" },
+	{ label: $_("settings.tabs.ai"), value: "ai", hotkey: "⌘2" },
+	{ label: $_("settings.tabs.notes"), value: "notes", hotkey: "⌘3" },
 ];
-
 
 let newToggleShortcut = $state<string[]>([]);
 let recordingShortcut = $state(false);
 let connectionStatus = $state<{ status: 'loading' | 'error' | 'success'; text?: string; } | null>(null);
 let currentTab = $state("general");
-let additionalContextPlaceholder = 'Additional context for note generation.\r\ne.g. "Respond in professional style. Be concise".'
 const themes = Object.keys(THEME);
 const accentColors = Object.keys(ACCENT_COLOR);
+const languages = [
+  { code: LANGUAGE.EN, name: $_("settings.languages.EN") },
+  { code: LANGUAGE.PL, name: $_("settings.languages.PL") },
+  { code: LANGUAGE.DE, name: $_("settings.languages.DE") },
+];
 
 function changeTab(tab: string) {
 	currentTab = tab;
@@ -41,7 +45,7 @@ const toggleShortcut = $derived(
 );
 
 const recordShortcutLabel = $derived(
-	recordingShortcut ? "Press to save" : "Press to change",
+	recordingShortcut ? $_("settings.fields.recordShortcut") : $_("settings.fields.changeShortcut"),
 );
 
 function processShortcut(keys: string[]) {
@@ -70,7 +74,7 @@ async function wipeLocalData() {
 }
 
 async function testConnection() {
-  connectionStatus = { status: 'loading', text: 'Testing connection...' };
+  connectionStatus = { status: 'loading', text: $_("settings.testingConnection") };
   const result = await aiStore.testConnection();
   connectionStatus = { status: result.success ? 'success' : 'error', text: result.message };
 }
@@ -105,13 +109,13 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
 
 <div class="flex flex-1 flex-col">
   <TopBar>
-    <div slot="input" class="grow flex-1 truncate text-lg font-semibold">Settings</div>
+    <div slot="input" class="grow flex-1 truncate text-lg font-semibold">{$_("settings.title")}</div>
     <div slot="addon" role="tablist" class="join">
       {#each tabs as tab, index}
       	{@const active = currentTab === tab.value}
       	{@const hotkey = `Meta+${index + 1}`}
         <button type="button" class={clsx("btn join-item", active && 'text-primary')} onclick={() => changeTab(tab.value)} data-hotkey={hotkey}>
-        	<span>{tab.label}</span>
+        	<span>{$_(tab.label)}</span>
         	{#if isCmdPressed}
 	        	<span>{tab.hotkey}</span>
         	{/if}
@@ -122,45 +126,51 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
    <div class="flex flex-1 flex-col mt-20 mb-8 mx-4">
     {#if currentTab === 'general'}
       <form class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center">
-        <label class="text-sm">Shortcut</label>
+        <label class="text-sm">{$_("settings.fields.shortcut")}</label>
         <div class="flex gap-2 items-center">
           <input type="hidden" name="toggleShortcut" value={toggleShortcut} />
           <button type="button" class="btn flex-1" disabled>{toggleShortcut}</button>
           <button type="button" class="btn flex-1" onclick={toggleShortcutRecording}>{recordShortcutLabel}</button>
         </div>
-        <label class="text-sm">Version</label>
+        <label class="text-sm">{$_("settings.fields.version")}</label>
         <div class="flex gap-2 items-center">
           <button type="button" class="btn flex-1" disabled>{packageJson.version}</button>
-          <button type="button" class="btn flex-1">Check for update</button>
+          <button type="button" class="btn flex-1">{$_("settings.fields.checkForUpdate")}</button>
         </div>
-        <label class="text-sm">Theme</label>
+        <label class="text-sm">{$_("settings.fields.theme")}</label>
         <select name="theme" bind:value={settingsStore.settings.theme} class="select select-bordered w-full">
         	{#each themes as theme}
           	<option value={theme}>{humanizeString(theme)}</option>
           {/each}
         </select>
-        <label class="text-sm">Accent Color</label>
+        <label class="text-sm">{$_("settings.fields.accentColor")}</label>
         <select name="accentColor" bind:value={settingsStore.settings.accentColor} class="select select-bordered w-full">
         	{#each accentColors as color}
           	<option value={color}>{humanizeString(color)}</option>
           {/each}
         </select>
-        <label class="text-sm">Danger Zone</label>
-        <button type="button" class="btn btn-warning" onclick={wipeLocalData}>Wipe All Local Data</button>
+        <label class="text-sm">{$_("settings.language")}</label>
+        <select name="language" bind:value={settingsStore.settings.language} class="select select-bordered w-full">
+        	{#each languages as language}
+          	<option value={language.code}>{$_(`settings.languages.${language.code}`)}</option>
+          {/each}
+        </select>
+        <label class="text-sm">{$_("settings.fields.dangerZone")}</label>
+        <button type="button" class="btn btn-warning" onclick={wipeLocalData}>{$_("settings.fields.wipeAllLocalData")}</button>
       </form>
     {:else if currentTab === 'ai'}
       <form class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center"> 
-        <label class="text-sm">Model Name</label>
+        <label class="text-sm">{$_("settings.fields.modelName")}</label>
         <input class="input w-full" name="modelName" placeholder="gpt-4o" bind:value={settingsStore.settings.aiModelName} />
-        <label class="text-sm">Custom Endpoint</label>
+        <label class="text-sm">{$_("settings.fields.customEndpoint")}</label>
         <input class="input w-full" name="endpointUrl" placeholder="https://api.openai.com/v1/chat/completions" bind:value={settingsStore.settings.aiEndpointUrl} />
-        <label class="text-sm">Token Secret</label>
+        <label class="text-sm">{$_("settings.fields.tokenSecret")}</label>
         <input class="input w-full" type="password" name="secretKey" bind:value={settingsStore.settings.aiSecretKey} />
-        <label class="text-sm">Additional Context</label>
-        <textarea class="textarea w-full resize-none" placeholder="{additionalContextPlaceholder}" bind:value={settingsStore.settings.aiAdditionalContext} />
+        <label class="text-sm">{$_("settings.fields.additionalContext")}</label>
+        <textarea class="textarea w-full resize-none" placeholder="{$_("additionalContextPlaceholder")}" bind:value={settingsStore.settings.aiAdditionalContext} />
         <span></span>
         <div>
-        <button type="button" class="btn btn-warning w-[100%]" onclick={testConnection}>Test Connection</button>
+        <button type="button" class="btn btn-warning w-[100%]" onclick={testConnection}>{$_("settings.fields.ai.testConnection")}</button>
         <div class={clsx("text-sm text-center mt-2", {
           "text-success": connectionStatus?.status === "success",
           "text-error": connectionStatus?.status === "error"
@@ -170,9 +180,9 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
       </form>
     {:else if currentTab === 'notes'}
       <form class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center">
-        <label class="text-sm">AI Enabled</label>
+        <label class="text-sm">{$_("settings.fields.aiEnabled")}</label>
         <input type="checkbox" bind:checked={settingsStore.settings.notesAiEnabled} class="toggle toggle-lg" />
-        <label class="text-sm">Notes Directory</label>
+        <label class="text-sm">{$_("settings.fields.notesDirectory")}</label>
         <input class="input w-full" name="notesDir" value={notesDirString} onchange={updateNotesDir} />
       </form>
     {/if}

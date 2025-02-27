@@ -1,0 +1,40 @@
+{
+  "settings": {
+    "title": "Einstellungen",
+    "tabs": {
+      "general": "Allgemein",
+      "ai": "KI",
+      "notes": "Notizen"
+    },
+    "fields": {
+      "shortcut": "Tastenkürzel",
+      "changeShortcut": "Drücken zum Ändern",
+      "recordShortcut": "Drücken zum Speichern",
+      "version": "Version",
+      "checkForUpdate": "Nach Updates suchen",
+      "theme": "Thema",
+      "accentColor": "Akzentfarbe",
+      "dangerZone": "Gefahrenzone",
+      "wipeAllLocalData": "Alle lokalen Daten löschen",
+      "testingConnection": "Verbindung wird getestet...",
+      "ai": {
+        "modelName": "Modellname",
+        "customEndpoint": "Benutzerdefinierter Endpunkt",
+        "tokenSecret": "Token-Geheimnis",
+        "additionalContext": "Zusätzlicher Kontext",
+        "testConnection": "Verbindung testen"
+      },
+      "notes": {
+        "aiEnabled": "KI aktiviert",
+        "notesDirectory": "Notizverzeichnis"
+      }
+    },
+    "language": "Sprache",
+    "languages": {
+      "en": "Englisch",
+      "pl": "Polnisch",
+      "de": "Deutsch"
+    }
+  },
+  "additionalContextPlaceholder": "Zusätzlicher Kontext für die Notizgenerierung.\r\nz.B. \"Antworte im professionellen Stil. Sei präzise\"."
+}

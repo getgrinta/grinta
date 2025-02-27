@@ -1,0 +1,33 @@
+{
+  "settings": {
+    "title": "Ustawienia",
+    "tabs": {
+      "general": "Ogólne",
+      "ai": "AI",
+      "notes": "Notatki"
+    },
+    "fields": {
+      "shortcut": "Skrót",
+      "version": "Wersja",
+      "theme": "Motyw",
+      "accentColor": "Akcent",
+      "dangerZone": "Strefa zagrożenia",
+      "wipeData": "Wyczyść wszystkie dane lokalne",
+      "modelName": "Nazwa modelu",
+      "customEndpoint": "Endpoint",
+      "tokenSecret": "Sekret",
+      "additionalContext": "Dodatkowy kontekst",
+      "testConnection": "Testuj połączenie",
+      "aiEnabled": "AI",
+      "notesDirectory": "Lokalizacja notatek",
+      "checkUpdate": "Sprawdź aktualizacje"
+    },
+    "language": "Język",
+    "languages": {
+      "en": "Angielski",
+      "pl": "Polski",
+      "de": "Niemiecki"
+    }
+  },
+  "additionalContextPlaceholder": "Dodatkowy kontekst dla generowania notatek.\r\nnp. \"Odpowiadaj w profesjonalnym stylu. Bądź zwięzły\"."
+}

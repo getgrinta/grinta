@@ -22,9 +22,20 @@ import { clsx } from "clsx";
 import * as focusTrap from "focus-trap";
 import { onMount } from "svelte";
 import { Toaster } from "svelte-sonner";
+import { setupI18n, locale } from "$lib/i18n";
 const { children } = $props();
 
 dayjs.extend(LocalizedFormat);
+
+// Initialize i18n
+setupI18n();
+
+// Sync language with settings
+$effect(() => {
+  if (settingsStore.settings.language) {
+    locale.set(settingsStore.settings.language);
+  }
+});
 
 let trap = $state();
 
