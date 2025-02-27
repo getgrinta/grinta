@@ -110,7 +110,7 @@ export class NotesStore {
 		callback,
 	}: { filename: string; prompt: string; callback: (text: string) => void }) {
 		const note = await this.fetchNote(filename);
-		const result = aiStore.streamText(prompt);
+		const result = aiStore.streamNoteText(prompt);
 		let content = note.content;
 
 		for await (const chunk of result.textStream) {

@@ -21,6 +21,7 @@ let newToggleShortcut = $state<string[]>([]);
 let recordingShortcut = $state(false);
 let connectionStatus = $state<{ status: 'loading' | 'error' | 'success'; text?: string; } | null>(null);
 let currentTab = $state("general");
+let additionalContextPlaceholder = 'Additional context for note generation.\r\ne.g. "Respond in professional style. Be concise".'
 const themes = Object.keys(THEME);
 const accentColors = Object.keys(ACCENT_COLOR);
 
@@ -156,7 +157,7 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
         <label class="text-sm">Token Secret</label>
         <input class="input w-full" type="password" name="secretKey" bind:value={settingsStore.settings.aiSecretKey} />
         <label class="text-sm">Additional Context</label>
-        <textarea class="textarea w-full resize-none" placeholder="e.g. Respond in professional style. Be concise." bind:value={settingsStore.settings.aiAdditionalContext} />
+        <textarea class="textarea w-full resize-none" placeholder="{additionalContextPlaceholder}" bind:value={settingsStore.settings.aiAdditionalContext} />
         <span></span>
         <div>
         <button type="button" class="btn btn-warning w-[100%]" onclick={testConnection}>Test Connection</button>

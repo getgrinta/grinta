@@ -66,7 +66,7 @@ function buildEditor() {
 			}),
 			TextSuggestion.configure({
 				// You can override fetchAutocompletion() here if needed.
-				async fetchAutocompletion({ query, context }: Record<string, string>) {
+				async fetchAutocompletion({ query }: Record<string, string>) {
 					const result = await aiStore.generateAutocompletion({ query });
 					return result;
 				},
