@@ -93,3 +93,7 @@ export async function activateWindow() {
 	const queryInput = document.querySelector("#queryInput") as HTMLInputElement;
 	return queryInput?.focus();
 }
+
+export function getBaseLLMApiUrl(url: string): string {
+  return url.replace(/chat\/completions\/?/, '').trim();
+}

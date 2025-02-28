@@ -2,6 +2,7 @@ import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { generateText, smoothStream, streamText } from "ai";
 import dedent from "dedent";
 import { settingsStore } from "./settings.svelte";
+import { getBaseLLMApiUrl } from "$lib/utils.svelte";
 
 const RESPONSE_REGEX = /<response>(.*?)<\/response>/;
 
@@ -13,7 +14,7 @@ export class AiStore {
 			headers: {
 				Authorization: this.bearerToken,
 			},
-			baseURL: settingsStore.settings.aiEndpointUrl.replace(/chat\/completions\/?/, '').trim(),
+			baseURL: getBaseLLMApiUrl(settingsStore.settings.aiEndpointUrl),
 		}),
 	);
 	model = $derived(this.client(settingsStore.settings.aiModelName));
