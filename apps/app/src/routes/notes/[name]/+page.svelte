@@ -82,15 +82,20 @@ async function completePrompt() {
 	await notesStore.updateNote({ filename: note.filename, content: "" });
 	generatingNote = true;
 	note.content = "";
-	await notesStore.completePrompt({
-		filename: note.filename,
-		prompt: note.filename,
-		callback(text: string) {
-			if (!note) return;
-			note.content = text;
-		},
-	});
-	generatingNote = false;
+	try {
+		await notesStore.completePrompt({
+			filename: note.filename,
+			prompt: note.filename,
+			callback(text: string) {
+				if (!note) return;
+				note.content = text;
+			},
+		});
+	} catch (error) {
+		toast.error(`Failed to complete prompt: ${error}`);
+	} finally {
+		generatingNote = false;
+	}
 }
 
 async function deleteNote() {
