@@ -7,7 +7,7 @@ import { BAR_MODE } from "$lib/store/app.svelte";
 import { type ExtendedNote, notesStore } from "$lib/store/notes.svelte";
 import { BaseDirectory, type UnwatchFn, watch } from "@tauri-apps/plugin-fs";
 import clsx from "clsx";
-import { MoreVerticalIcon } from "lucide-svelte";
+import { LoaderCircle, LoaderCircleIcon, MoreVerticalIcon } from "lucide-svelte";
 import { marked } from "marked";
 import { PressedKeys } from "runed";
 import { onMount } from "svelte";
@@ -21,7 +21,7 @@ const filename = $derived(decodeURIComponent(page.params.name));
 let deleteConfirmationMode = $state(false);
 let note = $state<ExtendedNote>();
 let noteTitle = $state<string>();
-let editorLocked = $state<boolean>(false);
+let generatingNote = $state<boolean>(false);
 let unsubWatcher = $state<UnwatchFn>();
 let sidebarOpened = $state(false);
 const content = $derived(note ? marked.parse(note.content) : "");
@@ -80,7 +80,7 @@ function goBack() {
 async function completePrompt() {
 	if (!note) return;
 	await notesStore.updateNote({ filename: note.filename, content: "" });
-	editorLocked = true;
+	generatingNote = true;
 	note.content = "";
 	await notesStore.completePrompt({
 		filename: note.filename,
@@ -90,7 +90,7 @@ async function completePrompt() {
 			note.content = text;
 		},
 	});
-	editorLocked = false;
+	generatingNote = false;
 }
 
 async function deleteNote() {
@@ -144,6 +144,11 @@ $effect(() => {
 			<TopBar goBack={goBack}>
 				<input bind:value={noteTitle} slot="input" class="grow h-8 font-semibold text-lg" onkeydown={handleNavigation} onchange={onNameUpdate} placeholder={$_("notes.noteName")} />
 				<label for="sidebar" slot="addon" class="btn btn-sm btn-neutral drawer-button text-primary" data-hotkey="Mod+j">
+				
+				{#if generatingNote}
+				<LoaderCircleIcon class="animate-spin" size={16} />
+				{/if}
+				
 				<MoreVerticalIcon size={16} />
 				{#if isCmdPressed}
 					<span>⌘J</span>
@@ -152,7 +157,7 @@ $effect(() => {
 			</TopBar>
 		  	<div class="pt-20 px-8 pb-8">
 				{#if note} 
-					<NoteEditor {content} editable={!editorLocked} onUpdate={onContentUpdate} {toggleSidebar} />
+					<NoteEditor {content} editable={!generatingNote} onUpdate={onContentUpdate} {toggleSidebar} />
 				{/if}
 			</div>
 		</div>

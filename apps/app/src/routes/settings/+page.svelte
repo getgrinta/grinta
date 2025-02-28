@@ -74,7 +74,7 @@ async function wipeLocalData() {
 }
 
 async function testConnection() {
-  connectionStatus = { status: 'loading', text: $_("settings.testingConnection") };
+  connectionStatus = { status: 'loading', text: $_("settings.fields.testingConnection") };
   const result = await aiStore.testConnection();
   connectionStatus = { status: result.success ? 'success' : 'error', text: result.message };
 }

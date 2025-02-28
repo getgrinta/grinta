@@ -14,6 +14,7 @@
       "dangerZone": "Danger Zone",
       "wipeAllLocalData": "Wipe All Local Data",
       "testingConnection": "Testing connection...",
+      "changeShortcut": "Change",
       "ai": {
         "modelName": "Model Name",
         "customEndpoint": "Custom Endpoint",

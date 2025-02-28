@@ -13,11 +13,13 @@
       "accentColor": "Akcent",
       "dangerZone": "Strefa zagrożenia",
       "wipeData": "Wyczyść wszystkie dane lokalne",
-      "modelName": "Nazwa modelu",
-      "customEndpoint": "Endpoint",
-      "tokenSecret": "Sekret",
-      "additionalContext": "Dodatkowy kontekst",
-      "testConnection": "Testuj połączenie",
+      "ai": {
+        "modelName": "Nazwa modelu",
+        "customEndpoint": "Endpoint",
+        "tokenSecret": "Sekret",
+        "additionalContext": "Dodatkowy kontekst",
+        "testConnection": "Testuj połączenie"
+      },
       "aiEnabled": "AI",
       "notesDirectory": "Lokalizacja notatek",
       "checkUpdate": "Sprawdź aktualizacje",
