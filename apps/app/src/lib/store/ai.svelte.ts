@@ -13,7 +13,7 @@ export class AiStore {
 			headers: {
 				Authorization: this.bearerToken,
 			},
-			baseURL: settingsStore.settings.aiEndpointUrl,
+			baseURL: settingsStore.settings.aiEndpointUrl.replace(/chat\/completions\/?/, '').trim(),
 		}),
 	);
 	model = $derived(this.client(settingsStore.settings.aiModelName));
