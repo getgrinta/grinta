@@ -26,7 +26,6 @@ export const TextSuggestion = Extension.create({
 
 	addProseMirrorPlugins() {
 		const fetchAutocompletion = this.options.fetchAutocompletion;
-		
 
 		return [
 			new Plugin({
@@ -81,10 +80,10 @@ export const TextSuggestion = Extension.create({
 							// Check if there is a suggestion available
 							if (pluginState?.suggestion) {
 								const { pos, suggestion } = pluginState;
-								
+
 								// Calculate the new cursor position after insertion
 								const newPos = pos + suggestion.length;
-								
+
 								// Create a single transaction that does both operations
 								const tr = state.tr
 									.insertText(suggestion, pos, pos)
@@ -92,18 +91,18 @@ export const TextSuggestion = Extension.create({
 										deco: DecorationSet.empty,
 										suggestion: null,
 									});
-								
+
 								// Apply the transaction
 								view.dispatch(tr);
-								
+
 								// Set selection to the end of the inserted text
 								const newState = view.state;
 								const newSelection = TextSelection.create(newState.doc, newPos);
 								view.dispatch(newState.tr.setSelection(newSelection));
-								
+
 								// Focus immediately
 								view.focus();
-								
+
 								return true;
 							}
 						}
@@ -223,7 +222,7 @@ export const TextSuggestion = Extension.create({
 							lastQuery = query;
 
 							if (debounceTimer) clearTimeout(debounceTimer);
-							
+
 							debounceTimer = setTimeout(async () => {
 								const suggestion = await fetchAutocompletion({
 									query,

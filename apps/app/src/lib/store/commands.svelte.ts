@@ -11,23 +11,23 @@ import { parse } from "equation-parser";
 import { resolve } from "equation-resolver";
 import { matchSorter } from "match-sorter";
 import { uniq } from "rambda";
+import { _ } from "svelte-i18n";
+import { get } from "svelte/store";
 import { P, match } from "ts-pattern";
 import { z } from "zod";
 import { BAR_MODE, type BarMode, appStore } from "./app.svelte";
 import { type Note, notesStore } from "./notes.svelte";
-import { _ } from "svelte-i18n";
-import { get } from "svelte/store";
 
 nlp.plugin(datePlugin);
 nlp.plugin(numbersPlugin);
 
 function t(key: string, params: Record<string, string> = {}) {
-  try {
-    const translationFn = get(_);
-    return translationFn(key, { values: params });
-  } catch (error) {
-    return key;
-  }
+	try {
+		const translationFn = get(_);
+		return translationFn(key, { values: params });
+	} catch (error) {
+		return key;
+	}
 }
 
 const APP_REGEX = /[^.]\.app$/;
@@ -160,7 +160,7 @@ async function buildQueryCommands(query: string) {
 			value: query,
 			handler: COMMAND_HANDLER.CREATE_NOTE,
 		},
-	];	
+	];
 }
 
 export class CommandsStore {

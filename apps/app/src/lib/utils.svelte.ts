@@ -95,5 +95,5 @@ export async function activateWindow() {
 }
 
 export function getBaseLLMApiUrl(url: string): string {
-  return url.replace(/chat\/completions\/?/, '').trim();
+	return url.replace(/chat\/completions\/?/, "").trim();
 }

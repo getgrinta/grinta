@@ -1,5 +1,4 @@
 import { activateWindow } from "$lib/utils.svelte";
-// import { appStore } from "$lib/store/app.svelte";
 import {
 	type ShortcutEvent,
 	register,
@@ -35,13 +34,15 @@ export const LANGUAGE = {
 	DE: "de",
 } as const;
 
-export type Language = typeof LANGUAGE[keyof typeof LANGUAGE];
+export type Language = (typeof LANGUAGE)[keyof typeof LANGUAGE];
 
 export const SettingsSchema = z.object({
 	toggleShortcut: z.string().default("CommandOrControl+Space"),
 	theme: z.nativeEnum(THEME).default(THEME.SYSTEM),
 	accentColor: z.nativeEnum(ACCENT_COLOR).default(ACCENT_COLOR.MARE),
-	language: z.enum([LANGUAGE.EN, LANGUAGE.PL, LANGUAGE.DE]).default(LANGUAGE.EN),
+	language: z
+		.enum([LANGUAGE.EN, LANGUAGE.PL, LANGUAGE.DE])
+		.default(LANGUAGE.EN),
 	aiModelName: z.string().default("ministral-3b-latest"),
 	aiEndpointUrl: z.string().default("https://api.mistral.ai/v1"),
 	aiSecretKey: z.string().default(""),

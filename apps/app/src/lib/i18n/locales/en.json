@@ -1,94 +1,94 @@
 {
-  "settings": {
-    "title": "Settings",
-    "tabs": {
-      "general": "General",
-      "ai": "AI",
-      "notes": "Notes"
-    },
-    "fields": {
-      "shortcut": "Shortcut",
-      "version": "Version",
-      "theme": "Theme",
-      "accentColor": "Accent Color",
-      "dangerZone": "Danger Zone",
-      "wipeAllLocalData": "Wipe All Local Data",
-      "testingConnection": "Testing connection...",
-      "changeShortcut": "Change",
-      "ai": {
-        "modelName": "Model Name",
-        "customEndpoint": "Custom Endpoint",
-        "tokenSecret": "Token Secret",
-        "additionalContext": "Additional Context",
-        "testConnection": "Test Connection"
-      },
-      "notes": {
-        "aiEnabled": "AI Enabled",
-        "notesDirectory": "Notes Directory"
-      },
-      "checkForUpdate": "Check for update"
-    },
-    "language": "Language",
-    "languages": {
-      "en": "English",
-      "pl": "Polish",
-      "de": "German"
-    }
-  },
-  "notes": {
-    "placeholder": "Note name",
-    "regenerateWithAI": "Regenerate with AI",
-    "copyMarkdown": "Copy Markdown",
-    "deleteNote": "Delete Note",
-    "confirmDelete": "Confirm Delete",
-    "noteDeleted": "Note deleted",
-    "markdownCopied": "Markdown was copied.",
-    "failedToRename": "Failed to rename note",
-    "noteName": "Note name",
-    "closeSidebar": "close sidebar",
-    "createNote": "Create Note"
-  },
-  "commands": {
-    "helperText": {
-      "app": "App",
-      "web": "Web",
-      "barCommand": "Bar Command",
-      "changeMode": "Change Mode",
-      "copyToClipboard": "Copy to clipboard",
-      "openNote": "Open Note",
-      "createNote": "Create Note",
-      "askAI": "Ask AI",
-      "runShortcut": "Run Shortcut"
-    },
-    "menuItems": {
-      "clearNotes": "Clear notes",
-      "clearHistory": "Clear commands history",
-      "help": "Help",
-      "settings": "Settings",
-      "exit": "Exit"
-    },
-    "actions": {
-      "search": "Search for \"{query}\"",
-      "ask": "Ask \"{query}\"",
-      "createNote": "Create \"{query}\" note"
-    }
-  },
-  "searchBar": {
-    "placeholder": {
-      "initial": "Search web or apps",
-      "menu": "Menu",
-      "notes": "Search or create notes"
-    },
-    "actions": {
-      "menu": "Menu",
-      "exitMenu": "Exit Menu",
-      "createNote": "Create Note"
-    }
-  },
-  "editor": {
-    "floatingMenu": {
-      "askAI": "Ask AI"
-    }
-  },
-  "additionalContextPlaceholder": "Additional context for note generation.\r\ne.g. \"Respond in professional style. Be concise\"."
+	"settings": {
+		"title": "Settings",
+		"tabs": {
+			"general": "General",
+			"ai": "AI",
+			"notes": "Notes"
+		},
+		"fields": {
+			"shortcut": "Shortcut",
+			"version": "Version",
+			"theme": "Theme",
+			"accentColor": "Accent Color",
+			"dangerZone": "Danger Zone",
+			"wipeAllLocalData": "Wipe All Local Data",
+			"testingConnection": "Testing connection...",
+			"changeShortcut": "Change",
+			"ai": {
+				"modelName": "Model Name",
+				"customEndpoint": "Custom Endpoint",
+				"tokenSecret": "Token Secret",
+				"additionalContext": "Additional Context",
+				"testConnection": "Test Connection"
+			},
+			"notes": {
+				"aiEnabled": "AI Enabled",
+				"notesDirectory": "Notes Directory"
+			},
+			"checkForUpdate": "Check for update"
+		},
+		"language": "Language",
+		"languages": {
+			"en": "English",
+			"pl": "Polish",
+			"de": "German"
+		}
+	},
+	"notes": {
+		"placeholder": "Note name",
+		"regenerateWithAI": "Regenerate with AI",
+		"copyMarkdown": "Copy Markdown",
+		"deleteNote": "Delete Note",
+		"confirmDelete": "Confirm Delete",
+		"noteDeleted": "Note deleted",
+		"markdownCopied": "Markdown was copied.",
+		"failedToRename": "Failed to rename note",
+		"noteName": "Note name",
+		"closeSidebar": "close sidebar",
+		"createNote": "Create Note"
+	},
+	"commands": {
+		"helperText": {
+			"app": "App",
+			"web": "Web",
+			"barCommand": "Bar Command",
+			"changeMode": "Change Mode",
+			"copyToClipboard": "Copy to clipboard",
+			"openNote": "Open Note",
+			"createNote": "Create Note",
+			"askAI": "Ask AI",
+			"runShortcut": "Run Shortcut"
+		},
+		"menuItems": {
+			"clearNotes": "Clear notes",
+			"clearHistory": "Clear commands history",
+			"help": "Help",
+			"settings": "Settings",
+			"exit": "Exit"
+		},
+		"actions": {
+			"search": "Search for \"{query}\"",
+			"ask": "Ask \"{query}\"",
+			"createNote": "Create \"{query}\" note"
+		}
+	},
+	"searchBar": {
+		"placeholder": {
+			"initial": "Search web or apps",
+			"menu": "Menu",
+			"notes": "Search or create notes"
+		},
+		"actions": {
+			"menu": "Menu",
+			"exitMenu": "Exit Menu",
+			"createNote": "Create Note"
+		}
+	},
+	"editor": {
+		"floatingMenu": {
+			"askAI": "Ask AI"
+		}
+	},
+	"additionalContextPlaceholder": "Additional context for note generation.\r\ne.g. \"Respond in professional style. Be concise\"."
 }

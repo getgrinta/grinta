@@ -2,12 +2,17 @@
 import { goto } from "$app/navigation";
 import TopBar from "$lib/components/top-bar.svelte";
 import { aiStore } from "$lib/store/ai.svelte";
-import { ACCENT_COLOR, LANGUAGE, THEME, settingsStore } from "$lib/store/settings.svelte";
+import {
+	ACCENT_COLOR,
+	LANGUAGE,
+	THEME,
+	settingsStore,
+} from "$lib/store/settings.svelte";
 import { clsx } from "clsx";
 import humanizeString from "humanize-string";
 import { PressedKeys, watch } from "runed";
-import packageJson from "../../../package.json" with { type: "json" };
 import { _ } from "svelte-i18n";
+import packageJson from "../../../package.json" with { type: "json" };
 
 const pressedKeys = new PressedKeys();
 
@@ -19,14 +24,17 @@ const tabs = [
 
 let newToggleShortcut = $state<string[]>([]);
 let recordingShortcut = $state(false);
-let connectionStatus = $state<{ status: 'loading' | 'error' | 'success'; text?: string; } | null>(null);
+let connectionStatus = $state<{
+	status: "loading" | "error" | "success";
+	text?: string;
+} | null>(null);
 let currentTab = $state("general");
 const themes = Object.keys(THEME);
 const accentColors = Object.keys(ACCENT_COLOR);
 const languages = [
-  { code: LANGUAGE.EN, name: $_("settings.languages.EN") },
-  { code: LANGUAGE.PL, name: $_("settings.languages.PL") },
-  { code: LANGUAGE.DE, name: $_("settings.languages.DE") },
+	{ code: LANGUAGE.EN, name: $_("settings.languages.EN") },
+	{ code: LANGUAGE.PL, name: $_("settings.languages.PL") },
+	{ code: LANGUAGE.DE, name: $_("settings.languages.DE") },
 ];
 
 function changeTab(tab: string) {
@@ -45,7 +53,9 @@ const toggleShortcut = $derived(
 );
 
 const recordShortcutLabel = $derived(
-	recordingShortcut ? $_("settings.fields.recordShortcut") : $_("settings.fields.changeShortcut"),
+	recordingShortcut
+		? $_("settings.fields.recordShortcut")
+		: $_("settings.fields.changeShortcut"),
 );
 
 function processShortcut(keys: string[]) {
@@ -74,9 +84,15 @@ async function wipeLocalData() {
 }
 
 async function testConnection() {
-  connectionStatus = { status: 'loading', text: $_("settings.fields.testingConnection") };
-  const result = await aiStore.testConnection();
-  connectionStatus = { status: result.success ? 'success' : 'error', text: result.message };
+	connectionStatus = {
+		status: "loading",
+		text: $_("settings.fields.testingConnection"),
+	};
+	const result = await aiStore.testConnection();
+	connectionStatus = {
+		status: result.success ? "success" : "error",
+		text: result.message,
+	};
 }
 
 $effect(() => {

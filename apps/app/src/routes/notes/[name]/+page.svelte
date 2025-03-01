@@ -7,12 +7,16 @@ import { BAR_MODE } from "$lib/store/app.svelte";
 import { type ExtendedNote, notesStore } from "$lib/store/notes.svelte";
 import { BaseDirectory, type UnwatchFn, watch } from "@tauri-apps/plugin-fs";
 import clsx from "clsx";
-import { LoaderCircle, LoaderCircleIcon, MoreVerticalIcon } from "lucide-svelte";
+import {
+	LoaderCircle,
+	LoaderCircleIcon,
+	MoreVerticalIcon,
+} from "lucide-svelte";
 import { marked } from "marked";
 import { PressedKeys } from "runed";
 import { onMount } from "svelte";
-import { toast } from "svelte-sonner";
 import { _ } from "svelte-i18n";
+import { toast } from "svelte-sonner";
 
 const TO_COMPLETE_PROMPT = "%G4TW%";
 const pressedKeys = new PressedKeys();

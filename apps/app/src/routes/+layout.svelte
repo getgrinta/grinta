@@ -4,6 +4,7 @@ import LocalizedFormat from "dayjs/plugin/localizedFormat";
 import "@fontsource-variable/dm-sans";
 import "../app.css";
 import { afterNavigate, goto } from "$app/navigation";
+import { locale, setupI18n } from "$lib/i18n";
 import { BAR_MODE, appStore } from "$lib/store/app.svelte";
 import { clipboardStore } from "$lib/store/clipboard.svelte";
 import { commandsStore } from "$lib/store/commands.svelte";
@@ -22,7 +23,6 @@ import { clsx } from "clsx";
 import * as focusTrap from "focus-trap";
 import { onMount } from "svelte";
 import { Toaster } from "svelte-sonner";
-import { setupI18n, locale } from "$lib/i18n";
 const { children } = $props();
 
 dayjs.extend(LocalizedFormat);
@@ -32,9 +32,9 @@ setupI18n();
 
 // Sync language with settings
 $effect(() => {
-  if (settingsStore.settings.language) {
-    locale.set(settingsStore.settings.language);
-  }
+	if (settingsStore.settings.language) {
+		locale.set(settingsStore.settings.language);
+	}
 });
 
 let trap = $state();

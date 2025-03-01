@@ -19,9 +19,9 @@ import {
 } from "lucide-svelte";
 import { PressedKeys } from "runed";
 import { onMount } from "svelte";
+import { _ } from "svelte-i18n";
 import { fly } from "svelte/transition";
 import { match } from "ts-pattern";
-import { _ } from "svelte-i18n";
 
 const pressedKeys = new PressedKeys();
 
@@ -158,9 +158,9 @@ const inputProps = $derived(
 			icon: SearchIcon,
 			placeholder: $_("searchBar.placeholder.initial"),
 		}))
-		.with(BAR_MODE.MENU, () => ({ 
-			icon: MenuIcon, 
-			placeholder: $_("searchBar.placeholder.menu") 
+		.with(BAR_MODE.MENU, () => ({
+			icon: MenuIcon,
+			placeholder: $_("searchBar.placeholder.menu"),
 		}))
 		.with(BAR_MODE.NOTES, () => ({
 			icon: StickyNoteIcon,
