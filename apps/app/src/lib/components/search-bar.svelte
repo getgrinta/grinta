@@ -110,10 +110,6 @@ async function handleNavigation(event: KeyboardEvent) {
 		scrollElementIntoView(commandsStore.selectedIndex);
 		return;
 	}
-	if (event.key === "j" && event.metaKey) {
-		event.preventDefault();
-		return switchModeNext();
-	}
 	if (event.key === "Escape") {
 		event.preventDefault();
 		if (appStore.barMode !== BAR_MODE.INITIAL) {
@@ -148,7 +144,7 @@ $effect(() => {
 
 $effect(() => {
 	if (appStore.query === "@") {
-		return switchMode(BAR_MODE.NOTES);
+		switchMode(BAR_MODE.NOTES);
 	}
 });
 
@@ -197,27 +193,27 @@ const actionButton = $derived(
 <form use:form>
 	<TopBar>
 		<div slot="indicator" class="hidden"></div>
-    <input
-      id="queryInput"
-      slot="input"
-      class="grow font-semibold text-lg !outline-none"
-      name="query"
-      bind:value={appStore.query}
-      onkeydown={handleNavigation}
-      placeholder={inputProps.placeholder}
-      autocomplete="off"
-      autofocus
-    />
-  	<div slot="addon" class="join">
-  		{#each INDICATOR_MODES as mode, i}
-  			{@const active = mode.value === appStore.barMode}
-			  <button type="button" onclick={() => switchMode(mode.value)} class={clsx("btn btn-sm join-item border-neutral-800", active ? "text-primary bg-base-300" : "text-neutral-500")}>
-		  		<mode.icon size={24} class="w-6 h-6" />
-		  		{#if isCmdPressed}
-			  		<span>{mode.shortcut}</span>
-		  		{/if}
-	  		</button>
-  		{/each}
+		<input
+			id="queryInput"
+			slot="input"
+			class="grow font-semibold text-lg !outline-none"
+			name="query"
+			bind:value={appStore.query}
+			onkeydown={handleNavigation}
+			placeholder={inputProps.placeholder}
+			autocomplete="off"
+			autofocus
+		/>
+		<div slot="addon" class="join">
+			{#each INDICATOR_MODES as mode, i}
+				{@const active = mode.value === appStore.barMode}
+				<button type="button" onclick={() => switchMode(mode.value)} class={clsx("btn btn-sm join-item border-neutral-800", active ? "text-primary bg-base-300" : "text-neutral-500")}>
+					<mode.icon size={24} class="w-6 h-6" />
+					{#if isCmdPressed}
+						<span>{mode.shortcut}</span>
+					{/if}
+				</button>
+  			{/each}
 		</div>
 	</TopBar>
 </form>

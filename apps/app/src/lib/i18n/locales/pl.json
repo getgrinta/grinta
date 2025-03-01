@@ -56,7 +56,7 @@
 			"copyToClipboard": "Kopiuj do schowka",
 			"openNote": "Otwórz notatkę",
 			"createNote": "Utwórz notatkę",
-			"askAI": "Zapytaj AI",
+			"createSmartNote": "Utwórz smart notatkę",
 			"runShortcut": "Uruchom skrót"
 		},
 		"menuItems": {
@@ -68,7 +68,7 @@
 		},
 		"actions": {
 			"search": "Szukaj \"{query}\"",
-			"ask": "Zapytaj \"{query}\"",
+			"smartNote": "Smart notatka \"{query}\"",
 			"createNote": "Utwórz notatkę \"{query}\""
 		}
 	},

@@ -3,6 +3,7 @@ import { goto } from "$app/navigation";
 import { page } from "$app/state";
 import CommandList from "$lib/components/command-list.svelte";
 import SearchBar from "$lib/components/search-bar.svelte";
+import SearchModeToggle from "$lib/components/search-mode-toggle.svelte";
 import ViewActions from "$lib/components/view-actions.svelte";
 import { BAR_MODE, appStore } from "$lib/store/app.svelte";
 import { notesStore } from "$lib/store/notes.svelte";
@@ -19,8 +20,6 @@ const viewActions = [
 	{ label: $_("notes.createNote"), onclick: createNote, shortcut: "⌘N" },
 ];
 
-const showActions = $derived(appStore.barMode === BAR_MODE.NOTES);
-
 $effect(() => {
 	appStore.switchMode(page.params.mode);
 });
@@ -29,7 +28,13 @@ $effect(() => {
 <div class="flex flex-1 flex-col gap-1">
   <SearchBar />
   <CommandList />
-  {#if showActions}
-	  <ViewActions actions={viewActions} />
+  {#if appStore.barMode !== BAR_MODE.MENU}
+	<div class="flex fixed bottom-4 right-4">
+		{#if appStore.barMode === BAR_MODE.INITIAL}
+			<SearchModeToggle />
+		{:else}
+			<ViewActions actions={viewActions} />
+		{/if}
+	</div>
   {/if}
 </div>

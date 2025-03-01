@@ -57,7 +57,7 @@
 			"copyToClipboard": "Copy to clipboard",
 			"openNote": "Open Note",
 			"createNote": "Create Note",
-			"askAI": "Ask AI",
+			"createSmartNote": "Create Smart Note",
 			"runShortcut": "Run Shortcut"
 		},
 		"menuItems": {
@@ -69,7 +69,7 @@
 		},
 		"actions": {
 			"search": "Search for \"{query}\"",
-			"ask": "Ask \"{query}\"",
+			"smartNote": "Smart Note \"{query}\"",
 			"createNote": "Create \"{query}\" note"
 		}
 	},

@@ -45,7 +45,9 @@ function getHelperText({ value, handler }: GetHelperProps) {
 		.with(COMMAND_HANDLER.CREATE_NOTE, () =>
 			$_("commands.helperText.createNote"),
 		)
-		.with(COMMAND_HANDLER.COMPLETE_NOTE, () => $_("commands.helperText.askAI"))
+		.with(COMMAND_HANDLER.COMPLETE_NOTE, () =>
+			$_("commands.helperText.createSmartNote"),
+		)
 		.with(COMMAND_HANDLER.RUN_SHORTCUT, () =>
 			$_("commands.helperText.runShortcut"),
 		)

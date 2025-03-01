@@ -49,10 +49,8 @@ export class AiStore {
 
 	async generateNoteText(query: string) {
 		const prompt = this.getGenerateNoteTextPrompt({
-			query,
 			context: settingsStore.settings.aiAdditionalContext,
 		});
-
 		return generateText({
 			model: this.model,
 			prompt,

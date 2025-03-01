@@ -119,7 +119,7 @@ async function buildQueryCommands(query: string) {
 	const queryMatchSearch = [
 		{
 			label: t("commands.actions.search", { query }),
-			value: `https://www.startpage.com/do/search?q=${encodedQuery}`,
+			value: appStore.getSearchUrl(query),
 			handler: COMMAND_HANDLER.URL,
 		},
 	];
@@ -141,7 +141,7 @@ async function buildQueryCommands(query: string) {
 		const completionQuery = encodeURIComponent(completion);
 		return {
 			label: completion,
-			value: `https://www.startpage.com/do/search?q=${completionQuery}`,
+			value: appStore.getSearchUrl(completion),
 			handler: COMMAND_HANDLER.URL,
 		};
 	});
@@ -151,7 +151,7 @@ async function buildQueryCommands(query: string) {
 		...completionList,
 		...literalSearch,
 		{
-			label: t("commands.actions.ask", { query }),
+			label: t("commands.actions.smartNote", { query }),
 			value: query,
 			handler: COMMAND_HANDLER.COMPLETE_NOTE,
 		},
