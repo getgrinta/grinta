@@ -62,6 +62,10 @@ function escapeRegExp(str: string): string {
 	return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+export function generateCancellationToken(): string {
+	return Math.random().toString(36).substring(2, 12);
+}
+
 // The text highlighting function (case insensitive)
 export function highlightText(
 	text: string,
