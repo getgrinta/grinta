@@ -96,8 +96,8 @@ $effect(() => {
     	{@const labelChunks = highlightText(command.label, appStore.query)}
 		{@const IconComponent = getIcon(command.handler)}
       <li class="w-full" data-command-index={index} transition:fly={{ duration: 150, y: -5, delay: index * 20, easing: circOut }}>
-          <div class={clsx("flex justify-between gap-4 py-[0.75rem] px-6 border-1 border-transparent text-neutral-300", active && 'menu-active !bg-base-100/40 !text-primary !border-neutral-600')}>
-            <button type="button" onclick={() => commandsStore.handleCommand(index)} class="flex flex-1 h-full gap-4 items-center overflow-hidden cursor-pointer">
+          <div class={clsx("flex justify-between gap-4 border-1 border-transparent text-neutral-300", active && 'menu-active !bg-base-100/40 !text-primary !border-neutral-600')}>
+            <button type="button" onclick={() => commandsStore.handleCommand(index)} class="flex flex-1 h-full gap-4 py-[0.75rem] items-center overflow-hidden cursor-pointer">
               <IconComponent size={24} />
               <h2 class={clsx("flex-1 text-left truncate")}>
               	{#if appStore.query.length > 0}
