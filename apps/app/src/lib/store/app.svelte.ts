@@ -35,13 +35,6 @@ export class AppStore {
 		this.searchMode = searchMode;
 	}
 
-	getSearchUrl(query: string) {
-		if (this.searchMode === SEARCH_MODE.AI) {
-			return `https://scira.app/?q=${query}`;
-		}
-		return `https://www.startpage.com/do/search?q=${query}`;
-	}
-
 	setQuery(query: string) {
 		this.query = query;
 	}

@@ -17,6 +17,7 @@ import { P, match } from "ts-pattern";
 import { z } from "zod";
 import { BAR_MODE, type BarMode, appStore } from "./app.svelte";
 import { type Note, notesStore } from "./notes.svelte";
+import { settingsStore } from "./settings.svelte";
 
 nlp.plugin(datePlugin);
 nlp.plugin(numbersPlugin);
@@ -119,7 +120,7 @@ async function buildQueryCommands(query: string) {
 	const queryMatchSearch = [
 		{
 			label: t("commands.actions.search", { query }),
-			value: appStore.getSearchUrl(query),
+			value: settingsStore.getSearchUrl(query),
 			handler: COMMAND_HANDLER.URL,
 		},
 	];
@@ -141,7 +142,7 @@ async function buildQueryCommands(query: string) {
 		const completionQuery = encodeURIComponent(completion);
 		return {
 			label: completion,
-			value: appStore.getSearchUrl(completion),
+			value: settingsStore.getSearchUrl(completion),
 			handler: COMMAND_HANDLER.URL,
 		};
 	});

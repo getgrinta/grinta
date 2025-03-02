@@ -7,8 +7,9 @@ import {
 import { Position, moveWindow } from "@tauri-apps/plugin-positioner";
 import { load } from "@tauri-apps/plugin-store";
 import superjson from "superjson";
+import { match } from "ts-pattern";
 import { z } from "zod";
-import { appStore } from "./app.svelte";
+import { SEARCH_MODE, appStore } from "./app.svelte";
 import { commandsStore } from "./commands.svelte";
 import { notesStore } from "./notes.svelte";
 
@@ -19,6 +20,12 @@ export const THEME = {
 } as const;
 
 export type Theme = keyof typeof THEME;
+
+export const SEARCH_ENGINE = {
+	STARTPAGE: "STARTPAGE",
+	GOOGLE: "GOOGLE",
+	DUCKDUCKGO: "DUCKDUCKGO",
+} as const;
 
 export const ACCENT_COLOR = {
 	MARE: "MARE",
@@ -44,6 +51,9 @@ export const SettingsSchema = z.object({
 		.enum([LANGUAGE.EN, LANGUAGE.PL, LANGUAGE.DE])
 		.default(LANGUAGE.EN),
 	aiModelName: z.string().default("ministral-3b-latest"),
+	defaultSearchEngine: z
+		.nativeEnum(SEARCH_ENGINE)
+		.default(SEARCH_ENGINE.STARTPAGE),
 	aiEndpointUrl: z.string().default("https://api.mistral.ai/v1"),
 	aiSecretKey: z.string().default(""),
 	aiAdditionalContext: z.string().default(""),
@@ -87,6 +97,18 @@ export class SettingsStore {
 		await this.unregisterShortcuts();
 		this.settings.toggleShortcut = toggleShortcut;
 		await this.registerShortcuts();
+	}
+
+	getSearchUrl(query: string) {
+		if (appStore.searchMode === SEARCH_MODE.AI) {
+			return `https://scira.app/?q=${query}`;
+		}
+
+		return match(this.settings.defaultSearchEngine)
+			.with("DUCKDUCKGO", () => `https://duckduckgo.com/?q=${query}`)
+			.with("STARTPAGE", () => `https://www.startpage.com/do/search?q=${query}`)
+			.with("GOOGLE", () => `https://www.google.com/search?q=${query}`)
+			.exhaustive();
 	}
 
 	async setNotesDir(notesDir: string[]) {
