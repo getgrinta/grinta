@@ -29,7 +29,7 @@ $effect(() => {
   <SearchBar />
   <CommandList />
   {#if appStore.barMode !== BAR_MODE.MENU}
-	<div class="flex fixed bottom-4 right-4">
+	<div class="flex fixed bottom-4 right-4 left-4 justify-end">
 		{#if appStore.barMode === BAR_MODE.INITIAL}
 			<SearchModeToggle />
 		{:else}

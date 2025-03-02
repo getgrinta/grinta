@@ -6,23 +6,21 @@ import TopBar from "$lib/components/top-bar.svelte";
 import { BAR_MODE, type BarMode, appStore } from "$lib/store/app.svelte";
 import { commandsStore } from "$lib/store/commands.svelte";
 import { notesStore } from "$lib/store/notes.svelte";
-import { generateText } from "ai";
 import { clsx } from "clsx";
 import { createForm } from "felte";
 import {
 	MenuIcon,
 	PlusIcon,
 	SearchIcon,
-	SparklesIcon,
 	StickyNoteIcon,
 	XIcon,
 } from "lucide-svelte";
 import { PressedKeys } from "runed";
-import { onMount } from "svelte";
+import { watch } from "runed";
 import { _ } from "svelte-i18n";
-import { fly } from "svelte/transition";
 import { match } from "ts-pattern";
 
+let queryInput: HTMLInputElement;
 const pressedKeys = new PressedKeys();
 
 const QUICK_MODE_SWITCH = [BAR_MODE.INITIAL, BAR_MODE.NOTES];
@@ -41,10 +39,6 @@ const { form } = createForm({
 	},
 });
 
-function getSearchInputElement(): HTMLInputElement | null {
-	return document.querySelector("#queryInput");
-}
-
 function getCommandElement(index: number) {
 	return document.querySelector(`[data-command-index="${index}"]`);
 }
@@ -56,28 +50,6 @@ function scrollElementIntoView(index: number) {
 
 function switchMode(mode: BarMode) {
 	return goto(`/commands/${mode}`);
-}
-
-function switchModeNext() {
-	const index = QUICK_MODE_SWITCH.findIndex(
-		(mode) => mode === appStore.barMode,
-	);
-	const nextMode =
-		index === QUICK_MODE_SWITCH.length - 1
-			? QUICK_MODE_SWITCH[0]
-			: QUICK_MODE_SWITCH[index + 1];
-	return switchMode(nextMode);
-}
-
-function switchModePrevious() {
-	const index = QUICK_MODE_SWITCH.findIndex(
-		(mode) => mode === appStore.barMode,
-	);
-	const previousMode =
-		index === 0
-			? QUICK_MODE_SWITCH[QUICK_MODE_SWITCH.length - 1]
-			: QUICK_MODE_SWITCH[index - 1];
-	return switchMode(previousMode);
 }
 
 async function createNote() {
@@ -121,6 +93,9 @@ async function handleNavigation(event: KeyboardEvent) {
 		appStore.barMode = BAR_MODE.INITIAL;
 		return;
 	}
+	if (event.key === "j" && event.metaKey) {
+		return appStore.toggleSearchMode();
+	}
 	if (event.key === "k" && event.metaKey) {
 		event.preventDefault();
 		const shouldGoBack = appStore.barMode === BAR_MODE.MENU;
@@ -139,8 +114,19 @@ async function handleNavigation(event: KeyboardEvent) {
 }
 
 $effect(() => {
-	commandsStore.buildCommands(appStore.query);
+	commandsStore.buildCommands({
+		query: appStore.query,
+		searchMode: appStore.searchMode,
+		barMode: appStore.barMode,
+	});
 });
+
+watch(
+	() => appStore.searchMode,
+	() => {
+		queryInput?.focus();
+	},
+);
 
 $effect(() => {
 	if (appStore.query === "@") {
@@ -194,7 +180,7 @@ const actionButton = $derived(
 	<TopBar>
 		<div slot="indicator" class="hidden"></div>
 		<input
-			id="queryInput"
+			bind:this={queryInput}
 			slot="input"
 			class="grow font-semibold text-lg !outline-none"
 			name="query"
