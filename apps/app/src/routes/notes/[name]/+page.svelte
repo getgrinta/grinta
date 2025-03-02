@@ -96,7 +96,15 @@ async function completePrompt() {
 			},
 		});
 	} catch (error) {
-		toast.error(`Failed to complete prompt: ${error}`);
+		let toastId = toast.error(`Failed to complete prompt: ${error}`, {
+			action: {
+				label: $_('notes.retry'),
+				onClick: () => {
+					toast.dismiss(toastId);
+					completePrompt();
+				}
+			}
+		});
 	} finally {
 		generatingNote = false;
 	}

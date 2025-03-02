@@ -48,7 +48,8 @@
 		"failedToRename": "Umbenennen der Notiz fehlgeschlagen",
 		"noteName": "Notizname",
 		"closeSidebar": "Seitenleiste schließen",
-		"createNote": "Notiz erstellen"
+		"createNote": "Notiz erstellen",
+		"retry": "Wiederholen"
 	},
 	"commands": {
 		"helperText": {

@@ -170,7 +170,7 @@ onMount(() => {
 afterNavigate(({ from, to }) => {
 	installHotkeys();
 	if (to?.url?.pathname === "/") return;
-	trap = focusTrap.createFocusTrap("#mainLayout");
+	trap = focusTrap.createFocusTrap(["#mainLayout", "ol[data-sonner-toaster=\"true\"]"]);
 	trap?.activate();
 });
 </script>

@@ -47,7 +47,8 @@
 		"failedToRename": "Failed to rename note",
 		"noteName": "Note name",
 		"closeSidebar": "close sidebar",
-		"createNote": "Create Note"
+		"createNote": "Create Note",
+		"retry": "Retry"
 	},
 	"commands": {
 		"helperText": {
