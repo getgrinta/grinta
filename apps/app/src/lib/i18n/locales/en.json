@@ -11,6 +11,7 @@
 			"version": "Version",
 			"theme": "Theme",
 			"accentColor": "Accent Color",
+			"defaultSearchEngine": "Default Search Engine",
 			"dangerZone": "Danger Zone",
 			"wipeAllLocalData": "Wipe All Local Data",
 			"testingConnection": "Testing connection...",

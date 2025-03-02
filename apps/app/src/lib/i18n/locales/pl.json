@@ -12,6 +12,7 @@
 			"theme": "Motyw",
 			"accentColor": "Akcent",
 			"dangerZone": "Strefa zagrożenia",
+			"defaultSearchEngine": "Domyślna wyszukiwarka",
 			"wipeData": "Wyczyść wszystkie dane lokalne",
 			"ai": {
 				"modelName": "Nazwa modelu",

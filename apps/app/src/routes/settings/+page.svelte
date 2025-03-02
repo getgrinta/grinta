@@ -162,7 +162,7 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
           	<option value={theme}>{humanizeString(theme)}</option>
           {/each}
         </select>
-		        <label class="text-sm">{$_("settings.fields.defaultSearchEngine")}</label>
+		<label class="text-sm">{$_("settings.fields.defaultSearchEngine")}</label>
         <select name="theme" bind:value={settingsStore.settings.defaultSearchEngine} class="select select-bordered w-full">
         	{#each searchEngines as searchEngine}
           	<option value={searchEngine}>{humanizeString(searchEngine)}</option>

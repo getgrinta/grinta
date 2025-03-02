@@ -12,6 +12,7 @@
 			"theme": "Thema",
 			"accentColor": "Akzentfarbe",
 			"dangerZone": "Gefahrenzone",
+			"defaultSearchEngine": "Standard-Suchmaschine",
 			"wipeAllLocalData": "Alle lokalen Daten löschen",
 			"testingConnection": "Verbindung wird getestet...",
 			"ai": {
