@@ -12,6 +12,7 @@
 			"theme": "Motyw",
 			"accentColor": "Akcent",
 			"dangerZone": "Strefa zagrożenia",
+			"defaultSearchEngine": "Domyślna wyszukiwarka",
 			"wipeData": "Wyczyść wszystkie dane lokalne",
 			"ai": {
 				"modelName": "Nazwa modelu",
@@ -45,7 +46,8 @@
 		"failedToRename": "Nie udało się zmienić nazwy notatki",
 		"noteName": "Nazwa notatki",
 		"closeSidebar": "zamknij panel boczny",
-		"createNote": "Utwórz notatkę"
+		"createNote": "Utwórz notatkę",
+		"retry": "Ponów"
 	},
 	"commands": {
 		"helperText": {

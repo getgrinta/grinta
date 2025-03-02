@@ -3,7 +3,14 @@ import { goto } from "$app/navigation";
 import { page } from "$app/state";
 import { BAR_MODE } from "$lib/store/app.svelte";
 import { type ExtendedNote, notesStore } from "$lib/store/notes.svelte";
+import { generateCancellationToken } from "$lib/utils.svelte";
 import { BaseDirectory, type UnwatchFn, watch } from "@tauri-apps/plugin-fs";
+import clsx from "clsx";
+import {
+	LoaderCircleIcon,
+	MoreVerticalIcon,
+	SquareIcon,
+} from "lucide-svelte";
 import { marked } from "marked";
 import { PressedKeys } from "runed";
 import { onMount } from "svelte";
@@ -72,25 +79,49 @@ function goBack() {
 	return window.history.back();
 }
 
+let completePromptCancellationToken: string | null = null;
+
+function getCurrentPromptCancellationToken(): string | null {
+	return completePromptCancellationToken;
+}
+
 async function completePrompt() {
 	if (!note) return;
+
 	await notesStore.updateNote({ filename: note.filename, content: "" });
-	_generatingNote = true;
+
+	const completePromptToken = generateCancellationToken();
+	completePromptCancellationToken = completePromptToken;
+
+	generatingNote = true;
 	note.content = "";
+
 	try {
 		await notesStore.completePrompt({
 			filename: note.filename,
 			prompt: note.filename,
-			callback(text: string) {
-				if (!note) return;
-				note.content = text;
+			isCompletionActive: () => {
+				return note != null && getCurrentPromptCancellationToken() === completePromptToken;
 			},
 		});
 	} catch (error) {
-		toast.error(`Failed to complete prompt: ${error}`);
+		let toastId = toast.error(`Failed to complete prompt: ${error}`, {
+			action: {
+				label: $_("notes.retry"),
+				onClick: () => {
+					toast.dismiss(toastId);
+					completePrompt();
+				},
+			},
+		});
 	} finally {
 		_generatingNote = false;
 	}
+}
+
+async function stopGeneratingNote() {
+	generatingNote = false;
+	completePromptCancellationToken = null;
 }
 
 async function deleteNote() {
@@ -145,10 +176,6 @@ $effect(() => {
 				<input bind:value={noteTitle} slot="input" class="grow h-8 font-semibold text-lg" onkeydown={handleNavigation} onchange={onNameUpdate} placeholder={$_("notes.noteName")} />
 				<label for="sidebar" slot="addon" class="btn btn-sm btn-neutral drawer-button text-primary" data-hotkey="Mod+j">
 				
-				{#if generatingNote}
-				<LoaderCircleIcon class="animate-spin" size={16} />
-				{/if}
-				
 				<MoreVerticalIcon size={16} />
 				{#if isCmdPressed}
 					<span>⌘J</span>
@@ -159,6 +186,21 @@ $effect(() => {
 				{#if note} 
 					<NoteEditor {content} editable={!generatingNote} onUpdate={onContentUpdate} {toggleSidebar} />
 				{/if}
+
+				{#if generatingNote}
+				<div class="flex fixed bottom-4 right-4 left-4 justify-end">			
+					<div class="join">
+						<button type="button" class={clsx("btn btn-sm join-item", 'text-neutral-500')}>	
+							<SquareIcon size={16} class="text-neutral-500" onclick={stopGeneratingNote} />
+						</button>
+
+						<button type="button" class={clsx("btn btn-sm join-item", 'text-neutral-500')}>	
+							<LoaderCircleIcon class="animate-spin" size={16} />
+						</button>
+					</div>
+				</div>
+				{/if}
+		
 			</div>
 		</div>
   </div>

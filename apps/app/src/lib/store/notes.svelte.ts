@@ -107,21 +107,23 @@ export class NotesStore {
 	async completePrompt({
 		filename,
 		prompt,
-		callback,
-	}: { filename: string; prompt: string; callback: (text: string) => void }) {
+		isCompletionActive,
+	}: { filename: string; prompt: string; isCompletionActive: () => boolean }) {
 		const note = await this.fetchNote(filename);
 		const result = aiStore.streamNoteText(prompt);
 		let content = note.content;
 
 		for await (const chunk of result.textStream) {
+			if (!isCompletionActive()) break;
 			content = note.content + chunk;
 			await this.updateNote({
 				filename,
 				content,
 			});
 			note.content = content;
-			callback(content);
 		}
+
+		if (!isCompletionActive()) return;
 
 		await this.updateNote({
 			filename,

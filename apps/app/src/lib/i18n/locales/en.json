@@ -11,6 +11,7 @@
 			"version": "Version",
 			"theme": "Theme",
 			"accentColor": "Accent Color",
+			"defaultSearchEngine": "Default Search Engine",
 			"dangerZone": "Danger Zone",
 			"wipeAllLocalData": "Wipe All Local Data",
 			"testingConnection": "Testing connection...",
@@ -46,7 +47,8 @@
 		"failedToRename": "Failed to rename note",
 		"noteName": "Note name",
 		"closeSidebar": "close sidebar",
-		"createNote": "Create Note"
+		"createNote": "Create Note",
+		"retry": "Retry"
 	},
 	"commands": {
 		"helperText": {

@@ -4,10 +4,15 @@ import { aiStore } from "$lib/store/ai.svelte";
 import {
 	ACCENT_COLOR,
 	LANGUAGE,
+	SEARCH_ENGINE,
 	THEME,
 	settingsStore,
 } from "$lib/store/settings.svelte";
+import { clsx } from "clsx";
+import humanizeString from "humanize-string";
 import { PressedKeys, watch } from "runed";
+import { _ } from "svelte-i18n";
+import packageJson from "../../../package.json" with { type: "json" };
 
 const pressedKeys = new PressedKeys();
 
@@ -23,10 +28,11 @@ let _connectionStatus = $state<{
 	status: "loading" | "error" | "success";
 	text?: string;
 } | null>(null);
-let _currentTab = $state("general");
-const _themes = Object.keys(THEME);
-const _accentColors = Object.keys(ACCENT_COLOR);
-const _languages = [
+let currentTab = $state("general");
+const themes = Object.keys(THEME);
+const searchEngines = Object.keys(SEARCH_ENGINE);
+const accentColors = Object.keys(ACCENT_COLOR);
+const languages = [
 	{ code: LANGUAGE.EN, name: $_("settings.languages.EN") },
 	{ code: LANGUAGE.PL, name: $_("settings.languages.PL") },
 	{ code: LANGUAGE.DE, name: $_("settings.languages.DE") },
@@ -152,6 +158,12 @@ const _isCmdPressed = $derived(pressedKeys.has("Meta"));
         <select name="theme" bind:value={settingsStore.settings.theme} class="select select-bordered w-full">
         	{#each themes as theme}
           	<option value={theme}>{humanizeString(theme)}</option>
+          {/each}
+        </select>
+		<label class="text-sm">{$_("settings.fields.defaultSearchEngine")}</label>
+        <select name="theme" bind:value={settingsStore.settings.defaultSearchEngine} class="select select-bordered w-full">
+        	{#each searchEngines as searchEngine}
+          	<option value={searchEngine}>{humanizeString(searchEngine)}</option>
           {/each}
         </select>
         <label class="text-sm">{$_("settings.fields.accentColor")}</label>

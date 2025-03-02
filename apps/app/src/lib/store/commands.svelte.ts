@@ -22,6 +22,7 @@ import {
 	appStore,
 } from "./app.svelte";
 import { type Note, notesStore } from "./notes.svelte";
+import { settingsStore } from "./settings.svelte";
 
 nlp.plugin(datePlugin);
 nlp.plugin(numbersPlugin);
@@ -124,7 +125,7 @@ async function buildQueryCommands(query: string) {
 	const queryMatchSearch = [
 		{
 			label: t("commands.actions.search", { query }),
-			value: appStore.getSearchUrl(query),
+			value: settingsStore.getSearchUrl(query),
 			handler: COMMAND_HANDLER.URL,
 		},
 	];
@@ -146,7 +147,7 @@ async function buildQueryCommands(query: string) {
 		const _completionQuery = encodeURIComponent(completion);
 		return {
 			label: completion,
-			value: appStore.getSearchUrl(completion),
+			value: settingsStore.getSearchUrl(completion),
 			handler: COMMAND_HANDLER.URL,
 		};
 	});
@@ -273,8 +274,10 @@ export class CommandsStore {
 				return [...createNoteCommand, ...buildNoteCommands(notesStore.notes)];
 			})
 			.exhaustive();
-		const sortedCommands =
-			query.length === 0
+
+		// Do not filter when in menu mode
+		const sortedAndFilteredCommands =
+			query.length === 0 || barMode === 'MENU'
 				? commands
 				: matchSorter(commands, query, {
 						keys: ["label"],
@@ -284,7 +287,7 @@ export class CommandsStore {
 							commandsPriority.indexOf(b.handler),
 					);
 		const formulaCommands = buildFormulaCommands(query);
-		this.commands = uniq([...formulaCommands, ...sortedCommands]);
+		this.commands = uniq([...formulaCommands, ...sortedAndFilteredCommands]);
 	}
 
 	removeHistoryOfType(handler: CommandHandler) {
