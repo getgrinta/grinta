@@ -14,8 +14,6 @@ import UnderlineExtension from "@tiptap/extension-underline";
 import StarterKit from "@tiptap/starter-kit";
 import { onDestroy, onMount } from "svelte";
 import TurndownService from "turndown";
-import BubbleMenu from "./editor/bubble-menu.svelte";
-import FloatingMenu from "./editor/floating-menu.svelte";
 
 const turndownService = new TurndownService({ headingStyle: "atx" });
 

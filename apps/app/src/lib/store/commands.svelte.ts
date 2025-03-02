@@ -30,7 +30,7 @@ function t(key: string, params: Record<string, string> = {}) {
 	try {
 		const translationFn = get(_);
 		return translationFn(key, { values: params });
-	} catch (error) {
+	} catch (_error) {
 		return key;
 	}
 }
@@ -138,12 +138,12 @@ async function buildQueryCommands(query: string) {
 		// Might fail because of no connection or proxy
 		const response = await fetch(completionUrl);
 		completions = await response.json();
-	} catch (error) {
+	} catch (_error) {
 		completions = [encodedQuery, []];
 	}
 
 	const completionList = completions[1].map((completion: string) => {
-		const completionQuery = encodeURIComponent(completion);
+		const _completionQuery = encodeURIComponent(completion);
 		return {
 			label: completion,
 			value: appStore.getSearchUrl(completion),
@@ -269,7 +269,7 @@ export class CommandsStore {
 								},
 							]
 						: [];
-				const notes = await notesStore.fetchNotes();
+				const _notes = await notesStore.fetchNotes();
 				return [...createNoteCommand, ...buildNoteCommands(notesStore.notes)];
 			})
 			.exhaustive();

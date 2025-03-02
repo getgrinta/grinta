@@ -4,7 +4,7 @@ import { PressedKeys } from "runed";
 
 const pressedKeys = new PressedKeys();
 
-const isCmdPressed = $derived(pressedKeys.has("Meta"));
+const _isCmdPressed = $derived(pressedKeys.has("Meta"));
 </script>
 
 {#each actions as action}

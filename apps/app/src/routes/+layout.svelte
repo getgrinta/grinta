@@ -12,6 +12,7 @@ import { THEME, settingsStore } from "$lib/store/settings.svelte";
 import { installHotkeys } from "$lib/utils.svelte";
 import { systemThemeWatcher } from "$lib/utils.svelte";
 import { defaultWindowIcon } from "@tauri-apps/api/app";
+import { invoke } from "@tauri-apps/api/core";
 import { Menu } from "@tauri-apps/api/menu";
 import { TrayIcon } from "@tauri-apps/api/tray";
 import { getCurrentWindow } from "@tauri-apps/api/window";
@@ -19,11 +20,8 @@ import { readText } from "@tauri-apps/plugin-clipboard-manager";
 import { Position, moveWindow } from "@tauri-apps/plugin-positioner";
 import { exit } from "@tauri-apps/plugin-process";
 import { open } from "@tauri-apps/plugin-shell";
-import { clsx } from "clsx";
 import * as focusTrap from "focus-trap";
 import { onMount } from "svelte";
-import { Toaster } from "svelte-sonner";
-import { invoke } from "@tauri-apps/api/core";
 const { children } = $props();
 
 dayjs.extend(LocalizedFormat);
@@ -134,22 +132,22 @@ function initializeApp() {
 	moveWindow(Position.TopCenter);
 }
 
-const accentColorClass = $derived(
+const _accentColorClass = $derived(
 	`accent-${settingsStore.settings.accentColor.toLowerCase()}-${systemThemeWatcher.theme.toLowerCase()}`,
 );
 
-const themeName = $derived(
+const _themeName = $derived(
 	systemThemeWatcher.theme === THEME.DARK ? "grinta-dark" : "grinta-light",
 );
 
-const bgClass = $derived(
+const _bgClass = $derived(
 	systemThemeWatcher.theme === THEME.DARK ? "bg-base-200/20" : "bg-white/20",
 );
 
 $effect(() => {
-	const isDarkTheme = systemThemeWatcher.theme === 'DARK';
-	invoke('set_vibrancy', { 
-		materialName: isDarkTheme ? 'dark' : 'light'
+	const isDarkTheme = systemThemeWatcher.theme === "DARK";
+	invoke("set_vibrancy", {
+		materialName: isDarkTheme ? "dark" : "light",
 	});
 });
 

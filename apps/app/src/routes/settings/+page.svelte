@@ -1,6 +1,5 @@
 <script lang="ts">
 import { goto } from "$app/navigation";
-import TopBar from "$lib/components/top-bar.svelte";
 import { aiStore } from "$lib/store/ai.svelte";
 import {
 	ACCENT_COLOR,
@@ -8,16 +7,11 @@ import {
 	THEME,
 	settingsStore,
 } from "$lib/store/settings.svelte";
-import { clsx } from "clsx";
-import humanizeString from "humanize-string";
 import { PressedKeys, watch } from "runed";
-import { _ } from "svelte-i18n";
-import packageJson from "../../../package.json" with { type: "json" };
-    import { invoke } from "@tauri-apps/api/core";
 
 const pressedKeys = new PressedKeys();
 
-const tabs = [
+const _tabs = [
 	{ label: $_("settings.tabs.general"), value: "general", hotkey: "⌘1" },
 	{ label: $_("settings.tabs.ai"), value: "ai", hotkey: "⌘2" },
 	{ label: $_("settings.tabs.notes"), value: "notes", hotkey: "⌘3" },
@@ -25,21 +19,21 @@ const tabs = [
 
 let newToggleShortcut = $state<string[]>([]);
 let recordingShortcut = $state(false);
-let connectionStatus = $state<{
+let _connectionStatus = $state<{
 	status: "loading" | "error" | "success";
 	text?: string;
 } | null>(null);
-let currentTab = $state("general");
-const themes = Object.keys(THEME);
-const accentColors = Object.keys(ACCENT_COLOR);
-const languages = [
+let _currentTab = $state("general");
+const _themes = Object.keys(THEME);
+const _accentColors = Object.keys(ACCENT_COLOR);
+const _languages = [
 	{ code: LANGUAGE.EN, name: $_("settings.languages.EN") },
 	{ code: LANGUAGE.PL, name: $_("settings.languages.PL") },
 	{ code: LANGUAGE.DE, name: $_("settings.languages.DE") },
 ];
 
 function changeTab(tab: string) {
-	currentTab = tab;
+	_currentTab = tab;
 }
 
 function toggleShortcutRecording() {
@@ -47,13 +41,13 @@ function toggleShortcutRecording() {
 	recordingShortcut = !recordingShortcut;
 }
 
-const toggleShortcut = $derived(
+const _toggleShortcut = $derived(
 	newToggleShortcut.length > 1
 		? newToggleShortcut.join("+")
 		: settingsStore.settings.toggleShortcut,
 );
 
-const recordShortcutLabel = $derived(
+const _recordShortcutLabel = $derived(
 	recordingShortcut
 		? $_("settings.fields.recordShortcut")
 		: $_("settings.fields.changeShortcut"),
@@ -77,7 +71,7 @@ function updateNotesDir(event: any) {
 	return settingsStore.setNotesDir(notesDirSplit);
 }
 
-const notesDirString = $derived(settingsStore.settings.notesDir.join("/"));
+const _notesDirString = $derived(settingsStore.settings.notesDir.join("/"));
 
 async function wipeLocalData() {
 	await settingsStore.wipeLocalData();
@@ -85,12 +79,12 @@ async function wipeLocalData() {
 }
 
 async function testConnection() {
-	connectionStatus = {
+	_connectionStatus = {
 		status: "loading",
 		text: $_("settings.fields.testingConnection"),
 	};
 	const result = await aiStore.testConnection();
-	connectionStatus = {
+	_connectionStatus = {
 		status: result.success ? "success" : "error",
 		text: result.message,
 	};
@@ -121,7 +115,7 @@ watch(
 	},
 );
 
-const isCmdPressed = $derived(pressedKeys.has("Meta"));
+const _isCmdPressed = $derived(pressedKeys.has("Meta"));
 </script>
 
 <div class="flex flex-1 flex-col">

@@ -1,9 +1,8 @@
 <script lang="ts">
 import { SEARCH_MODE, appStore } from "$lib/store/app.svelte";
-import clsx from "clsx";
 import { GlobeIcon, SparklesIcon } from "lucide-svelte";
 
-const SEARCH_MODES = [
+const _SEARCH_MODES = [
 	{ value: SEARCH_MODE.WEB, icon: GlobeIcon },
 	{ value: SEARCH_MODE.AI, icon: SparklesIcon },
 ];
