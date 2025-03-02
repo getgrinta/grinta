@@ -274,8 +274,10 @@ export class CommandsStore {
 				return [...createNoteCommand, ...buildNoteCommands(notesStore.notes)];
 			})
 			.exhaustive();
-		const sortedCommands =
-			query.length === 0
+
+		// Do not filter when in menu mode
+		const sortedAndFilteredCommands =
+			query.length === 0 || barMode === 'MENU'
 				? commands
 				: matchSorter(commands, query, {
 						keys: ["label"],
@@ -285,7 +287,7 @@ export class CommandsStore {
 							commandsPriority.indexOf(b.handler),
 					);
 		const formulaCommands = buildFormulaCommands(query);
-		this.commands = uniq([...formulaCommands, ...sortedCommands]);
+		this.commands = uniq([...formulaCommands, ...sortedAndFilteredCommands]);
 	}
 
 	removeHistoryOfType(handler: CommandHandler) {
