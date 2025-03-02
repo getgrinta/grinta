@@ -15,7 +15,12 @@ import { _ } from "svelte-i18n";
 import { get } from "svelte/store";
 import { P, match } from "ts-pattern";
 import { z } from "zod";
-import { BAR_MODE, type BarMode, appStore } from "./app.svelte";
+import {
+	BAR_MODE,
+	type BarMode,
+	type SearchMode,
+	appStore,
+} from "./app.svelte";
 import { type Note, notesStore } from "./notes.svelte";
 
 nlp.plugin(datePlugin);
@@ -206,10 +211,13 @@ export class CommandsStore {
 		this.commandHistory = commandHistory;
 	}
 
-	async buildCommands(query: string) {
+	async buildCommands({
+		query,
+		barMode,
+	}: { query: string; searchMode: SearchMode; barMode: BarMode }) {
 		this.selectedIndex = 0;
 		const queryIsUrl = urlParser.safeParse(query);
-		const commands: ExecutableCommand[] = await match(appStore.barMode)
+		const commands: ExecutableCommand[] = await match(barMode)
 			.with(BAR_MODE.INITIAL, async () => {
 				const commandHistory = this.commandHistory.slice().reverse();
 				if (query.length === 0) {
