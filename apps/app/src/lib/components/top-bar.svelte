@@ -1,4 +1,7 @@
 <script lang="ts">
+import clsx from "clsx";
+import { ChevronLeftIcon } from "lucide-svelte";
+
 const { goBack, fancyMode = false } = $props();
 
 function defaultGoBack() {

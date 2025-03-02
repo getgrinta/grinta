@@ -31,7 +31,7 @@ function t(key: string, params: Record<string, string> = {}) {
 	try {
 		const translationFn = get(_);
 		return translationFn(key, { values: params });
-	} catch (_error) {
+	} catch (error) {
 		return key;
 	}
 }
@@ -139,12 +139,12 @@ async function buildQueryCommands(query: string) {
 		// Might fail because of no connection or proxy
 		const response = await fetch(completionUrl);
 		completions = await response.json();
-	} catch (_error) {
+	} catch (error) {
 		completions = [encodedQuery, []];
 	}
 
 	const completionList = completions[1].map((completion: string) => {
-		const _completionQuery = encodeURIComponent(completion);
+		const completionQuery = encodeURIComponent(completion);
 		return {
 			label: completion,
 			value: settingsStore.getSearchUrl(completion),
@@ -270,14 +270,14 @@ export class CommandsStore {
 								},
 							]
 						: [];
-				const _notes = await notesStore.fetchNotes();
+				const notes = await notesStore.fetchNotes();
 				return [...createNoteCommand, ...buildNoteCommands(notesStore.notes)];
 			})
 			.exhaustive();
 
 		// Do not filter when in menu mode
 		const sortedAndFilteredCommands =
-			query.length === 0 || barMode === 'MENU'
+			query.length === 0 || barMode === "MENU"
 				? commands
 				: matchSorter(commands, query, {
 						keys: ["label"],

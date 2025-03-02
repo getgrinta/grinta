@@ -1,5 +1,6 @@
 <script lang="ts">
 import { goto } from "$app/navigation";
+import TopBar from "$lib/components/top-bar.svelte";
 import { aiStore } from "$lib/store/ai.svelte";
 import {
 	ACCENT_COLOR,
@@ -8,6 +9,7 @@ import {
 	THEME,
 	settingsStore,
 } from "$lib/store/settings.svelte";
+import { invoke } from "@tauri-apps/api/core";
 import { clsx } from "clsx";
 import humanizeString from "humanize-string";
 import { PressedKeys, watch } from "runed";
@@ -16,7 +18,7 @@ import packageJson from "../../../package.json" with { type: "json" };
 
 const pressedKeys = new PressedKeys();
 
-const _tabs = [
+const tabs = [
 	{ label: $_("settings.tabs.general"), value: "general", hotkey: "⌘1" },
 	{ label: $_("settings.tabs.ai"), value: "ai", hotkey: "⌘2" },
 	{ label: $_("settings.tabs.notes"), value: "notes", hotkey: "⌘3" },
@@ -24,7 +26,7 @@ const _tabs = [
 
 let newToggleShortcut = $state<string[]>([]);
 let recordingShortcut = $state(false);
-let _connectionStatus = $state<{
+let connectionStatus = $state<{
 	status: "loading" | "error" | "success";
 	text?: string;
 } | null>(null);
@@ -39,7 +41,7 @@ const languages = [
 ];
 
 function changeTab(tab: string) {
-	_currentTab = tab;
+	currentTab = tab;
 }
 
 function toggleShortcutRecording() {
@@ -47,13 +49,13 @@ function toggleShortcutRecording() {
 	recordingShortcut = !recordingShortcut;
 }
 
-const _toggleShortcut = $derived(
+const toggleShortcut = $derived(
 	newToggleShortcut.length > 1
 		? newToggleShortcut.join("+")
 		: settingsStore.settings.toggleShortcut,
 );
 
-const _recordShortcutLabel = $derived(
+const recordShortcutLabel = $derived(
 	recordingShortcut
 		? $_("settings.fields.recordShortcut")
 		: $_("settings.fields.changeShortcut"),
@@ -77,7 +79,7 @@ function updateNotesDir(event: any) {
 	return settingsStore.setNotesDir(notesDirSplit);
 }
 
-const _notesDirString = $derived(settingsStore.settings.notesDir.join("/"));
+const notesDirString = $derived(settingsStore.settings.notesDir.join("/"));
 
 async function wipeLocalData() {
 	await settingsStore.wipeLocalData();
@@ -85,12 +87,12 @@ async function wipeLocalData() {
 }
 
 async function testConnection() {
-	_connectionStatus = {
+	connectionStatus = {
 		status: "loading",
 		text: $_("settings.fields.testingConnection"),
 	};
 	const result = await aiStore.testConnection();
-	_connectionStatus = {
+	connectionStatus = {
 		status: result.success ? "success" : "error",
 		text: result.message,
 	};
@@ -121,7 +123,7 @@ watch(
 	},
 );
 
-const _isCmdPressed = $derived(pressedKeys.has("Meta"));
+const isCmdPressed = $derived(pressedKeys.has("Meta"));
 </script>
 
 <div class="flex flex-1 flex-col">

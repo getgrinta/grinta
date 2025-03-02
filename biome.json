@@ -28,8 +28,14 @@
 		"rules": {
 			"recommended": true,
 			"correctness": {
-				"noUnusedImports": "error",
-				"noUnusedVariables": "error"
+				"noUnusedImports": {
+					"level": "error",
+					"fix": "none"
+				},
+				"noUnusedVariables": {
+					"level": "error",
+					"fix": "none"
+				}
 			}
 		}
 	},

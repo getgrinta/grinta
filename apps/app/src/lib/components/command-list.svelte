@@ -5,14 +5,20 @@ import {
 	type CommandHandler,
 	commandsStore,
 } from "$lib/store/commands.svelte";
+import { highlightText } from "$lib/utils.svelte";
+import { clsx } from "clsx";
 import {
 	AppWindowIcon,
+	ArrowDownLeftIcon,
 	ChevronRightIcon,
 	EqualIcon,
 	GlobeIcon,
 	SparklesIcon,
 	StickyNoteIcon,
 } from "lucide-svelte";
+import { _ } from "svelte-i18n";
+import { circOut } from "svelte/easing";
+import { fly } from "svelte/transition";
 import { P, match } from "ts-pattern";
 
 type GetHelperProps = {

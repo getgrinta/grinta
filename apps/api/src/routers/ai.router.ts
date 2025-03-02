@@ -14,8 +14,8 @@ export const GenerateParamsSchema = z.object({
 });
 
 export const GenerateNoteResult = z.object({
-    text: z.string()
-})
+	text: z.string(),
+});
 
 export const aiRouter = createRouter();
 
@@ -51,10 +51,10 @@ const GENERATE_ROUTE = createRoute({
 			description: "Note generate result",
 			content: { "application/json": { schema: GenerateNoteResult } },
 		},
-        401: {
-            description: "Unauthorized",
-            content: { "text/plain": { schema: z.string() } },
-        }
+		401: {
+			description: "Unauthorized",
+			content: { "text/plain": { schema: z.string() } },
+		},
 	},
 });
 
@@ -79,10 +79,10 @@ const AUTOCOMPLETE_ROUTE = createRoute({
 			description: "Autocomplete result",
 			content: { "application/json": { schema: GenerateNoteResult } },
 		},
-        401: {
-            description: "Unauthorized",
-            content: { "text/plain": { schema: z.string() } },
-        }
+		401: {
+			description: "Unauthorized",
+			content: { "text/plain": { schema: z.string() } },
+		},
 	},
 });
 

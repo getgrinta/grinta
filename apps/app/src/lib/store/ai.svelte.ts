@@ -47,7 +47,7 @@ export class AiStore {
 		});
 	}
 
-	async generateNoteText(_query: string) {
+	async generateNoteText(query: string) {
 		const prompt = this.getGenerateNoteTextPrompt({
 			context: settingsStore.settings.aiAdditionalContext,
 		});

@@ -1,12 +1,15 @@
 <script lang="ts">
-import { goto } from "$app/navigation";
+import { goto, invalidateAll } from "$app/navigation";
 import { page } from "$app/state";
+import NoteEditor from "$lib/components/editor.svelte";
+import TopBar from "$lib/components/top-bar.svelte";
 import { BAR_MODE } from "$lib/store/app.svelte";
 import { type ExtendedNote, notesStore } from "$lib/store/notes.svelte";
 import { generateCancellationToken } from "$lib/utils.svelte";
 import { BaseDirectory, type UnwatchFn, watch } from "@tauri-apps/plugin-fs";
 import clsx from "clsx";
 import {
+	LoaderCircle,
 	LoaderCircleIcon,
 	MoreVerticalIcon,
 	SquareIcon,
@@ -14,6 +17,7 @@ import {
 import { marked } from "marked";
 import { PressedKeys } from "runed";
 import { onMount } from "svelte";
+import { _ } from "svelte-i18n";
 import { toast } from "svelte-sonner";
 
 const TO_COMPLETE_PROMPT = "%G4TW%";
@@ -23,10 +27,10 @@ const filename = $derived(decodeURIComponent(page.params.name));
 let deleteConfirmationMode = $state(false);
 let note = $state<ExtendedNote>();
 let noteTitle = $state<string>();
-let _generatingNote = $state<boolean>(false);
+let generatingNote = $state<boolean>(false);
 let unsubWatcher = $state<UnwatchFn>();
 let sidebarOpened = $state(false);
-const _content = $derived(note ? marked.parse(note.content) : "");
+const content = $derived(note ? marked.parse(note.content) : "");
 
 function toggleSidebar() {
 	sidebarOpened = !sidebarOpened;
@@ -101,7 +105,10 @@ async function completePrompt() {
 			filename: note.filename,
 			prompt: note.filename,
 			isCompletionActive: () => {
-				return note != null && getCurrentPromptCancellationToken() === completePromptToken;
+				return (
+					note != null &&
+					getCurrentPromptCancellationToken() === completePromptToken
+				);
 			},
 		});
 	} catch (error) {
@@ -115,7 +122,7 @@ async function completePrompt() {
 			},
 		});
 	} finally {
-		_generatingNote = false;
+		generatingNote = false;
 	}
 }
 
@@ -134,7 +141,7 @@ async function deleteNote() {
 	return goto(`/commands/${BAR_MODE.NOTES}`);
 }
 
-const _isCmdPressed = $derived(pressedKeys.has("Meta"));
+const isCmdPressed = $derived(pressedKeys.has("Meta"));
 
 async function setupNoteWatcher() {
 	await fetchNote();

@@ -20,8 +20,10 @@ import { readText } from "@tauri-apps/plugin-clipboard-manager";
 import { Position, moveWindow } from "@tauri-apps/plugin-positioner";
 import { exit } from "@tauri-apps/plugin-process";
 import { open } from "@tauri-apps/plugin-shell";
+import { clsx } from "clsx";
 import * as focusTrap from "focus-trap";
 import { onMount } from "svelte";
+import { Toaster } from "svelte-sonner";
 const { children } = $props();
 
 dayjs.extend(LocalizedFormat);
@@ -132,15 +134,15 @@ function initializeApp() {
 	moveWindow(Position.TopCenter);
 }
 
-const _accentColorClass = $derived(
+const accentColorClass = $derived(
 	`accent-${settingsStore.settings.accentColor.toLowerCase()}-${systemThemeWatcher.theme.toLowerCase()}`,
 );
 
-const _themeName = $derived(
+const themeName = $derived(
 	systemThemeWatcher.theme === THEME.DARK ? "grinta-dark" : "grinta-light",
 );
 
-const _bgClass = $derived(
+const bgClass = $derived(
 	systemThemeWatcher.theme === THEME.DARK ? "bg-base-200/20" : "bg-white/20",
 );
 
@@ -168,7 +170,10 @@ onMount(() => {
 afterNavigate(({ from, to }) => {
 	installHotkeys();
 	if (to?.url?.pathname === "/") return;
-	trap = focusTrap.createFocusTrap(["#mainLayout", "ol[data-sonner-toaster=\"true\"]"]);
+	trap = focusTrap.createFocusTrap([
+		"#mainLayout",
+		'ol[data-sonner-toaster="true"]',
+	]);
 	trap?.activate();
 });
 </script>

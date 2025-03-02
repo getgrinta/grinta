@@ -1,5 +1,7 @@
 <script lang="ts">
 import type { Editor } from "@tiptap/core";
+import { QuoteIcon, SparklesIcon } from "lucide-svelte";
+import { fly } from "svelte/transition";
 
 let { editor } = $props<{ editor: Editor | undefined }>();
 

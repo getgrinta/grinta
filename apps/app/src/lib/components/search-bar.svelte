@@ -2,9 +2,11 @@
 import { goto } from "$app/navigation";
 import AiNoteIcon from "$lib/assets/ai-note.svelte";
 import GrintaIcon from "$lib/assets/grinta.svelte";
+import TopBar from "$lib/components/top-bar.svelte";
 import { BAR_MODE, type BarMode, appStore } from "$lib/store/app.svelte";
 import { commandsStore } from "$lib/store/commands.svelte";
 import { notesStore } from "$lib/store/notes.svelte";
+import { clsx } from "clsx";
 import { createForm } from "felte";
 import {
 	MenuIcon,
@@ -15,23 +17,24 @@ import {
 } from "lucide-svelte";
 import { PressedKeys } from "runed";
 import { watch } from "runed";
+import { _ } from "svelte-i18n";
 import { match } from "ts-pattern";
 
 let queryInput: HTMLInputElement;
 const pressedKeys = new PressedKeys();
 
-const _QUICK_MODE_SWITCH = [BAR_MODE.INITIAL, BAR_MODE.NOTES];
+const QUICK_MODE_SWITCH = [BAR_MODE.INITIAL, BAR_MODE.NOTES];
 
-const _INDICATOR_MODES = [
+const INDICATOR_MODES = [
 	{ value: BAR_MODE.INITIAL, icon: GrintaIcon, shortcut: "⌘1" },
 	{ value: BAR_MODE.NOTES, icon: AiNoteIcon, shortcut: "⌘2" },
 	{ value: BAR_MODE.MENU, icon: MenuIcon, shortcut: "⌘K" },
 ];
 
-const _isCmdPressed = $derived(pressedKeys.has("Meta"));
+const isCmdPressed = $derived(pressedKeys.has("Meta"));
 
 const { form } = createForm({
-	async onSubmit(_values) {
+	async onSubmit(values) {
 		return commandsStore.handleCommand(undefined);
 	},
 });
@@ -131,7 +134,7 @@ $effect(() => {
 	}
 });
 
-const _inputProps = $derived(
+const inputProps = $derived(
 	match(appStore.barMode)
 		.with(BAR_MODE.INITIAL, () => ({
 			icon: SearchIcon,
@@ -155,7 +158,7 @@ const MENU_BUTTON = {
 	action: () => switchMode(BAR_MODE.MENU),
 };
 
-const _actionButton = $derived(
+const actionButton = $derived(
 	match(appStore.barMode)
 		.with(BAR_MODE.MENU, () => ({
 			label: $_("searchBar.actions.exitMenu"),

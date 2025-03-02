@@ -4,6 +4,7 @@ import {
 	register,
 	unregisterAll,
 } from "@tauri-apps/plugin-global-shortcut";
+import { Position, moveWindow } from "@tauri-apps/plugin-positioner";
 import { load } from "@tauri-apps/plugin-store";
 import superjson from "superjson";
 import { match } from "ts-pattern";

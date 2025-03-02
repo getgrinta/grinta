@@ -1,8 +1,13 @@
 <script lang="ts">
 import { goto } from "$app/navigation";
 import { page } from "$app/state";
-import { appStore } from "$lib/store/app.svelte";
+import CommandList from "$lib/components/command-list.svelte";
+import SearchBar from "$lib/components/search-bar.svelte";
+import SearchModeToggle from "$lib/components/search-mode-toggle.svelte";
+import ViewActions from "$lib/components/view-actions.svelte";
+import { BAR_MODE, appStore } from "$lib/store/app.svelte";
 import { notesStore } from "$lib/store/notes.svelte";
+import { _ } from "svelte-i18n";
 
 async function createNote() {
 	const filename = await notesStore.createNote(
@@ -11,7 +16,7 @@ async function createNote() {
 	return goto(`/notes/${filename}`);
 }
 
-const _viewActions = [
+const viewActions = [
 	{ label: $_("notes.createNote"), onclick: createNote, shortcut: "⌘N" },
 ];
 
