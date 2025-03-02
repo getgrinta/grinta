@@ -13,6 +13,7 @@ import humanizeString from "humanize-string";
 import { PressedKeys, watch } from "runed";
 import { _ } from "svelte-i18n";
 import packageJson from "../../../package.json" with { type: "json" };
+    import { invoke } from "@tauri-apps/api/core";
 
 const pressedKeys = new PressedKeys();
 

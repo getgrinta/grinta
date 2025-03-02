@@ -1,6 +1,9 @@
 use tauri::Manager;
+use tauri::{command, Runtime};
 use tauri_plugin_autostart::MacosLauncher;
 use window_vibrancy::*;
+
+mod theme_utils;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -21,13 +24,10 @@ pub fn run() {
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_opener::init())
-        .setup(|app| {
-            let window = app.get_webview_window("main").unwrap();
-            #[cfg(target_os = "macos")]
-            apply_vibrancy(&window, NSVisualEffectMaterial::HudWindow, None, None)
-                .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
-            Ok({})
-        })
+        .invoke_handler(tauri::generate_handler![
+            theme_utils::set_vibrancy,
+            theme_utils::set_appearance
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

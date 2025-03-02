@@ -57,6 +57,7 @@
 			"openNote": "Otwórz notatkę",
 			"createNote": "Utwórz notatkę",
 			"createSmartNote": "Utwórz smart notatkę",
+			"askAI": "Zapytaj AI",
 			"runShortcut": "Uruchom skrót"
 		},
 		"menuItems": {
@@ -69,6 +70,7 @@
 		"actions": {
 			"search": "Szukaj \"{query}\"",
 			"smartNote": "Smart notatka \"{query}\"",
+			"ask": "Zapytaj \"{query}\"",
 			"createNote": "Utwórz notatkę \"{query}\""
 		}
 	},

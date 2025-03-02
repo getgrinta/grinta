@@ -58,6 +58,7 @@
 			"openNote": "Open Note",
 			"createNote": "Create Note",
 			"createSmartNote": "Create Smart Note",
+			"askAI": "Ask AI",
 			"runShortcut": "Run Shortcut"
 		},
 		"menuItems": {
@@ -70,6 +71,7 @@
 		"actions": {
 			"search": "Search for \"{query}\"",
 			"smartNote": "Smart Note \"{query}\"",
+			"ask": "Ask \"{query}\"",
 			"createNote": "Create \"{query}\" note"
 		}
 	},

@@ -59,6 +59,7 @@
 			"openNote": "Notiz öffnen",
 			"createNote": "Notiz erstellen",
 			"createSmartNote": "Smart-Notiz erstellen",
+			"askAI": "KI fragen",
 			"runShortcut": "Tastenkürzel ausführen"
 		},
 		"menuItems": {
@@ -71,6 +72,7 @@
 		"actions": {
 			"search": "Nach \"{query}\" suchen",
 			"smartNote": "Smart-Notiz \"{query}\" erstellen",
+			"ask": "\"{query}\" fragen",
 			"createNote": "Notiz \"{query}\" erstellen"
 		}
 	},

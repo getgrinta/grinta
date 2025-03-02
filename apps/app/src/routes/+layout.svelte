@@ -23,6 +23,7 @@ import { clsx } from "clsx";
 import * as focusTrap from "focus-trap";
 import { onMount } from "svelte";
 import { Toaster } from "svelte-sonner";
+import { invoke } from "@tauri-apps/api/core";
 const { children } = $props();
 
 dayjs.extend(LocalizedFormat);
@@ -142,8 +143,15 @@ const themeName = $derived(
 );
 
 const bgClass = $derived(
-	systemThemeWatcher.theme === THEME.DARK ? "bg-base-200/40" : "bg-white/90",
+	systemThemeWatcher.theme === THEME.DARK ? "bg-base-200/20" : "bg-white/20",
 );
+
+$effect(() => {
+	const isDarkTheme = systemThemeWatcher.theme === 'DARK';
+	invoke('set_vibrancy', { 
+		materialName: isDarkTheme ? 'dark' : 'light'
+	});
+});
 
 onMount(() => {
 	console.info("[Grinta] Layout Mount");
