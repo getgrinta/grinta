@@ -3,7 +3,8 @@
 	"scripts": {
 		"dev": "bun run --hot src/index.ts",
 		"db:push": "drizzle-kit push",
-		"db:generate": "drizzle-kit generate"
+		"db:generate": "drizzle-kit generate",
+		"db:migrate": "drizzle-kit migrate"
 	},
 	"dependencies": {
 		"@ai-sdk/openai-compatible": "^0.1.12",

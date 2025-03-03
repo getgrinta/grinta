@@ -1,6 +1,10 @@
-import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
-import { createSelectSchema } from "drizzle-zod";
-import { z } from "zod";
+import {
+	boolean,
+	integer,
+	pgTable,
+	text,
+	timestamp,
+} from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
 	id: text("id").primaryKey(),
@@ -8,6 +12,7 @@ export const user = pgTable("user", {
 	email: text("email").notNull().unique(),
 	emailVerified: boolean("email_verified").notNull(),
 	image: text("image"),
+	stripeCustomerId: text("stripe_customer_id"),
 	createdAt: timestamp("created_at").notNull(),
 	updatedAt: timestamp("updated_at").notNull(),
 });
@@ -52,19 +57,25 @@ export const verification = pgTable("verification", {
 	updatedAt: timestamp("updated_at"),
 });
 
+export const subscription = pgTable("subscription", {
+	id: text("id").primaryKey(),
+	plan: text("plan"),
+	referenceId: text("reference_id"),
+	stripeCustomerId: text("stripe_customer_id"),
+	stripeSubscriptionId: text("stripe_subscription_id"),
+	status: text("status"),
+	periodStart: timestamp("period_start"),
+	periodEnd: timestamp("period_end"),
+	cancelAtPeriodEnd: boolean("cancel_at_period_end"),
+	seats: integer("seats"),
+	trialStart: timestamp("trial_start"),
+	trialEnd: timestamp("trial_end"),
+});
+
 export const schema = {
 	user,
 	session,
 	account,
 	verification,
-};
-
-// Create a base schema and then customize it
-const baseUserSchema = createSelectSchema(user);
-
-export const validation = {
-	selectUser: baseUserSchema.extend({
-		// Explicitly define image as string or null (not undefined)
-		image: z.string().nullable(),
-	}),
+	subscription,
 };
