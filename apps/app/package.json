@@ -46,6 +46,7 @@
 		"dayjs": "^1.11.13",
 		"debounce": "^2.2.0",
 		"dedent": "^1.5.3",
+		"electron-icns-ex": "^1.0.1",
 		"equation-parser": "^1.0.0",
 		"equation-resolver": "^1.0.0",
 		"felte": "^1.3.0",

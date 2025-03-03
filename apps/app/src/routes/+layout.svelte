@@ -9,6 +9,7 @@ import { BAR_MODE, appStore } from "$lib/store/app.svelte";
 import { clipboardStore } from "$lib/store/clipboard.svelte";
 import { commandsStore } from "$lib/store/commands.svelte";
 import { THEME, settingsStore } from "$lib/store/settings.svelte";
+import { APP_ICONS } from "$lib/store/app-icons.svelte";
 import { installHotkeys } from "$lib/utils.svelte";
 import { systemThemeWatcher } from "$lib/utils.svelte";
 import { defaultWindowIcon } from "@tauri-apps/api/app";
@@ -129,6 +130,8 @@ function initializeApp() {
 	commandsStore.initialize();
 	settingsStore.initialize();
 	clipboardStore.initialize();
+	// Initialize app icons in the background
+	APP_ICONS.initializeIcons();
 	appStore.appWindow = getCurrentWindow();
 	initTrayIcon();
 	moveWindow(Position.TopCenter);

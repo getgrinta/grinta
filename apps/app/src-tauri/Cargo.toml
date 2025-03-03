@@ -29,6 +29,9 @@ tauri-plugin-store = "2"
 tauri-plugin-clipboard-manager = "2.2.0"
 tauri-plugin-dialog = "2"
 tauri-plugin-process = "2"
+tauri-icns = "0.1.0"
+png = "0.17.10"
+base64 = "0.21.5"
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-autostart = "2"

@@ -4,6 +4,7 @@ use tauri_plugin_autostart::MacosLauncher;
 use window_vibrancy::*;
 
 mod theme_utils;
+mod icns_utils;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -26,7 +27,9 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
             theme_utils::set_vibrancy,
-            theme_utils::set_appearance
+            theme_utils::set_appearance,
+            icns_utils::load_app_icons,
+            icns_utils::get_icons_directory
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

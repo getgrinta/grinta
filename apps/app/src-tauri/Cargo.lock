@@ -1660,12 +1660,15 @@ dependencies = [
 name = "grinta"
 version = "0.1.0"
 dependencies = [
+ "base64 0.21.7",
  "cocoa 0.25.0",
  "objc",
+ "png",
  "serde",
  "serde_json",
  "tauri",
  "tauri-build",
+ "tauri-icns",
  "tauri-plugin-autostart",
  "tauri-plugin-clipboard-manager",
  "tauri-plugin-dialog",
@@ -4401,6 +4404,16 @@ dependencies = [
  "url",
  "uuid",
  "walkdir",
+]
+
+[[package]]
+name = "tauri-icns"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "03b7eb4d0d43724ba9ba6a6717420ee68aee377816a3edbb45db8c18862b1431"
+dependencies = [
+ "byteorder",
+ "png",
 ]
 
 [[package]]

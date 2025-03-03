@@ -1,5 +1,5 @@
 import { goto } from "$app/navigation";
-import { type DirEntry, readDir } from "@tauri-apps/plugin-fs";
+import { type DirEntry, exists, readDir } from "@tauri-apps/plugin-fs";
 import { fetch } from "@tauri-apps/plugin-http";
 import { exit } from "@tauri-apps/plugin-process";
 import { Command } from "@tauri-apps/plugin-shell";
@@ -15,6 +15,8 @@ import { _ } from "svelte-i18n";
 import { get } from "svelte/store";
 import { P, match } from "ts-pattern";
 import { z } from "zod";
+import { invoke } from "@tauri-apps/api/core";
+import { appDataDir } from "@tauri-apps/api/path";
 import {
 	BAR_MODE,
 	type BarMode,
@@ -23,6 +25,7 @@ import {
 } from "./app.svelte";
 import { type Note, notesStore } from "./notes.svelte";
 import { settingsStore } from "./settings.svelte";
+import { appIconsStore } from "$lib/store/app-icons.svelte";
 
 nlp.plugin(datePlugin);
 nlp.plugin(numbersPlugin);
@@ -65,6 +68,7 @@ type ExecutableCommand = {
 	label: string;
 	value: string;
 	handler: CommandHandler;
+	icon?: string;
 };
 
 export const SYSTEM_COMMAND = {
@@ -93,14 +97,23 @@ function buildFormulaCommands(currentQuery: string): ExecutableCommand[] {
 	];
 }
 
-function buildAppCommands(apps: DirEntry[]): ExecutableCommand[] {
-	return apps
-		.filter((app) => APP_REGEX.test(app.name))
-		.map((app) => ({
-			label: app.name.replace(".app", ""),
+async function buildAppCommands(
+	apps: DirEntry[],
+): Promise<ExecutableCommand[]> {
+	const filteredApps = apps.filter((app) => APP_REGEX.test(app.name));
+	const commands: ExecutableCommand[] = [];
+
+	for (const app of filteredApps) {
+		const appName = app.name.replace(".app", "");
+
+		commands.push({
+			label: appName,
 			value: app.name,
 			handler: COMMAND_HANDLER.APP,
-		}));
+		});
+	}
+
+	return commands;
 }
 
 function buildNoteCommands(notes: Note[]): ExecutableCommand[] {
@@ -172,6 +185,7 @@ async function buildQueryCommands(query: string) {
 export class CommandsStore {
 	commands = $state<ExecutableCommand[]>([]);
 	commandHistory = $state<ExecutableCommand[]>([]);
+	appIcons = $state<Record<string, string>>({});
 	selectedIndex = $state<number>(0);
 
 	getMenuItems(): ExecutableCommand[] {
@@ -236,7 +250,7 @@ export class CommandsStore {
 				const shortcutCommands = buildShortcutCommands(
 					availableShortcuts.stdout,
 				);
-				const appCommands = buildAppCommands(installedApps);
+				const appCommands = await buildAppCommands(installedApps);
 				const urlCommands = queryIsUrl.success
 					? [
 							{
@@ -275,9 +289,8 @@ export class CommandsStore {
 			})
 			.exhaustive();
 
-		// Do not filter when in menu mode
 		const sortedAndFilteredCommands =
-			query.length === 0 || barMode === 'MENU'
+			query.length === 0 || barMode === "MENU"
 				? commands
 				: matchSorter(commands, query, {
 						keys: ["label"],
@@ -286,6 +299,18 @@ export class CommandsStore {
 							commandsPriority.indexOf(a.handler) -
 							commandsPriority.indexOf(b.handler),
 					);
+
+		// Apply icons from the app icons store
+		for (let i = 0; i < sortedAndFilteredCommands.length; i++) {
+			const command = sortedAndFilteredCommands[i];
+			if (command.icon || command.handler !== "APP") continue;
+
+			const appIcon = appIconsStore.getIcon(command.label);
+			if (appIcon) {
+				sortedAndFilteredCommands[i].icon = appIcon;
+			}
+		}
+
 		const formulaCommands = buildFormulaCommands(query);
 		this.commands = uniq([...formulaCommands, ...sortedAndFilteredCommands]);
 	}
