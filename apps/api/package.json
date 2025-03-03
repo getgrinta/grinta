@@ -1,0 +1,31 @@
+{
+	"name": "@getgrinta/api",
+	"scripts": {
+		"dev": "bun run --hot src/index.ts",
+		"build": "bun build src/index.ts --outdir ./dist --target bun",
+		"start": "bun dist/index.js",
+		"db:push": "drizzle-kit push",
+		"db:generate": "drizzle-kit generate",
+		"db:migrate": "drizzle-kit migrate"
+	},
+	"dependencies": {
+		"@ai-sdk/openai-compatible": "^0.1.12",
+		"@better-auth/stripe": "^1.2.0",
+		"@hono/zod-openapi": "^0.19.1",
+		"@scalar/hono-api-reference": "^0.5.177",
+		"ai": "^4.1.47",
+		"better-auth": "^1.2.0",
+		"dedent": "^1.5.3",
+		"drizzle-orm": "^0.40.0",
+		"drizzle-zod": "^0.7.0",
+		"hono": "^4.7.2",
+		"resend": "^4.1.2",
+		"stripe": "^17.7.0",
+		"zod": "^3.24.2"
+	},
+	"devDependencies": {
+		"@types/bun": "latest",
+		"drizzle-kit": "^0.30.5",
+		"postgres": "^3.4.5"
+	}
+}

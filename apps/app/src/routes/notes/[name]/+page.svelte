@@ -5,7 +5,7 @@ import NoteEditor from "$lib/components/editor.svelte";
 import TopBar from "$lib/components/top-bar.svelte";
 import { BAR_MODE } from "$lib/store/app.svelte";
 import { type ExtendedNote, notesStore } from "$lib/store/notes.svelte";
-    import { generateCancellationToken } from "$lib/utils.svelte";
+import { generateCancellationToken } from "$lib/utils.svelte";
 import { BaseDirectory, type UnwatchFn, watch } from "@tauri-apps/plugin-fs";
 import clsx from "clsx";
 import {
@@ -105,7 +105,10 @@ async function completePrompt() {
 			filename: note.filename,
 			prompt: note.filename,
 			isCompletionActive: () => {
-				return note != null && getCurrentPromptCancellationToken() === completePromptToken;
+				return (
+					note != null &&
+					getCurrentPromptCancellationToken() === completePromptToken
+				);
 			},
 		});
 	} catch (error) {

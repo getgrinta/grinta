@@ -277,7 +277,7 @@ export class CommandsStore {
 
 		// Do not filter when in menu mode
 		const sortedAndFilteredCommands =
-			query.length === 0 || barMode === 'MENU'
+			query.length === 0 || barMode === "MENU"
 				? commands
 				: matchSorter(commands, query, {
 						keys: ["label"],
