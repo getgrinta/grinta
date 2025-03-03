@@ -13,6 +13,7 @@ import { APP_ICONS } from "$lib/store/app-icons.svelte";
 import { installHotkeys } from "$lib/utils.svelte";
 import { systemThemeWatcher } from "$lib/utils.svelte";
 import { defaultWindowIcon } from "@tauri-apps/api/app";
+import { invoke } from "@tauri-apps/api/core";
 import { Menu } from "@tauri-apps/api/menu";
 import { TrayIcon } from "@tauri-apps/api/tray";
 import { getCurrentWindow } from "@tauri-apps/api/window";
@@ -24,7 +25,6 @@ import { clsx } from "clsx";
 import * as focusTrap from "focus-trap";
 import { onMount } from "svelte";
 import { Toaster } from "svelte-sonner";
-import { invoke } from "@tauri-apps/api/core";
 const { children } = $props();
 
 dayjs.extend(LocalizedFormat);
@@ -150,9 +150,9 @@ const bgClass = $derived(
 );
 
 $effect(() => {
-	const isDarkTheme = systemThemeWatcher.theme === 'DARK';
-	invoke('set_vibrancy', { 
-		materialName: isDarkTheme ? 'dark' : 'light'
+	const isDarkTheme = systemThemeWatcher.theme === "DARK";
+	invoke("set_vibrancy", {
+		materialName: isDarkTheme ? "dark" : "light",
 	});
 });
 
@@ -173,7 +173,10 @@ onMount(() => {
 afterNavigate(({ from, to }) => {
 	installHotkeys();
 	if (to?.url?.pathname === "/") return;
-	trap = focusTrap.createFocusTrap(["#mainLayout", "ol[data-sonner-toaster=\"true\"]"]);
+	trap = focusTrap.createFocusTrap([
+		"#mainLayout",
+		'ol[data-sonner-toaster="true"]',
+	]);
 	trap?.activate();
 });
 </script>

@@ -2,7 +2,6 @@ import starlightPlugin from "@astrojs/starlight-tailwind";
 import daisyui from "daisyui";
 import tailwindIntersect from "tailwindcss-intersect";
 import tailwindMotion from "tailwindcss-motion";
-import colors from "tailwindcss/colors";
 
 const accent = {
 	200: "#b6c7f8",
