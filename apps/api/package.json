@@ -3,7 +3,7 @@
 	"scripts": {
 		"dev": "bun run --hot src/index.ts",
 		"build": "bun build src/index.ts --outdir ./dist --target bun",
-		"start": "bun dist/index.js",
+		"start": "bun run --bun dist/index.js",
 		"db:push": "drizzle-kit push",
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "drizzle-kit migrate"
