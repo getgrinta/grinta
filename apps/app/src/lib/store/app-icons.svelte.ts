@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import { type DirEntry, readDir } from "@tauri-apps/plugin-fs";
+import { readDir } from "@tauri-apps/plugin-fs";
 
 export class AppIconsStore {
 	icons = $state<Record<string, string>>({});

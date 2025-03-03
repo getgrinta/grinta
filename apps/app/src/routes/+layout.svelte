@@ -5,7 +5,7 @@ import "@fontsource-variable/dm-sans";
 import "../app.css";
 import { afterNavigate, goto } from "$app/navigation";
 import { locale, setupI18n } from "$lib/i18n";
-import { APP_ICONS } from "$lib/store/app-icons.svelte";
+import { appIconsStore } from "$lib/store/app-icons.svelte";
 import { BAR_MODE, appStore } from "$lib/store/app.svelte";
 import { clipboardStore } from "$lib/store/clipboard.svelte";
 import { commandsStore } from "$lib/store/commands.svelte";
@@ -131,7 +131,7 @@ function initializeApp() {
 	settingsStore.initialize();
 	clipboardStore.initialize();
 	// Initialize app icons in the background
-	APP_ICONS.initializeIcons();
+	appIconsStore.initializeIcons();
 	appStore.appWindow = getCurrentWindow();
 	initTrayIcon();
 	moveWindow(Position.TopCenter);
