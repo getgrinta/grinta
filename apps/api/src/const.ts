@@ -16,7 +16,15 @@ export const AI_PROVIDERS_CONFIG = {
 	},
 } as const;
 
-export const AI_MODELS = [
+export const AI_AUTOCOMPLETE_MODELS = [
+	{
+		label: "Mistral Small 3",
+		provider: "mistral",
+		model: "mistral-small-latest",
+	},
+] as const;
+
+export const AI_GENERATE_MODELS = [
 	{
 		label: "Mistral Small 3",
 		provider: "mistral",

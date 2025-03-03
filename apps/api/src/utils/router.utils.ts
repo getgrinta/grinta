@@ -1,4 +1,5 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
+import { createMiddleware } from "hono/factory";
 import type { auth } from "../auth";
 
 export function createRouter() {
@@ -9,3 +10,9 @@ export function createRouter() {
 		};
 	}>();
 }
+
+export const authenticatedGuard = createMiddleware(async (c, next) => {
+	const user = c.get("user");
+	if (!user) return c.text("Unauthorized", 401);
+	return next();
+});
