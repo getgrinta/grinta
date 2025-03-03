@@ -1,4 +1,7 @@
 import { goto } from "$app/navigation";
+import { appIconsStore } from "$lib/store/app-icons.svelte";
+import { invoke } from "@tauri-apps/api/core";
+import { appDataDir } from "@tauri-apps/api/path";
 import { type DirEntry, exists, readDir } from "@tauri-apps/plugin-fs";
 import { fetch } from "@tauri-apps/plugin-http";
 import { exit } from "@tauri-apps/plugin-process";
@@ -15,8 +18,6 @@ import { _ } from "svelte-i18n";
 import { get } from "svelte/store";
 import { P, match } from "ts-pattern";
 import { z } from "zod";
-import { invoke } from "@tauri-apps/api/core";
-import { appDataDir } from "@tauri-apps/api/path";
 import {
 	BAR_MODE,
 	type BarMode,
@@ -25,7 +26,6 @@ import {
 } from "./app.svelte";
 import { type Note, notesStore } from "./notes.svelte";
 import { settingsStore } from "./settings.svelte";
-import { appIconsStore } from "$lib/store/app-icons.svelte";
 
 nlp.plugin(datePlugin);
 nlp.plugin(numbersPlugin);

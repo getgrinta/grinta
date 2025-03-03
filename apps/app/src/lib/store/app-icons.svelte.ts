@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import { readDir, type DirEntry } from "@tauri-apps/plugin-fs";
+import { type DirEntry, readDir } from "@tauri-apps/plugin-fs";
 
 export class AppIconsStore {
 	icons = $state<Record<string, string>>({});
@@ -13,27 +13,30 @@ export class AppIconsStore {
 	async initializeIcons() {
 		// Only initialize once
 		if (this.initialized || this.loading) return;
-		
+
 		this.loading = true;
 
 		try {
 			const resourcesPaths: string[] = [];
 			const appNameMap: Record<string, string> = {};
-			
+
 			// Process apps from multiple directories
 			const appDirectories = [
 				{ path: "/Applications", apps: await readDir("/Applications") },
-				{ path: "/System/Applications", apps: await readDir("/System/Applications") }
+				{
+					path: "/System/Applications",
+					apps: await readDir("/System/Applications"),
+				},
 			];
-			
+
 			// Process all app directories
 			for (const { path, apps } of appDirectories) {
 				for (const app of apps) {
-					if (!app.name.endsWith('.app') || !app.isDirectory) continue;
-					
+					if (!app.name.endsWith(".app") || !app.isDirectory) continue;
+
 					const appName = app.name.replace(".app", "");
 					const resourcesPath = `${path}/${app.name}/Contents/Resources/`;
-					
+
 					resourcesPaths.push(resourcesPath);
 					appNameMap[appName] = resourcesPath;
 				}
@@ -42,15 +45,21 @@ export class AppIconsStore {
 			const batchSize = 20;
 			for (let i = 0; i < resourcesPaths.length; i += batchSize) {
 				const batch = resourcesPaths.slice(i, i + batchSize);
-				
+
 				try {
-					const iconBatch = await invoke<Record<string, string>>("load_app_icons", {
-						resourcesPaths: batch,
-					});
-					
+					const iconBatch = await invoke<Record<string, string>>(
+						"load_app_icons",
+						{
+							resourcesPaths: batch,
+						},
+					);
+
 					this.icons = { ...this.icons, ...iconBatch };
 				} catch (error) {
-					console.error(`Error loading icon batch ${i}-${i + batchSize}:`, error);
+					console.error(
+						`Error loading icon batch ${i}-${i + batchSize}:`,
+						error,
+					);
 				}
 			}
 		} catch (error) {
