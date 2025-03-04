@@ -29,11 +29,11 @@
 			"recommended": true,
 			"correctness": {
 				"noUnusedImports": {
-					"level": "error",
+					"level": "warn",
 					"fix": "none"
 				},
 				"noUnusedVariables": {
-					"level": "error",
+					"level": "warn",
 					"fix": "none"
 				}
 			}

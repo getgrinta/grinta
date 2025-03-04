@@ -3,12 +3,28 @@ use tauri::{command, Runtime};
 use tauri_plugin_autostart::MacosLauncher;
 use window_vibrancy::*;
 
-mod theme_utils;
 mod icns_utils;
+mod theme_utils;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_stronghold::Builder::new(|password| {
+            use argon2::{hash_raw, Config, Variant, Version};
+            let config = Config {
+                lanes: 4,
+                mem_cost: 10_000,
+                time_cost: 10,
+                variant: Variant::Argon2id,
+                version: Version::Version13,
+                ..Default::default()
+            };
+            let salt = "dsgfdfgdfg345345".as_bytes();
+            let key = hash_raw(password.as_ref(), salt, &config).expect("failed to hash password");
+
+            key.to_vec()
+        })
+        .build())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_dialog::init())

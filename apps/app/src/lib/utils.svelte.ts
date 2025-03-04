@@ -1,7 +1,6 @@
 import { install } from "@github/hotkey";
 import { Position, moveWindow } from "@tauri-apps/plugin-positioner";
 import { useEventListener } from "runed";
-import { onMount } from "svelte";
 import { appStore } from "./store/app.svelte";
 import { settingsStore } from "./store/settings.svelte";
 
@@ -23,14 +22,12 @@ export class SystemThemeWatcher {
 	);
 
 	initialize() {
-		onMount(() => {
-			this.setInitialSystemTheme();
-			useEventListener(
-				() => window.matchMedia(THEME_QUERY),
-				"change",
-				this.handleSystemThemeChange,
-			);
-		});
+		this.setInitialSystemTheme();
+		useEventListener(
+			() => window.matchMedia(THEME_QUERY),
+			"change",
+			this.handleSystemThemeChange,
+		);
 	}
 
 	setInitialSystemTheme() {

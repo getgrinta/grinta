@@ -32,6 +32,8 @@ tauri-plugin-process = "2"
 tauri-icns = "0.1.0"
 png = "0.17.10"
 base64 = "0.21.5"
+tauri-plugin-stronghold = "2"
+rust-argon2 = "2.1.0"
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-autostart = "2"

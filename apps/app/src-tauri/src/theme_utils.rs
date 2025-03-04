@@ -1,5 +1,5 @@
+use tauri::command;
 use tauri::Manager;
-use tauri::{command};
 use window_vibrancy::*;
 
 #[command]

@@ -72,6 +72,8 @@ type ExecutableCommand = {
 };
 
 export const SYSTEM_COMMAND = {
+	SIGN_IN: "SIGN_IN",
+	PROFILE: "PROFILE",
 	CLEAR_NOTES: "CLEAR_NOTES",
 	CLEAR_HISTORY: "CLEAR_HISTORY",
 	HELP: "HELP",
@@ -160,7 +162,7 @@ async function buildQueryCommands(query: string) {
 		const completionQuery = encodeURIComponent(completion);
 		return {
 			label: completion,
-			value: settingsStore.getSearchUrl(completion),
+			value: settingsStore.getSearchUrl(completionQuery),
 			handler: COMMAND_HANDLER.URL,
 		};
 	});
@@ -189,7 +191,24 @@ export class CommandsStore {
 	selectedIndex = $state<number>(0);
 
 	getMenuItems(): ExecutableCommand[] {
+		console.log(">>>USER", appStore?.user);
+		const userCommands = appStore?.user
+			? [
+					{
+						label: t("commands.menuItems.profile"),
+						value: SYSTEM_COMMAND.PROFILE,
+						handler: COMMAND_HANDLER.SYSTEM,
+					},
+				]
+			: [
+					{
+						label: t("commands.menuItems.signIn"),
+						value: SYSTEM_COMMAND.SIGN_IN,
+						handler: COMMAND_HANDLER.SYSTEM,
+					},
+				];
 		return [
+			...userCommands,
 			{
 				label: t("commands.menuItems.clearNotes"),
 				value: SYSTEM_COMMAND.CLEAR_NOTES,
@@ -284,7 +303,7 @@ export class CommandsStore {
 								},
 							]
 						: [];
-				const notes = await notesStore.fetchNotes();
+				await notesStore.fetchNotes();
 				return [...createNoteCommand, ...buildNoteCommands(notesStore.notes)];
 			})
 			.exhaustive();
@@ -410,6 +429,12 @@ export class CommandsStore {
 						await this.clearHistory();
 						appStore.barMode = BAR_MODE.INITIAL;
 						return goto("/");
+					})
+					.with(SYSTEM_COMMAND.SIGN_IN, async () => {
+						return goto("/sign-in");
+					})
+					.with(SYSTEM_COMMAND.PROFILE, async () => {
+						return goto("/profile");
 					})
 					.exhaustive();
 			})

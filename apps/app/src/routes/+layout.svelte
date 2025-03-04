@@ -16,7 +16,6 @@ import { defaultWindowIcon } from "@tauri-apps/api/app";
 import { invoke } from "@tauri-apps/api/core";
 import { Menu } from "@tauri-apps/api/menu";
 import { TrayIcon } from "@tauri-apps/api/tray";
-import { getCurrentWindow } from "@tauri-apps/api/window";
 import { readText } from "@tauri-apps/plugin-clipboard-manager";
 import { Position, moveWindow } from "@tauri-apps/plugin-positioner";
 import { exit } from "@tauri-apps/plugin-process";
@@ -39,7 +38,7 @@ $effect(() => {
 	}
 });
 
-let trap = $state();
+let trap = $state<focusTrap.FocusTrap>();
 
 async function initTrayIcon() {
 	const menu = await Menu.new({
@@ -124,15 +123,12 @@ async function openMenu() {
 	return goto(`/commands/${BAR_MODE.MENU}`);
 }
 
-function initializeApp() {
-	if (appStore.appWindow) return;
-	systemThemeWatcher.initialize();
+async function initializeApp() {
 	commandsStore.initialize();
 	settingsStore.initialize();
 	clipboardStore.initialize();
-	// Initialize app icons in the background
 	appIconsStore.initializeIcons();
-	appStore.appWindow = getCurrentWindow();
+	systemThemeWatcher.initialize();
 	initTrayIcon();
 	moveWindow(Position.TopCenter);
 }
@@ -170,20 +166,18 @@ onMount(() => {
 	};
 });
 
-afterNavigate(({ from, to }) => {
+afterNavigate(({ to }) => {
 	installHotkeys();
 	if (to?.url?.pathname === "/") return;
-	trap = focusTrap.createFocusTrap([
-		"#mainLayout",
-		'ol[data-sonner-toaster="true"]',
-	]);
+	trap = focusTrap.createFocusTrap(["#mainLayout"]);
 	trap?.activate();
 });
 </script>
 
-<Toaster theme="dark" position="bottom-center" richColors />
-
 <main id="mainLayout" class={clsx("flex-1 flex flex-col p-4", accentColorClass, bgClass)} data-theme={themeName}>
 	<button type="button" class="hidden" onclick={openMenu} data-hotkey="Mod+k">Open Settings</button>
-  {@render children?.()}
+	{#if appStore.appWindow}
+		{@render children?.()}
+	{/if}
+	<Toaster theme="dark" position="bottom-center" richColors />
 </main>

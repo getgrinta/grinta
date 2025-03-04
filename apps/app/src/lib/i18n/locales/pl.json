@@ -67,7 +67,8 @@
 			"clearHistory": "Wyczyść historię poleceń",
 			"help": "Pomoc",
 			"settings": "Ustawienia",
-			"exit": "Wyjście"
+			"exit": "Wyjść",
+			"signIn": "Zaloguj"
 		},
 		"actions": {
 			"search": "Szukaj \"{query}\"",
