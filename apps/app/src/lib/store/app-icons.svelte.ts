@@ -11,7 +11,6 @@ export class AppIconsStore {
 	}
 
 	async initializeIcons() {
-		// Only initialize once
 		if (this.initialized || this.loading) return;
 
 		this.loading = true;

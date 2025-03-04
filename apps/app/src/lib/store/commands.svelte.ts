@@ -1,8 +1,6 @@
 import { goto } from "$app/navigation";
 import { appIconsStore } from "$lib/store/app-icons.svelte";
-import { invoke } from "@tauri-apps/api/core";
-import { appDataDir } from "@tauri-apps/api/path";
-import { type DirEntry, exists, readDir } from "@tauri-apps/plugin-fs";
+import { type DirEntry, readDir } from "@tauri-apps/plugin-fs";
 import { fetch } from "@tauri-apps/plugin-http";
 import { exit } from "@tauri-apps/plugin-process";
 import { Command } from "@tauri-apps/plugin-shell";
@@ -41,6 +39,7 @@ function t(key: string, params: Record<string, string> = {}) {
 
 const APP_REGEX = /[^.]\.app$/;
 
+const HOSTNAME_REGEX = /[a-zA-Z0-9\-\.]{1,61}\.[a-zA-Z]{2,}/;
 const urlParser = z
 	.string()
 	.url()
@@ -294,11 +293,7 @@ export class CommandsStore {
 				? commands
 				: matchSorter(commands, query, {
 						keys: ["label"],
-					}).sort(
-						(a, b) =>
-							commandsPriority.indexOf(a.handler) -
-							commandsPriority.indexOf(b.handler),
-					);
+					}).sort((a, b) => this.sortCommands(a, b, query));
 
 		// Apply icons from the app icons store
 		for (let i = 0; i < sortedAndFilteredCommands.length; i++) {
@@ -313,6 +308,26 @@ export class CommandsStore {
 
 		const formulaCommands = buildFormulaCommands(query);
 		this.commands = uniq([...formulaCommands, ...sortedAndFilteredCommands]);
+	}
+
+	sortCommands(
+		a: ExecutableCommand,
+		b: ExecutableCommand,
+		query: string,
+	): number {
+		// Smart match urls
+		if (HOSTNAME_REGEX.test(query)) {
+			if (a.label === query && b.label !== query) {
+				return -1;
+			}
+			if (b.label === query && a.label !== query) {
+				return 1;
+			}
+		}
+
+		return (
+			commandsPriority.indexOf(a.handler) - commandsPriority.indexOf(b.handler)
+		);
 	}
 
 	removeHistoryOfType(handler: CommandHandler) {

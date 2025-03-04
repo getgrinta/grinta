@@ -130,7 +130,6 @@ function initializeApp() {
 	commandsStore.initialize();
 	settingsStore.initialize();
 	clipboardStore.initialize();
-	// Initialize app icons in the background
 	appIconsStore.initializeIcons();
 	appStore.appWindow = getCurrentWindow();
 	initTrayIcon();
