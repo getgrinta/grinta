@@ -1,10 +1,10 @@
 use base64::{engine::general_purpose, Engine as _};
 use std::collections::HashMap;
-use std::fs::{self, File};
+use std::fs::{self};
 use std::io::BufWriter;
-use std::path::{Path, PathBuf};
-use tauri::path::PathResolver;
+use std::path::{Path};
 use tauri::{command, AppHandle, Manager, Runtime};
+use base64::{Engine as _, engine::general_purpose};
 
 #[cfg(target_os = "macos")]
 use tauri_icns::{IconFamily, IconType};
@@ -30,13 +30,7 @@ fn load_icns_file(path: &Path) -> Result<Option<Vec<u8>>, String> {
         Err(e) => return Err(format!("Failed to parse ICNS data: {}", e)),
     };
 
-    // Try to get the largest icon (preferably 256x256 or 128x128)
-    let icon_types = [
-        IconType::RGBA32_256x256,
-        IconType::RGBA32_128x128,
-        IconType::RGBA32_64x64,
-        IconType::RGBA32_32x32,
-    ];
+    let icon_types = [IconType::RGBA32_512x512_2x, IconType::RGBA32_512x512, IconType::RGBA32_256x256_2x, IconType::RGBA32_256x256, IconType::RGBA32_128x128_2x, IconType::RGBA32_128x128, IconType::RGB24_128x128, IconType::RGBA32_64x64, IconType::RGBA32_32x32_2x, IconType::RGBA32_32x32, IconType::RGB24_48x48];
 
     // First try our preferred icon types
     for icon_type in icon_types {
@@ -47,14 +41,14 @@ fn load_icns_file(path: &Path) -> Result<Option<Vec<u8>>, String> {
                 let writer = BufWriter::new(&mut png_data);
 
                 // Use the built-in write_png method
-                if let Err(e) = image.write_png(writer) {
+                if let Err(_e) = image.write_png(writer) {
                     // println!("Error writing PNG for icon type {:?}: {}", icon_type, e);
                     continue;
                 }
 
                 return Ok(Some(png_data));
-            }
-            Err(e) => {
+            },
+            Err(_e) => {
                 // println!("Error extracting icon type {:?}: {}", icon_type, e);
                 continue;
             }
@@ -79,14 +73,14 @@ fn load_icns_file(path: &Path) -> Result<Option<Vec<u8>>, String> {
                 let writer = BufWriter::new(&mut png_data);
 
                 // Use the built-in write_png method
-                if let Err(e) = image.write_png(writer) {
+                if let Err(_e) = image.write_png(writer) {
                     // println!("Error writing PNG for fallback icon type {:?}: {}", icon_type, e);
                     continue;
                 }
 
                 return Ok(Some(png_data));
-            }
-            Err(e) => {
+            },
+            Err(_e) => {
                 // println!("Error extracting fallback icon type {:?}: {}", icon_type, e);
                 continue;
             }
@@ -99,10 +93,7 @@ fn load_icns_file(path: &Path) -> Result<Option<Vec<u8>>, String> {
 
 #[command]
 #[cfg(target_os = "macos")]
-pub fn load_app_icons<R: Runtime>(
-    app_handle: AppHandle<R>,
-    resources_paths: Vec<String>,
-) -> Result<HashMap<String, String>, String> {
+pub fn load_app_icons<R: Runtime>(_app_handle: AppHandle<R>, resources_paths: Vec<String>) -> Result<HashMap<String, String>, String> {
     let mut result = HashMap::new();
 
     for resources_path in resources_paths {
@@ -160,8 +151,8 @@ pub fn load_app_icons<R: Runtime>(
             Ok(None) => {
                 // No suitable icon found, skip
                 continue;
-            }
-            Err(e) => {
+            },
+            Err(_e) => {
                 // Log error but continue with other icons
                 continue;
             }

@@ -1,8 +1,6 @@
 import { goto } from "$app/navigation";
-import { appIconsStore } from "$lib/store/app-icons.svelte";
-import { invoke } from "@tauri-apps/api/core";
-import { appDataDir } from "@tauri-apps/api/path";
-import { type DirEntry, exists, readDir } from "@tauri-apps/plugin-fs";
+import { generateCancellationToken } from "$lib/utils.svelte";
+import { type DirEntry, readDir } from "@tauri-apps/plugin-fs";
 import { fetch } from "@tauri-apps/plugin-http";
 import { exit } from "@tauri-apps/plugin-process";
 import { Command } from "@tauri-apps/plugin-shell";
@@ -41,6 +39,7 @@ function t(key: string, params: Record<string, string> = {}) {
 
 const APP_REGEX = /[^.]\.app$/;
 
+const HOSTNAME_REGEX = /[a-zA-Z0-9\-\.]{1,61}\.[a-zA-Z]{2,}/;
 const urlParser = z
 	.string()
 	.url()
@@ -68,7 +67,6 @@ type ExecutableCommand = {
 	label: string;
 	value: string;
 	handler: CommandHandler;
-	icon?: string;
 };
 
 export const SYSTEM_COMMAND = {
@@ -187,7 +185,7 @@ async function buildQueryCommands(query: string) {
 export class CommandsStore {
 	commands = $state<ExecutableCommand[]>([]);
 	commandHistory = $state<ExecutableCommand[]>([]);
-	appIcons = $state<Record<string, string>>({});
+	buildCommandsToken = $state<string>("");
 	selectedIndex = $state<number>(0);
 
 	getMenuItems(): ExecutableCommand[] {
@@ -251,6 +249,9 @@ export class CommandsStore {
 	}: { query: string; searchMode: SearchMode; barMode: BarMode }) {
 		this.selectedIndex = 0;
 		const queryIsUrl = urlParser.safeParse(query);
+		const newCommandsToken = generateCancellationToken();
+		this.buildCommandsToken = newCommandsToken;
+
 		const commands: ExecutableCommand[] = await match(barMode)
 			.with(BAR_MODE.INITIAL, async () => {
 				const commandHistory = this.commandHistory.slice().reverse();
@@ -313,25 +314,36 @@ export class CommandsStore {
 				? commands
 				: matchSorter(commands, query, {
 						keys: ["label"],
-					}).sort(
-						(a, b) =>
-							commandsPriority.indexOf(a.handler) -
-							commandsPriority.indexOf(b.handler),
-					);
+					}).sort((a, b) => this.sortCommands(a, b, query));
 
-		// Apply icons from the app icons store
-		for (let i = 0; i < sortedAndFilteredCommands.length; i++) {
-			const command = sortedAndFilteredCommands[i];
-			if (command.icon || command.handler !== "APP") continue;
+		const formulaCommands = buildFormulaCommands(query);
 
-			const appIcon = appIconsStore.getIcon(command.label);
-			if (appIcon) {
-				sortedAndFilteredCommands[i].icon = appIcon;
+		// Prevent overriding commands
+		if (newCommandsToken !== this.buildCommandsToken) {
+			return;
+		}
+
+		this.commands = uniq([...formulaCommands, ...sortedAndFilteredCommands]);
+	}
+
+	sortCommands(
+		a: ExecutableCommand,
+		b: ExecutableCommand,
+		query: string,
+	): number {
+		// Smart match urls
+		if (HOSTNAME_REGEX.test(query)) {
+			if (a.label === query && b.label !== query) {
+				return -1;
+			}
+			if (b.label === query && a.label !== query) {
+				return 1;
 			}
 		}
 
-		const formulaCommands = buildFormulaCommands(query);
-		this.commands = uniq([...formulaCommands, ...sortedAndFilteredCommands]);
+		return (
+			commandsPriority.indexOf(a.handler) - commandsPriority.indexOf(b.handler)
+		);
 	}
 
 	removeHistoryOfType(handler: CommandHandler) {
