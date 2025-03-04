@@ -24,6 +24,7 @@ import {
 } from "./app.svelte";
 import { type Note, notesStore } from "./notes.svelte";
 import { settingsStore } from "./settings.svelte";
+import { generateCancellationToken } from "$lib/utils.svelte";
 
 nlp.plugin(datePlugin);
 nlp.plugin(numbersPlugin);
@@ -185,6 +186,7 @@ export class CommandsStore {
 	commands = $state<ExecutableCommand[]>([]);
 	commandHistory = $state<ExecutableCommand[]>([]);
 	appIcons = $state<Record<string, string>>({});
+	buildCommandsToken = $state<string>("");
 	selectedIndex = $state<number>(0);
 
 	getMenuItems(): ExecutableCommand[] {
@@ -225,12 +227,16 @@ export class CommandsStore {
 		this.commandHistory = commandHistory;
 	}
 
+	
 	async buildCommands({
 		query,
 		barMode,
 	}: { query: string; searchMode: SearchMode; barMode: BarMode }) {
 		this.selectedIndex = 0;
 		const queryIsUrl = urlParser.safeParse(query);
+		const newCommandsToken = generateCancellationToken();
+		this.buildCommandsToken = newCommandsToken;
+
 		const commands: ExecutableCommand[] = await match(barMode)
 			.with(BAR_MODE.INITIAL, async () => {
 				const commandHistory = this.commandHistory.slice().reverse();
@@ -307,6 +313,12 @@ export class CommandsStore {
 		}
 
 		const formulaCommands = buildFormulaCommands(query);
+
+		// Prevent overriding commands
+		if (newCommandsToken !== this.buildCommandsToken) {
+			return;
+		}
+
 		this.commands = uniq([...formulaCommands, ...sortedAndFilteredCommands]);
 	}
 
