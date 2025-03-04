@@ -1,12 +1,13 @@
 <script lang="ts">
-import { BAR_MODE, appStore } from "$lib/store/app.svelte";
 import { appIconsStore } from "$lib/store/app-icons.svelte";
+import { BAR_MODE, appStore } from "$lib/store/app.svelte";
 import {
 	COMMAND_HANDLER,
 	type CommandHandler,
 	commandsStore,
 } from "$lib/store/commands.svelte";
 import { highlightText } from "$lib/utils.svelte";
+import { $ } from "bun";
 import { clsx } from "clsx";
 import {
 	AppWindowIcon,

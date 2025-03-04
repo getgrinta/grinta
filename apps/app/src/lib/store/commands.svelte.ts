@@ -1,5 +1,5 @@
 import { goto } from "$app/navigation";
-import { appIconsStore } from "$lib/store/app-icons.svelte";
+import { generateCancellationToken } from "$lib/utils.svelte";
 import { type DirEntry, readDir } from "@tauri-apps/plugin-fs";
 import { fetch } from "@tauri-apps/plugin-http";
 import { exit } from "@tauri-apps/plugin-process";
@@ -24,7 +24,6 @@ import {
 } from "./app.svelte";
 import { type Note, notesStore } from "./notes.svelte";
 import { settingsStore } from "./settings.svelte";
-import { generateCancellationToken } from "$lib/utils.svelte";
 
 nlp.plugin(datePlugin);
 nlp.plugin(numbersPlugin);
@@ -184,7 +183,6 @@ async function buildQueryCommands(query: string) {
 export class CommandsStore {
 	commands = $state<ExecutableCommand[]>([]);
 	commandHistory = $state<ExecutableCommand[]>([]);
-	appIcons = $state<Record<string, string>>({});
 	buildCommandsToken = $state<string>("");
 	selectedIndex = $state<number>(0);
 
@@ -226,7 +224,6 @@ export class CommandsStore {
 		this.commandHistory = commandHistory;
 	}
 
-	
 	async buildCommands({
 		query,
 		barMode,
