@@ -1,5 +1,6 @@
 <script lang="ts">
 import { BAR_MODE, appStore } from "$lib/store/app.svelte";
+import { appIconsStore } from "$lib/store/app-icons.svelte";
 import {
 	COMMAND_HANDLER,
 	type CommandHandler,
@@ -98,9 +99,15 @@ $effect(() => {
       <li class="w-full" data-command-index={index} transition:fly={{ duration: 150, y: -5, delay: index * 20, easing: circOut }}>
           <div class={clsx("flex justify-between gap-4 border-1 border-transparent text-neutral-300", active && 'menu-active !bg-base-100/40 !text-primary !border-neutral-600')}>
             <button type="button" onclick={() => commandsStore.handleCommand(index)} class="flex flex-1 h-full gap-4 py-[0.75rem] items-center overflow-hidden cursor-pointer">
-              {#if command.icon}
-                <img src={command.icon} alt={command.label} width="24" height="24" class="w-6 h-6 object-contain" />
-              {:else}
+              {#if command.handler === COMMAND_HANDLER.APP}
+				{@const icon = appIconsStore.getIcon(command.label)}
+
+				{#if icon}
+                  <img src={icon} alt={command.label} width="24" height="24" class="w-6 h-6 object-contain" />
+				{:else}
+				  <IconComponent size={24} />
+				{/if}
+			  {:else}
                 <IconComponent size={24} />
               {/if}
               <h2 class={clsx("flex-1 text-left truncate")}>

@@ -68,7 +68,6 @@ type ExecutableCommand = {
 	label: string;
 	value: string;
 	handler: CommandHandler;
-	icon?: string;
 };
 
 export const SYSTEM_COMMAND = {
@@ -300,17 +299,6 @@ export class CommandsStore {
 				: matchSorter(commands, query, {
 						keys: ["label"],
 					}).sort((a, b) => this.sortCommands(a, b, query));
-
-		// Apply icons from the app icons store
-		for (let i = 0; i < sortedAndFilteredCommands.length; i++) {
-			const command = sortedAndFilteredCommands[i];
-			if (command.icon || command.handler !== "APP") continue;
-
-			const appIcon = appIconsStore.getIcon(command.label);
-			if (appIcon) {
-				sortedAndFilteredCommands[i].icon = appIcon;
-			}
-		}
 
 		const formulaCommands = buildFormulaCommands(query);
 
