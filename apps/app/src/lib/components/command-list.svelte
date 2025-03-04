@@ -7,7 +7,6 @@ import {
 	commandsStore,
 } from "$lib/store/commands.svelte";
 import { highlightText } from "$lib/utils.svelte";
-import { $ } from "bun";
 import { clsx } from "clsx";
 import {
 	AppWindowIcon,
