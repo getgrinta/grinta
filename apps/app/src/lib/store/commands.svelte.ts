@@ -120,7 +120,10 @@ function buildShortcutCommands(stdout: string) {
 	}));
 }
 
-async function buildQueryCommands(query: string) {
+async function buildQueryCommands(
+	query: string,
+	excludeResult: string | null = null,
+) {
 	const encodedQuery = encodeURIComponent(query);
 	const queryMatchSearch = [
 		{
@@ -166,7 +169,7 @@ async function buildQueryCommands(query: string) {
 			value: query,
 			handler: COMMAND_HANDLER.CREATE_NOTE,
 		},
-	];
+	].filter((a) => a.label !== excludeResult);
 }
 
 export class CommandsStore {
@@ -277,7 +280,7 @@ export class CommandsStore {
 		barMode,
 	}: { query: string; searchMode: SearchMode; barMode: BarMode }) {
 		this.selectedIndex = 0;
-		const queryIsUrl = urlParser.safeParse(query);
+		const queryIsUrl = HOSTNAME_REGEX.test(query);
 		const newCommandsToken = generateCancellationToken();
 		this.buildCommandsToken = newCommandsToken;
 
@@ -285,21 +288,36 @@ export class CommandsStore {
 
 		commands = await match(barMode)
 			.with(BAR_MODE.INITIAL, async () => {
-				const commandHistory = this.commandHistory.slice().reverse();
+				let commandHistory = this.commandHistory.slice().reverse();
 				if (query.length === 0) {
 					return commandHistory;
 				}
 
-				const urlCommands = queryIsUrl.success
+				const urlCommands = queryIsUrl
 					? [
 							{
 								label: query,
-								value: query,
+								value:
+									query.startsWith("http://") || query.startsWith("https://")
+										? query
+										: `https://${query}`,
 								handler: COMMAND_HANDLER.URL,
 							},
 						]
 					: [];
-				const webSearchCommands = await buildQueryCommands(query);
+
+				const webSearchCommands = await buildQueryCommands(
+					query,
+					queryIsUrl ? query : null,
+				);
+
+				// Filter out commands of the same url as the current query
+				if (queryIsUrl) {
+					commandHistory = commandHistory.filter(
+						(a) => a.label !== query && a.handler !== COMMAND_HANDLER.URL,
+					);
+				}
+
 				return [
 					...this.appCommands,
 					...urlCommands,
