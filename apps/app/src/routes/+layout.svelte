@@ -131,7 +131,7 @@ function initializeApp() {
 	settingsStore.initialize();
 	clipboardStore.initialize();
 	setTimeout(() => {
-	    appIconsStore.initializeIcons();
+		appIconsStore.initializeIcons();
 	}, 0);
 	appStore.appWindow = getCurrentWindow();
 	initTrayIcon();
