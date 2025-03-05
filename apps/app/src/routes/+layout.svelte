@@ -130,7 +130,9 @@ function initializeApp() {
 	commandsStore.initialize();
 	settingsStore.initialize();
 	clipboardStore.initialize();
-	appIconsStore.initializeIcons();
+	setTimeout(() => {
+	    appIconsStore.initializeIcons();
+	}, 0);
 	appStore.appWindow = getCurrentWindow();
 	initTrayIcon();
 	moveWindow(Position.TopCenter);
