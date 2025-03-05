@@ -6,12 +6,6 @@ export class AppIconsStore {
 	loading = $state<boolean>(false);
 	initialized = $state<boolean>(false);
 
-	constructor() {
-		setTimeout(() => {
-			this.initializeIcons();
-		}, 0);
-	}
-
 	async initializeIcons() {
 		if (this.initialized || this.loading) return;
 

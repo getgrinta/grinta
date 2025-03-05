@@ -1,6 +1,6 @@
 import { goto } from "$app/navigation";
 import { generateCancellationToken } from "$lib/utils.svelte";
-import { type DirEntry, readDir } from "@tauri-apps/plugin-fs";
+import { type DirEntry, readDir, watch } from "@tauri-apps/plugin-fs";
 import { fetch } from "@tauri-apps/plugin-http";
 import { exit } from "@tauri-apps/plugin-process";
 import { Command } from "@tauri-apps/plugin-shell";
@@ -36,8 +36,6 @@ function t(key: string, params: Record<string, string> = {}) {
 		return key;
 	}
 }
-
-const APP_REGEX = /[^.]\.app$/;
 
 const HOSTNAME_REGEX = /[a-zA-Z0-9\-\.]{1,61}\.[a-zA-Z]{2,}/;
 const urlParser = z
@@ -100,20 +98,11 @@ function buildFormulaCommands(currentQuery: string): ExecutableCommand[] {
 async function buildAppCommands(
 	apps: DirEntry[],
 ): Promise<ExecutableCommand[]> {
-	const filteredApps = apps.filter((app) => APP_REGEX.test(app.name));
-	const commands: ExecutableCommand[] = [];
-
-	for (const app of filteredApps) {
-		const appName = app.name.replace(".app", "");
-
-		commands.push({
-			label: appName,
-			value: app.name,
-			handler: COMMAND_HANDLER.APP,
-		});
-	}
-
-	return commands;
+	return apps.map((app) => ({
+		label: app.name.slice(0, -4),
+		value: app.name,
+		handler: COMMAND_HANDLER.APP,
+	}));
 }
 
 function buildNoteCommands(notes: Note[]): ExecutableCommand[] {
@@ -187,6 +176,9 @@ export class CommandsStore {
 	commandHistory = $state<ExecutableCommand[]>([]);
 	buildCommandsToken = $state<string>("");
 	selectedIndex = $state<number>(0);
+	installedApps = $state<DirEntry[]>([]);
+	appCommands = $state<ExecutableCommand[]>([]);
+	shortcutCommands = $state<ExecutableCommand[]>([]);
 
 	getMenuItems(): ExecutableCommand[] {
 		console.log(">>>USER", appStore?.user);
@@ -236,11 +228,67 @@ export class CommandsStore {
 	}
 
 	async initialize() {
-		const store = await load("commands.json");
-		const commandHistory =
-			(await store.get<ExecutableCommand[]>("commandHistory")) ?? [];
-		if (!commandHistory) return;
-		this.commandHistory = commandHistory;
+		try {
+			await this.buildAppCommands();
+			await this.buildShortcutCommands();
+
+			// Load command history
+			const store = await load("commands.json");
+			const commandHistory =
+				(await store.get<ExecutableCommand[]>("commandHistory")) ?? [];
+			if (!commandHistory) return;
+			this.commandHistory = commandHistory;
+		} catch (error) {
+			console.error("Error initializing CommandsStore:", error);
+		}
+
+		await this.watchForApplicationChanges();
+
+		setInterval(() => {
+			(async () => {
+				await this.buildShortcutCommands();
+			})();
+		}, 10_000);
+	}
+
+	private async buildShortcutCommands() {
+		const availableShortcuts = await Command.create("shortcuts", [
+			"list",
+		]).execute();
+		this.shortcutCommands = buildShortcutCommands(availableShortcuts.stdout);
+	}
+
+	private async buildAppCommands() {
+		const appsFromApplications = await readDir("/Applications");
+		const appsFromSystemApplications = await readDir("/System/Applications");
+		this.installedApps = [
+			...appsFromApplications,
+			...appsFromSystemApplications,
+		].filter((app) => app.isDirectory && app.name.endsWith(".app"));
+
+		this.appCommands = await buildAppCommands(this.installedApps);
+	}
+
+	async watchForApplicationChanges() {
+		await watch(
+			"/Applications/",
+			(event) => {
+				if (
+					event.paths.length === 1 &&
+					event.paths[0] === "/Applications/.DS_Store"
+				) {
+					return;
+				}
+				if (event.paths.every((path) => !path.endsWith(".app"))) {
+					return;
+				}
+
+				(async () => {
+					await this.buildAppCommands();
+				})();
+			},
+			{ recursive: false },
+		);
 	}
 
 	async buildCommands({
@@ -252,25 +300,15 @@ export class CommandsStore {
 		const newCommandsToken = generateCancellationToken();
 		this.buildCommandsToken = newCommandsToken;
 
-		const commands: ExecutableCommand[] = await match(barMode)
+		let commands: ExecutableCommand[] = [];
+
+		commands = await match(barMode)
 			.with(BAR_MODE.INITIAL, async () => {
 				const commandHistory = this.commandHistory.slice().reverse();
 				if (query.length === 0) {
 					return commandHistory;
 				}
-				let installedApps: DirEntry[] = [];
-				installedApps = await readDir("/Applications");
-				installedApps = [
-					...installedApps,
-					...(await readDir("/System/Applications")),
-				];
-				const availableShortcuts = await Command.create("shortcuts", [
-					"list",
-				]).execute();
-				const shortcutCommands = buildShortcutCommands(
-					availableShortcuts.stdout,
-				);
-				const appCommands = await buildAppCommands(installedApps);
+
 				const urlCommands = queryIsUrl.success
 					? [
 							{
@@ -282,11 +320,11 @@ export class CommandsStore {
 					: [];
 				const webSearchCommands = await buildQueryCommands(query);
 				return [
-					...appCommands,
+					...this.appCommands,
 					...urlCommands,
 					...webSearchCommands,
 					...commandHistory,
-					...shortcutCommands,
+					...this.shortcutCommands,
 					...this.getMenuItems(),
 				];
 			})
@@ -304,7 +342,6 @@ export class CommandsStore {
 								},
 							]
 						: [];
-				await notesStore.fetchNotes();
 				return [...createNoteCommand, ...buildNoteCommands(notesStore.notes)];
 			})
 			.exhaustive();
