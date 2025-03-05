@@ -6,9 +6,13 @@ import TopBar from "$lib/components/top-bar.svelte";
 import { BAR_MODE, type BarMode, appStore } from "$lib/store/app.svelte";
 import { commandsStore } from "$lib/store/commands.svelte";
 import { notesStore } from "$lib/store/notes.svelte";
+import { settingsStore } from "$lib/store/settings.svelte";
 import { clsx } from "clsx";
 import { createForm } from "felte";
 import {
+	DivideSquare,
+	EyeIcon,
+	EyeOffIcon,
 	MenuIcon,
 	PlusIcon,
 	SearchIcon,
@@ -177,8 +181,16 @@ const actionButton = $derived(
 </script>
 
 <form use:form>
-	<TopBar>
-		<div slot="indicator" class="hidden"></div>
+	<TopBar fancyMode={settingsStore.settings.incognitoEnabled}>
+		<div slot="indicator">
+			<div class="btn btn-sm" onclick={() => settingsStore.toggleIncognito()}>
+				{#if settingsStore.settings.incognitoEnabled}
+					<EyeOffIcon size={16} />
+				{:else}
+					<EyeIcon size={16} />
+				{/if}
+			</div>
+		</div>
 		<input
 			bind:this={queryInput}
 			slot="input"

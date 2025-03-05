@@ -2,7 +2,7 @@
 import clsx from "clsx";
 import { ChevronLeftIcon } from "lucide-svelte";
 
-const { goBack, fancyMode = false } = $props();
+const { goBack = false, fancyMode = false } = $props();
 
 function defaultGoBack() {
 	return window.history.back();

@@ -59,6 +59,7 @@ export const SettingsSchema = z.object({
 	aiAdditionalContext: z.string().default(""),
 	notesDir: z.array(z.string()).default(["Grinta", "notes"]),
 	notesAiEnabled: z.boolean().default(true),
+	incognitoEnabled: z.boolean().default(false),
 });
 
 export type Settings = z.infer<typeof SettingsSchema>;
@@ -91,6 +92,10 @@ export class SettingsStore {
 
 	async unregisterShortcuts() {
 		await unregisterAll();
+	}
+
+	toggleIncognito() {
+		this.settings.incognitoEnabled = !this.settings.incognitoEnabled;
 	}
 
 	async setToggleShortcut(toggleShortcut: string) {
