@@ -236,7 +236,9 @@ export class CommandsStore {
 		const availableShortcuts = await Command.create("shortcuts", [
 			"list",
 		]).execute();
-		this.shortcutCommands = buildShortcutCommands(availableShortcuts.stdout);
+		this.shortcutCommands = buildShortcutCommands(
+			availableShortcuts.stdout
+		);
 	}
 
 	private async buildAppCommands() {
@@ -254,10 +256,7 @@ export class CommandsStore {
 		await watch(
 			"/Applications/",
 			(event) => {
-				if (
-					event.paths.length === 1 &&
-					event.paths[0] === "/Applications/.DS_Store"
-				) {
+				if (event.paths.length === 1 && event.paths[0] === '/Applications/.DS_Store') {
 					return;
 				}
 				if (event.paths.every((path) => !path.endsWith(".app"))) {
@@ -268,9 +267,9 @@ export class CommandsStore {
 					await this.buildAppCommands();
 				})();
 			},
-			{ recursive: false },
+			{ recursive: false }
 		);
-	}
+	}	
 
 	async buildCommands({
 		query,
@@ -323,6 +322,8 @@ export class CommandsStore {
 								},
 							]
 						: [];
+				
+				await notesStore.fetchNotes();
 				return [...createNoteCommand, ...buildNoteCommands(notesStore.notes)];
 			})
 			.exhaustive();
