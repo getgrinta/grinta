@@ -1,3 +1,4 @@
+import { browser } from "$app/environment";
 import { activateWindow } from "$lib/utils.svelte";
 import {
 	type ShortcutEvent,
@@ -39,13 +40,32 @@ export const LANGUAGE = {
 	DE: "de",
 } as const;
 
+// Create a reverse mapping from language code to enum key
+const LANGUAGE_CODE_TO_ENUM = Object.entries(LANGUAGE).reduce(
+	(acc, [key, value]) => {
+		acc[value] = key as keyof typeof LANGUAGE;
+		return acc;
+	},
+	{} as Record<string, keyof typeof LANGUAGE>,
+);
+
 export type Language = (typeof LANGUAGE)[keyof typeof LANGUAGE];
+
+// Get browser language or default to English
+const getBrowserLanguage = (): Language => {
+	if (!browser) return LANGUAGE.EN;
+
+	const browserLang = window.navigator.language.split("-")[0];
+
+	const enumKey = LANGUAGE_CODE_TO_ENUM[browserLang];
+	return enumKey ? LANGUAGE[enumKey] : LANGUAGE.EN;
+};
 
 export const SettingsSchema = z.object({
 	toggleShortcut: z.string().default("CommandOrControl+Space"),
 	theme: z.nativeEnum(THEME).default(THEME.SYSTEM),
 	accentColor: z.nativeEnum(ACCENT_COLOR).default(ACCENT_COLOR.MARE),
-	language: z.nativeEnum(LANGUAGE).default(LANGUAGE.EN),
+	language: z.nativeEnum(LANGUAGE).default(getBrowserLanguage()),
 	aiModelName: z.string().default("ministral-small-latest"),
 	defaultSearchEngine: z
 		.nativeEnum(SEARCH_ENGINE)

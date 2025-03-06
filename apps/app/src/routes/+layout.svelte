@@ -29,9 +29,6 @@ const { children } = $props();
 
 dayjs.extend(LocalizedFormat);
 
-// Initialize i18n
-setupI18n();
-
 let initializing = $state<boolean>(true);
 
 if (process.env.NODE_ENV === "development") {
@@ -141,6 +138,7 @@ async function openMenu() {
 
 async function initializeApp() {
 	initializing = true;
+	await setupI18n();
 	await vaultStore.initialize();
 	await appStore.setSession();
 	await commandsStore.initialize();
@@ -179,6 +177,8 @@ $effect(() => {
 onMount(() => {
 	console.info("[Grinta] Layout Mount");
 	initializeApp();
+
+	// Initialize i18n
 	window.addEventListener("blur", hideWindow);
 	window.addEventListener("focus", activateFocusTrap);
 	const intervalId = setInterval(clipboardSnapshot, 5000);
