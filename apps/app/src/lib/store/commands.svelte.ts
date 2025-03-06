@@ -285,7 +285,7 @@ export class CommandsStore {
 		if (this.isUpdatingFromWebSearch) {
 			return;
 		}
-		
+
 		this.selectedIndex = 0;
 		const queryIsUrl = HOSTNAME_REGEX.test(query);
 		const newCommandsToken = generateCancellationToken();
@@ -543,13 +543,13 @@ export class CommandsStore {
 			if (token !== this.buildCommandsToken) {
 				return;
 			}
-			
+
 			// Set flag to prevent infinite loop
 			this.isUpdatingFromWebSearch = true;
-			
+
 			// Update web search commands
 			this.webSearchCommands = webSearchCommands;
-			
+
 			// Rebuild the commands with the new web search results
 			let commandHistory = this.commandHistory.slice().reverse();
 
@@ -574,10 +574,10 @@ export class CommandsStore {
 			}).sort((a, b) => this.sortCommands(a, b, query));
 
 			const formulaCommands = buildFormulaCommands(query);
-			
+
 			// Update the commands list
 			this.commands = uniq([...formulaCommands, ...sortedAndFilteredCommands]);
-			
+
 			// Reset the flag after updating
 			this.isUpdatingFromWebSearch = false;
 		} catch (error) {
