@@ -7,6 +7,7 @@ import SearchModeToggle from "$lib/components/search-mode-toggle.svelte";
 import ViewActions from "$lib/components/view-actions.svelte";
 import { BAR_MODE, appStore } from "$lib/store/app.svelte";
 import { notesStore } from "$lib/store/notes.svelte";
+import { onMount } from "svelte";
 import { _ } from "svelte-i18n";
 
 async function createNote() {

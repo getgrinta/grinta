@@ -32,6 +32,19 @@ dayjs.extend(LocalizedFormat);
 // Initialize i18n
 setupI18n();
 
+let initializing = $state<boolean>(true);
+
+if (process.env.NODE_ENV === "development") {
+	window.onerror = (_event, _source, _lineno, _colno, err) => {
+		const ErrorOverlay = customElements.get("vite-error-overlay");
+		if (!ErrorOverlay) {
+			return;
+		}
+		const overlay = new ErrorOverlay(err);
+		document.body.appendChild(overlay);
+	};
+}
+
 const systemThemeWatcher = new SystemThemeWatcher();
 
 // Sync language with settings
@@ -127,6 +140,7 @@ async function openMenu() {
 }
 
 async function initializeApp() {
+	initializing = true;
 	await vaultStore.initialize();
 	await appStore.setSession();
 	await commandsStore.initialize();
@@ -135,6 +149,7 @@ async function initializeApp() {
 	await appIconsStore.initializeIcons();
 	initTrayIcon();
 	moveWindow(Position.TopCenter);
+	initializing = false;
 }
 
 const accentLower = $derived(
@@ -178,15 +193,18 @@ onMount(() => {
 afterNavigate(({ to }) => {
 	installHotkeys();
 	if (to?.url?.pathname === "/") return;
-	trap = focusTrap.createFocusTrap(["#mainLayout"]);
+	trap = focusTrap.createFocusTrap("body");
 	trap?.activate();
 });
 </script>
 
+<Toaster theme="dark" position="bottom-center" richColors />
+
 <main id="mainLayout" class={clsx("flex-1 flex flex-col p-4", accentColorClass, bgClass)} data-theme={themeName}>
 	<button type="button" class="hidden" onclick={openMenu} data-hotkey="Mod+k">Open Settings</button>
-	{#if appStore.appWindow}
+	{#if initializing}
+		<div class="skeleton w-full h-10"></div>
+	{:else}
 		{@render children?.()}
 	{/if}
-	<Toaster theme="dark" position="bottom-center" richColors />
 </main>

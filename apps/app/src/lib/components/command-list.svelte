@@ -1,8 +1,6 @@
 <script lang="ts">
 import { appIconsStore } from "$lib/store/app-icons.svelte";
 import { BAR_MODE, appStore } from "$lib/store/app.svelte";
-import VirtualList from "svelte-tiny-virtual-list";
-
 import {
 	COMMAND_HANDLER,
 	type CommandHandler,
@@ -20,6 +18,7 @@ import {
 	StickyNoteIcon,
 } from "lucide-svelte";
 import { _ } from "svelte-i18n";
+import VirtualList from "svelte-tiny-virtual-list";
 import { fade } from "svelte/transition";
 import { P, match } from "ts-pattern";
 
@@ -68,24 +67,10 @@ function getIcon(handler: CommandHandler) {
 		.otherwise(() => ChevronRightIcon);
 }
 
-$effect(() => {
-	const firstSelected = commandsStore.selectedIndex === 0;
-	const lastSelected =
-		commandsStore.selectedIndex === commandsStore.commands.length - 1;
-	if (firstSelected) {
-		return window.scrollTo({
-			top: 0,
-		});
-	}
-	if (lastSelected) {
-		return window.scrollTo({
-			top: document.body.scrollHeight,
-		});
-	}
-	return window.scrollTo({
-		top: (commandsStore.selectedIndex + 1) * 51 - 52,
-	});
-});
+const itemCount = $derived(commandsStore.commands.length);
+const scrollToIndex = $derived(
+	itemCount > 0 ? commandsStore.selectedIndex : undefined,
+);
 </script>
 
 <div class="flex flex-1 flex-col mt-[4.25rem] overflow-hidden">
@@ -93,13 +78,12 @@ $effect(() => {
   	id="commandList"
     class="menu menu-lg flex-1 menu-vertical flex-nowrap p-0 w-full"
   >
-	<VirtualList scrollToIndex={commandsStore.selectedIndex}  width="100%" height={290} itemCount={commandsStore.commands.length} itemSize={70}>e}
-		<li class="w-full" data-command-index={index} slot="item" let:index let:style {style}>
+	<VirtualList scrollToIndex={scrollToIndex} width="100%" height={290} {itemCount} itemSize={70}>
+		<li let:index class="w-full" data-command-index={index} slot="item" let:style transition:fade={{ duration: 150 }} {style}>
 			{#if true}
 			{@const active = commandsStore.selectedIndex === index}
 			{@const IconComponent = getIcon(commandsStore.commands[index].handler)}
 			{@const labelChunks = highlightText(commandsStore.commands[index].label, appStore.query)}
-
 			<div class={clsx("flex justify-between gap-4 border-1 border-transparent text-neutral-300", active && 'menu-active !bg-base-100/40 !text-primary !border-neutral-600')}>
 				<button type="button" onclick={() => commandsStore.handleCommand(index)} class="flex flex-1 h-full gap-4 py-[0.75rem] items-center overflow-hidden cursor-pointer">
 					{#if commandsStore.commands[index].handler === COMMAND_HANDLER.APP}
