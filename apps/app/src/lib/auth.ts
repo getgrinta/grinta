@@ -6,14 +6,12 @@ import { createAuthClient } from "better-auth/svelte";
 import { vaultStore } from "./store/vault.svelte";
 
 export function getAuthClient() {
-	const authCookie = vaultStore.vault?.authCookie ?? "";
-	console.log(">>>Auth cookie", authCookie, vaultStore);
 	return createAuthClient({
 		baseURL: env.PUBLIC_BETTER_AUTH_URL,
 		fetchOptions: {
 			customFetchImpl: tauriFetch,
 			headers: {
-				Cookie: vaultStore.vault?.authCookie ?? "",
+				Cookie: vaultStore.data?.authCookie ?? "",
 			},
 		},
 		plugins: [

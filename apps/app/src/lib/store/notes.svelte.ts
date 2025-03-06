@@ -35,7 +35,7 @@ async function findUnusedFilename(
 	counter = 0,
 ): Promise<string> {
 	const fsStorage = createFsStorage(
-		await PathApi.join(...settingsStore.settings.notesDir),
+		await PathApi.join(...settingsStore.data.notesDir),
 	);
 	const uniqueFilename = counter === 0 ? filename : `${filename} (${counter})`;
 	if (!(await fsStorage.exists(`${uniqueFilename}.md`))) {
@@ -49,7 +49,7 @@ export class NotesStore {
 
 	async fetchNotes() {
 		const fsStorage = createFsStorage(
-			await PathApi.join(...settingsStore.settings.notesDir),
+			await PathApi.join(...settingsStore.data.notesDir),
 		);
 		const noteFiles = await fsStorage.listItems();
 		this.notes = noteFiles.map((file) => ({
@@ -62,7 +62,7 @@ export class NotesStore {
 
 	async fetchNote(filename: string): Promise<ExtendedNote> {
 		const fsStorage = createFsStorage(
-			await PathApi.join(...settingsStore.settings.notesDir),
+			await PathApi.join(...settingsStore.data.notesDir),
 		);
 		const file = await fsStorage.getItem(filename);
 		if (!file) throw new Error("File not found");
@@ -77,7 +77,7 @@ export class NotesStore {
 
 	async createNote(name?: string) {
 		const fsStorage = createFsStorage(
-			await PathApi.join(...settingsStore.settings.notesDir),
+			await PathApi.join(...settingsStore.data.notesDir),
 		);
 		const ensuredName = name ?? dayjs().format("ll");
 		const uniqueName = await findUnusedFilename(ensuredName);
@@ -88,14 +88,14 @@ export class NotesStore {
 
 	async updateNote({ filename, content }: UpdateNoteProps) {
 		const fsStorage = createFsStorage(
-			await PathApi.join(...settingsStore.settings.notesDir),
+			await PathApi.join(...settingsStore.data.notesDir),
 		);
 		return fsStorage.setItem({ filename, content });
 	}
 
 	async renameNote({ filename, nextFilename }: RenameNoteProps) {
 		const fsStorage = createFsStorage(
-			await PathApi.join(...settingsStore.settings.notesDir),
+			await PathApi.join(...settingsStore.data.notesDir),
 		);
 		await fsStorage.renameItem({ filename, nextFilename });
 		return commandsStore.removeHistoryEntry({
@@ -135,7 +135,7 @@ export class NotesStore {
 
 	async deleteNote(filename: string) {
 		const fsStorage = createFsStorage(
-			await PathApi.join(...settingsStore.settings.notesDir),
+			await PathApi.join(...settingsStore.data.notesDir),
 		);
 		commandsStore.removeHistoryEntry({
 			value: filename,
@@ -146,13 +146,13 @@ export class NotesStore {
 
 	async clearNotes() {
 		const fsStorage = createFsStorage(
-			await PathApi.join(...settingsStore.settings.notesDir),
+			await PathApi.join(...settingsStore.data.notesDir),
 		);
 		await fsStorage.removeAll();
 	}
 
 	async getFullNotePath(filename: string) {
-		return PathApi.join(...settingsStore.settings.notesDir, filename);
+		return PathApi.join(...settingsStore.data.notesDir, filename);
 	}
 }
 

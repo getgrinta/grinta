@@ -52,7 +52,7 @@ function toggleShortcutRecording() {
 const toggleShortcut = $derived(
 	newToggleShortcut.length > 1
 		? newToggleShortcut.join("+")
-		: settingsStore.settings.toggleShortcut,
+		: settingsStore.data.toggleShortcut,
 );
 
 const recordShortcutLabel = $derived(
@@ -79,7 +79,7 @@ function updateNotesDir(event: any) {
 	return settingsStore.setNotesDir(notesDirSplit);
 }
 
-const notesDirString = $derived(settingsStore.settings.notesDir.join("/"));
+const notesDirString = $derived(settingsStore.data.notesDir.join("/"));
 
 async function wipeLocalData() {
 	await settingsStore.wipeLocalData();
@@ -117,7 +117,7 @@ $effect(() => {
 });
 
 watch(
-	() => $state.snapshot(settingsStore.settings),
+	() => $state.snapshot(settingsStore.data),
 	() => {
 		settingsStore.persist();
 	},
@@ -157,25 +157,25 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
           <button type="button" class="btn flex-1">{$_("settings.fields.checkForUpdate")}</button>
         </div>
         <label class="text-sm">{$_("settings.fields.theme")}</label>
-        <select name="theme" bind:value={settingsStore.settings.theme} class="select select-bordered w-full">
+        <select name="theme" bind:value={settingsStore.data.theme} class="select select-bordered w-full">
         	{#each themes as theme}
           	<option value={theme}>{humanizeString(theme)}</option>
           {/each}
         </select>
 		<label class="text-sm">{$_("settings.fields.defaultSearchEngine")}</label>
-        <select name="theme" bind:value={settingsStore.settings.defaultSearchEngine} class="select select-bordered w-full">
+        <select name="theme" bind:value={settingsStore.data.defaultSearchEngine} class="select select-bordered w-full">
         	{#each searchEngines as searchEngine}
           	<option value={searchEngine}>{humanizeString(searchEngine)}</option>
           {/each}
         </select>
         <label class="text-sm">{$_("settings.fields.accentColor")}</label>
-        <select name="accentColor" bind:value={settingsStore.settings.accentColor} class="select select-bordered w-full">
+        <select name="accentColor" bind:value={settingsStore.data.accentColor} class="select select-bordered w-full">
         	{#each accentColors as color}
           	<option value={color}>{humanizeString(color)}</option>
           {/each}
         </select>
         <label class="text-sm">{$_("settings.language")}</label>
-        <select name="language" bind:value={settingsStore.settings.language} class="select select-bordered w-full">
+        <select name="language" bind:value={settingsStore.data.language} class="select select-bordered w-full">
         	{#each languages as language}
           	<option value={language.code}>{$_(`settings.languages.${language.code}`)}</option>
           {/each}
@@ -186,13 +186,13 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
     {:else if currentTab === 'ai'}
       <form class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center"> 
         <label class="text-sm">{$_("settings.fields.ai.modelName")}</label>
-        <input class="input w-full" name="modelName" placeholder="gpt-4o" bind:value={settingsStore.settings.aiModelName} />
+        <input class="input w-full" name="modelName" placeholder="gpt-4o" bind:value={settingsStore.data.aiModelName} />
         <label class="text-sm">{$_("settings.fields.ai.customEndpoint")}</label>
-        <input class="input w-full" name="endpointUrl" placeholder="https://api.openai.com/v1" bind:value={settingsStore.settings.aiEndpointUrl} />
+        <input class="input w-full" name="endpointUrl" placeholder="https://api.openai.com/v1" bind:value={settingsStore.data.aiEndpointUrl} />
         <label class="text-sm">{$_("settings.fields.ai.tokenSecret")}</label>
-        <input class="input w-full" type="password" name="secretKey" bind:value={settingsStore.settings.aiSecretKey} />
+        <input class="input w-full" type="password" name="secretKey" bind:value={settingsStore.data.aiSecretKey} />
         <label class="text-sm">{$_("settings.fields.ai.additionalContext")}</label>
-        <textarea class="textarea w-full resize-none" placeholder="{$_("additionalContextPlaceholder")}" bind:value={settingsStore.settings.aiAdditionalContext} />
+        <textarea class="textarea w-full resize-none" placeholder="{$_("additionalContextPlaceholder")}" bind:value={settingsStore.data.aiAdditionalContext} />
         <span></span>
         <div>
         <button type="button" class="btn btn-warning w-[100%]" onclick={testConnection}>{$_("settings.fields.ai.testConnection")}</button>
@@ -206,7 +206,7 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
     {:else if currentTab === 'notes'}
       <form class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center">
         <label class="text-sm">{$_("settings.fields.notes.aiEnabled")}</label>
-        <input type="checkbox" bind:checked={settingsStore.settings.notesAiEnabled} class="toggle toggle-lg" />
+        <input type="checkbox" bind:checked={settingsStore.data.notesAiEnabled} class="toggle toggle-lg" />
         <label class="text-sm">{$_("settings.fields.notes.notesDirectory")}</label>
         <input class="input w-full" name="notesDir" value={notesDirString} onchange={updateNotesDir} />
       </form>

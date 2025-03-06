@@ -1,33 +1,33 @@
-import { load } from "@tauri-apps/plugin-store";
+import { z } from "zod";
+import { SecureStore } from "./secure.svelte";
 
-export class ClipboardStore {
-	clipboardHistory = $state<string[]>([]);
+export const ClipboardSchema = z.object({
+	clipboardHistory: z.array(z.string()).default([]),
+});
 
+type Clipboard = z.infer<typeof ClipboardSchema>;
+
+export class ClipboardStore extends SecureStore<Clipboard> {
 	async initialize() {
-		const store = await load("clipboard.json");
-		const clipboardHistory = (await store.get<string[]>("clipboard")) ?? [];
-		if (!clipboardHistory) return;
-		this.clipboardHistory = clipboardHistory;
+		await this.restore();
 	}
 
 	async addSnapshot(snapshot: string) {
 		const lastSnapshot =
-			this.clipboardHistory[this.clipboardHistory.length - 1];
+			this.data.clipboardHistory[this.data.clipboardHistory.length - 1];
 		if (snapshot === lastSnapshot) return;
-		this.clipboardHistory.push(snapshot);
-		await this.persist();
+		this.updateData({
+			clipboardHistory: [...this.data.clipboardHistory, snapshot],
+		});
 	}
 
 	async clearClipboardHistory() {
-		this.clipboardHistory = [];
-		await this.persist();
-	}
-
-	async persist() {
-		const store = await load("clipboard.json");
-		await store.set("clipboard", this.clipboardHistory);
-		await store.save();
+		this.updateData({ clipboardHistory: [] });
 	}
 }
 
-export const clipboardStore = new ClipboardStore();
+export const clipboardStore = new ClipboardStore({
+	schema: ClipboardSchema,
+	fileName: "clipboard.json",
+	storageKey: "clipboard",
+});

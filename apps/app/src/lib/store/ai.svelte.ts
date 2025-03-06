@@ -27,32 +27,22 @@ const AUTOCOMPLETE_SYSTEM_PROMPT = dedent`
 `;
 
 export class AiStore {
-	bearerToken = $derived(`Bearer ${settingsStore.settings.aiSecretKey}`);
+	bearerToken = $derived(`Bearer ${settingsStore.data.aiSecretKey}`);
 	client = $derived(
 		createOpenAICompatible({
 			name: "grinta",
 			headers: {
 				Authorization: this.bearerToken,
 			},
-			baseURL: getBaseLLMApiUrl(settingsStore.settings.aiEndpointUrl),
+			baseURL: getBaseLLMApiUrl(settingsStore.data.aiEndpointUrl),
 		}),
 	);
-	model = $derived(this.client(settingsStore.settings.aiModelName));
+	model = $derived(this.client(settingsStore.data.aiModelName));
 
 	async generateText(prompt: string) {
 		return generateText({
 			model: this.model,
 			system: AUTOCOMPLETE_SYSTEM_PROMPT,
-			prompt,
-		});
-	}
-
-	async generateNoteText(query: string) {
-		const prompt = this.getGenerateNoteTextPrompt({
-			context: settingsStore.settings.aiAdditionalContext,
-		});
-		return generateText({
-			model: this.model,
 			prompt,
 		});
 	}
@@ -79,7 +69,7 @@ export class AiStore {
 
 	streamNoteText(query: string) {
 		const system = this.getGenerateNoteTextPrompt({
-			context: settingsStore.settings.aiAdditionalContext,
+			context: settingsStore.data.aiAdditionalContext,
 		});
 
 		return streamText({
@@ -112,15 +102,15 @@ export class AiStore {
 		try {
 			const testQuery = "Hello, this is a connection test.";
 
-			if (!settingsStore.settings.aiEndpointUrl) {
+			if (!settingsStore.data.aiEndpointUrl) {
 				return { success: false, message: "AI endpoint URL is not configured" };
 			}
 
-			if (!settingsStore.settings.aiSecretKey) {
+			if (!settingsStore.data.aiSecretKey) {
 				return { success: false, message: "API secret key is not configured" };
 			}
 
-			if (!settingsStore.settings.aiModelName) {
+			if (!settingsStore.data.aiModelName) {
 				return { success: false, message: "AI model name is not configured" };
 			}
 

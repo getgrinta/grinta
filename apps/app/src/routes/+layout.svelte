@@ -36,8 +36,8 @@ const systemThemeWatcher = new SystemThemeWatcher();
 
 // Sync language with settings
 $effect(() => {
-	if (settingsStore.settings.language) {
-		locale.set(settingsStore.settings.language);
+	if (settingsStore.data.language) {
+		locale.set(settingsStore.data.language);
 	}
 });
 
@@ -137,9 +137,14 @@ async function initializeApp() {
 	moveWindow(Position.TopCenter);
 }
 
-const accentColorClass = $derived(
-	`accent-${settingsStore.settings.accentColor.toLowerCase()}-${systemThemeWatcher.theme.toLowerCase()}`,
+const accentLower = $derived(
+	settingsStore?.data?.accentColor?.toLowerCase() ?? "mare",
 );
+const themeLower = $derived(
+	systemThemeWatcher?.theme?.toLowerCase() ?? "light",
+);
+
+const accentColorClass = $derived(`accent-${accentLower}-${themeLower}`);
 
 const themeName = $derived(
 	systemThemeWatcher.theme === THEME.DARK ? "grinta-dark" : "grinta-light",

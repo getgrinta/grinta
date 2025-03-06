@@ -23,6 +23,7 @@ import {
 	appStore,
 } from "./app.svelte";
 import { type Note, notesStore } from "./notes.svelte";
+import { SecureStore } from "./secure.svelte";
 import { settingsStore } from "./settings.svelte";
 
 nlp.plugin(datePlugin);
@@ -32,16 +33,12 @@ function t(key: string, params: Record<string, string> = {}) {
 	try {
 		const translationFn = get(_);
 		return translationFn(key, { values: params });
-	} catch (error) {
+	} catch {
 		return key;
 	}
 }
 
 const HOSTNAME_REGEX = /[a-zA-Z0-9\-\.]{1,61}\.[a-zA-Z]{2,}/;
-const urlParser = z
-	.string()
-	.url()
-	.regex(/^https?:\/\//);
 
 // The order is important for command sorting.
 export const COMMAND_HANDLER = {
@@ -61,11 +58,13 @@ export type CommandHandler = keyof typeof COMMAND_HANDLER;
 
 const commandsPriority = Object.keys(COMMAND_HANDLER);
 
-type ExecutableCommand = {
-	label: string;
-	value: string;
-	handler: CommandHandler;
-};
+const ExecutableCommandSchema = z.object({
+	label: z.string(),
+	value: z.string(),
+	handler: z.nativeEnum(COMMAND_HANDLER),
+});
+
+type ExecutableCommand = z.infer<typeof ExecutableCommandSchema>;
 
 export const SYSTEM_COMMAND = {
 	SIGN_IN: "SIGN_IN",
@@ -174,9 +173,14 @@ async function buildQueryCommands(
 	].filter((a) => a.label !== excludeResult);
 }
 
-export class CommandsStore {
+const CommandsSchema = z.object({
+	commandHistory: z.array(ExecutableCommandSchema).default([]),
+});
+
+export type Commands = z.infer<typeof CommandsSchema>;
+
+export class CommandsStore extends SecureStore<Commands> {
 	commands = $state<ExecutableCommand[]>([]);
-	commandHistory = $state<ExecutableCommand[]>([]);
 	buildCommandsToken = $state<string>("");
 	selectedIndex = $state<number>(0);
 	installedApps = $state<DirEntry[]>([]);
@@ -184,6 +188,11 @@ export class CommandsStore {
 	shortcutCommands = $state<ExecutableCommand[]>([]);
 	webSearchCommands = $state<ExecutableCommand[]>([]);
 	isUpdatingFromWebSearch = $state<boolean>(false);
+
+	// Ensure we have a valid commandHistory even before initialization
+	get commandHistory(): ExecutableCommand[] {
+		return this.data?.commandHistory || [];
+	}
 
 	getMenuItems(): ExecutableCommand[] {
 		const userCommands = appStore?.user
@@ -233,15 +242,12 @@ export class CommandsStore {
 
 	async initialize() {
 		try {
+			// First restore data to ensure we have valid commandHistory
+			await this.restore();
+
+			// Then build commands
 			await this.buildAppCommands();
 			await this.buildShortcutCommands();
-
-			// Load command history
-			const store = await load("commands.json");
-			const commandHistory =
-				(await store.get<ExecutableCommand[]>("commandHistory")) ?? [];
-			if (!commandHistory) return;
-			this.commandHistory = commandHistory;
 		} catch (error) {
 			console.error("Error initializing CommandsStore:", error);
 		}
@@ -420,21 +426,18 @@ export class CommandsStore {
 		const filteredHistory = this.commandHistory
 			.slice()
 			.filter((entry) => entry.handler !== handler);
-		this.commandHistory = filteredHistory;
+		this.updateData({ commandHistory: filteredHistory });
 	}
 
 	removeHistoryEntry({ value, handler }: HistoryEntry) {
 		const filteredHistory = this.commandHistory
 			.slice()
 			.filter((entry) => entry.handler !== handler || entry.value !== value);
-		this.commandHistory = filteredHistory;
+		this.updateData({ commandHistory: filteredHistory });
 	}
 
 	async clearHistory() {
-		const store = await load("commands.json");
-		this.commandHistory = [];
-		await store.set("commandHistory", this.commandHistory);
-		await store.save();
+		this.updateData({ commandHistory: [] });
 	}
 
 	async openUrl(url: string) {
@@ -443,7 +446,6 @@ export class CommandsStore {
 
 	async handleCommand(commandIndex: number | undefined) {
 		if (!appStore.appWindow) return;
-		const store = await load("commands.json");
 		const command = this.commands[commandIndex ?? this.selectedIndex];
 		const otherThanLast =
 			this.commandHistory[this.commandHistory.length - 1]?.value !==
@@ -455,7 +457,7 @@ export class CommandsStore {
 		] as string[];
 
 		const shouldRecord =
-			!settingsStore.settings.incognitoEnabled &&
+			!settingsStore.data.incognitoEnabled &&
 			!commandsToSkip.includes(command.handler);
 
 		if (otherThanLast && shouldRecord) {
@@ -467,10 +469,8 @@ export class CommandsStore {
 						pastCommand.handler !== command.handler,
 				);
 			filteredHistory.push(command);
-			this.commandHistory = filteredHistory;
+			this.updateData({ commandHistory: filteredHistory });
 		}
-		await store.set("commandHistory", this.commandHistory);
-		await store.save();
 		window.scrollTo({ top: 0 });
 		return match(command)
 			.with({ handler: COMMAND_HANDLER.APP }, async ({ value }) => {
@@ -613,4 +613,8 @@ export class CommandsStore {
 	}
 }
 
-export const commandsStore = new CommandsStore();
+export const commandsStore = new CommandsStore({
+	schema: CommandsSchema,
+	fileName: "commands.json",
+	storageKey: "commands",
+});

@@ -16,9 +16,9 @@ type Theme = keyof typeof THEME;
 export class SystemThemeWatcher {
 	systemTheme = $state<Theme>();
 	theme = $derived(
-		settingsStore.settings.theme === "SYSTEM"
+		settingsStore.data.theme === "SYSTEM"
 			? (this.systemTheme ?? "DARK")
-			: settingsStore.settings.theme,
+			: settingsStore.data.theme,
 	);
 
 	constructor() {

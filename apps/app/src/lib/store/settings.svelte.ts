@@ -4,13 +4,12 @@ import {
 	register,
 	unregisterAll,
 } from "@tauri-apps/plugin-global-shortcut";
-import { load } from "@tauri-apps/plugin-store";
-import superjson from "superjson";
 import { match } from "ts-pattern";
 import { z } from "zod";
 import { SEARCH_MODE, appStore } from "./app.svelte";
 import { commandsStore } from "./commands.svelte";
 import { notesStore } from "./notes.svelte";
+import { SecureStore } from "./secure.svelte";
 
 export const THEME = {
 	SYSTEM: "SYSTEM",
@@ -46,10 +45,8 @@ export const SettingsSchema = z.object({
 	toggleShortcut: z.string().default("CommandOrControl+Space"),
 	theme: z.nativeEnum(THEME).default(THEME.SYSTEM),
 	accentColor: z.nativeEnum(ACCENT_COLOR).default(ACCENT_COLOR.MARE),
-	language: z
-		.enum([LANGUAGE.EN, LANGUAGE.PL, LANGUAGE.DE])
-		.default(LANGUAGE.EN),
-	aiModelName: z.string().default("ministral-3b-latest"),
+	language: z.nativeEnum(LANGUAGE).default(LANGUAGE.EN),
+	aiModelName: z.string().default("ministral-small-latest"),
 	defaultSearchEngine: z
 		.nativeEnum(SEARCH_ENGINE)
 		.default(SEARCH_ENGINE.STARTPAGE),
@@ -73,20 +70,14 @@ async function toggleShortcutHandler(event: ShortcutEvent) {
 	return appStore.appWindow.hide();
 }
 
-export class SettingsStore {
-	settings = $state<Settings>(SettingsSchema.parse({}));
-
+export class SettingsStore extends SecureStore<Settings> {
 	async initialize() {
-		const store = await load("settings.json");
-		const settings = await store.get<string>("settings");
-		if (!settings) return;
-		const settingsParsed = SettingsSchema.parse(superjson.parse(settings));
-		this.settings = settingsParsed;
+		await this.restore();
 		await this.registerShortcuts();
 	}
 
 	async registerShortcuts() {
-		await register(this.settings.toggleShortcut, toggleShortcutHandler);
+		await register(this.data.toggleShortcut, toggleShortcutHandler);
 	}
 
 	async unregisterShortcuts() {
@@ -94,12 +85,12 @@ export class SettingsStore {
 	}
 
 	toggleIncognito() {
-		this.settings.incognitoEnabled = !this.settings.incognitoEnabled;
+		this.updateData({ incognitoEnabled: !this.data.incognitoEnabled });
 	}
 
 	async setToggleShortcut(toggleShortcut: string) {
 		await this.unregisterShortcuts();
-		this.settings.toggleShortcut = toggleShortcut;
+		this.updateData({ toggleShortcut });
 		await this.registerShortcuts();
 	}
 
@@ -108,7 +99,7 @@ export class SettingsStore {
 			return `https://scira.app/?q=${query}`;
 		}
 
-		return match(this.settings.defaultSearchEngine)
+		return match(this.data.defaultSearchEngine)
 			.with(
 				SEARCH_ENGINE.DUCKDUCKGO,
 				() => `https://duckduckgo.com/?q=${query}`,
@@ -125,22 +116,17 @@ export class SettingsStore {
 	}
 
 	async setNotesDir(notesDir: string[]) {
-		this.settings.notesDir = notesDir;
-		await this.persist();
+		this.updateData({ notesDir });
 	}
 
 	async wipeLocalData() {
 		await notesStore.clearNotes();
 		await commandsStore.clearHistory();
 	}
-
-	async persist() {
-		const store = await load("settings.json");
-		const settingsParsed = SettingsSchema.parse(this.settings);
-		const settingsString = superjson.stringify(settingsParsed);
-		await store.set("settings", settingsString);
-		await store.save();
-	}
 }
 
-export const settingsStore = new SettingsStore();
+export const settingsStore = new SettingsStore({
+	schema: SettingsSchema,
+	fileName: "settings.json",
+	storageKey: "settings",
+});

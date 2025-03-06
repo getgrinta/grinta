@@ -38,7 +38,7 @@ const INDICATOR_MODES = [
 const isCmdPressed = $derived(pressedKeys.has("Meta"));
 
 const { form } = createForm({
-	async onSubmit(values) {
+	async onSubmit() {
 		return commandsStore.handleCommand(undefined);
 	},
 });
@@ -181,10 +181,10 @@ const actionButton = $derived(
 </script>
 
 <form use:form>
-	<TopBar fancyMode={settingsStore.settings.incognitoEnabled}>
+	<TopBar fancyMode={settingsStore.data.incognitoEnabled}>
 		<div slot="indicator">
 			<div class="btn btn-sm" onclick={() => settingsStore.toggleIncognito()}>
-				{#if settingsStore.settings.incognitoEnabled}
+				{#if settingsStore.data.incognitoEnabled}
 					<EyeOffIcon size={16} />
 				{:else}
 					<EyeIcon size={16} />
