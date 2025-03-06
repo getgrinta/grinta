@@ -180,6 +180,8 @@ export class CommandsStore {
 	installedApps = $state<DirEntry[]>([]);
 	appCommands = $state<ExecutableCommand[]>([]);
 	shortcutCommands = $state<ExecutableCommand[]>([]);
+	webSearchCommands = $state<ExecutableCommand[]>([]);
+	isUpdatingFromWebSearch = $state<boolean>(false);
 
 	getMenuItems(): ExecutableCommand[] {
 		return [
@@ -279,6 +281,11 @@ export class CommandsStore {
 		query,
 		barMode,
 	}: { query: string; searchMode: SearchMode; barMode: BarMode }) {
+		// Skip if we're currently updating from web search to prevent infinite loop
+		if (this.isUpdatingFromWebSearch) {
+			return;
+		}
+		
 		this.selectedIndex = 0;
 		const queryIsUrl = HOSTNAME_REGEX.test(query);
 		const newCommandsToken = generateCancellationToken();
@@ -293,24 +300,6 @@ export class CommandsStore {
 					return commandHistory;
 				}
 
-				const urlCommands = queryIsUrl
-					? [
-							{
-								label: query,
-								value:
-									query.startsWith("http://") || query.startsWith("https://")
-										? query
-										: `https://${query}`,
-								handler: COMMAND_HANDLER.URL,
-							},
-						]
-					: [];
-
-				const webSearchCommands = await buildQueryCommands(
-					query,
-					queryIsUrl ? query : null,
-				);
-
 				// Filter out commands of the same url as the current query
 				if (queryIsUrl) {
 					commandHistory = commandHistory.filter(
@@ -320,8 +309,8 @@ export class CommandsStore {
 
 				return [
 					...this.appCommands,
-					...urlCommands,
-					...webSearchCommands,
+					...this.buildUrlCommands(queryIsUrl, query),
+					...this.webSearchCommands,
 					...commandHistory,
 					...this.shortcutCommands,
 					...this.getMenuItems(),
@@ -362,6 +351,31 @@ export class CommandsStore {
 		}
 
 		this.commands = uniq([...formulaCommands, ...sortedAndFilteredCommands]);
+
+		if (query.length > 0 && barMode === "INITIAL") {
+			setTimeout(() => {
+				this.fetchWebSearchCommands(
+					query,
+					newCommandsToken,
+					queryIsUrl ? query : null,
+				);
+			}, 0);
+		}
+	}
+
+	private buildUrlCommands(queryIsUrl: boolean, query: string) {
+		return queryIsUrl
+			? [
+					{
+						label: query,
+						value:
+							query.startsWith("http://") || query.startsWith("https://")
+								? query
+								: `https://${query}`,
+						handler: COMMAND_HANDLER.URL,
+					},
+				]
+			: [];
 	}
 
 	sortCommands(
@@ -509,6 +523,67 @@ export class CommandsStore {
 				return result.code === 0;
 			})
 			.exhaustive();
+	}
+
+	async fetchWebSearchCommands(
+		query: string,
+		token: string,
+		excludeResult: string | null = null,
+	) {
+		if (query.length < 1) {
+			return;
+		}
+
+		const queryIsUrl = HOSTNAME_REGEX.test(query);
+
+		try {
+			const webSearchCommands = await buildQueryCommands(query, excludeResult);
+
+			// Check if the token is still valid (user hasn't typed something else)
+			if (token !== this.buildCommandsToken) {
+				return;
+			}
+			
+			// Set flag to prevent infinite loop
+			this.isUpdatingFromWebSearch = true;
+			
+			// Update web search commands
+			this.webSearchCommands = webSearchCommands;
+			
+			// Rebuild the commands with the new web search results
+			let commandHistory = this.commandHistory.slice().reverse();
+
+			// Filter out commands of the same url as the current query
+			if (queryIsUrl) {
+				commandHistory = commandHistory.filter(
+					(a) => a.label !== query && a.handler !== COMMAND_HANDLER.URL,
+				);
+			}
+
+			const commands = [
+				...this.appCommands,
+				...this.buildUrlCommands(queryIsUrl, query),
+				...this.webSearchCommands,
+				...commandHistory,
+				...this.shortcutCommands,
+				...this.getMenuItems(),
+			];
+
+			const sortedAndFilteredCommands = matchSorter(commands, query, {
+				keys: ["label"],
+			}).sort((a, b) => this.sortCommands(a, b, query));
+
+			const formulaCommands = buildFormulaCommands(query);
+			
+			// Update the commands list
+			this.commands = uniq([...formulaCommands, ...sortedAndFilteredCommands]);
+			
+			// Reset the flag after updating
+			this.isUpdatingFromWebSearch = false;
+		} catch (error) {
+			this.isUpdatingFromWebSearch = false;
+			console.error("Error fetching web search commands:", error);
+		}
 	}
 }
 
