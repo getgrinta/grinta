@@ -4,7 +4,6 @@ import {
 	register,
 	unregisterAll,
 } from "@tauri-apps/plugin-global-shortcut";
-import { Position, moveWindow } from "@tauri-apps/plugin-positioner";
 import { load } from "@tauri-apps/plugin-store";
 import superjson from "superjson";
 import { match } from "ts-pattern";
@@ -105,9 +104,18 @@ export class SettingsStore {
 		}
 
 		return match(this.settings.defaultSearchEngine)
-			.with("DUCKDUCKGO", () => `https://duckduckgo.com/?q=${query}`)
-			.with("STARTPAGE", () => `https://www.startpage.com/do/search?q=${query}`)
-			.with("GOOGLE", () => `https://www.google.com/search?q=${query}`)
+			.with(
+				SEARCH_ENGINE.DUCKDUCKGO,
+				() => `https://duckduckgo.com/?q=${query}`,
+			)
+			.with(
+				SEARCH_ENGINE.STARTPAGE,
+				() => `https://www.startpage.com/do/search?q=${query}`,
+			)
+			.with(
+				SEARCH_ENGINE.GOOGLE,
+				() => `https://www.google.com/search?q=${query}`,
+			)
 			.exhaustive();
 	}
 
@@ -126,6 +134,7 @@ export class SettingsStore {
 		const settingsParsed = SettingsSchema.parse(this.settings);
 		const settingsString = superjson.stringify(settingsParsed);
 		await store.set("settings", settingsString);
+		await store.save();
 	}
 }
 

@@ -65,6 +65,7 @@
 		"updater:default",
 		"process:default",
 		"core:app:allow-default-window-icon",
-		"stronghold:default"
+		"stronghold:default",
+		"deep-link:default"
 	]
 }

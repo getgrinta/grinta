@@ -1,7 +1,9 @@
 <script lang="ts">
 import { goto } from "$app/navigation";
-import { authClient } from "$lib/auth";
+import { getAuthClient } from "$lib/auth";
 import TopBar from "$lib/components/top-bar.svelte";
+import { appStore } from "$lib/store/app.svelte";
+import { vaultStore } from "$lib/store/vault.svelte";
 import { createForm } from "felte";
 import { toast } from "svelte-sonner";
 import { ZodError, z } from "zod";
@@ -26,6 +28,7 @@ function setMode(newMode: Mode) {
 
 const { form } = createForm({
 	onSubmit: async (values) => {
+		const authClient = getAuthClient();
 		if (mode === "sendCode") {
 			const data = SignInSchema.parse(values);
 			const { error } = await authClient.emailOtp.sendVerificationOtp({
@@ -39,15 +42,21 @@ const { form } = createForm({
 		}
 		const data = VerifyOtpSchema.parse(values);
 		const { error } = await authClient.signIn.emailOtp(data, {
-			onSuccess(context) {
-				console.log(">>>H", context.response.headers.get("set-cookie"));
-				// const authToken = context.response.headers.get("")
+			async onSuccess(context) {
+				const authCookie = context.response.headers.get("set-cookie");
+				if (!authCookie) {
+					throw new Error("Auth cookie not found");
+				}
+				console.log(authCookie);
+				await vaultStore.setAuthCookie(authCookie);
+				await appStore.setSession();
+				console.log("Auth cookie saved");
+				return goto("/profile");
 			},
 		});
 		if (error) {
 			throw error;
 		}
-		return goto("/profile");
 	},
 	onError: (error) => {
 		if (error instanceof ZodError) {

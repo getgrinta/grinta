@@ -181,7 +181,6 @@ export class CommandsStore {
 	shortcutCommands = $state<ExecutableCommand[]>([]);
 
 	getMenuItems(): ExecutableCommand[] {
-		console.log(">>>USER", appStore?.user);
 		const userCommands = appStore?.user
 			? [
 					{
@@ -401,6 +400,7 @@ export class CommandsStore {
 		const store = await load("commands.json");
 		this.commandHistory = [];
 		await store.set("commandHistory", this.commandHistory);
+		await store.save();
 	}
 
 	async openUrl(url: string) {
@@ -432,6 +432,7 @@ export class CommandsStore {
 			this.commandHistory = filteredHistory;
 		}
 		await store.set("commandHistory", this.commandHistory);
+		await store.save();
 		window.scrollTo({ top: 0 });
 		return match(command)
 			.with({ handler: COMMAND_HANDLER.APP }, async ({ value }) => {

@@ -10,8 +10,9 @@ import { BAR_MODE, appStore } from "$lib/store/app.svelte";
 import { clipboardStore } from "$lib/store/clipboard.svelte";
 import { commandsStore } from "$lib/store/commands.svelte";
 import { THEME, settingsStore } from "$lib/store/settings.svelte";
+import { vaultStore } from "$lib/store/vault.svelte";
 import { installHotkeys } from "$lib/utils.svelte";
-import { systemThemeWatcher } from "$lib/utils.svelte";
+import { SystemThemeWatcher } from "$lib/utils.svelte";
 import { defaultWindowIcon } from "@tauri-apps/api/app";
 import { invoke } from "@tauri-apps/api/core";
 import { Menu } from "@tauri-apps/api/menu";
@@ -30,6 +31,8 @@ dayjs.extend(LocalizedFormat);
 
 // Initialize i18n
 setupI18n();
+
+const systemThemeWatcher = new SystemThemeWatcher();
 
 // Sync language with settings
 $effect(() => {
@@ -124,11 +127,12 @@ async function openMenu() {
 }
 
 async function initializeApp() {
-	commandsStore.initialize();
-	settingsStore.initialize();
-	clipboardStore.initialize();
-	appIconsStore.initializeIcons();
-	systemThemeWatcher.initialize();
+	await vaultStore.initialize();
+	await appStore.setSession();
+	await commandsStore.initialize();
+	await settingsStore.initialize();
+	await clipboardStore.initialize();
+	await appIconsStore.initializeIcons();
 	initTrayIcon();
 	moveWindow(Position.TopCenter);
 }

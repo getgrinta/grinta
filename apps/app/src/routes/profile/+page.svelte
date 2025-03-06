@@ -1,10 +1,13 @@
 <script lang="ts">
-import { authClient } from "$lib/auth";
+import { getAuthClient } from "$lib/auth";
 import TopBar from "$lib/components/top-bar.svelte";
+import { vaultStore } from "$lib/store/vault.svelte";
 import { onMount } from "svelte";
 
 onMount(() => {
+	const authClient = getAuthClient();
 	console.log(authClient.getSession());
+	console.log(vaultStore.vault?.authCookie);
 });
 </script>
 

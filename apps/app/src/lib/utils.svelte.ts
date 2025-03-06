@@ -21,7 +21,7 @@ export class SystemThemeWatcher {
 			: settingsStore.settings.theme,
 	);
 
-	initialize() {
+	constructor() {
 		this.setInitialSystemTheme();
 		useEventListener(
 			() => window.matchMedia(THEME_QUERY),
@@ -40,8 +40,6 @@ export class SystemThemeWatcher {
 		this.systemTheme = event.matches ? THEME.DARK : THEME.LIGHT;
 	}
 }
-
-export const systemThemeWatcher = new SystemThemeWatcher();
 
 export async function installHotkeys() {
 	for (const el of document.querySelectorAll("[data-hotkey]")) {

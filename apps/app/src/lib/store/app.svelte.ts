@@ -1,4 +1,4 @@
-import { authClient } from "$lib/auth";
+import { getAuthClient } from "$lib/auth";
 import { type Window, getCurrentWindow } from "@tauri-apps/api/window";
 import type { Session, User } from "better-auth";
 import { z } from "zod";
@@ -30,16 +30,16 @@ export class AppStore {
 
 	constructor() {
 		this.appWindow = getCurrentWindow();
-		this.initialize();
 	}
 
-	async initialize() {
+	async setSession() {
+		const authClient = getAuthClient();
 		const { data } = await authClient.getSession();
 		this.session = data?.session;
 		this.user = data?.user;
 	}
 
-	switchMode(mode: string) {
+	async switchMode(mode: string) {
 		const barMode = barModeEnum.parse(mode);
 		this.barMode = barMode;
 	}
