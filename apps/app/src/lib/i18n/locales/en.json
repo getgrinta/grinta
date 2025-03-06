@@ -68,7 +68,8 @@
 			"clearHistory": "Clear commands history",
 			"help": "Help",
 			"settings": "Settings",
-			"exit": "Exit"
+			"exit": "Exit",
+			"signIn": "Sign In"
 		},
 		"actions": {
 			"search": "Search for \"{query}\"",

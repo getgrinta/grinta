@@ -68,6 +68,8 @@ type ExecutableCommand = {
 };
 
 export const SYSTEM_COMMAND = {
+	SIGN_IN: "SIGN_IN",
+	PROFILE: "PROFILE",
 	CLEAR_NOTES: "CLEAR_NOTES",
 	CLEAR_HISTORY: "CLEAR_HISTORY",
 	HELP: "HELP",
@@ -150,7 +152,7 @@ async function buildQueryCommands(
 		const completionQuery = encodeURIComponent(completion);
 		return {
 			label: completion,
-			value: settingsStore.getSearchUrl(completion),
+			value: settingsStore.getSearchUrl(completionQuery),
 			handler: COMMAND_HANDLER.URL,
 		};
 	});
@@ -184,7 +186,23 @@ export class CommandsStore {
 	isUpdatingFromWebSearch = $state<boolean>(false);
 
 	getMenuItems(): ExecutableCommand[] {
+		const userCommands = appStore?.user
+			? [
+					{
+						label: t("commands.menuItems.profile"),
+						value: SYSTEM_COMMAND.PROFILE,
+						handler: COMMAND_HANDLER.SYSTEM,
+					},
+				]
+			: [
+					{
+						label: t("commands.menuItems.signIn"),
+						value: SYSTEM_COMMAND.SIGN_IN,
+						handler: COMMAND_HANDLER.SYSTEM,
+					},
+				];
 		return [
+			...userCommands,
 			{
 				label: t("commands.menuItems.clearNotes"),
 				value: SYSTEM_COMMAND.CLEAR_NOTES,
@@ -416,6 +434,7 @@ export class CommandsStore {
 		const store = await load("commands.json");
 		this.commandHistory = [];
 		await store.set("commandHistory", this.commandHistory);
+		await store.save();
 	}
 
 	async openUrl(url: string) {
@@ -451,6 +470,7 @@ export class CommandsStore {
 			this.commandHistory = filteredHistory;
 		}
 		await store.set("commandHistory", this.commandHistory);
+		await store.save();
 		window.scrollTo({ top: 0 });
 		return match(command)
 			.with({ handler: COMMAND_HANDLER.APP }, async ({ value }) => {
@@ -497,6 +517,12 @@ export class CommandsStore {
 						await this.clearHistory();
 						appStore.barMode = BAR_MODE.INITIAL;
 						return goto("/");
+					})
+					.with(SYSTEM_COMMAND.SIGN_IN, async () => {
+						return goto("/sign-in");
+					})
+					.with(SYSTEM_COMMAND.PROFILE, async () => {
+						return goto("/profile");
 					})
 					.exhaustive();
 			})

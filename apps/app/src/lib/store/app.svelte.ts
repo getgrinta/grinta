@@ -1,4 +1,6 @@
-import type { Window } from "@tauri-apps/api/window";
+import { getAuthClient } from "$lib/auth";
+import { type Window, getCurrentWindow } from "@tauri-apps/api/window";
+import type { Session, User } from "better-auth";
 import { z } from "zod";
 
 export const BAR_MODE = {
@@ -23,8 +25,21 @@ export class AppStore {
 	barMode = $state<BarMode>(BAR_MODE.INITIAL);
 	searchMode = $state<SearchMode>(SEARCH_MODE.WEB);
 	appWindow = $state<Window>();
+	session = $state<Session>();
+	user = $state<User>();
 
-	switchMode(mode: string) {
+	constructor() {
+		this.appWindow = getCurrentWindow();
+	}
+
+	async setSession() {
+		const authClient = getAuthClient();
+		const { data } = await authClient.getSession();
+		this.session = data?.session;
+		this.user = data?.user;
+	}
+
+	async switchMode(mode: string) {
 		const barMode = barModeEnum.parse(mode);
 		this.barMode = barMode;
 	}

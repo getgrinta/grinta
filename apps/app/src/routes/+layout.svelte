@@ -10,13 +10,13 @@ import { BAR_MODE, appStore } from "$lib/store/app.svelte";
 import { clipboardStore } from "$lib/store/clipboard.svelte";
 import { commandsStore } from "$lib/store/commands.svelte";
 import { THEME, settingsStore } from "$lib/store/settings.svelte";
+import { vaultStore } from "$lib/store/vault.svelte";
 import { installHotkeys } from "$lib/utils.svelte";
-import { systemThemeWatcher } from "$lib/utils.svelte";
+import { SystemThemeWatcher } from "$lib/utils.svelte";
 import { defaultWindowIcon } from "@tauri-apps/api/app";
 import { invoke } from "@tauri-apps/api/core";
 import { Menu } from "@tauri-apps/api/menu";
 import { TrayIcon } from "@tauri-apps/api/tray";
-import { getCurrentWindow } from "@tauri-apps/api/window";
 import { readText } from "@tauri-apps/plugin-clipboard-manager";
 import { Position, moveWindow } from "@tauri-apps/plugin-positioner";
 import { exit } from "@tauri-apps/plugin-process";
@@ -32,6 +32,8 @@ dayjs.extend(LocalizedFormat);
 // Initialize i18n
 setupI18n();
 
+const systemThemeWatcher = new SystemThemeWatcher();
+
 // Sync language with settings
 $effect(() => {
 	if (settingsStore.settings.language) {
@@ -39,7 +41,7 @@ $effect(() => {
 	}
 });
 
-let trap = $state();
+let trap = $state<focusTrap.FocusTrap>();
 
 async function initTrayIcon() {
 	const menu = await Menu.new({
@@ -124,16 +126,13 @@ async function openMenu() {
 	return goto(`/commands/${BAR_MODE.MENU}`);
 }
 
-function initializeApp() {
-	if (appStore.appWindow) return;
-	systemThemeWatcher.initialize();
-	commandsStore.initialize();
-	settingsStore.initialize();
-	clipboardStore.initialize();
-	setTimeout(() => {
-		appIconsStore.initializeIcons();
-	}, 0);
-	appStore.appWindow = getCurrentWindow();
+async function initializeApp() {
+	await vaultStore.initialize();
+	await appStore.setSession();
+	await commandsStore.initialize();
+	await settingsStore.initialize();
+	await clipboardStore.initialize();
+	await appIconsStore.initializeIcons();
 	initTrayIcon();
 	moveWindow(Position.TopCenter);
 }
@@ -171,20 +170,18 @@ onMount(() => {
 	};
 });
 
-afterNavigate(({ from, to }) => {
+afterNavigate(({ to }) => {
 	installHotkeys();
 	if (to?.url?.pathname === "/") return;
-	trap = focusTrap.createFocusTrap([
-		"#mainLayout",
-		'ol[data-sonner-toaster="true"]',
-	]);
+	trap = focusTrap.createFocusTrap(["#mainLayout"]);
 	trap?.activate();
 });
 </script>
 
-<Toaster theme="dark" position="bottom-center" richColors />
-
 <main id="mainLayout" class={clsx("flex-1 flex flex-col p-4", accentColorClass, bgClass)} data-theme={themeName}>
 	<button type="button" class="hidden" onclick={openMenu} data-hotkey="Mod+k">Open Settings</button>
-  {@render children?.()}
+	{#if appStore.appWindow}
+		{@render children?.()}
+	{/if}
+	<Toaster theme="dark" position="bottom-center" richColors />
 </main>

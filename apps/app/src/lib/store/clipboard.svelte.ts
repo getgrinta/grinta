@@ -25,7 +25,8 @@ export class ClipboardStore {
 
 	async persist() {
 		const store = await load("clipboard.json");
-		return store.set("clipboard", this.clipboardHistory);
+		await store.set("clipboard", this.clipboardHistory);
+		await store.save();
 	}
 }
 
