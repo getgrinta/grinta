@@ -105,6 +105,10 @@
 	@apply content-[''] absolute inset-0 pointer-events-none rounded-[1.25rem] p-[2px] bg-gradient-to-br from-blue-500 to-indigo-500;
 }
 
+.virtual-list-wrapper {
+	@apply pb-4;
+}
+
 body {
 	font-family: "DM Sans Variable", sans-serif;
 }

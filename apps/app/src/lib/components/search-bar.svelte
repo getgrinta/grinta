@@ -3,23 +3,16 @@ import { goto } from "$app/navigation";
 import AiNoteIcon from "$lib/assets/ai-note.svelte";
 import GrintaIcon from "$lib/assets/grinta.svelte";
 import TopBar from "$lib/components/top-bar.svelte";
-import {
-	BAR_MODE,
-	type BarMode,
-	type SearchMode,
-	appStore,
-} from "$lib/store/app.svelte";
+import { BAR_MODE, type BarMode, appStore } from "$lib/store/app.svelte";
 import { commandsStore } from "$lib/store/commands.svelte";
 import { notesStore } from "$lib/store/notes.svelte";
 import { settingsStore } from "$lib/store/settings.svelte";
 import { clsx } from "clsx";
 import { createForm } from "felte";
 import {
-	DivideSquare,
 	EyeIcon,
 	EyeOffIcon,
 	MenuIcon,
-	PlusIcon,
 	SearchIcon,
 	StickyNoteIcon,
 	XIcon,
@@ -162,42 +155,18 @@ const inputProps = $derived(
 		}))
 		.exhaustive(),
 );
-
-const MENU_BUTTON = {
-	label: $_("searchBar.actions.menu"),
-	icon: MenuIcon,
-	shortcut: "⌘K",
-	action: () => switchMode(BAR_MODE.MENU),
-};
-
-const actionButton = $derived(
-	match(appStore.barMode)
-		.with(BAR_MODE.MENU, () => ({
-			label: $_("searchBar.actions.exitMenu"),
-			icon: XIcon,
-			shortcut: "⌘K",
-			action: () => switchMode(BAR_MODE.INITIAL),
-		}))
-		.with(BAR_MODE.NOTES, () => ({
-			label: $_("searchBar.actions.createNote"),
-			icon: PlusIcon,
-			shortcut: "⌘N",
-			action: createNote,
-		}))
-		.otherwise(() => MENU_BUTTON),
-);
 </script>
 
 <form use:form>
 	<TopBar fancyMode={settingsStore.data.incognitoEnabled}>
 		<div slot="indicator">
-			<div class="btn btn-sm" onclick={() => settingsStore.toggleIncognito()}>
+			<button type="button" class="btn btn-sm" onclick={() => settingsStore.toggleIncognito()} data-hotkey="Mod+p">
 				{#if settingsStore.data.incognitoEnabled}
 					<EyeOffIcon size={16} />
 				{:else}
 					<EyeIcon size={16} />
 				{/if}
-			</div>
+			</button>
 		</div>
 		<input
 			bind:this={queryInput}
