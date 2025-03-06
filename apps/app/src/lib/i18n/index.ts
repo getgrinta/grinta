@@ -9,14 +9,14 @@ const locales = {
 };
 
 // Initialize i18n
-export function setupI18n() {
+export async function setupI18n() {
 	// Register all locales
-	Object.entries(locales).forEach(([locale, loader]) => {
+	for (const [locale, loader] of Object.entries(locales)) {
 		register(locale, loader);
-	});
+	}
 
 	// Initialize with browser language or default to English
-	init({
+	await init({
 		fallbackLocale: "en",
 		initialLocale: browser ? window.navigator.language.split("-")[0] : "en",
 	});
