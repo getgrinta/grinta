@@ -3,12 +3,13 @@ use tauri::{command, Runtime};
 use tauri_plugin_autostart::MacosLauncher;
 use window_vibrancy::*;
 
-mod theme_utils;
 mod icns_utils;
+mod theme_utils;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_dialog::init())

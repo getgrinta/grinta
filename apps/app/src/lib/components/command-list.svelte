@@ -18,8 +18,7 @@ import {
 	StickyNoteIcon,
 } from "lucide-svelte";
 import { _ } from "svelte-i18n";
-import { circOut } from "svelte/easing";
-import { fly } from "svelte/transition";
+import { fade } from "svelte/transition";
 import { P, match } from "ts-pattern";
 
 type GetHelperProps = {
@@ -96,7 +95,7 @@ $effect(() => {
     	{@const active = commandsStore.selectedIndex === index}
     	{@const labelChunks = highlightText(command.label, appStore.query)}
 		{@const IconComponent = getIcon(command.handler)}
-      <li class="w-full" data-command-index={index} transition:fly={{ duration: 150, y: -5, delay: index * 20, easing: circOut }}>
+      <li class="w-full" data-command-index={index} transition:fade={{ duration: 150, delay: index * 20 }}>
           <div class={clsx("flex justify-between gap-4 border-1 border-transparent text-neutral-300", active && 'menu-active !bg-base-100/40 !text-primary !border-neutral-600')}>
             <button type="button" onclick={() => commandsStore.handleCommand(index)} class="flex flex-1 h-full gap-4 py-[0.75rem] items-center overflow-hidden cursor-pointer">
               {#if command.handler === COMMAND_HANDLER.APP}

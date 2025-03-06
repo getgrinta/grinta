@@ -54,6 +54,11 @@
 			"endpoints": [
 				"https://github.com/palladians/grinta/releases/latest/download/latest.json"
 			]
+		},
+		"deep-link": {
+			"desktop": {
+				"schemes": ["grinta"]
+			}
 		}
 	}
 }

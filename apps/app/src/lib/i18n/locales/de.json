@@ -69,7 +69,8 @@
 			"clearHistory": "Befehlsverlauf löschen",
 			"help": "Hilfe",
 			"settings": "Einstellungen",
-			"exit": "Beenden"
+			"exit": "Beenden",
+			"signIn": "Anmelden"
 		},
 		"actions": {
 			"search": "Nach \"{query}\" suchen",

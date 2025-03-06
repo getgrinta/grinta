@@ -24,7 +24,7 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tauri-plugin-fs = { version = "2", features = ["watch"] }
 tauri-plugin-shell = "2"
-tauri-plugin-http = "2"
+tauri-plugin-http = { version = "2", features = ["unsafe-headers"] }
 tauri-plugin-store = "2"
 tauri-plugin-clipboard-manager = "2.2.0"
 tauri-plugin-dialog = "2"
@@ -32,12 +32,14 @@ tauri-plugin-process = "2"
 tauri-icns = "0.1.0"
 png = "0.17.10"
 base64 = "0.21.5"
+rust-argon2 = "2.1.0"
+tauri-plugin-deep-link = "2"
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-autostart = "2"
 tauri-plugin-global-shortcut = "2"
 tauri-plugin-positioner = "2"
-tauri-plugin-single-instance = "2"
+tauri-plugin-single-instance = { version = "2.0.0", features = ["deep-link"] }
 tauri-plugin-updater = "2"
 window-vibrancy = "0.6.0"
 

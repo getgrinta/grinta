@@ -1,7 +1,6 @@
 import { install } from "@github/hotkey";
 import { Position, moveWindow } from "@tauri-apps/plugin-positioner";
 import { useEventListener } from "runed";
-import { onMount } from "svelte";
 import { appStore } from "./store/app.svelte";
 import { settingsStore } from "./store/settings.svelte";
 
@@ -22,15 +21,13 @@ export class SystemThemeWatcher {
 			: settingsStore.settings.theme,
 	);
 
-	initialize() {
-		onMount(() => {
-			this.setInitialSystemTheme();
-			useEventListener(
-				() => window.matchMedia(THEME_QUERY),
-				"change",
-				this.handleSystemThemeChange,
-			);
-		});
+	constructor() {
+		this.setInitialSystemTheme();
+		useEventListener(
+			() => window.matchMedia(THEME_QUERY),
+			"change",
+			this.handleSystemThemeChange,
+		);
 	}
 
 	setInitialSystemTheme() {
@@ -43,8 +40,6 @@ export class SystemThemeWatcher {
 		this.systemTheme = event.matches ? THEME.DARK : THEME.LIGHT;
 	}
 }
-
-export const systemThemeWatcher = new SystemThemeWatcher();
 
 export async function installHotkeys() {
 	for (const el of document.querySelectorAll("[data-hotkey]")) {
