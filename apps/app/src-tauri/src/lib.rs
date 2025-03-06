@@ -10,25 +10,6 @@ mod theme_utils;
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_deep_link::init())
-        .plugin(
-            tauri_plugin_stronghold::Builder::new(|password| {
-                use argon2::{hash_raw, Config, Variant, Version};
-                let config = Config {
-                    lanes: 4,
-                    mem_cost: 10_000,
-                    time_cost: 10,
-                    variant: Variant::Argon2id,
-                    version: Version::Version13,
-                    ..Default::default()
-                };
-                let salt = "dsgfdfgdfg345345".as_bytes();
-                let key =
-                    hash_raw(password.as_ref(), salt, &config).expect("failed to hash password");
-
-                key.to_vec()
-            })
-            .build(),
-        )
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_dialog::init())

@@ -32,7 +32,6 @@ tauri-plugin-process = "2"
 tauri-icns = "0.1.0"
 png = "0.17.10"
 base64 = "0.21.5"
-tauri-plugin-stronghold = "2"
 rust-argon2 = "2.1.0"
 tauri-plugin-deep-link = "2"
 

@@ -32,7 +32,6 @@
 		"@tauri-apps/plugin-process": "^2.2.0",
 		"@tauri-apps/plugin-shell": "~2",
 		"@tauri-apps/plugin-store": "~2",
-		"@tauri-apps/plugin-stronghold": "^2.2.0",
 		"@tauri-apps/plugin-updater": "^2.3.1",
 		"@tiptap/core": "^2.11.2",
 		"@tiptap/extension-blockquote": "^2.11.5",
