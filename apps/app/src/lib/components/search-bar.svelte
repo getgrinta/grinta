@@ -3,7 +3,12 @@ import { goto } from "$app/navigation";
 import AiNoteIcon from "$lib/assets/ai-note.svelte";
 import GrintaIcon from "$lib/assets/grinta.svelte";
 import TopBar from "$lib/components/top-bar.svelte";
-import { BAR_MODE, type BarMode, appStore } from "$lib/store/app.svelte";
+import {
+	BAR_MODE,
+	type BarMode,
+	type SearchMode,
+	appStore,
+} from "$lib/store/app.svelte";
 import { commandsStore } from "$lib/store/commands.svelte";
 import { notesStore } from "$lib/store/notes.svelte";
 import { settingsStore } from "$lib/store/settings.svelte";
@@ -117,13 +122,16 @@ async function handleNavigation(event: KeyboardEvent) {
 	}
 }
 
-$effect(() => {
-	commandsStore.buildCommands({
-		query: appStore.query,
-		searchMode: appStore.searchMode,
-		barMode: appStore.barMode,
-	});
-});
+watch(
+	() => [appStore.query, appStore.searchMode, appStore.barMode],
+	() => {
+		commandsStore.buildCommands({
+			query: appStore.query,
+			searchMode: appStore.searchMode,
+			barMode: appStore.barMode,
+		});
+	},
+);
 
 watch(
 	() => appStore.searchMode,

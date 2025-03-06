@@ -93,82 +93,45 @@ $effect(() => {
   	id="commandList"
     class="menu menu-lg flex-1 menu-vertical flex-nowrap p-0 w-full"
   >
+	<VirtualList scrollToIndex={commandsStore.selectedIndex}  width="100%" height={290} itemCount={commandsStore.commands.length} itemSize={70}>e}
+		<li class="w-full" data-command-index={index} slot="item" let:index let:style {style}>
+			{#if true}
+			{@const active = commandsStore.selectedIndex === index}
+			{@const IconComponent = getIcon(commandsStore.commands[index].handler)}
+			{@const labelChunks = highlightText(commandsStore.commands[index].label, appStore.query)}
 
-<VirtualList width="100%" height={290} itemCount={commandsStore.commands.length} itemSize={70}>
-	<li class="w-full" data-command-index={index} slot="item" let:index let:style {style}>
-		<div class={clsx("flex justify-between gap-4 border-1 border-transparent text-neutral-300", commandsStore.selectedIndex == index && 'menu-active !bg-base-100/40 !text-primary !border-neutral-600')}>
-            <button type="button" onclick={() => commandsStore.handleCommand(index)} class="flex flex-1 h-full gap-4 py-[0.75rem] items-center overflow-hidden cursor-pointer">
-				{#if true}
-				{@const IconComponent = getIcon(commandsStore.commands[index].handler)}
-
-				{#if commandsStore.commands[index].handler === COMMAND_HANDLER.APP}
-				{@const icon = appIconsStore.getIcon(commandsStore.commands[index].label)}
-	
-				{#if icon}
-                  <img src={icon} alt={commandsStore.commands[index].label} width="24" height="24" class="w-6 h-6 object-contain" />
-				{:else}
-				  <IconComponent size={24} />
-				{/if}
-			  {:else}
-                <IconComponent size={24} />
-              {/if}
-			  {/if}
-              <h2 class={clsx("flex-1 text-left truncate")}>
-              	{#if appStore.query.length > 0}
-	              	{#each highlightText(commandsStore.commands[index].label, appStore.query) as chunk}
-		              	<span class={clsx(chunk.highlight ? "text-neutral-300" : "text-primary font-semibold")}>{chunk.text}</span>
-		              {/each}
-	              {:else}
-					<span>{commandsStore.commands[index].label}</span>
-	              {/if}
-			  </h2>
-            </button>
-            <div class="flex gap-1 items-center">
-	            <span class={clsx("badge", commandsStore.selectedIndex == index ? "badge-outline !text-primary !border-primary" : "badge-soft text-neutral-300")}>{getHelperText({ value: commandsStore.commands[index].value, handler: commandsStore.commands[index].handler })}</span>
-            	<button type="button" class="btn btn-square btn-ghost btn-sm" onclick={() => appStore.setQuery(commandsStore.commands[index].label)}>
-            		<ArrowDownLeftIcon size={16} />
-          		</button>
-            </div>
-		</div>
-	</li>
-</VirtualList>
-
-    <!-- {#each commandsStore.commands as command, index (index)}
-    	{@const active = commandsStore.selectedIndex === index}
-    	{@const labelChunks = highlightText(command.label, appStore.query)}
-		{@const IconComponent = getIcon(command.handler)}
-      <li class="w-full" data-command-index={index} transition:fade={{ duration: 150, delay: index * 20 }}>
-          <div class={clsx("flex justify-between gap-4 border-1 border-transparent text-neutral-300", active && 'menu-active !bg-base-100/40 !text-primary !border-neutral-600')}>
-            <button type="button" onclick={() => commandsStore.handleCommand(index)} class="flex flex-1 h-full gap-4 py-[0.75rem] items-center overflow-hidden cursor-pointer">
-              {#if command.handler === COMMAND_HANDLER.APP}
-				{@const icon = appIconsStore.getIcon(command.label)}
-
-				{#if icon}
-                  <img src={icon} alt={command.label} width="24" height="24" class="w-6 h-6 object-contain" />
-				{:else}
-				  <IconComponent size={24} />
-				{/if}
-			  {:else}
-                <IconComponent size={24} />
-              {/if}
-              <h2 class={clsx("flex-1 text-left truncate")}>
-              	{#if appStore.query.length > 0}
-	              	{#each labelChunks as chunk}
-		              	<span class={clsx(chunk.highlight ? "text-neutral-300" : "text-primary font-semibold")}>{chunk.text}</span>
-		              {/each}
-	              {:else}
-					<span>{command.label}</span>
-	              {/if}
-			  </h2>
-            </button>
-            <div class="flex gap-1 items-center">
-	            <span class={clsx("badge", active ? "badge-outline !text-primary !border-primary" : "badge-soft text-neutral-300")}>{getHelperText({ value: command.value, handler: command.handler })}</span>
-            	<button type="button" class="btn btn-square btn-ghost btn-sm" onclick={() => appStore.setQuery(command.label)}>
-            		<ArrowDownLeftIcon size={16} />
-          		</button>
-            </div>
-		</div>
-      </li>
-    {/each} -->
+			<div class={clsx("flex justify-between gap-4 border-1 border-transparent text-neutral-300", active && 'menu-active !bg-base-100/40 !text-primary !border-neutral-600')}>
+				<button type="button" onclick={() => commandsStore.handleCommand(index)} class="flex flex-1 h-full gap-4 py-[0.75rem] items-center overflow-hidden cursor-pointer">
+					{#if commandsStore.commands[index].handler === COMMAND_HANDLER.APP}
+						{@const icon = appIconsStore.getIcon(commandsStore.commands[index].label)}
+			
+						{#if icon}
+							<img src={icon} alt={commandsStore.commands[index].label} width="24" height="24" class="w-6 h-6 object-contain" />
+						{:else}
+							<IconComponent size={24} />
+						{/if}
+					{:else}
+						<IconComponent size={24} />
+					{/if}
+					<h2 class={clsx("flex-1 text-left truncate")}>
+						{#if appStore.query.length > 0}
+							{#each labelChunks as chunk}
+								<span class={clsx(chunk.highlight ? "text-neutral-300" : "text-primary font-semibold")}>{chunk.text}</span>
+							{/each}
+						{:else}
+							<span>{commandsStore.commands[index].label}</span>
+						{/if}
+					</h2>
+				</button>
+				<div class="flex gap-1 items-center">
+					<span class={clsx("badge", active ? "badge-outline !text-primary !border-primary" : "badge-soft text-neutral-300")}>{getHelperText({ value: commandsStore.commands[index].value, handler: commandsStore.commands[index].handler })}</span>
+					<button type="button" class="btn btn-square btn-ghost btn-sm" onclick={() => appStore.setQuery(commandsStore.commands[index].label)}>
+						<ArrowDownLeftIcon size={16} />
+					</button>
+				</div>
+			</div>
+			{/if}
+		</li>
+	</VirtualList>
   </ul>
 </div>
