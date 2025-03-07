@@ -1,4 +1,5 @@
 use base64::{engine::general_purpose, Engine as _};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs::{self, File};
 use std::io::BufWriter;
@@ -47,14 +48,14 @@ fn load_icns_file(path: &Path) -> Result<Option<Vec<u8>>, String> {
                 let writer = BufWriter::new(&mut png_data);
 
                 // Use the built-in write_png method
-                if let Err(e) = image.write_png(writer) {
+                if let Err(_e) = image.write_png(writer) {
                     // println!("Error writing PNG for icon type {:?}: {}", icon_type, e);
                     continue;
                 }
 
                 return Ok(Some(png_data));
             }
-            Err(e) => {
+            Err(_e) => {
                 // println!("Error extracting icon type {:?}: {}", icon_type, e);
                 continue;
             }
@@ -79,14 +80,14 @@ fn load_icns_file(path: &Path) -> Result<Option<Vec<u8>>, String> {
                 let writer = BufWriter::new(&mut png_data);
 
                 // Use the built-in write_png method
-                if let Err(e) = image.write_png(writer) {
+                if let Err(_e) = image.write_png(writer) {
                     // println!("Error writing PNG for fallback icon type {:?}: {}", icon_type, e);
                     continue;
                 }
 
                 return Ok(Some(png_data));
             }
-            Err(e) => {
+            Err(_e) => {
                 // println!("Error extracting fallback icon type {:?}: {}", icon_type, e);
                 continue;
             }
@@ -97,27 +98,46 @@ fn load_icns_file(path: &Path) -> Result<Option<Vec<u8>>, String> {
     Ok(None)
 }
 
+// Define a struct to hold app information
+#[derive(serde::Serialize, serde::Deserialize)]
+#[cfg(target_os = "macos")]
+pub struct AppInfo {
+    pub base64Image: String,
+    pub localizedName: String,
+}
+
 #[command]
 #[cfg(target_os = "macos")]
 pub fn load_app_icons<R: Runtime>(
-    app_handle: AppHandle<R>,
+    _app_handle: AppHandle<R>,
     resources_paths: Vec<String>,
-) -> Result<HashMap<String, String>, String> {
+) -> Result<HashMap<String, AppInfo>, String> {
     let mut result = HashMap::new();
+    let mut app_paths = Vec::new();
+    let mut app_names = HashMap::new();
+    let mut icns_paths = HashMap::new();
 
     for resources_path in resources_paths {
         let resources_dir = Path::new(&resources_path);
 
-        // Skip if the directory doesn't exist
         if !resources_dir.exists() || !resources_dir.is_dir() {
             continue;
         }
 
-        // Get app name from path (parent directory of Resources)
-        let app_name = resources_dir
+        // Get app path (parent directory of Resources/Contents
+        let app_path = resources_dir
             .parent() // This gets "Contents"
-            .and_then(|p| p.parent()) // This gets "App.app"
-            .and_then(|p| p.file_name())
+            .and_then(|p| p.parent()); // This gets "App.app"
+
+        // Skip if we can't get the app path
+        let app_path = match app_path {
+            Some(path) => path,
+            None => continue,
+        };
+
+        // Get app name from path
+        let app_name = app_path
+            .file_name()
             .and_then(|s| s.to_str())
             .unwrap_or("unknown")
             .replace(".app", "");
@@ -135,36 +155,69 @@ pub fn load_app_icons<R: Runtime>(
             }
         }
 
-        // Skip if no .icns file found
-        let icns_path = match icns_path {
-            Some(path) => {
-                // println!("Found .icns file: {} for path {}", path.display(), resources_path);
-                path
-            }
-            None => {
-                // println!("No .icns file found for path {}", resources_path);
-                continue;
-            }
+        let app_path_str = app_path.to_string_lossy().to_string();
+        app_paths.push(app_path_str.clone());
+        app_names.insert(app_path_str.clone(), app_name);
+
+        if let Some(path) = icns_path {
+            icns_paths.insert(app_path_str, path);
+        }
+    }
+
+    // Get all localized names at once using mdls
+    let localized_names = get_localized_app_names(&app_paths);
+
+    for app_path_str in app_paths {
+        let app_name = match app_names.get(&app_path_str) {
+            Some(name) => name.clone(),
+            None => continue,
         };
 
-        // Load and convert ICNS to PNG
-        match load_icns_file(&icns_path) {
-            Ok(Some(png_data)) => {
-                // Convert PNG data to base64
-                let base64_png = general_purpose::STANDARD.encode(&png_data);
-                let data_url = format!("data:image/png;base64,{}", base64_png);
+        // Get the localized name or fall back to app name
+        let localized_name = localized_names
+            .get(&app_path_str)
+            .cloned()
+            .unwrap_or_else(|| app_name.clone());
 
-                // Add to result with base64 data URL
-                result.insert(app_name.to_string(), data_url);
+        // Check if we have an icon path for this app
+        if let Some(icns_path) = icns_paths.get(&app_path_str) {
+            // Load and convert ICNS to PNG
+            match load_icns_file(icns_path) {
+                Ok(Some(png_data)) => {
+                    // Convert PNG data to base64
+                    let base64_png = general_purpose::STANDARD.encode(&png_data);
+                    let data_url = format!("data:image/png;base64,{}", base64_png);
+
+                    let app_info = AppInfo {
+                        base64Image: data_url,
+                        localizedName: localized_name,
+                    };
+
+                    result.insert(app_name, app_info);
+                }
+                Ok(None) => {
+                    // No suitable icon found, create AppInfo with empty image
+                    let app_info = AppInfo {
+                        base64Image: String::new(),
+                        localizedName: localized_name.clone(),
+                    };
+                    result.insert(app_name, app_info);
+                }
+                Err(_) => {
+                    let app_info = AppInfo {
+                        base64Image: String::new(),
+                        localizedName: localized_name.clone(),
+                    };
+                    result.insert(app_name, app_info);
+                }
             }
-            Ok(None) => {
-                // No suitable icon found, skip
-                continue;
-            }
-            Err(e) => {
-                // Log error but continue with other icons
-                continue;
-            }
+        } else {
+            // No icon path, create AppInfo with empty image
+            let app_info = AppInfo {
+                base64Image: String::new(),
+                localizedName: localized_name,
+            };
+            result.insert(app_name, app_info);
         }
     }
 
@@ -190,13 +243,67 @@ pub fn get_icons_directory<R: Runtime>(app_handle: AppHandle<R>) -> Result<Strin
     Ok(icons_dir)
 }
 
+// Define a struct to hold app information for non-macOS platforms
+#[derive(serde::Serialize, serde::Deserialize)]
+#[cfg(not(target_os = "macos"))]
+pub struct AppInfo {
+    pub base64Image: String,
+    pub localizedName: String,
+}
+
+// Function to get localized app names using mdls
+#[cfg(target_os = "macos")]
+fn get_localized_app_names(app_paths: &[String]) -> HashMap<String, String> {
+    let mut localized_names = HashMap::new();
+
+    if app_paths.is_empty() {
+        return localized_names;
+    }
+
+    // Build the mdls command with all app paths
+    let mut command = std::process::Command::new("mdls");
+    command.arg("-name").arg("kMDItemDisplayName");
+
+    // Add all app paths to the command
+    for path in app_paths {
+        command.arg(path);
+    }
+
+    // Execute the command
+    if let Ok(output) = command.output() {
+        if output.status.success() {
+            let output_str = String::from_utf8_lossy(&output.stdout);
+            let lines: Vec<&str> = output_str.lines().collect();
+
+            // Process the output lines
+            let mut current_app_index = 0;
+            for line in lines {
+                const PREFIX: &str = "kMDItemDisplayName = \"";
+                if !line.starts_with(PREFIX) {
+                    continue;
+                }
+                
+                let name = &line[PREFIX.len()..line.len()-1];
+                
+                if current_app_index < app_paths.len() {
+                    localized_names.insert(app_paths[current_app_index].clone(), name.to_string());
+                }
+    
+                current_app_index += 1;
+            }
+        }
+    }
+
+    localized_names
+}
+
 // Fallback implementations for non-macOS platforms
 #[command]
 #[cfg(not(target_os = "macos"))]
 pub fn load_app_icons<R: Runtime>(
     _app_handle: AppHandle<R>,
     _icns_paths: Vec<String>,
-) -> Result<HashMap<String, String>, String> {
+) -> Result<HashMap<String, AppInfo>, String> {
     Ok(HashMap::new())
 }
 

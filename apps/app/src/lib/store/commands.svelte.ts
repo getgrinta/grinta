@@ -1,4 +1,5 @@
 import { goto } from "$app/navigation";
+import { appMetadataStore } from "$lib/store/app-metadata.svelte";
 import { generateCancellationToken } from "$lib/utils.svelte";
 import { type DirEntry, readDir, watch } from "@tauri-apps/plugin-fs";
 import { fetch } from "@tauri-apps/plugin-http";
@@ -60,6 +61,7 @@ const commandsPriority = Object.keys(COMMAND_HANDLER);
 
 const ExecutableCommandSchema = z.object({
 	label: z.string(),
+	localizedLabel: z.string().optional(),
 	value: z.string(),
 	handler: z.nativeEnum(COMMAND_HANDLER),
 });
@@ -97,11 +99,17 @@ function buildFormulaCommands(currentQuery: string): ExecutableCommand[] {
 async function buildAppCommands(
 	apps: DirEntry[],
 ): Promise<ExecutableCommand[]> {
-	return apps.map((app) => ({
-		label: app.name.slice(0, -4),
-		value: app.name,
-		handler: COMMAND_HANDLER.APP,
-	}));
+	return apps.map((app) => {
+		const defaultName = app.name.slice(0, -4);
+		const localizedName = appMetadataStore.getLocalizedName(defaultName);
+
+		return {
+			label: defaultName,
+			localizedLabel: localizedName,
+			value: app.name,
+			handler: COMMAND_HANDLER.APP,
+		};
+	});
 }
 
 function buildNoteCommands(notes: Note[]): ExecutableCommand[] {
@@ -268,7 +276,7 @@ export class CommandsStore extends SecureStore<Commands> {
 		this.shortcutCommands = buildShortcutCommands(availableShortcuts.stdout);
 	}
 
-	private async buildAppCommands() {
+	async buildAppCommands() {
 		const appsFromApplications = await readDir("/Applications");
 		const appsFromSystemApplications = await readDir("/System/Applications");
 		this.installedApps = [
@@ -364,7 +372,7 @@ export class CommandsStore extends SecureStore<Commands> {
 			query.length === 0 || barMode === "MENU"
 				? commands
 				: matchSorter(commands, query, {
-						keys: ["label"],
+						keys: ["localizedLabel", "label"],
 					}).sort((a, b) => this.sortCommands(a, b, query));
 
 		const formulaCommands = buildFormulaCommands(query);
@@ -596,7 +604,7 @@ export class CommandsStore extends SecureStore<Commands> {
 			];
 
 			const sortedAndFilteredCommands = matchSorter(commands, query, {
-				keys: ["label"],
+				keys: ["localizedLabel", "label"],
 			}).sort((a, b) => this.sortCommands(a, b, query));
 
 			const formulaCommands = buildFormulaCommands(query);

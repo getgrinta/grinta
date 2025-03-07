@@ -3,6 +3,7 @@ import { goto } from "$app/navigation";
 import AiNoteIcon from "$lib/assets/ai-note.svelte";
 import GrintaIcon from "$lib/assets/grinta.svelte";
 import TopBar from "$lib/components/top-bar.svelte";
+import { appMetadataStore } from "$lib/store/app-metadata.svelte";
 import {
 	BAR_MODE,
 	type BarMode,
@@ -130,6 +131,21 @@ watch(
 			searchMode: appStore.searchMode,
 			barMode: appStore.barMode,
 		});
+	},
+);
+
+watch(
+	() => appMetadataStore.appInfo.length,
+	() => {
+		async function buildCommands() {
+			await commandsStore.buildAppCommands();
+			commandsStore.buildCommands({
+				query: appStore.query,
+				searchMode: appStore.searchMode,
+				barMode: appStore.barMode,
+			});
+		}
+		buildCommands();
 	},
 );
 

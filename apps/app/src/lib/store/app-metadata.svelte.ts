@@ -1,8 +1,10 @@
 import { invoke } from "@tauri-apps/api/core";
 import { readDir } from "@tauri-apps/plugin-fs";
 
-export class AppIconsStore {
-	icons = $state<Record<string, string>>({});
+type AppInfo = { base64Image: string; localizedName: string };
+
+export class AppMetadataStore {
+	appInfo = $state<Record<string, AppInfo>>({});
 	loading = $state<boolean>(false);
 	initialized = $state<boolean>(false);
 
@@ -36,20 +38,21 @@ export class AppIconsStore {
 					appNameMap[appName] = resourcesPath;
 				}
 			}
+
 			// Load app icons in batches to avoid overloading the system
 			const batchSize = 20;
 			for (let i = 0; i < resourcesPaths.length; i += batchSize) {
 				const batch = resourcesPaths.slice(i, i + batchSize);
 
 				try {
-					const iconBatch = await invoke<Record<string, string>>(
+					const appInfo = await invoke<Record<string, AppInfo>>(
 						"load_app_icons",
 						{
 							resourcesPaths: batch,
 						},
 					);
 
-					this.icons = { ...this.icons, ...iconBatch };
+					this.appInfo = { ...this.appInfo, ...appInfo };
 				} catch (error) {
 					console.error(
 						`Error loading icon batch ${i}-${i + batchSize}:`,
@@ -57,6 +60,8 @@ export class AppIconsStore {
 					);
 				}
 			}
+
+			console.log(this.appInfo);
 		} catch (error) {
 			console.error("Error initializing app icons:", error);
 		} finally {
@@ -66,8 +71,12 @@ export class AppIconsStore {
 	}
 
 	getIcon(appName: string): string | undefined {
-		return this.icons[appName];
+		return this.appInfo[appName]?.base64Image;
+	}
+
+	getLocalizedName(appName: string): string | undefined {
+		return this.appInfo[appName]?.localizedName;
 	}
 }
 
-export const appIconsStore = new AppIconsStore();
+export const appMetadataStore = new AppMetadataStore();
