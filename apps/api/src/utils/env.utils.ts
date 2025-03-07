@@ -8,6 +8,7 @@ export const EnvSchema = z.object({
 	MISTRAL_API_KEY: z.string(),
 	STRIPE_SECRET_KEY: z.string(),
 	STRIPE_WEBHOOK_SECRET: z.string(),
+	STRIPE_PRICE_ID: z.string(),
 });
 
 export const env = EnvSchema.parse(process.env);

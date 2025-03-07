@@ -20,6 +20,9 @@ function toggleMode() {
         {@const active = mode.value === appStore.searchMode}
         <button type="button" class={clsx("btn btn-sm join-item", active ? 'text-primary' : 'text-neutral-500')} onclick={() => appStore.searchMode = mode.value}>
             <mode.icon size={16} />
+            {#if active}
+                <span>{mode.value}</span>
+            {/if}
         </button>
     {/each}
 </div>

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { goto, invalidateAll } from "$app/navigation";
+import { goto } from "$app/navigation";
 import { page } from "$app/state";
 import NoteEditor from "$lib/components/editor.svelte";
 import TopBar from "$lib/components/top-bar.svelte";
@@ -8,12 +8,7 @@ import { type ExtendedNote, notesStore } from "$lib/store/notes.svelte";
 import { generateCancellationToken } from "$lib/utils.svelte";
 import { BaseDirectory, type UnwatchFn, watch } from "@tauri-apps/plugin-fs";
 import clsx from "clsx";
-import {
-	LoaderCircle,
-	LoaderCircleIcon,
-	MoreVerticalIcon,
-	SquareIcon,
-} from "lucide-svelte";
+import { LoaderCircleIcon, MoreVerticalIcon, SquareIcon } from "lucide-svelte";
 import { marked } from "marked";
 import { PressedKeys } from "runed";
 import { onMount } from "svelte";

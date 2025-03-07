@@ -15,7 +15,6 @@ import {
 	MenuIcon,
 	SearchIcon,
 	StickyNoteIcon,
-	XIcon,
 } from "lucide-svelte";
 import { PressedKeys } from "runed";
 import { watch } from "runed";
@@ -24,8 +23,6 @@ import { match } from "ts-pattern";
 
 let queryInput: HTMLInputElement;
 const pressedKeys = new PressedKeys();
-
-const QUICK_MODE_SWITCH = [BAR_MODE.INITIAL, BAR_MODE.NOTES];
 
 const INDICATOR_MODES = [
 	{ value: BAR_MODE.INITIAL, icon: GrintaIcon, shortcut: "⌘1" },
@@ -162,9 +159,9 @@ const inputProps = $derived(
 		<div slot="indicator">
 			<button type="button" class="btn btn-sm" onclick={() => settingsStore.toggleIncognito()} data-hotkey="Mod+p">
 				{#if settingsStore.data.incognitoEnabled}
-					<EyeOffIcon size={16} />
+					<EyeOffIcon size={16} class="pointer-events-none" />
 				{:else}
-					<EyeIcon size={16} />
+					<EyeIcon size={16} class="pointer-events-none" />
 				{/if}
 			</button>
 		</div>
@@ -184,6 +181,9 @@ const inputProps = $derived(
 				{@const active = mode.value === appStore.barMode}
 				<button type="button" onclick={() => switchMode(mode.value)} class={clsx("btn btn-sm join-item border-neutral-800", active ? "text-primary bg-base-300" : "text-neutral-500")}>
 					<mode.icon size={24} class="w-6 h-6" />
+					{#if active}
+						<span>{mode.value}</span>
+					{/if}
 					{#if isCmdPressed}
 						<span>{mode.shortcut}</span>
 					{/if}

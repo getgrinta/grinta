@@ -59,6 +59,7 @@
 		"lucide-svelte": "^0.468.0",
 		"marked": "^15.0.6",
 		"match-sorter": "^8.0.0",
+		"neverthrow": "^8.2.0",
 		"ox": "^0.6.9",
 		"p-debounce": "^4.0.0",
 		"prosemirror-state": "^1.4.3",

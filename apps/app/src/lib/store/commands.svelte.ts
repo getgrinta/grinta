@@ -4,13 +4,13 @@ import { type DirEntry, readDir, watch } from "@tauri-apps/plugin-fs";
 import { fetch } from "@tauri-apps/plugin-http";
 import { exit } from "@tauri-apps/plugin-process";
 import { Command } from "@tauri-apps/plugin-shell";
-import { load } from "@tauri-apps/plugin-store";
 import nlp from "compromise";
 import datePlugin from "compromise-dates";
 import numbersPlugin from "compromise-numbers";
 import { parse } from "equation-parser";
 import { resolve } from "equation-resolver";
 import { matchSorter } from "match-sorter";
+import { ResultAsync } from "neverthrow";
 import { uniq } from "rambda";
 import { _ } from "svelte-i18n";
 import { get } from "svelte/store";
@@ -42,6 +42,7 @@ const HOSTNAME_REGEX = /[a-zA-Z0-9\-\.]{1,61}\.[a-zA-Z]{2,}/;
 
 // The order is important for command sorting.
 export const COMMAND_HANDLER = {
+	SMART_MATCH: "SMART_MATCH",
 	SYSTEM: "SYSTEM",
 	APP: "APP",
 	CHANGE_MODE: "CHANGE_MODE",
@@ -52,6 +53,7 @@ export const COMMAND_HANDLER = {
 	CREATE_NOTE: "CREATE_NOTE",
 	COMPLETE_NOTE: "COMPLETE_NOTE",
 	URL: "URL",
+	EMBEDDED_URL: "EMBEDDED_URL",
 } as const;
 
 export type CommandHandler = keyof typeof COMMAND_HANDLER;
@@ -79,6 +81,18 @@ export const SYSTEM_COMMAND = {
 export type SystemCommand = keyof typeof SYSTEM_COMMAND;
 
 type HistoryEntry = Omit<ExecutableCommand, "label">;
+
+async function fetchCompletions(query: string) {
+	type CompletionResult = [string, string[]];
+	const encodedQuery = encodeURIComponent(query);
+	const completionUrl = `https://www.startpage.com/osuggestions?q=${encodedQuery}`;
+	return ResultAsync.fromPromise(
+		fetch(completionUrl),
+		() => new Error("Failed to fetch completions"),
+	)
+		.map<CompletionResult>((res) => res.json())
+		.unwrapOr<CompletionResult>([encodedQuery, []]);
+}
 
 function buildFormulaCommands(currentQuery: string): ExecutableCommand[] {
 	const parsed = parse(currentQuery);
@@ -125,7 +139,6 @@ async function buildQueryCommands(
 	query: string,
 	excludeResult: string | null = null,
 ) {
-	const encodedQuery = encodeURIComponent(query);
 	const queryMatchSearch = [
 		{
 			label: t("commands.actions.search", { query }),
@@ -133,20 +146,8 @@ async function buildQueryCommands(
 			handler: COMMAND_HANDLER.URL,
 		},
 	];
-
 	if (query.length < 3) return queryMatchSearch;
-
-	let completions: [string, string[]];
-	const completionUrl = `https://www.startpage.com/osuggestions?q=${encodedQuery}`;
-
-	try {
-		// Might fail because of no connection or proxy
-		const response = await fetch(completionUrl);
-		completions = await response.json();
-	} catch (error) {
-		completions = [encodedQuery, []];
-	}
-
+	const completions = await fetchCompletions(query);
 	const completionList = completions[1].map((completion: string) => {
 		const completionQuery = encodeURIComponent(completion);
 		return {
@@ -156,7 +157,6 @@ async function buildQueryCommands(
 		};
 	});
 	const literalSearch = completionList.length > 0 ? [] : queryMatchSearch;
-
 	return [
 		...completionList,
 		...literalSearch,
@@ -361,11 +361,11 @@ export class CommandsStore extends SecureStore<Commands> {
 			.exhaustive();
 
 		const sortedAndFilteredCommands =
-			query.length === 0 || barMode === "MENU"
+			query.length === 0
 				? commands
 				: matchSorter(commands, query, {
 						keys: ["label"],
-					}).sort((a, b) => this.sortCommands(a, b, query));
+					}).sort((a, b) => this.sortCommands({ prev: a, next: b }));
 
 		const formulaCommands = buildFormulaCommands(query);
 
@@ -402,23 +402,13 @@ export class CommandsStore extends SecureStore<Commands> {
 			: [];
 	}
 
-	sortCommands(
-		a: ExecutableCommand,
-		b: ExecutableCommand,
-		query: string,
-	): number {
-		// Smart match urls
-		if (HOSTNAME_REGEX.test(query)) {
-			if (a.label === query && b.label !== query) {
-				return -1;
-			}
-			if (b.label === query && a.label !== query) {
-				return 1;
-			}
-		}
-
+	sortCommands({
+		prev,
+		next,
+	}: { prev: ExecutableCommand; next: ExecutableCommand }): number {
 		return (
-			commandsPriority.indexOf(a.handler) - commandsPriority.indexOf(b.handler)
+			commandsPriority.indexOf(prev.handler) -
+			commandsPriority.indexOf(next.handler)
 		);
 	}
 
@@ -548,6 +538,13 @@ export class CommandsStore extends SecureStore<Commands> {
 				]).execute();
 				return result.code === 0;
 			})
+			.with({ handler: COMMAND_HANDLER.SMART_MATCH }, async ({ value }) => {
+				console.log(">>>SMART_MATCH", value);
+			})
+			.with({ handler: COMMAND_HANDLER.EMBEDDED_URL }, async ({ value }) => {
+				const encodedValue = encodeURIComponent(value);
+				return goto(`/web/${encodedValue}`);
+			})
 			.exhaustive();
 	}
 
@@ -597,7 +594,7 @@ export class CommandsStore extends SecureStore<Commands> {
 
 			const sortedAndFilteredCommands = matchSorter(commands, query, {
 				keys: ["label"],
-			}).sort((a, b) => this.sortCommands(a, b, query));
+			}).sort((a, b) => this.sortCommands({ prev: a, next: b }));
 
 			const formulaCommands = buildFormulaCommands(query);
 
