@@ -70,7 +70,8 @@
 			"help": "Hilfe",
 			"settings": "Einstellungen",
 			"exit": "Beenden",
-			"signIn": "Anmelden"
+			"signIn": "Anmelden",
+			"profile": "Profil"
 		},
 		"actions": {
 			"search": "Nach \"{query}\" suchen",

@@ -4,26 +4,18 @@ import AiNoteIcon from "$lib/assets/ai-note.svelte";
 import GrintaIcon from "$lib/assets/grinta.svelte";
 import TopBar from "$lib/components/top-bar.svelte";
 import { appMetadataStore } from "$lib/store/app-metadata.svelte";
-import {
-	BAR_MODE,
-	type BarMode,
-	type SearchMode,
-	appStore,
-} from "$lib/store/app.svelte";
+import { BAR_MODE, type BarMode, appStore } from "$lib/store/app.svelte";
 import { commandsStore } from "$lib/store/commands.svelte";
 import { notesStore } from "$lib/store/notes.svelte";
 import { settingsStore } from "$lib/store/settings.svelte";
 import { clsx } from "clsx";
 import { createForm } from "felte";
 import {
-	DivideSquare,
 	EyeIcon,
 	EyeOffIcon,
 	MenuIcon,
-	PlusIcon,
 	SearchIcon,
 	StickyNoteIcon,
-	XIcon,
 } from "lucide-svelte";
 import { PressedKeys } from "runed";
 import { watch } from "runed";
@@ -32,8 +24,6 @@ import { match } from "ts-pattern";
 
 let queryInput: HTMLInputElement;
 const pressedKeys = new PressedKeys();
-
-const QUICK_MODE_SWITCH = [BAR_MODE.INITIAL, BAR_MODE.NOTES];
 
 const INDICATOR_MODES = [
 	{ value: BAR_MODE.INITIAL, icon: GrintaIcon, shortcut: "⌘1" },
@@ -178,42 +168,18 @@ const inputProps = $derived(
 		}))
 		.exhaustive(),
 );
-
-const MENU_BUTTON = {
-	label: $_("searchBar.actions.menu"),
-	icon: MenuIcon,
-	shortcut: "⌘K",
-	action: () => switchMode(BAR_MODE.MENU),
-};
-
-const actionButton = $derived(
-	match(appStore.barMode)
-		.with(BAR_MODE.MENU, () => ({
-			label: $_("searchBar.actions.exitMenu"),
-			icon: XIcon,
-			shortcut: "⌘K",
-			action: () => switchMode(BAR_MODE.INITIAL),
-		}))
-		.with(BAR_MODE.NOTES, () => ({
-			label: $_("searchBar.actions.createNote"),
-			icon: PlusIcon,
-			shortcut: "⌘N",
-			action: createNote,
-		}))
-		.otherwise(() => MENU_BUTTON),
-);
 </script>
 
 <form use:form>
 	<TopBar fancyMode={settingsStore.data.incognitoEnabled}>
 		<div slot="indicator">
-			<div class="btn btn-sm" onclick={() => settingsStore.toggleIncognito()}>
+			<button type="button" class="btn btn-sm" onclick={() => settingsStore.toggleIncognito()} data-hotkey="Mod+p">
 				{#if settingsStore.data.incognitoEnabled}
-					<EyeOffIcon size={16} />
+					<EyeOffIcon size={16} class="pointer-events-none" />
 				{:else}
-					<EyeIcon size={16} />
+					<EyeIcon size={16} class="pointer-events-none" />
 				{/if}
-			</div>
+			</button>
 		</div>
 		<input
 			bind:this={queryInput}
@@ -231,6 +197,9 @@ const actionButton = $derived(
 				{@const active = mode.value === appStore.barMode}
 				<button type="button" onclick={() => switchMode(mode.value)} class={clsx("btn btn-sm join-item border-neutral-800", active ? "text-primary bg-base-300" : "text-neutral-500")}>
 					<mode.icon size={24} class="w-6 h-6" />
+					{#if active}
+						<span>{mode.value}</span>
+					{/if}
 					{#if isCmdPressed}
 						<span>{mode.shortcut}</span>
 					{/if}

@@ -69,7 +69,8 @@
 			"help": "Help",
 			"settings": "Settings",
 			"exit": "Exit",
-			"signIn": "Sign In"
+			"signIn": "Sign In",
+			"profile": "Profile"
 		},
 		"actions": {
 			"search": "Search for \"{query}\"",
