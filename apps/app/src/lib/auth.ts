@@ -8,6 +8,7 @@ import { vaultStore } from "./store/vault.svelte";
 export function getAuthClient() {
 	return createAuthClient({
 		baseURL: env.PUBLIC_API_URL,
+		basePath: "/api/auth",
 		fetchOptions: {
 			customFetchImpl: tauriFetch,
 			headers: {

@@ -18,7 +18,7 @@ const app = createRouter()
 	})
 	.use("*", authSession)
 	.use("/api/ai/*", authenticatedGuard)
-	.on(["POST", "GET"], "*", (c) => {
+	.on(["POST", "GET"], "/api/ai/*", (c) => {
 		return auth.handler(c.req.raw);
 	})
 	.route("/api/ai", aiRouter)
