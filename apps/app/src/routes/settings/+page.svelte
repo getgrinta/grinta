@@ -15,6 +15,7 @@ import humanizeString from "humanize-string";
 import { PressedKeys, watch } from "runed";
 import { _ } from "svelte-i18n";
 import packageJson from "../../../package.json" with { type: "json" };
+import SecondaryButton from "$lib/components/secondary-button.svelte";
 
 const pressedKeys = new PressedKeys();
 
@@ -148,13 +149,13 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
         <label class="text-sm">{$_("settings.fields.shortcut")}</label>
         <div class="flex gap-2 items-center">
           <input type="hidden" name="toggleShortcut" value={toggleShortcut} />
-          <button type="button" class="btn flex-1" disabled>{toggleShortcut}</button>
-          <button type="button" class="btn flex-1" onclick={toggleShortcutRecording}>{recordShortcutLabel}</button>
+          <SecondaryButton class="flex-1" disabled>{toggleShortcut}</SecondaryButton>
+          <SecondaryButton class="flex-1" onclick={toggleShortcutRecording}>{recordShortcutLabel}</SecondaryButton>
         </div>
         <label class="text-sm">{$_("settings.fields.version")}</label>
         <div class="flex gap-2 items-center">
-          <button type="button" class="btn flex-1" disabled>{packageJson.version}</button>
-          <button type="button" class="btn flex-1">{$_("settings.fields.checkForUpdate")}</button>
+          <SecondaryButton class="flex-1" disabled>{packageJson.version}</SecondaryButton>
+          <SecondaryButton class="flex-1">{$_("settings.fields.checkForUpdate")}</SecondaryButton>
         </div>
         <label class="text-sm">{$_("settings.fields.theme")}</label>
         <select name="theme" bind:value={settingsStore.data.theme} class="select select-bordered w-full">
