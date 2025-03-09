@@ -3,6 +3,7 @@ import { goto } from "$app/navigation";
 import { TextSuggestion } from "$lib/editor/suggestion";
 import { aiStore } from "$lib/store/ai.svelte";
 import { BAR_MODE, appStore } from "$lib/store/app.svelte";
+import { apiClient } from "$lib/utils.svelte";
 import { LogicalSize } from "@tauri-apps/api/dpi";
 import { currentMonitor } from "@tauri-apps/api/window";
 import { Editor, Extension } from "@tiptap/core";
@@ -80,7 +81,6 @@ function buildEditor() {
 				},
 			}),
 			TextSuggestion.configure({
-				// You can override fetchAutocompletion() here if needed.
 				async fetchAutocompletion({ query }: Record<string, string>) {
 					const context = editor?.getText() ?? "";
 					const result = await aiStore.generateText({

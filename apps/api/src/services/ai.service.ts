@@ -1,5 +1,5 @@
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
-import { generateObject, streamText } from "ai";
+import { generateText, streamText } from "ai";
 import dedent from "dedent";
 import { match } from "ts-pattern";
 import { z } from "zod";
@@ -23,10 +23,14 @@ export const AUTOCOMPLETE_SYSTEM_PROMPT = dedent`
 		- If you autocomplete a word, do not include a trailing whitespace.
 	3. Whitespace Handling: Pay attention to preceding whitespaces to ensure proper formatting.
 	4. Nonsensical Input: If the user's input is incoherent or nonsensical, do not generate a response.
+	5. Output Format: Return only the continuation of the paragraph wrapped in an XML <response> tag. Do not include any additional text or explanations.
 
 	Example Input:
 	<request>Hello </request>
 	<context>My context</context>
+
+	Example Output:
+	<response>World</response>
 `;
 
 export const INLINE_SYSTEM_PROMPT = dedent`
@@ -95,15 +99,12 @@ export class AiService {
 			.with(CONTENT_TYPE.INLINE_AI, () => INLINE_SYSTEM_PROMPT)
 			.with(CONTENT_TYPE.REPHRASE, () => REPHRASE_SYSTEM_PROMPT)
 			.exhaustive();
-		const { object } = await generateObject({
+		const { text } = await generateText({
 			prompt,
 			system,
 			model,
-			schema: z.object({
-				text: z.string(),
-			}),
 		});
-		return object;
+		return text;
 	}
 
 	streamResponse(params: {

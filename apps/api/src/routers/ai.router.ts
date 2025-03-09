@@ -114,6 +114,6 @@ export const aiRouter = createRouter()
 			provider: AI_PROVIDER.MISTRAL,
 			model: "mistral-small-latest",
 		};
-		const response = await aiService.generateResponse(body);
-		return c.json(response, 200);
+		const text = await aiService.generateResponse(body);
+		return c.json({ text }, 200);
 	});
