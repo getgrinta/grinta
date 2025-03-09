@@ -1,9 +1,10 @@
-import { apiClient } from "$lib/utils.svelte";
+import { getApiClient } from "$lib/utils.svelte";
 import type { ContentType } from "@getgrinta/api";
 import { settingsStore } from "./settings.svelte";
 
 export class AiStore {
 	streamText(prompt: string) {
+		const apiClient = getApiClient();
 		return apiClient.api.ai.stream.$post({
 			json: {
 				provider: "MISTRAL",
@@ -19,6 +20,7 @@ export class AiStore {
 		context,
 		contentType,
 	}: { prompt: string; context: string; contentType: ContentType }) {
+		const apiClient = getApiClient();
 		return apiClient.api.ai.generate.$post({
 			json: {
 				prompt,

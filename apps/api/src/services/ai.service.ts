@@ -6,6 +6,8 @@ import { z } from "zod";
 import { AI_PROVIDERS_CONFIG, type AiProvider } from "../const.js";
 import { CONTENT_TYPE, type ContentType } from "../routers/ai.router.js";
 
+const RESPONSE_REGEX = /<response>(.*?)<\/response>/;
+
 export const ModelSchema = z.object({
 	label: z.string(),
 	provider: z.string(),
@@ -104,7 +106,7 @@ export class AiService {
 			system,
 			model,
 		});
-		return text;
+		return text.match(RESPONSE_REGEX)?.[1] ?? "";
 	}
 
 	streamResponse(params: {

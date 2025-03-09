@@ -98,9 +98,10 @@ export async function activateWindow() {
 	return queryInput?.focus();
 }
 
-export const apiClient = hc<AppType>(env.PUBLIC_API_URL, {
-	fetch,
-	headers: {
-		Cookie: vaultStore.data?.authCookie ?? "",
-	},
-});
+export const getApiClient = () =>
+	hc<AppType>(env.PUBLIC_API_URL, {
+		fetch,
+		headers: {
+			Cookie: vaultStore.data?.authCookie ?? "",
+		},
+	});
