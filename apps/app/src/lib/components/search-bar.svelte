@@ -17,6 +17,7 @@ import {
 	SearchIcon,
 	StickyNoteIcon,
 } from "lucide-svelte";
+import SearchBarAccessoryButton from "$lib/components/search-bar-accessory-button.svelte";
 import { PressedKeys } from "runed";
 import { watch } from "runed";
 import { _ } from "svelte-i18n";
@@ -173,13 +174,13 @@ const inputProps = $derived(
 <form use:form>
 	<TopBar fancyMode={settingsStore.data.incognitoEnabled}>
 		<div slot="indicator">
-			<button type="button" class="btn btn-sm" onclick={() => settingsStore.toggleIncognito()} data-hotkey="Mod+p">
+			<SearchBarAccessoryButton onclick={() => settingsStore.toggleIncognito()} hotkey="Mod+p">
 				{#if settingsStore.data.incognitoEnabled}
-					<EyeOffIcon size={16} class="pointer-events-none" />
+					<EyeOffIcon size={16} class="text-neutral-700 pointer-events-none" />
 				{:else}
-					<EyeIcon size={16} class="pointer-events-none" />
+					<EyeIcon size={16} class="text-neutral-500 pointer-events-none" />
 				{/if}
-			</button>
+			</SearchBarAccessoryButton>
 		</div>
 		<input
 			bind:this={queryInput}
@@ -195,7 +196,7 @@ const inputProps = $derived(
 		<div slot="addon" class="join">
 			{#each INDICATOR_MODES as mode, i}
 				{@const active = mode.value === appStore.barMode}
-				<button type="button" onclick={() => switchMode(mode.value)} class={clsx("btn btn-sm join-item border-neutral-800", active ? "text-primary bg-base-300" : "text-neutral-500")}>
+				<button type="button" onclick={() => switchMode(mode.value)} class={clsx("btn btn-sm join-item shadow-neutral-400/30 shadow-xs border-neutral-300/30", active ? "text-primary bg-neutral-300/30" : "bg-neutral-300 text-neutral-500/70")}>
 					<mode.icon size={24} class="w-6 h-6" />
 					{#if active}
 						<span>{mode.value}</span>

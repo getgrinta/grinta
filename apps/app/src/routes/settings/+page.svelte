@@ -133,7 +133,7 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
       {#each tabs as tab, index}
       	{@const active = currentTab === tab.value}
       	{@const hotkey = `Meta+${index + 1}`}
-        <button type="button" class={clsx("btn join-item", active && 'text-primary')} onclick={() => changeTab(tab.value)} data-hotkey={hotkey}>
+        <button type="button" class={clsx("btn join-item shadow-neutral-400/30 shadow-xs border-neutral-300/30", active ? 'text-primary bg-neutral-300/30' : 'bg-neutral-300')} onclick={() => changeTab(tab.value)} data-hotkey={hotkey}>
         	<span>{$_(tab.label)}</span>
         	{#if isCmdPressed}
 	        	<span>{tab.hotkey}</span>

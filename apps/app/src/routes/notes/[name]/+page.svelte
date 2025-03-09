@@ -2,6 +2,7 @@
 import { goto } from "$app/navigation";
 import { page } from "$app/state";
 import NoteEditor from "$lib/components/editor.svelte";
+    import SearchBarAccessoryLabel from "$lib/components/search-bar-accessory-label.svelte";
 import TopBar from "$lib/components/top-bar.svelte";
 import { BAR_MODE } from "$lib/store/app.svelte";
 import { type ExtendedNote, notesStore } from "$lib/store/notes.svelte";
@@ -176,13 +177,13 @@ $effect(() => {
 		<div class="flex flex-1 flex-col">
 			<TopBar goBack={goBack}>
 				<input bind:value={noteTitle} slot="input" class="grow h-8 font-semibold text-lg" onkeydown={handleNavigation} onchange={onNameUpdate} placeholder={$_("notes.noteName")} />
-				<label for="sidebar" slot="addon" class="btn btn-sm btn-neutral drawer-button text-primary" data-hotkey="Mod+j">
-				
+				<SearchBarAccessoryLabel for="sidebar" slot="addon" hotkey="Mod+j">
+
 				<MoreVerticalIcon size={16} />
 				{#if isCmdPressed}
 					<span>⌘J</span>
 				{/if}
-				</label>
+				</SearchBarAccessoryLabel>
 			</TopBar>
 		  	<div class="pt-20 px-8 pb-8">
 				{#if note} 

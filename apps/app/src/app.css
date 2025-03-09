@@ -8,7 +8,6 @@
 	prefersdark: true;
 	color-scheme: "dark";
 	--color-base-100: #0a0e17;
-	--color-base-200: #0f1624;
 	--color-secondary: #ebbcba;
 	--color-accent: #f6c177;
 	--color-neutral: #191724;
@@ -41,7 +40,7 @@
 	default: false;
 	prefersdark: false;
 	color-scheme: "light";
-	--color-base-100: #fffaf3;
+	--color-base-100: #dedede;
 	--color-secondary: #d7827e;
 	--color-accent: #907aa9;
 	--color-neutral: #faf4ed;

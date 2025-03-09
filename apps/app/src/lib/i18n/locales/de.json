@@ -54,7 +54,7 @@
 	"commands": {
 		"helperText": {
 			"app": "App",
-			"web": "Web",
+			"web": "Netz",
 			"barCommand": "Befehlsleiste",
 			"changeMode": "Modus ändern",
 			"copyToClipboard": "In die Zwischenablage kopieren",
