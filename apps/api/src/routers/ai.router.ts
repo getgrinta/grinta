@@ -1,4 +1,5 @@
 import { createRoute } from "@hono/zod-openapi";
+import type { StreamTextResult } from "ai";
 import { stream } from "hono/streaming";
 import { z } from "zod";
 import {
@@ -103,8 +104,20 @@ export const aiRouter = createRouter()
 	.openapi(STREAM_ROUTE, async (c) => {
 		const params = StreamParamsSchema.parse(await c.req.json());
 		c.header("Content-Type", "text/plain; charset=utf-8");
-		const streamResult = aiService.streamResponse(params);
-		return stream(c, (stream) => stream.pipe(streamResult.toDataStream()));
+		const streamResult: StreamTextResult<never, never> =
+			aiService.streamResponse(params);
+		return stream(c, async (stream) => {
+			try {
+				for await (const chunk of streamResult.textStream) {
+					await stream.write(chunk);
+				}
+			} catch (error) {
+				console.error("Streaming error:", error);
+				throw error;
+			} finally {
+				await stream.close();
+			}
+		});
 	})
 	.openapi(GENERATE_ROUTE, async (c) => {
 		const params = GenerateParamsSchema.parse(await c.req.json());
