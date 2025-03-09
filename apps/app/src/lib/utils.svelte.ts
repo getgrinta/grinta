@@ -7,6 +7,7 @@ import { hc } from "hono/client";
 import { useEventListener } from "runed";
 import { appStore } from "./store/app.svelte";
 import { settingsStore } from "./store/settings.svelte";
+import { vaultStore } from "./store/vault.svelte";
 
 const THEME_QUERY = "(prefers-color-scheme: dark)";
 
@@ -97,4 +98,9 @@ export async function activateWindow() {
 	return queryInput?.focus();
 }
 
-export const apiClient = hc<AppType>(env.PUBLIC_API_URL, { fetch });
+export const apiClient = hc<AppType>(env.PUBLIC_API_URL, {
+	fetch,
+	headers: {
+		Cookie: vaultStore.data?.authCookie ?? "",
+	},
+});
