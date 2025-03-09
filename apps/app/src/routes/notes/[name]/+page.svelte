@@ -15,6 +15,8 @@ import { onMount } from "svelte";
 import { _ } from "svelte-i18n";
 import { toast } from "svelte-sonner";
 
+console.log(">>>MOUNT???");
+
 const TO_COMPLETE_PROMPT = "%G4TW%";
 const pressedKeys = new PressedKeys();
 

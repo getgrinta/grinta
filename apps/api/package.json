@@ -1,8 +1,18 @@
 {
 	"name": "@getgrinta/api",
+	"type": "module",
+	"module": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		}
+	},
+	"files": ["dist"],
 	"scripts": {
 		"dev": "bun run --hot src/index.ts",
-		"build": "bun build src/index.ts --outdir ./dist --target bun",
+		"build": "tsc --emitDeclarationOnly && bun build src/index.ts --outdir ./dist --target bun",
 		"start": "bun run --bun dist/index.js",
 		"db:push": "drizzle-kit push",
 		"db:generate": "drizzle-kit generate",
@@ -22,6 +32,7 @@
 		"postgres": "^3.4.5",
 		"resend": "^4.1.2",
 		"stripe": "^17.7.0",
+		"ts-pattern": "^5.6.2",
 		"zod": "^3.24.2"
 	},
 	"devDependencies": {

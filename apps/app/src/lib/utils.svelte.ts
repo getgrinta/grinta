@@ -1,5 +1,8 @@
+import { env } from "$env/dynamic/public";
+import type { AppType } from "@getgrinta/api";
 import { install } from "@github/hotkey";
 import { Position, moveWindow } from "@tauri-apps/plugin-positioner";
+import { hc } from "hono/client";
 import { useEventListener } from "runed";
 import { appStore } from "./store/app.svelte";
 import { settingsStore } from "./store/settings.svelte";
@@ -93,6 +96,4 @@ export async function activateWindow() {
 	return queryInput?.focus();
 }
 
-export function getBaseLLMApiUrl(url: string): string {
-	return url.replace(/chat\/completions\/?/, "").trim();
-}
+export const apiClient = hc<AppType>(env.PUBLIC_API_URL);

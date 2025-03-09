@@ -21,9 +21,9 @@ const turndownService = new TurndownService({ headingStyle: "atx" });
 
 const { content, onUpdate, editable = true, toggleSidebar } = $props();
 
-let element = $state<Element>();
-let floatingMenu = $state<Element>();
-let bubbleMenu = $state<Element>();
+let element = $state<HTMLElement>();
+let floatingMenu = $state<HTMLElement>();
+let bubbleMenu = $state<HTMLElement>();
 let editor = $state<Editor>();
 
 async function setContentAwareWindowHeight() {
@@ -82,7 +82,12 @@ function buildEditor() {
 			TextSuggestion.configure({
 				// You can override fetchAutocompletion() here if needed.
 				async fetchAutocompletion({ query }: Record<string, string>) {
-					const result = await aiStore.generateAutocompletion({ query });
+					const context = editor?.getText() ?? "";
+					const result = await aiStore.generateText({
+						prompt: query,
+						context,
+						contentType: "AUTOCOMPLETION",
+					});
 					return result;
 				},
 			}),
@@ -112,6 +117,7 @@ function buildEditor() {
 }
 
 function initializeEditor() {
+	if (!element || !floatingMenu || !bubbleMenu) return;
 	editor = buildEditor();
 }
 
@@ -120,6 +126,13 @@ onMount(initializeEditor);
 onDestroy(() => {
 	if (editor) {
 		editor.destroy();
+	}
+});
+
+$effect(() => {
+	// Re-initialize editor if any of the required elements change
+	if (element && floatingMenu && bubbleMenu && !editor) {
+		initializeEditor();
 	}
 });
 

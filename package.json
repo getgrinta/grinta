@@ -16,7 +16,7 @@
 		"typescript": "5.5.4"
 	},
 	"engines": {
-		"node": ">=18"
+		"node": ">=22"
 	},
 	"packageManager": "bun@1.1.42",
 	"workspaces": ["apps/*", "packages/*"],

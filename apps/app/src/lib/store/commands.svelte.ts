@@ -526,6 +526,7 @@ export class CommandsStore extends SecureStore<Commands> {
 			})
 			.with({ handler: COMMAND_HANDLER.OPEN_NOTE }, async ({ value }) => {
 				const filename = encodeURIComponent(value);
+				console.log(">>>OPEN_NOTE", filename);
 				return goto(`/notes/${filename}`);
 			})
 			.with({ handler: COMMAND_HANDLER.CREATE_NOTE }, async ({ value }) => {

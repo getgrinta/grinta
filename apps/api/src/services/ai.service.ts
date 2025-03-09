@@ -1,10 +1,10 @@
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
-import { generateText, streamText } from "ai";
+import { generateObject, streamText } from "ai";
 import dedent from "dedent";
+import { match } from "ts-pattern";
 import { z } from "zod";
-import { AI_PROVIDERS_CONFIG, type AiProvider } from "../const";
-
-const RESPONSE_REGEX = /<response>(.*?)<\/response>/;
+import { AI_PROVIDERS_CONFIG, type AiProvider } from "../const.js";
+import { CONTENT_TYPE, type ContentType } from "../routers/ai.router.js";
 
 export const ModelSchema = z.object({
 	label: z.string(),
@@ -23,14 +23,20 @@ export const AUTOCOMPLETE_SYSTEM_PROMPT = dedent`
 		- If you autocomplete a word, do not include a trailing whitespace.
 	3. Whitespace Handling: Pay attention to preceding whitespaces to ensure proper formatting.
 	4. Nonsensical Input: If the user's input is incoherent or nonsensical, do not generate a response.
-	5. Output Format: Return only the continuation of the paragraph wrapped in an XML <response> tag. Do not include any additional text or explanations.
 
 	Example Input:
 	<request>Hello </request>
 	<context>My context</context>
+`;
 
-	Example Output:
-	<response>World</response>
+export const INLINE_SYSTEM_PROMPT = dedent`
+	You are a highly intelligent note-taking AI assistant.
+	Your task is to generate a new paragraph of text based on the provided prompt and the additional information in the <context></context>.
+`;
+
+export const REPHRASE_SYSTEM_PROMPT = dedent`
+	You are a highly intelligent note-taking AI assistant.
+	Your task is to rephrase the provided text in a way provided in the <request></request> tag. The text to rephrase is provided in the <context></context> tag.
 `;
 
 export class AiService {
@@ -69,11 +75,12 @@ export class AiService {
         `;
 	}
 
-	async generateAutocompletion(params: {
+	async generateResponse(params: {
 		prompt: string;
 		context: string;
 		provider: AiProvider;
 		model: string;
+		contentType: ContentType;
 	}) {
 		const model = this.createModel({
 			provider: params.provider,
@@ -83,15 +90,23 @@ export class AiService {
 			context: params.context,
 			request: params.prompt,
 		});
-		const { text } = await generateText({
+		const system = match(params.contentType)
+			.with(CONTENT_TYPE.AUTOCOMPLETION, () => AUTOCOMPLETE_SYSTEM_PROMPT)
+			.with(CONTENT_TYPE.INLINE_AI, () => INLINE_SYSTEM_PROMPT)
+			.with(CONTENT_TYPE.REPHRASE, () => REPHRASE_SYSTEM_PROMPT)
+			.exhaustive();
+		const { object } = await generateObject({
 			prompt,
-			system: AUTOCOMPLETE_SYSTEM_PROMPT,
+			system,
 			model,
+			schema: z.object({
+				text: z.string(),
+			}),
 		});
-		return text.match(RESPONSE_REGEX)?.[1] ?? "";
+		return object;
 	}
 
-	generateNote(params: {
+	streamResponse(params: {
 		prompt: string;
 		context: string;
 		provider: AiProvider;
@@ -110,6 +125,6 @@ export class AiService {
 			system,
 			model,
 		});
-		return stream.toDataStreamResponse();
+		return stream.toDataStream();
 	}
 }

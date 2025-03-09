@@ -5,6 +5,10 @@ import { aiStore } from "./ai.svelte";
 import { COMMAND_HANDLER, commandsStore } from "./commands.svelte";
 import { settingsStore } from "./settings.svelte";
 
+type StreamResult = {
+	textStream: ReadableStream<string> & AsyncIterable<string>;
+};
+
 export type Note = {
 	title: string;
 	filename: string;
@@ -110,7 +114,7 @@ export class NotesStore {
 		isCompletionActive,
 	}: { filename: string; prompt: string; isCompletionActive: () => boolean }) {
 		const note = await this.fetchNote(filename);
-		const result = aiStore.streamNoteText(prompt);
+		const result = aiStore.streamText(prompt) as unknown as StreamResult;
 		let content = note.content;
 
 		for await (const chunk of result.textStream) {

@@ -1,7 +1,6 @@
 <script lang="ts">
 import { goto } from "$app/navigation";
 import TopBar from "$lib/components/top-bar.svelte";
-import { aiStore } from "$lib/store/ai.svelte";
 import {
 	ACCENT_COLOR,
 	LANGUAGE,
@@ -9,7 +8,6 @@ import {
 	THEME,
 	settingsStore,
 } from "$lib/store/settings.svelte";
-import { invoke } from "@tauri-apps/api/core";
 import { clsx } from "clsx";
 import humanizeString from "humanize-string";
 import { PressedKeys, watch } from "runed";
@@ -26,10 +24,6 @@ const tabs = [
 
 let newToggleShortcut = $state<string[]>([]);
 let recordingShortcut = $state(false);
-let connectionStatus = $state<{
-	status: "loading" | "error" | "success";
-	text?: string;
-} | null>(null);
 let currentTab = $state("general");
 const themes = Object.keys(THEME);
 const searchEngines = Object.keys(SEARCH_ENGINE);
@@ -84,18 +78,6 @@ const notesDirString = $derived(settingsStore.data.notesDir.join("/"));
 async function wipeLocalData() {
 	await settingsStore.wipeLocalData();
 	return goto("/");
-}
-
-async function testConnection() {
-	connectionStatus = {
-		status: "loading",
-		text: $_("settings.fields.testingConnection"),
-	};
-	const result = await aiStore.testConnection();
-	connectionStatus = {
-		status: result.success ? "success" : "error",
-		text: result.message,
-	};
 }
 
 $effect(() => {
@@ -193,15 +175,6 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
         <input class="input w-full" type="password" name="secretKey" bind:value={settingsStore.data.aiSecretKey} />
         <label class="text-sm">{$_("settings.fields.ai.additionalContext")}</label>
         <textarea class="textarea w-full resize-none" placeholder="{$_("additionalContextPlaceholder")}" bind:value={settingsStore.data.aiAdditionalContext} />
-        <span></span>
-        <div>
-        <button type="button" class="btn btn-warning w-[100%]" onclick={testConnection}>{$_("settings.fields.ai.testConnection")}</button>
-        <div class={clsx("text-sm text-center mt-2", {
-          "text-success": connectionStatus?.status === "success",
-          "text-error": connectionStatus?.status === "error"
-        })}>{connectionStatus?.text}</div>
-      </div>
-    
       </form>
     {:else if currentTab === 'notes'}
       <form class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center">
