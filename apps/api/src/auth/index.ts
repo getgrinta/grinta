@@ -10,6 +10,7 @@ import { sendOtp } from "../utils/mail.utils.js";
 const stripeClient = new Stripe(env.STRIPE_SECRET_KEY);
 
 export const auth = betterAuth({
+	basePath: "/api/auth",
 	trustedOrigins: ["*"],
 	database: drizzleAdapter(db, {
 		provider: "pg",
