@@ -7,7 +7,7 @@ export class AiStore {
 	async *streamText({ prompt }: { prompt: string }) {
 		const apiClient = getApiClient();
 		const url = new URL(apiClient.api.ai.stream.$url());
-		const request = await fetch(url, {
+		const response = await fetch(url, {
 			method: "POST",
 			body: JSON.stringify({
 				prompt,
@@ -17,12 +17,13 @@ export class AiStore {
 			}),
 			headers: getHeaders(),
 		});
-		console.log(">>>REQUEST1", request);
-		const reader = request.body?.getReader();
-		console.log(">>>READER", reader);
-		if (!reader) {
-			throw new Error("No reader");
+		if (!response.ok) {
+			throw new Error(`HTTP error! status: ${response.status}`);
 		}
+		if (!response.body) {
+			throw new Error("Response has no body");
+		}
+		const reader = response.body.getReader();
 		const decoder = new TextDecoder();
 		try {
 			while (true) {

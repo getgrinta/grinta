@@ -1,3 +1,4 @@
+import { logger } from "hono/logger";
 import { auth } from "./auth/index.js";
 import { aiRouter } from "./routers/ai.router.js";
 import { authRouter } from "./routers/auth.router.js";
@@ -16,6 +17,7 @@ const app = createRouter()
 			title: "Grinta",
 		},
 	})
+	.use(logger())
 	.use("*", authSession)
 	.use("/api/ai/*", authenticatedGuard)
 	.on(["POST", "GET"], "/api/auth/*", (c) => {
