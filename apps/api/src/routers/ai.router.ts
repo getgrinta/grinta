@@ -107,10 +107,20 @@ export const aiRouter = createRouter()
 			aiService.streamResponse(params);
 
 		c.header("Content-Type", "text/plain; charset=utf-8");
-		c.header("Transfer-Encoding", "chunked");
+		c.header("Cache-Control", "no-cache");
 		c.header("Connection", "keep-alive");
+		c.header("Transfer-Encoding", "chunked");
 
-		return stream(c, (stream) => stream.pipe(streamResult.textStream));
+		return stream(c, async (stream) => {
+			try {
+				for await (const chunk of streamResult.textStream) {
+					await stream.write(`${chunk}\n`);
+				}
+			} catch (error) {
+				console.error("Streaming error:", error);
+				throw error;
+			}
+		});
 	})
 	.openapi(GENERATE_ROUTE, async (c) => {
 		const params = GenerateParamsSchema.parse(await c.req.json());

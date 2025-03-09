@@ -138,13 +138,41 @@ $effect(() => {
 
 $effect(() => {
 	if (!editor) return;
-	editor.commands.setContent(content);
 
+	// Check if content has changed significantly before updating
+	const currentHTML = editor.getHTML();
+	if (
+		currentHTML !== content &&
+		// Only update if the difference is significant or content is empty
+		(content === "" || Math.abs(currentHTML.length - content.length) > 1)
+	) {
+		// Save selection
+		let savedSelection = null;
+		if (editor.isEditable) {
+			savedSelection = editor.state.selection;
+		}
+
+		// Update content
+		editor.commands.setContent(content);
+
+		// Restore selection if needed
+		if (savedSelection && editor.isEditable) {
+			try {
+				editor.commands.setTextSelection(savedSelection);
+			} catch (e) {
+				// Fallback if selection can't be restored
+				editor.commands.focus("end");
+			}
+		}
+	}
+
+	// Handle editable state changes
 	const currentIsEditable = editor.isEditable;
-
 	if (editable !== currentIsEditable) {
 		editor.setEditable(editable);
-		editor.commands.focus();
+		if (editable) {
+			editor.commands.focus();
+		}
 	}
 });
 </script>

@@ -15,7 +15,7 @@ import { onMount } from "svelte";
 import { _ } from "svelte-i18n";
 import { toast } from "svelte-sonner";
 
-console.log(">>>MOUNT???");
+// Initialize state
 
 const TO_COMPLETE_PROMPT = "%G4TW%";
 const pressedKeys = new PressedKeys();
@@ -27,7 +27,10 @@ let noteTitle = $state<string>();
 let generatingNote = $state<boolean>(false);
 let unsubWatcher = $state<UnwatchFn>();
 let sidebarOpened = $state(false);
-const content = $derived(note ? marked.parse(note.content) : "");
+const content = $derived(() => {
+	if (!note || note.content === undefined) return "";
+	return marked.parse(note.content);
+});
 
 function toggleSidebar() {
 	sidebarOpened = !sidebarOpened;
@@ -89,26 +92,28 @@ function getCurrentPromptCancellationToken(): string | null {
 async function completePrompt() {
 	if (!note) return;
 
-	await notesStore.updateNote({ filename: note.filename, content: "" });
-
 	const completePromptToken = generateCancellationToken();
 	completePromptCancellationToken = completePromptToken;
 
 	generatingNote = true;
-	note.content = "";
 
 	try {
-		await notesStore.completePrompt({
+		// Clear content
+		note.content = "";
+
+		// Start streaming
+		const updatedNote = await notesStore.completePrompt({
 			filename: note.filename,
 			prompt: note.filename,
-			isCompletionActive: () => {
-				return (
-					note != null &&
-					getCurrentPromptCancellationToken() === completePromptToken
-				);
-			},
+			isCompletionActive: () =>
+				completePromptCancellationToken === completePromptToken,
 		});
+
+		if (updatedNote) {
+			note = updatedNote;
+		}
 	} catch (error) {
+		console.error("Failed to complete prompt:", error);
 		let toastId = toast.error(`Failed to complete prompt: ${error}`, {
 			action: {
 				label: $_("notes.retry"),
@@ -120,6 +125,7 @@ async function completePrompt() {
 		});
 	} finally {
 		generatingNote = false;
+		completePromptCancellationToken = null;
 	}
 }
 
