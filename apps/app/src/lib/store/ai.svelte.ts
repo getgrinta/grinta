@@ -31,7 +31,7 @@ export class AiStore {
 				if (done) {
 					break;
 				}
-				yield decoder.decode(value, { stream: true });
+				yield decoder.decode(value);
 			}
 		} finally {
 			reader.releaseLock();

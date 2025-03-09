@@ -104,7 +104,7 @@ export const aiRouter = createRouter()
 		const params = StreamParamsSchema.parse(await c.req.json());
 		c.header("Content-Type", "text/plain; charset=utf-8");
 		const streamResult = aiService.streamResponse(params);
-		return stream(c, (stream) => stream.pipe(streamResult.textStream));
+		return stream(c, (stream) => stream.pipe(streamResult.toDataStream()));
 	})
 	.openapi(GENERATE_ROUTE, async (c) => {
 		const params = GenerateParamsSchema.parse(await c.req.json());

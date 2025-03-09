@@ -118,6 +118,7 @@ export class NotesStore {
 		console.log(">>>RESULT", result);
 		let content = note.content;
 		for await (const chunk of result) {
+			console.log(">>>CHUNK", result, chunk);
 			if (!isCompletionActive()) break;
 			content = note.content + chunk;
 			await this.updateNote({
