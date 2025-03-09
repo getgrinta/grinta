@@ -17,7 +17,7 @@ const app = createRouter()
 		},
 	})
 	.use("*", authSession)
-	.use("/api/ai", authenticatedGuard)
+	.use("/api/ai/*", authenticatedGuard)
 	.on(["POST", "GET"], "*", (c) => {
 		return auth.handler(c.req.raw);
 	})
@@ -27,6 +27,6 @@ const app = createRouter()
 
 export type AppType = typeof app;
 
-export { CONTENT_TYPE, ContentType } from "./routers/ai.router.js";
+export type { ContentType } from "./routers/ai.router.js";
 
 export default app;

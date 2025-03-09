@@ -88,6 +88,7 @@ function buildEditor() {
 						context,
 						contentType: "AUTOCOMPLETION",
 					});
+					console.log(">>>RES", result);
 					return result;
 				},
 			}),

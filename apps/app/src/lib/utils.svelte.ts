@@ -1,6 +1,7 @@
 import { env } from "$env/dynamic/public";
 import type { AppType } from "@getgrinta/api";
 import { install } from "@github/hotkey";
+import { fetch } from "@tauri-apps/plugin-http";
 import { Position, moveWindow } from "@tauri-apps/plugin-positioner";
 import { hc } from "hono/client";
 import { useEventListener } from "runed";
@@ -96,4 +97,4 @@ export async function activateWindow() {
 	return queryInput?.focus();
 }
 
-export const apiClient = hc<AppType>(env.PUBLIC_API_URL);
+export const apiClient = hc<AppType>(env.PUBLIC_API_URL, { fetch });
