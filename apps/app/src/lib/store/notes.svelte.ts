@@ -114,10 +114,10 @@ export class NotesStore {
 		isCompletionActive,
 	}: { filename: string; prompt: string; isCompletionActive: () => boolean }) {
 		const note = await this.fetchNote(filename);
-		const result = aiStore.streamText(prompt) as unknown as StreamResult;
+		const result = aiStore.streamText({ prompt });
+		console.log(">>>RESULT", result);
 		let content = note.content;
-
-		for await (const chunk of result.textStream) {
+		for await (const chunk of result) {
 			if (!isCompletionActive()) break;
 			content = note.content + chunk;
 			await this.updateNote({
@@ -126,14 +126,11 @@ export class NotesStore {
 			});
 			note.content = content;
 		}
-
 		if (!isCompletionActive()) return;
-
 		await this.updateNote({
 			filename,
 			content,
 		});
-
 		return note;
 	}
 

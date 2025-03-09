@@ -98,10 +98,15 @@ export async function activateWindow() {
 	return queryInput?.focus();
 }
 
-export const getApiClient = () =>
-	hc<AppType>(env.PUBLIC_API_URL, {
+export function getHeaders() {
+	return {
+		Cookie: vaultStore.data?.authCookie ?? "",
+	};
+}
+
+export function getApiClient() {
+	return hc<AppType>(env.PUBLIC_API_URL, {
 		fetch,
-		headers: {
-			Cookie: vaultStore.data?.authCookie ?? "",
-		},
+		headers: getHeaders(),
 	});
+}

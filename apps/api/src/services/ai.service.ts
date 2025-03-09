@@ -123,11 +123,10 @@ export class AiService {
 		const system = this.getGenerateNoteSystemPrompt({
 			context: params.context,
 		});
-		const stream = streamText({
+		return streamText({
 			prompt,
 			system,
 			model,
 		});
-		return stream.toDataStream();
 	}
 }

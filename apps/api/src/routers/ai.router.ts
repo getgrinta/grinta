@@ -102,10 +102,9 @@ export const aiRouter = createRouter()
 	})
 	.openapi(STREAM_ROUTE, async (c) => {
 		const params = StreamParamsSchema.parse(await c.req.json());
-		c.header("X-Vercel-AI-Data-Stream", "v1");
 		c.header("Content-Type", "text/plain; charset=utf-8");
 		const streamResult = aiService.streamResponse(params);
-		return stream(c, (stream) => stream.pipe(streamResult));
+		return stream(c, (stream) => stream.pipe(streamResult.textStream));
 	})
 	.openapi(GENERATE_ROUTE, async (c) => {
 		const params = GenerateParamsSchema.parse(await c.req.json());
