@@ -90,7 +90,7 @@ const systemThemeWatcher = new SystemThemeWatcher();
 			{@const currentLabel = command.localizedLabel ?? command.label}
 			{@const labelChunks = highlightText(currentLabel, appStore.query)}
 
-			{@const rowCss = systemThemeWatcher.theme === THEME.DARK ? "border-1 border-transparent hover:bg-neutral-300/30 color-base-100" : "border-1 border-transparent text-neutral-300" }
+			{@const rowCss = systemThemeWatcher.theme === THEME.LIGHT ? "border-1 border-transparent hover:bg-neutral-300/30 color-base-100" : "border-1 border-transparent text-neutral-300" }
 			{@const rowActiveCss = systemThemeWatcher.theme === THEME.DARK ? 'menu-active !bg-base-100/40 !text-primary !border-neutral-600' : 'menu-active !bg-neutral-300/30 color-base-10 border-1 !border-neutral-400/30'}
 			
 			{@const labelChunkCss = (isHiglighted: boolean) => systemThemeWatcher.theme === THEME.DARK ? (isHiglighted ? "text-neutral-300" : "text-primary font-semibold") : (isHiglighted ? "color-base-100 text-neutral-800" : "color-base-100 text-neutral-800 font-semibold")}

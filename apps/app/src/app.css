@@ -50,7 +50,7 @@
 	--color-error: #b4637a;
 	--color-base-200: #fdf6ed;
 	--color-base-300: #f5ede3;
-	--color-base-content: oklch(25% 0.029 256.847);
+	--color-base-content: oklch(40% 0.029 256.847);
 	--color-primary-content: oklch(98% 0.018 272.314);
 	--color-secondary-content: oklch(98% 0.028 342.258);
 	--color-accent-content: oklch(98% 0.063 188.416);

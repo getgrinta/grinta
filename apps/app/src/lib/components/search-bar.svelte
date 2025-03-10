@@ -7,7 +7,7 @@ import { appMetadataStore } from "$lib/store/app-metadata.svelte";
 import { BAR_MODE, type BarMode, appStore } from "$lib/store/app.svelte";
 import { commandsStore } from "$lib/store/commands.svelte";
 import { notesStore } from "$lib/store/notes.svelte";
-import { settingsStore } from "$lib/store/settings.svelte";
+import { settingsStore, THEME } from "$lib/store/settings.svelte";
 import { clsx } from "clsx";
 import { createForm } from "felte";
 import {
@@ -18,10 +18,12 @@ import {
 	StickyNoteIcon,
 } from "lucide-svelte";
 import SearchBarAccessoryButton from "$lib/components/search-bar-accessory-button.svelte";
+import SegmentedControl from "$lib/components/segmented-control.svelte";
 import { PressedKeys } from "runed";
 import { watch } from "runed";
 import { _ } from "svelte-i18n";
 import { match } from "ts-pattern";
+    import { SystemThemeWatcher } from "$lib/utils.svelte";
 
 let queryInput: HTMLInputElement;
 const pressedKeys = new PressedKeys();
@@ -117,11 +119,11 @@ async function handleNavigation(event: KeyboardEvent) {
 watch(
 	() => [appStore.query, appStore.searchMode, appStore.barMode],
 	() => {
-		commandsStore.buildCommands({
-			query: appStore.query,
-			searchMode: appStore.searchMode,
-			barMode: appStore.barMode,
-		});
+	commandsStore.buildCommands({
+		query: appStore.query,
+		searchMode: appStore.searchMode,
+		barMode: appStore.barMode,
+	});
 	},
 );
 
@@ -169,6 +171,8 @@ const inputProps = $derived(
 		}))
 		.exhaustive(),
 );
+
+const systemThemeWatcher = new SystemThemeWatcher();
 </script>
 
 <form use:form>
@@ -176,36 +180,33 @@ const inputProps = $derived(
 		<div slot="indicator">
 			<SearchBarAccessoryButton onclick={() => settingsStore.toggleIncognito()} hotkey="Mod+p">
 				{#if settingsStore.data.incognitoEnabled}
-					<EyeOffIcon size={16} class="text-neutral-700 pointer-events-none" />
+					<EyeOffIcon size={16} class={clsx(systemThemeWatcher.theme === THEME.LIGHT && "text-neutral-700", "pointer-events-none")} />
 				{:else}
-					<EyeIcon size={16} class="text-neutral-500 pointer-events-none" />
+					<EyeIcon size={16} class={clsx(systemThemeWatcher.theme === THEME.LIGHT && "text-neutral-500", "pointer-events-none")} />
 				{/if}
 			</SearchBarAccessoryButton>
 		</div>
-		<input
-			bind:this={queryInput}
-			slot="input"
-			class="grow font-semibold text-lg !outline-none"
-			name="query"
-			bind:value={appStore.query}
-			onkeydown={handleNavigation}
-			placeholder={inputProps.placeholder}
-			autocomplete="off"
-			autofocus
-		/>
-		<div slot="addon" class="join">
-			{#each INDICATOR_MODES as mode, i}
-				{@const active = mode.value === appStore.barMode}
-				<button type="button" onclick={() => switchMode(mode.value)} class={clsx("btn btn-sm join-item shadow-neutral-400/30 shadow-xs border-neutral-300/30", active ? "text-primary bg-neutral-300/30" : "bg-neutral-300 text-neutral-500/70")}>
-					<mode.icon size={24} class="w-6 h-6" />
-					{#if active}
-						<span>{mode.value}</span>
-					{/if}
-					{#if isCmdPressed}
-						<span>{mode.shortcut}</span>
-					{/if}
-				</button>
-  			{/each}
+			<input
+				bind:this={queryInput}
+				slot="input"
+				class="grow font-semibold text-lg !outline-none"
+				name="query"
+				bind:value={appStore.query}
+				onkeydown={handleNavigation}
+				placeholder={inputProps.placeholder}
+				autocomplete="off"
+				autofocus
+			/>
+		<div slot="addon">
+			<SegmentedControl
+				items={INDICATOR_MODES.map(mode => ({
+					text: mode.value,
+					icon: mode.icon,
+					active: mode.value === appStore.barMode,
+					shortcut: isCmdPressed ? mode.shortcut : undefined,
+					onClick: () => switchMode(mode.value)
+				}))}
+			/>
 		</div>
 	</TopBar>
 </form>

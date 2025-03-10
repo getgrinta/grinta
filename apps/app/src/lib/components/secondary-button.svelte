@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { THEME } from "$lib/store/settings.svelte";
+    import { SystemThemeWatcher } from "$lib/utils.svelte";
 import clsx from "clsx";
 
 const { children, class: className, onclick, disabled } = $props<{
@@ -6,13 +8,15 @@ const { children, class: className, onclick, disabled } = $props<{
 	onclick: () => void;
 	disabled?: boolean;
 }>();
-</script>
 
+const systemThemeWatcher = new SystemThemeWatcher();
+</script>
 
 <button 
     type="button" 
     class={clsx(
-        `btn shadow-neutral-400/30 shadow-xs border-neutral-400/30 bg-neutral-200/50`,
+        `btn`,
+        systemThemeWatcher.theme === THEME.LIGHT && "shadow-neutral-400/30 shadow-xs border-neutral-400/30 bg-neutral-200/50",
         className,
     )}
     disabled={disabled}

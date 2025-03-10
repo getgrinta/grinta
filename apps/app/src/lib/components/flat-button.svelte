@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { THEME } from "$lib/store/settings.svelte";
+    import { SystemThemeWatcher } from "$lib/utils.svelte";
 import clsx from "clsx";
 
 const { text, onClick, shortcut, showShortcut } = $props<{
@@ -7,14 +9,15 @@ const { text, onClick, shortcut, showShortcut } = $props<{
 	shortcut?: string;
 	showShortcut?: boolean;
 }>();
-</script>
 
+const systemThemeWatcher = new SystemThemeWatcher();
+</script>
 
 <button 
     type="button" 
     class={clsx(
         `btn btn-md border-0 bg-base-100`, 
-        'text-neutral-700'
+        systemThemeWatcher.theme === THEME.LIGHT && "text-neutral-700"
     )}
     onclick={onClick}
 >
