@@ -141,10 +141,10 @@ async function initializeApp() {
 	await setupI18n();
 	await vaultStore.initialize();
 	await appStore.setSession();
-	await commandsStore.initialize();
+	commandsStore.initialize();
 	await settingsStore.initialize();
 	await clipboardStore.initialize();
-	await appMetadataStore.initializeIcons();
+	appMetadataStore.initializeIcons();
 	initTrayIcon();
 	moveWindow(Position.TopCenter);
 	initializing = false;
