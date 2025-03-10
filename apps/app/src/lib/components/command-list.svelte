@@ -6,8 +6,8 @@ import {
 	type CommandHandler,
 	commandsStore,
 } from "$lib/store/commands.svelte";
-    import { THEME } from "$lib/store/settings.svelte";
-import { highlightText, SystemThemeWatcher } from "$lib/utils.svelte";
+import { THEME } from "$lib/store/settings.svelte";
+import { SystemThemeWatcher, highlightText } from "$lib/utils.svelte";
 import { clsx } from "clsx";
 import {
 	AppWindowIcon,
@@ -74,7 +74,6 @@ const scrollToIndex = $derived(
 );
 
 const systemThemeWatcher = new SystemThemeWatcher();
-
 </script>
 
 <div class="flex flex-1 flex-col mt-[5rem] overflow-hidden">

@@ -2,7 +2,7 @@
 import type { Editor } from "@tiptap/core";
 import { SparklesIcon } from "lucide-svelte";
 import { _ } from "svelte-i18n";
-    import SecondaryButton from "../secondary-button.svelte";
+import SecondaryButton from "../secondary-button.svelte";
 
 let { editor } = $props<{ editor: Editor | undefined }>();
 

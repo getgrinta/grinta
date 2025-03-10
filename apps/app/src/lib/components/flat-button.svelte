@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { THEME } from "$lib/store/settings.svelte";
-    import { SystemThemeWatcher } from "$lib/utils.svelte";
+import { THEME } from "$lib/store/settings.svelte";
+import { SystemThemeWatcher } from "$lib/utils.svelte";
 import clsx from "clsx";
 
 const { text, onClick, shortcut, showShortcut } = $props<{

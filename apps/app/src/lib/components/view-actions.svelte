@@ -12,7 +12,6 @@ const { actions } = $props<{ actions: Action[] }>();
 
 const pressedKeys = new PressedKeys();
 const isCmdPressed = $derived(pressedKeys.has("Meta"));
-
 </script>
 
 {#each actions as action}

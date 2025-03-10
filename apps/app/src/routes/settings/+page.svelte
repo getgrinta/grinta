@@ -1,7 +1,8 @@
 <script lang="ts">
 import { goto } from "$app/navigation";
-import TopBar from "$lib/components/top-bar.svelte";
+import SecondaryButton from "$lib/components/secondary-button.svelte";
 import SegmentedControl from "$lib/components/segmented-control.svelte";
+import TopBar from "$lib/components/top-bar.svelte";
 import { aiStore } from "$lib/store/ai.svelte";
 import {
 	ACCENT_COLOR,
@@ -15,7 +16,6 @@ import humanizeString from "humanize-string";
 import { PressedKeys, watch } from "runed";
 import { _ } from "svelte-i18n";
 import packageJson from "../../../package.json" with { type: "json" };
-import SecondaryButton from "$lib/components/secondary-button.svelte";
 
 const pressedKeys = new PressedKeys();
 

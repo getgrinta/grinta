@@ -1,13 +1,12 @@
 <script lang="ts">
-    import { THEME } from "$lib/store/settings.svelte";
-    import { SystemThemeWatcher } from "$lib/utils.svelte";
-    import clsx from "clsx";
+import { THEME } from "$lib/store/settings.svelte";
+import { SystemThemeWatcher } from "$lib/utils.svelte";
+import clsx from "clsx";
 
 const { children, onclick, hotkey } = $props<{
 	onClick: () => void;
 	hotkey?: string;
 }>();
-
 
 const systemThemeWatcher = new SystemThemeWatcher();
 </script>

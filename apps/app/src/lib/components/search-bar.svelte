@@ -2,12 +2,15 @@
 import { goto } from "$app/navigation";
 import AiNoteIcon from "$lib/assets/ai-note.svelte";
 import GrintaIcon from "$lib/assets/grinta.svelte";
+import SearchBarAccessoryButton from "$lib/components/search-bar-accessory-button.svelte";
+import SegmentedControl from "$lib/components/segmented-control.svelte";
 import TopBar from "$lib/components/top-bar.svelte";
 import { appMetadataStore } from "$lib/store/app-metadata.svelte";
 import { BAR_MODE, type BarMode, appStore } from "$lib/store/app.svelte";
 import { commandsStore } from "$lib/store/commands.svelte";
 import { notesStore } from "$lib/store/notes.svelte";
-import { settingsStore, THEME } from "$lib/store/settings.svelte";
+import { THEME, settingsStore } from "$lib/store/settings.svelte";
+import { SystemThemeWatcher } from "$lib/utils.svelte";
 import { clsx } from "clsx";
 import { createForm } from "felte";
 import {
@@ -17,13 +20,10 @@ import {
 	SearchIcon,
 	StickyNoteIcon,
 } from "lucide-svelte";
-import SearchBarAccessoryButton from "$lib/components/search-bar-accessory-button.svelte";
-import SegmentedControl from "$lib/components/segmented-control.svelte";
 import { PressedKeys } from "runed";
 import { watch } from "runed";
 import { _ } from "svelte-i18n";
 import { match } from "ts-pattern";
-    import { SystemThemeWatcher } from "$lib/utils.svelte";
 
 let queryInput: HTMLInputElement;
 const pressedKeys = new PressedKeys();
@@ -119,11 +119,11 @@ async function handleNavigation(event: KeyboardEvent) {
 watch(
 	() => [appStore.query, appStore.searchMode, appStore.barMode],
 	() => {
-	commandsStore.buildCommands({
-		query: appStore.query,
-		searchMode: appStore.searchMode,
-		barMode: appStore.barMode,
-	});
+		commandsStore.buildCommands({
+			query: appStore.query,
+			searchMode: appStore.searchMode,
+			barMode: appStore.barMode,
+		});
 	},
 );
 

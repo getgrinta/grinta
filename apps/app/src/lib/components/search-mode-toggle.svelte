@@ -1,7 +1,7 @@
 <script lang="ts">
+import SegmentedControl from "$lib/components/segmented-control.svelte";
 import { SEARCH_MODE, appStore } from "$lib/store/app.svelte";
 import { GlobeIcon, SparklesIcon } from "lucide-svelte";
-import SegmentedControl from "$lib/components/segmented-control.svelte";
 
 const items = $derived([
 	{

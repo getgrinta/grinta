@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { THEME } from "$lib/store/settings.svelte";
-    import { SystemThemeWatcher } from "$lib/utils.svelte";
-    import clsx from "clsx";
+import { THEME } from "$lib/store/settings.svelte";
+import { SystemThemeWatcher } from "$lib/utils.svelte";
+import clsx from "clsx";
 
 const {
 	children,

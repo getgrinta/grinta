@@ -1,9 +1,9 @@
 <script lang="ts">
+import { THEME } from "$lib/store/settings.svelte";
+import { SystemThemeWatcher } from "$lib/utils.svelte";
 import clsx from "clsx";
 import { ChevronLeftIcon } from "lucide-svelte";
 import SearchBarAccessoryButton from "./search-bar-accessory-button.svelte";
-import { SystemThemeWatcher } from "$lib/utils.svelte";
-import { THEME } from "$lib/store/settings.svelte";
 
 const { goBack, fancyMode = false } = $props<{
 	goBack?: () => void;
@@ -23,10 +23,11 @@ function scrollDown() {
 }
 
 const systemThemeWatcher = new SystemThemeWatcher();
-const topBarCss =
-	$derived(systemThemeWatcher.theme === THEME.DARK 
+const topBarCss = $derived(
+	systemThemeWatcher.theme === THEME.DARK
 		? "backdrop-blur-lg bg-base-100/20 border-neutral-800 !outline-none px-6 h-14"
-		: "bg-neutral-300/50 border-neutral-400/30 !shadow-neutral-300/30 !shadow-xs !outline-none px-6 h-14");
+		: "bg-neutral-300/50 border-neutral-400/30 !shadow-neutral-300/30 !shadow-xs !outline-none px-6 h-14",
+);
 </script>
 
 <button type="button" onclick={scrollUp} class="hidden" data-hotkey="k">Scroll Up</button>

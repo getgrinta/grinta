@@ -2,7 +2,7 @@
 import { goto } from "$app/navigation";
 import { page } from "$app/state";
 import NoteEditor from "$lib/components/editor.svelte";
-    import SearchBarAccessoryLabel from "$lib/components/search-bar-accessory-label.svelte";
+import SearchBarAccessoryLabel from "$lib/components/search-bar-accessory-label.svelte";
 import TopBar from "$lib/components/top-bar.svelte";
 import { BAR_MODE } from "$lib/store/app.svelte";
 import { type ExtendedNote, notesStore } from "$lib/store/notes.svelte";
