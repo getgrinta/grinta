@@ -16,17 +16,23 @@ const { items, size = "md" } = $props<{
 }>();
 
 const systemThemeWatcher = new SystemThemeWatcher();
+
+const containerCss = $derived(
+	systemThemeWatcher.theme === THEME.LIGHT ?
+		"ring-neutral-300/20" :
+        "ring-neutral-300/20"
+);
 </script>
 
-<div class={clsx("join", systemThemeWatcher.theme === THEME.LIGHT && "shadow-sm rounded-full overflow-hidden ring-1 ring-neutral-300/20")}>
+<div class={clsx("join shadow-sm rounded-full overflow-hidden ring-1", containerCss)}>
     {#each items as item}
-        {@const buttonClass = systemThemeWatcher.theme === THEME.LIGHT ? "border-0 bg-base-100" : "border-neutral-800"}
-        {@const buttonActiveClass = (isActive: boolean) => systemThemeWatcher.theme === THEME.LIGHT ? (isActive ? 'text-primary' : 'text-neutral-500') : (isActive ? "border-0 bg-base-100" : "border-neutral-800")}
+        {@const buttonClass = systemThemeWatcher.theme === THEME.LIGHT ? "border-0" : "border-neutral-800"}
+        {@const buttonActiveClass = (isActive: boolean) => systemThemeWatcher.theme === THEME.LIGHT ? (isActive ? 'text-primary' : 'text-neutral-500') : (isActive ? "border-0 bg-base-100" : "border-neutral-800 bg-neutral-800")}
 
         <button 
             type="button" 
             class={clsx(
-                `btn ${size === "lg" ? "btn-md" : "btn-sm"} join-item`, 
+                `btn ${size === "lg" ? "btn-md" : "btn-sm"} join-item bg-base-100`, 
                 buttonClass,
                 buttonActiveClass(item.active)
             )}
