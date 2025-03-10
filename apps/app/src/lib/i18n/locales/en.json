@@ -29,12 +29,7 @@
 			},
 			"checkForUpdate": "Check for update"
 		},
-		"language": "Language",
-		"languages": {
-			"en": "English",
-			"pl": "Polish",
-			"de": "German"
-		}
+		"language": "Language"
 	},
 	"notes": {
 		"placeholder": "Note name",

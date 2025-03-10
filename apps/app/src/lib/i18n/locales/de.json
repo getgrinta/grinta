@@ -30,12 +30,7 @@
 			"recordShortcut": "Drücken zum Speichern",
 			"changeShortcut": "Drücken zum Ändern"
 		},
-		"language": "Sprache",
-		"languages": {
-			"en": "Englisch",
-			"pl": "Polnisch",
-			"de": "Deutsch"
-		}
+		"language": "Sprache"
 	},
 	"notes": {
 		"placeholder": "Notizname",
