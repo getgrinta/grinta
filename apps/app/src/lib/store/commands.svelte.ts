@@ -277,13 +277,52 @@ export class CommandsStore extends SecureStore<Commands> {
 	}
 
 	async buildAppCommands() {
-		const appsFromApplications = await readDir("/Applications");
-		const appsFromSystemApplications = await readDir("/System/Applications");
+		// Use spotlight query through rust in the future
+		/*
+        let query = NSMetadataQuery()
+        query.searchScopes = [NSMetadataQueryLocalComputerScope]
+        query.predicate = NSPredicate(format: "kMDItemContentType == 'com.apple.application-bundle'")
+		*/
+	
+		async function findAppsInDirectory(path: string): Promise<DirEntry[]> {
+			const entries = await readDir(path);
+			const apps: DirEntry[] = [];
+
+			for (const entry of entries) {
+				if (entry.isDirectory) {
+					if (entry.name.endsWith(".app")) {
+						apps.push(entry);
+					} else {
+						// Don't recurse into .app directories
+						if (!entry.name.includes(".app/")) {
+							try {
+								const subApps = await findAppsInDirectory(
+									`${path}/${entry.name}`,
+								);
+								apps.push(...subApps);
+							} catch {
+								// Permission errors
+							}
+						}
+					}
+				}
+			}
+
+			console.log(apps);
+
+			return apps;
+		}
+
+		const [appsFromApplications, appsFromSystemApplications] =
+			await Promise.all([
+				findAppsInDirectory("/Applications"),
+				findAppsInDirectory("/System/Applications"),
+			]);
+
 		this.installedApps = [
 			...appsFromApplications,
 			...appsFromSystemApplications,
-		].filter((app) => app.isDirectory && app.name.endsWith(".app"));
-
+		];
 		this.appCommands = await buildAppCommands(this.installedApps);
 	}
 
