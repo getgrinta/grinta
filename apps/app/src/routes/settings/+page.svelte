@@ -9,7 +9,6 @@ import {
 	THEME,
 	settingsStore,
 } from "$lib/store/settings.svelte";
-import { invoke } from "@tauri-apps/api/core";
 import { clsx } from "clsx";
 import humanizeString from "humanize-string";
 import { PressedKeys, watch } from "runed";
