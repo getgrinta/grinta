@@ -11,7 +11,6 @@ function createSuggestionDecoration(from: number, suggestionText: string) {
 		() => {
 			const span = document.createElement("span");
 			span.className = "inline-suggestion";
-			// style the suggested text as grey
 			span.style.opacity = "0.5";
 			span.style.pointerEvents = "none";
 			span.textContent = suggestionText;
@@ -52,7 +51,7 @@ export const TextSuggestion = Extension.create({
 					},
 				},
 				view: (view) => {
-					let debounceTimer: number | undefined;
+					let debounceTimer: number | Timer | undefined;
 					let lastQuery = "";
 					let inputByMouse = false;
 					let navigationByArrow = false;
@@ -63,7 +62,7 @@ export const TextSuggestion = Extension.create({
 						inputByMouse = true;
 					};
 
-					const onKeyDown = (e) => {
+					const onKeyDown = (e: KeyboardEvent) => {
 						if (e.key === "ArrowUp" || e.key === "ArrowDown") {
 							navigationByArrow = true;
 						} else {
@@ -236,7 +235,7 @@ export const TextSuggestion = Extension.create({
 								view.dispatch(
 									view.state.tr.setMeta(suggestionPluginKey, {
 										deco,
-										suggestion,
+										suggestion: `${suggestion} `,
 										pos: view.state.selection.$from.pos,
 										query,
 									}),

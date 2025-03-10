@@ -1,6 +1,4 @@
 import { createRoute } from "@hono/zod-openapi";
-import type { StreamTextResult } from "ai";
-import { stream } from "hono/streaming";
 import { z } from "zod";
 import {
 	AI_AUTOCOMPLETE_MODELS,
@@ -50,29 +48,6 @@ const MODELS_ROUTE = createRoute({
 	},
 });
 
-const STREAM_ROUTE = createRoute({
-	method: "post",
-	path: "/stream",
-	request: {
-		body: {
-			content: {
-				"application/json": {
-					schema: StreamParamsSchema,
-				},
-			},
-		},
-	},
-	responses: {
-		200: {
-			description: "Streaming note generation response",
-		},
-		401: {
-			description: "Unauthorized",
-			content: { "text/plain": { schema: z.string() } },
-		},
-	},
-});
-
 const GENERATE_ROUTE = createRoute({
 	method: "post",
 	path: "/generate",
@@ -100,27 +75,6 @@ const GENERATE_ROUTE = createRoute({
 export const aiRouter = createRouter()
 	.openapi(MODELS_ROUTE, (c) => {
 		return c.json(AI_AUTOCOMPLETE_MODELS);
-	})
-	.openapi(STREAM_ROUTE, async (c) => {
-		const params = StreamParamsSchema.parse(await c.req.json());
-		const streamResult: StreamTextResult<never, never> =
-			aiService.streamResponse(params);
-
-		c.header("Content-Type", "text/plain; charset=utf-8");
-		c.header("Cache-Control", "no-cache");
-		c.header("Connection", "keep-alive");
-		c.header("Transfer-Encoding", "chunked");
-
-		return stream(c, async (stream) => {
-			try {
-				for await (const chunk of streamResult.textStream) {
-					await stream.write(`${chunk}\n`);
-				}
-			} catch (error) {
-				console.error("Streaming error:", error);
-				throw error;
-			}
-		});
 	})
 	.openapi(GENERATE_ROUTE, async (c) => {
 		const params = GenerateParamsSchema.parse(await c.req.json());

@@ -6,10 +6,8 @@ import { BAR_MODE, appStore } from "$lib/store/app.svelte";
 import { LogicalSize } from "@tauri-apps/api/dpi";
 import { currentMonitor } from "@tauri-apps/api/window";
 import { Editor, Extension } from "@tiptap/core";
-import BlockquoteExtension from "@tiptap/extension-blockquote";
 import BubbleMenuExtension from "@tiptap/extension-bubble-menu";
 import FloatingMenuExtension from "@tiptap/extension-floating-menu";
-import HeadingExtension from "@tiptap/extension-heading";
 import UnderlineExtension from "@tiptap/extension-underline";
 import StarterKit from "@tiptap/starter-kit";
 import { onDestroy, onMount } from "svelte";
@@ -63,8 +61,6 @@ function buildEditor() {
 			StarterKit,
 			ChangeDefaultExtension,
 			UnderlineExtension,
-			BlockquoteExtension,
-			HeadingExtension,
 			FloatingMenuExtension.configure({
 				element: floatingMenu,
 				tippyOptions: {
@@ -159,7 +155,7 @@ $effect(() => {
 		if (savedSelection && editor.isEditable) {
 			try {
 				editor.commands.setTextSelection(savedSelection);
-			} catch (e) {
+			} catch {
 				// Fallback if selection can't be restored
 				editor.commands.focus("end");
 			}

@@ -1,13 +1,8 @@
 import { createFsStorage } from "$lib/storage";
 import * as PathApi from "@tauri-apps/api/path";
 import dayjs from "dayjs";
-import { aiStore } from "./ai.svelte";
 import { COMMAND_HANDLER, commandsStore } from "./commands.svelte";
 import { settingsStore } from "./settings.svelte";
-
-type StreamResult = {
-	textStream: ReadableStream<string> & AsyncIterable<string>;
-};
 
 export type Note = {
 	title: string;
@@ -106,56 +101,6 @@ export class NotesStore {
 			value: filename,
 			handler: COMMAND_HANDLER.OPEN_NOTE,
 		});
-	}
-
-	async completePrompt({
-		filename,
-		prompt,
-		isCompletionActive,
-	}: { filename: string; prompt: string; isCompletionActive: () => boolean }) {
-		const note = await this.fetchNote(filename);
-		const textStream = aiStore.streamText({ prompt });
-		let accumulatedContent = "";
-
-		try {
-			for await (const chunk of textStream) {
-				if (!isCompletionActive()) {
-					break;
-				}
-
-				if (!chunk || typeof chunk !== "string") {
-					continue;
-				}
-
-				// Accumulate the text
-				accumulatedContent += chunk;
-
-				// Update the note state immediately
-				note.content = accumulatedContent;
-
-				// Debounce file updates to prevent overwhelming the file system
-				await new Promise((resolve) => setTimeout(resolve, 50));
-
-				// Update the file
-				await this.updateNote({
-					filename,
-					content: accumulatedContent,
-				});
-			}
-
-			// Ensure final state is saved
-			if (isCompletionActive()) {
-				await this.updateNote({
-					filename,
-					content: accumulatedContent,
-				});
-			}
-		} catch (error) {
-			console.error("Error during streaming:", error);
-			throw error;
-		}
-
-		return note;
 	}
 
 	async deleteNote(filename: string) {

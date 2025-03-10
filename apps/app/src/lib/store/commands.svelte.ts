@@ -52,7 +52,6 @@ export const COMMAND_HANDLER = {
 	RUN_SHORTCUT: "RUN_SHORTCUT",
 	OPEN_NOTE: "OPEN_NOTE",
 	CREATE_NOTE: "CREATE_NOTE",
-	COMPLETE_NOTE: "COMPLETE_NOTE",
 	URL: "URL",
 	EMBEDDED_URL: "EMBEDDED_URL",
 } as const;
@@ -168,11 +167,6 @@ async function buildQueryCommands(
 	return [
 		...completionList,
 		...literalSearch,
-		{
-			label: t("commands.actions.smartNote", { query }),
-			value: query,
-			handler: COMMAND_HANDLER.COMPLETE_NOTE,
-		},
 		{
 			label: t("commands.actions.createNote", { query }),
 			value: query,
@@ -449,7 +443,6 @@ export class CommandsStore extends SecureStore<Commands> {
 			this.commandHistory[this.commandHistory.length - 1]?.value !==
 			command.value;
 		const commandsToSkip = [
-			COMMAND_HANDLER.COMPLETE_NOTE,
 			COMMAND_HANDLER.CREATE_NOTE,
 			COMMAND_HANDLER.SYSTEM,
 		] as string[];
@@ -531,12 +524,6 @@ export class CommandsStore extends SecureStore<Commands> {
 			.with({ handler: COMMAND_HANDLER.CREATE_NOTE }, async ({ value }) => {
 				const filename = await notesStore.createNote(value);
 				const encodedFilename = encodeURIComponent(filename);
-				return goto(`/notes/${encodedFilename}`);
-			})
-			.with({ handler: COMMAND_HANDLER.COMPLETE_NOTE }, async ({ value }) => {
-				const filename = await notesStore.createNote(value);
-				const encodedFilename = encodeURIComponent(filename);
-				await notesStore.updateNote({ filename, content: "%G4TW%" });
 				return goto(`/notes/${encodedFilename}`);
 			})
 			.with({ handler: COMMAND_HANDLER.RUN_SHORTCUT }, async ({ value }) => {

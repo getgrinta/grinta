@@ -65,7 +65,7 @@ export function createFsStorage(path: string) {
 			return {
 				name: filename,
 				path: fullPath,
-				updatedAt: meta.mtime?.toDateString(),
+				updatedAt: meta.mtime?.toISOString(),
 				content,
 			};
 		},
