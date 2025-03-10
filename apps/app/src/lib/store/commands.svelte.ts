@@ -283,7 +283,7 @@ export class CommandsStore extends SecureStore<Commands> {
         query.searchScopes = [NSMetadataQueryLocalComputerScope]
         query.predicate = NSPredicate(format: "kMDItemContentType == 'com.apple.application-bundle'")
 		*/
-	
+
 		async function findAppsInDirectory(path: string): Promise<DirEntry[]> {
 			const entries = await readDir(path);
 			const apps: DirEntry[] = [];
