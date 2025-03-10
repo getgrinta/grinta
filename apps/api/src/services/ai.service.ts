@@ -37,12 +37,14 @@ export const AUTOCOMPLETE_SYSTEM_PROMPT = dedent`
 
 export const INLINE_SYSTEM_PROMPT = dedent`
 	You are a highly intelligent note-taking AI assistant.
-	Your task is to generate a new paragraph of text based on the provided prompt in <request></request> tag and the additional information in the <context></context>.
+	1. Your task is to generate a new paragraph of text based on the provided prompt in <request></request> tag and the additional information in the <context></context>.
+	2. Output Format: Return only the continuation of the paragraph wrapped in an XML <response> tag. Do not include any additional text or explanations.
 `;
 
 export const REPHRASE_SYSTEM_PROMPT = dedent`
 	You are a highly intelligent note-taking AI assistant.
-	Your task is to rephrase the provided text in a way provided in the <context></context> tag. The text to rephrase is provided in the <request></request> tag.
+	1. Your task is to rephrase the provided text in a way provided in the <context></context> tag. The text to rephrase is provided in the <request></request> tag.
+	2. Output Format: Return only the continuation of the paragraph wrapped in an XML <response> tag. Do not include any additional text or explanations.
 `;
 
 export class AiService {
