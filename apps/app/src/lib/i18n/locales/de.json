@@ -1,4 +1,13 @@
 {
+	"searchMode": {
+		"web": "Netz",
+		"ai": "KI"
+	},
+	"barMode": {
+		"initial": "Suche",
+		"notes": "Notizen",
+		"menu": "Menü"
+	},
 	"settings": {
 		"title": "Einstellungen",
 		"tabs": {

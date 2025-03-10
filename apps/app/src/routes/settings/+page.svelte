@@ -147,13 +147,13 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
         <label class="text-sm">{$_("settings.fields.shortcut")}</label>
         <div class="flex gap-2 items-center">
           <input type="hidden" name="toggleShortcut" value={toggleShortcut} />
-          <SecondaryButton class="flex-1" disabled>{toggleShortcut}</SecondaryButton>
+          <SecondaryButton class="flex-1" disabled onclick={() => {}}>{toggleShortcut}</SecondaryButton>
           <SecondaryButton class="flex-1" onclick={toggleShortcutRecording}>{recordShortcutLabel}</SecondaryButton>
         </div>
         <label class="text-sm">{$_("settings.fields.version")}</label>
         <div class="flex gap-2 items-center">
-          <SecondaryButton class="flex-1" disabled>{packageJson.version}</SecondaryButton>
-          <SecondaryButton class="flex-1">{$_("settings.fields.checkForUpdate")}</SecondaryButton>
+          <SecondaryButton class="flex-1" disabled onclick={() => {}}>{packageJson.version}</SecondaryButton>
+          <SecondaryButton class="flex-1" onclick={() => {}}>{$_("settings.fields.checkForUpdate")}</SecondaryButton>
         </div>
         <label class="text-sm">{$_("settings.fields.theme")}</label>
         <select name="theme" bind:value={settingsStore.data.theme} class="select select-bordered w-full">

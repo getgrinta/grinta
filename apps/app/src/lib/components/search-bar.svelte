@@ -200,7 +200,7 @@ const systemThemeWatcher = new SystemThemeWatcher();
 		<div slot="addon">
 			<SegmentedControl
 				items={INDICATOR_MODES.map(mode => ({
-					text: mode.value,
+					text: $_(`barMode.${mode.value.toLowerCase()}`),
 					icon: mode.icon,
 					active: mode.value === appStore.barMode,
 					shortcut: isCmdPressed ? mode.shortcut : undefined,

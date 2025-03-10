@@ -1,12 +1,13 @@
 <script lang="ts">
-import SegmentedControl from "$lib/components/segmented-control.svelte";
 import { SEARCH_MODE, appStore } from "$lib/store/app.svelte";
 import { GlobeIcon, SparklesIcon } from "lucide-svelte";
+import { _ } from "svelte-i18n";
+import SegmentedControl from "./segmented-control.svelte";
 
 const items = $derived([
 	{
 		icon: GlobeIcon,
-		text: SEARCH_MODE.WEB,
+		text: $_(`searchMode.${SEARCH_MODE.WEB.toLowerCase()}`),
 		onClick: () => {
 			appStore.searchMode = SEARCH_MODE.WEB;
 		},
@@ -14,7 +15,7 @@ const items = $derived([
 	},
 	{
 		icon: SparklesIcon,
-		text: SEARCH_MODE.AI,
+		text: $_(`searchMode.${SEARCH_MODE.AI.toLowerCase()}`),
 		onClick: () => {
 			appStore.searchMode = SEARCH_MODE.AI;
 		},

@@ -1,4 +1,13 @@
 {
+	"searchMode": {
+		"web": "Sieć",
+		"ai": "AI"
+	},
+	"barMode": {
+		"initial": "Szukaj",
+		"notes": "Notatki",
+		"menu": "Menu"
+	},
 	"settings": {
 		"title": "Ustawienia",
 		"tabs": {
