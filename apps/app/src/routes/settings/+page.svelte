@@ -29,9 +29,9 @@ const themes = Object.keys(THEME);
 const searchEngines = Object.keys(SEARCH_ENGINE);
 const accentColors = Object.keys(ACCENT_COLOR);
 const languages = [
-	{ code: LANGUAGE.EN, name: $_("settings.languages.EN") },
-	{ code: LANGUAGE.PL, name: $_("settings.languages.PL") },
-	{ code: LANGUAGE.DE, name: $_("settings.languages.DE") },
+	{ code: LANGUAGE.EN, name: "English" },
+	{ code: LANGUAGE.PL, name: "Polski" },
+	{ code: LANGUAGE.DE, name: "Deutsch" },
 ];
 
 function changeTab(tab: string) {
@@ -68,13 +68,13 @@ function processShortcut(keys: string[]) {
 		.join("+");
 }
 
-function updateNotesDir(event: any) {
-	const notesDirSplit = event.target.value.split("/");
+function updateNotesDir(event: Event) {
+	const notesDirSplit = (event.target as HTMLInputElement).value.split("/");
 	return settingsStore.setNotesDir(notesDirSplit);
 }
 
 const notesDirString = $derived(settingsStore.data.notesDir.join("/"));
-
+g;
 async function wipeLocalData() {
 	await settingsStore.wipeLocalData();
 	return goto("/");
@@ -159,7 +159,7 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
         <label class="text-sm">{$_("settings.language")}</label>
         <select name="language" bind:value={settingsStore.data.language} class="select select-bordered w-full">
         	{#each languages as language}
-          	<option value={language.code}>{$_(`settings.languages.${language.code}`)}</option>
+          	<option value={language.code}>{language.name}</option>
           {/each}
         </select>
         <label class="text-sm">{$_("settings.fields.dangerZone")}</label>
