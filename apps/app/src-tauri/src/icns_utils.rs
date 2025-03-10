@@ -1,10 +1,8 @@
 use base64::{engine::general_purpose, Engine as _};
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::fs::{self, File};
+use std::fs::{self};
 use std::io::BufWriter;
-use std::path::{Path, PathBuf};
-use tauri::path::PathResolver;
+use std::path::Path;
 use tauri::{command, AppHandle, Manager, Runtime};
 
 #[cfg(target_os = "macos")]

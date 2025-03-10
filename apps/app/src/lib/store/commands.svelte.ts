@@ -1,6 +1,7 @@
 import { goto } from "$app/navigation";
 import { appMetadataStore } from "$lib/store/app-metadata.svelte";
 import { generateCancellationToken } from "$lib/utils.svelte";
+import { until } from "@open-draft/until";
 import { type DirEntry, readDir, watch } from "@tauri-apps/plugin-fs";
 import { fetch } from "@tauri-apps/plugin-http";
 import { exit } from "@tauri-apps/plugin-process";
@@ -11,9 +12,9 @@ import numbersPlugin from "compromise-numbers";
 import { parse } from "equation-parser";
 import { resolve } from "equation-resolver";
 import { matchSorter } from "match-sorter";
-import { ResultAsync } from "neverthrow";
 import { uniq } from "rambda";
 import { _ } from "svelte-i18n";
+import { toast } from "svelte-sonner";
 import { get } from "svelte/store";
 import { P, match } from "ts-pattern";
 import { z } from "zod";
@@ -87,12 +88,21 @@ async function fetchCompletions(query: string) {
 	type CompletionResult = [string, string[]];
 	const encodedQuery = encodeURIComponent(query);
 	const completionUrl = `https://www.startpage.com/osuggestions?q=${encodedQuery}`;
-	return ResultAsync.fromPromise(
+	const { data: response, error: fetchError } = await until(() =>
 		fetch(completionUrl),
-		() => new Error("Failed to fetch completions"),
-	)
-		.map<CompletionResult>((res) => res.json())
-		.unwrapOr<CompletionResult>([encodedQuery, []]);
+	);
+	if (fetchError) {
+		toast.error("Failed to fetch completions");
+	}
+	if (!response) return [query, []] as CompletionResult;
+	const { data: json, error: jsonError } = await until<Error, CompletionResult>(
+		() => response.json(),
+	);
+	if (jsonError) {
+		toast.error("Failed to parse completions");
+	}
+	if (!json) return [query, []] as CompletionResult;
+	return json;
 }
 
 function buildFormulaCommands(currentQuery: string): ExecutableCommand[] {

@@ -1,7 +1,4 @@
-use tauri::Manager;
-use tauri::{command, Runtime};
 use tauri_plugin_autostart::MacosLauncher;
-use window_vibrancy::*;
 
 mod icns_utils;
 mod theme_utils;

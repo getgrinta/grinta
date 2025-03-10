@@ -1,4 +1,5 @@
 import { getAuthClient } from "$lib/auth";
+import { until } from "@open-draft/until";
 import { type Window, getCurrentWindow } from "@tauri-apps/api/window";
 import type { Session, User } from "better-auth";
 import { z } from "zod";
@@ -34,9 +35,12 @@ export class AppStore {
 
 	async setSession() {
 		const authClient = getAuthClient();
-		const { data } = await authClient.getSession();
-		this.session = data?.session;
-		this.user = data?.user;
+		const { data, error } = await until(authClient.getSession);
+		if (error) {
+			console.log("No session found");
+		}
+		this.session = data?.data?.session;
+		this.user = data?.data?.user;
 	}
 
 	async switchMode(mode: string) {

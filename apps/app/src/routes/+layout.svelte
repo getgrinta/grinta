@@ -141,7 +141,7 @@ async function initializeApp() {
 	await setupI18n();
 	await vaultStore.initialize();
 	await appStore.setSession();
-	commandsStore.initialize();
+	await commandsStore.initialize();
 	await settingsStore.initialize();
 	await clipboardStore.initialize();
 	appMetadataStore.initializeIcons();
@@ -177,7 +177,6 @@ $effect(() => {
 onMount(() => {
 	console.info("[Grinta] Layout Mount");
 	initializeApp();
-
 	// Initialize i18n
 	window.addEventListener("blur", hideWindow);
 	window.addEventListener("focus", activateFocusTrap);
