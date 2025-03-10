@@ -2,6 +2,7 @@
 import type { Editor } from "@tiptap/core";
 import { SparklesIcon } from "lucide-svelte";
 import { _ } from "svelte-i18n";
+    import SecondaryButton from "../secondary-button.svelte";
 
 let { editor } = $props<{ editor: Editor | undefined }>();
 
@@ -37,10 +38,10 @@ function handlePromptKeyDown(event: KeyboardEvent) {
 
 <div class="join">
     {#if menuState === "idle"}
-        <button type="button" class="btn btn-sm rounded-full text-primary" onclick={toggleState}>
+        <SecondaryButton class="btn-sm rounded-full text-primary" onclick={toggleState}>
             <SparklesIcon size={16} />
             <span>{$_("editor.floatingMenu.askAI")}</span>
-        </button>
+        </SecondaryButton>
     {:else}
         <label class="input rounded-full !outline-none">
             <SparklesIcon size={16} />

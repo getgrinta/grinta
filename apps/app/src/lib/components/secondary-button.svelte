@@ -1,10 +1,17 @@
 <script lang="ts">
-    import { THEME } from "$lib/store/settings.svelte";
-    import { SystemThemeWatcher } from "$lib/utils.svelte";
+import { THEME } from "$lib/store/settings.svelte";
+import { SystemThemeWatcher } from "$lib/utils.svelte";
 import clsx from "clsx";
+import type { Snippet } from "svelte";
 
-const { children, class: className, onclick, disabled } = $props<{
-    class?: string;
+const {
+	children,
+	class: className,
+	onclick,
+	disabled,
+} = $props<{
+	children: Snippet;
+	class?: string;
 	onclick: () => void;
 	disabled?: boolean;
 }>();

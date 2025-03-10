@@ -35,7 +35,7 @@ const systemThemeWatcher = new SystemThemeWatcher();
             {#if item.icon}
                 <item.icon size={size === "md" ? 16 : 18} />
             {/if}
-            {#if size === "lg" || item.active}
+            {#if size === "lg" || item.active || !item.icon}
                 <span>{item.text}</span>
             {/if}
             {#if item.shortcut}

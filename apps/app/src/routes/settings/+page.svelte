@@ -1,6 +1,7 @@
 <script lang="ts">
 import { goto } from "$app/navigation";
 import TopBar from "$lib/components/top-bar.svelte";
+import SegmentedControl from "$lib/components/segmented-control.svelte";
 import { aiStore } from "$lib/store/ai.svelte";
 import {
 	ACCENT_COLOR,
@@ -130,16 +131,14 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
   <TopBar>
     <div slot="input" class="grow flex-1 truncate text-lg font-semibold">{$_("settings.title")}</div>
     <div slot="addon" role="tablist" class="join">
-      {#each tabs as tab, index}
-      	{@const active = currentTab === tab.value}
-      	{@const hotkey = `Meta+${index + 1}`}
-        <button type="button" class={clsx("btn join-item shadow-neutral-400/30 shadow-xs border-neutral-300/30", active ? 'text-primary bg-neutral-300/30' : 'bg-neutral-300')} onclick={() => changeTab(tab.value)} data-hotkey={hotkey}>
-        	<span>{$_(tab.label)}</span>
-        	{#if isCmdPressed}
-	        	<span>{tab.hotkey}</span>
-        	{/if}
-        </button>
-      {/each}
+      <SegmentedControl
+        items={tabs.map((tab, index) => ({
+          text: $_(tab.label),
+          onClick: () => changeTab(tab.value),
+          active: currentTab === tab.value,
+          shortcut: isCmdPressed ? tab.hotkey : undefined
+        }))}
+      />
     </div>
   </TopBar>
    <div class="flex flex-1 flex-col mt-20 mb-8 mx-4">

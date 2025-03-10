@@ -90,9 +90,9 @@ const systemThemeWatcher = new SystemThemeWatcher();
 			{@const currentLabel = command.localizedLabel ?? command.label}
 			{@const labelChunks = highlightText(currentLabel, appStore.query)}
 
-			{@const rowCss = systemThemeWatcher.theme === THEME.LIGHT ? "border-1 border-transparent hover:bg-neutral-300/30 color-base-100" : "border-1 border-transparent text-neutral-300" }
+			{@const rowCss = systemThemeWatcher.theme === THEME.LIGHT ? "border-1 border-transparent hover:bg-neutral-300/30 color-base-100" : "border-1 border-transparent color-base-100"}
 			{@const rowActiveCss = systemThemeWatcher.theme === THEME.DARK ? 'menu-active !bg-base-100/40 !text-primary !border-neutral-600' : 'menu-active !bg-neutral-300/30 color-base-10 border-1 !border-neutral-400/30'}
-			
+
 			{@const labelChunkCss = (isHiglighted: boolean) => systemThemeWatcher.theme === THEME.DARK ? (isHiglighted ? "text-neutral-300" : "text-primary font-semibold") : (isHiglighted ? "color-base-100 text-neutral-800" : "color-base-100 text-neutral-800 font-semibold")}
 			{@const badgeCss = (isHiglighted: boolean) => systemThemeWatcher.theme === THEME.DARK ? (isHiglighted ? "badge-outline !text-primary !border-primary" : "badge-soft text-neutral-300") : (isHiglighted ? "badge-outline !text-primary !border-primary" : " !bg-neutral-300/50 border-0 badge-soft text-neutral-300")}
 			
@@ -104,7 +104,7 @@ const systemThemeWatcher = new SystemThemeWatcher();
 						{@const icon = appMetadataStore.getIcon(command.label)}
 
 						{#if icon}
-							<img src={icon} alt={currentLabel} width="24" height="24" class="w-6 h-6 object-contain" />
+							<img src={icon} alt={currentLabel} width="24" height="24" class="w-8 h-8 object-contain" />
 						{:else}
 							<IconComponent size={24} />
 						{/if}
