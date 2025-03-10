@@ -27,7 +27,7 @@ const containerCss = $derived(
 <div class={clsx("join shadow-sm rounded-full overflow-hidden ring-1", containerCss)}>
     {#each items as item}
         {@const buttonClass = systemThemeWatcher.theme === THEME.LIGHT ? "border-0" : "border-neutral-800"}
-        {@const buttonActiveClass = (isActive: boolean) => systemThemeWatcher.theme === THEME.LIGHT ? (isActive ? 'text-primary' : 'text-neutral-500') : (isActive ? "border-0 bg-base-100" : "border-neutral-800 bg-neutral-800")}
+        {@const buttonActiveClass = (isActive: boolean) => systemThemeWatcher.theme === THEME.LIGHT ? (isActive ? 'text-primary' : 'text-neutral-500') : (isActive ? "border-0 bg-base-300 text-primary" : "text-neutral-500 border-neutral-800 bg-base-100")}
 
         <button 
             type="button" 
