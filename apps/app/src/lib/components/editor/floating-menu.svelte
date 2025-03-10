@@ -1,24 +1,37 @@
 <script lang="ts">
+import { getApiClient } from "$lib/utils.svelte";
 import type { Editor } from "@tiptap/core";
+import { createForm } from "felte";
 import { SparklesIcon } from "lucide-svelte";
 import { _ } from "svelte-i18n";
 
+const { form } = createForm<{ prompt: string }>({
+	async onSubmit(values) {
+		const apiClient = getApiClient();
+		const context = editor?.getText() ?? "";
+		const response = await apiClient.api.ai.generate.$post({
+			json: {
+				prompt: values.prompt,
+				context,
+				contentType: "INLINE_AI",
+			},
+		});
+		const { text } = await response.json();
+		editor?.chain().focus().insertContent(text).run();
+	},
+});
+
 let { editor } = $props<{ editor: Editor | undefined }>();
 
-let prompt = $state("");
 let promptInput = $state<HTMLInputElement>();
-let menuState = $state<"idle" | "prompting">("idle");
+let menuState = $state<"idle" | "prompting" | "generating">("idle");
 
-function toggleState() {
+export function toggleState() {
 	menuState = menuState === "idle" ? "prompting" : "idle";
 	if (menuState === "prompting") {
 		return setTimeout(() => promptInput?.focus(), 100);
 	}
-	return setTimeout(() => editor?.focus(), 100);
-}
-
-function setPrompt(newPrompt: string) {
-	prompt = newPrompt;
+	return setTimeout(() => editor?.commands.focus(), 100);
 }
 
 function handlePromptKeyDown(event: KeyboardEvent) {
@@ -26,25 +39,19 @@ function handlePromptKeyDown(event: KeyboardEvent) {
 		event.preventDefault();
 		toggleState();
 	}
-	if (event.key === "Enter") {
-		event.preventDefault();
-		console.log(">>>INLINE_AI", prompt);
-		setPrompt("");
-		toggleState();
-	}
 }
 </script>
 
-<div class="join">
+<form use:form class="join">
     {#if menuState === "idle"}
         <button type="button" class="btn btn-sm rounded-full text-primary" onclick={toggleState}>
-            <SparklesIcon size={16} />
+			<span>⌘I</span>
             <span>{$_("editor.floatingMenu.askAI")}</span>
         </button>
     {:else}
         <label class="input rounded-full !outline-none">
             <SparklesIcon size={16} />
-            <input bind:this={promptInput} bind:value={prompt} type="text" placeholder={$_("editor.floatingMenu.askAI")} onblur={toggleState} onkeydown={handlePromptKeyDown} />
+            <input bind:this={promptInput} name="prompt" type="text" placeholder={$_("editor.floatingMenu.askAI")} onblur={toggleState} onkeydown={handlePromptKeyDown} />
         </label>
     {/if}
-</div>
+</form>

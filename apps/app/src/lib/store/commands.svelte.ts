@@ -302,8 +302,6 @@ export class CommandsStore extends SecureStore<Commands> {
 				}
 			}
 
-			console.log(apps);
-
 			return apps;
 		}
 

@@ -60,8 +60,6 @@ export class AppMetadataStore {
 					);
 				}
 			}
-
-			console.log(this.appInfo);
 		} catch (error) {
 			console.error("Error initializing app icons:", error);
 		} finally {

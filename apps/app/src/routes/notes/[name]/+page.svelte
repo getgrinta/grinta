@@ -25,7 +25,7 @@ let noteTitle = $state<string>();
 let generatingNote = $state<boolean>(false);
 let unsubWatcher = $state<UnwatchFn>();
 let sidebarOpened = $state(false);
-const content = $derived(!note?.content ? "" : marked.parse(note.content));
+let editorContent = $state<string>(""); // Track editor's raw markdown content
 
 function toggleSidebar() {
 	sidebarOpened = !sidebarOpened;
@@ -33,11 +33,42 @@ function toggleSidebar() {
 }
 
 async function fetchNote() {
-	note = await notesStore.fetchNote(filename);
-	noteTitle = note?.title ?? "";
+	const updatedNote = await notesStore.fetchNote(filename);
+
+	// Only update if the content has actually changed
+	// This prevents cursor reset and unnecessary rerenders
+	if (!note || note.content !== updatedNote.content) {
+		// Store editor content before updating note
+		const currentEditorContent = note?.content || "";
+
+		// Update the note
+		note = updatedNote;
+		noteTitle = updatedNote?.title ?? "";
+
+		// If editor content wasn't modified by the user (matches what was previously loaded)
+		// then we can safely update it with the markdown content
+		if (
+			editorContent === currentEditorContent ||
+			editorContent === "" ||
+			currentEditorContent === ""
+		) {
+			// Set raw markdown content - TipTap will parse it internally
+			editorContent = updatedNote.content || "";
+		} else {
+			console.debug("Note content changed externally while user was editing");
+		}
+	} else {
+		// Just update title if needed but keep content as is
+		if (note.title !== updatedNote.title) {
+			noteTitle = updatedNote.title ?? "";
+		}
+	}
 }
 
 async function onContentUpdate(markdownContent: string) {
+	// Update our tracked editor content - this is raw markdown
+	editorContent = markdownContent;
+	// Save to the store (still as markdown)
 	await notesStore.updateNote({ filename, content: markdownContent });
 }
 
@@ -121,8 +152,8 @@ onMount(() => {
 				</label>
 			</TopBar>
 		  	<div class="pt-20 px-8 pb-8">
-				{#if note} 
-					<NoteEditor {content} editable={!generatingNote} onUpdate={onContentUpdate} {toggleSidebar} />
+				{#if note}
+					<NoteEditor content={editorContent} editable={!generatingNote} onUpdate={onContentUpdate} {toggleSidebar} />
 				{/if}
 			</div>
 		</div>

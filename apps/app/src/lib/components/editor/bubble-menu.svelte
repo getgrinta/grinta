@@ -75,7 +75,6 @@ async function rephrase(rephraseAction: RephraseAction) {
 		},
 	});
 	const { text } = await response.json();
-	console.log(text);
 	editor?.chain().focus().deleteRange(editor.state.selection).run();
 	editor?.chain().focus().insertContent(text).run();
 }
