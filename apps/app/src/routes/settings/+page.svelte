@@ -74,7 +74,7 @@ function updateNotesDir(event: Event) {
 }
 
 const notesDirString = $derived(settingsStore.data.notesDir.join("/"));
-g;
+
 async function wipeLocalData() {
 	await settingsStore.wipeLocalData();
 	return goto("/");
