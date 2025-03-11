@@ -20,7 +20,7 @@
 	},
 	"dependencies": {
 		"@ai-sdk/openai-compatible": "0.1.13",
-		"@better-auth/stripe": "1.2.3",
+		"@better-auth/stripe": "1.2.4-beta.8",
 		"@hono/zod-openapi": "0.19.2",
 		"@scalar/hono-api-reference": "0.5.184",
 		"ai": "4.1.54",

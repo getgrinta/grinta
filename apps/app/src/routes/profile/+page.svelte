@@ -28,9 +28,8 @@ async function upgradeToPro() {
 }
 
 async function fetchProfile() {
-	const res = await apiClient.api.auth.me.$get();
-	console.log(res);
-	// profile = await json()
+	const res = await apiClient.api.users.me.$get();
+	profile = await res.json();
 }
 
 onMount(fetchProfile);
