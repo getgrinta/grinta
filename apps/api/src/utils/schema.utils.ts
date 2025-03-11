@@ -19,9 +19,9 @@ export const subscriptionSchema = z.object({
 		z.literal("trialing"),
 		z.literal("unpaid"),
 	]),
-	periodStart: z.date().optional(),
-	periodEnd: z.date().optional(),
-	cancelAtPeriodEnd: z.boolean().optional(),
+	periodStart: z.string().optional(),
+	periodEnd: z.string().optional(),
+	cancelAtPeriodEnd: z.boolean().nullish(),
 	groupId: z.string().optional(),
 	seats: z.number().optional(),
 });
@@ -29,5 +29,5 @@ export const subscriptionSchema = z.object({
 export const sanitizedSubscriptionSchema = z.object({
 	plan: z.string(),
 	status: z.union([z.literal("active"), z.literal("trialing")]),
-	periodEnd: z.date(),
+	periodEnd: z.string(),
 });
