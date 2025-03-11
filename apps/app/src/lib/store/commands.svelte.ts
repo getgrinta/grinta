@@ -4,6 +4,7 @@ import { generateCancellationToken } from "$lib/utils.svelte";
 import { until } from "@open-draft/until";
 import { type DirEntry, readDir, watch } from "@tauri-apps/plugin-fs";
 import { fetch } from "@tauri-apps/plugin-http";
+import { openPath, openUrl } from "@tauri-apps/plugin-opener";
 import { exit } from "@tauri-apps/plugin-process";
 import { Command } from "@tauri-apps/plugin-shell";
 import nlp from "compromise";
@@ -480,7 +481,7 @@ export class CommandsStore extends SecureStore<Commands> {
 	}
 
 	async openUrl(url: string) {
-		return Command.create("open", ["-u", url]).execute();
+		return openUrl(url);
 	}
 
 	async handleCommand(commandIndex: number | undefined) {
