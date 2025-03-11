@@ -7,6 +7,7 @@ type Item = {
 	text?: string;
 	onClick: () => void;
 	active?: boolean;
+	hotkey?: string;
 	shortcut?: string;
 	icon?: any;
 };
@@ -44,6 +45,7 @@ const containerCss = $derived(
                 buttonClass,
                 buttonActiveClass(item.active)
             )}
+            data-hotkey={item.hotkey}
             onclick={item.onClick}
         >
             {#if item.icon}

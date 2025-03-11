@@ -2,6 +2,10 @@ import { createRoute } from "@hono/zod-openapi";
 import { z } from "zod";
 import { env } from "../utils/env.utils.js";
 import { createRouter } from "../utils/router.utils.js";
+import {
+	sanitizedSubscriptionSchema,
+	subscriptionSchema,
+} from "../utils/schema.utils.js";
 
 export const MeSchema = z.object({
 	id: z.string(),
@@ -9,7 +13,7 @@ export const MeSchema = z.object({
 	email: z.string(),
 	emailVerified: z.boolean(),
 	image: z.string().nullable(),
-	subscription: z.any(),
+	subscriptions: z.array(sanitizedSubscriptionSchema),
 });
 
 const ME_ROUTE = createRoute({
@@ -37,7 +41,20 @@ export const usersRouter = createRouter().openapi(ME_ROUTE, async (c) => {
 			},
 		},
 	);
-	const subscription = request.ok ? await request.json() : {};
-	const sanitizedUser = MeSchema.parse({ ...user, subscription });
+	const subscriptions = z
+		.array(subscriptionSchema)
+		.parse(request.ok ? await request.json() : [])
+		.filter((subscription) =>
+			["active", "trialing"].includes(subscription.status),
+		);
+	const sanitizedSubscriptions = subscriptions.map((subscription) => ({
+		plan: subscription.plan,
+		status: subscription.status,
+		periodEnd: subscription.periodEnd,
+	}));
+	const sanitizedUser = MeSchema.parse({
+		...user,
+		subscriptions: sanitizedSubscriptions,
+	});
 	return c.json(sanitizedUser, 200);
 });

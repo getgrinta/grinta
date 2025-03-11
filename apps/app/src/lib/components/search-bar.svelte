@@ -14,6 +14,7 @@ import { SystemThemeWatcher } from "$lib/utils.svelte";
 import { clsx } from "clsx";
 import { createForm } from "felte";
 import {
+	ClipboardIcon,
 	EyeIcon,
 	EyeOffIcon,
 	MenuIcon,
@@ -105,6 +106,9 @@ async function handleNavigation(event: KeyboardEvent) {
 		if (shouldGoBack) return window.history.back();
 		return switchMode(BAR_MODE.MENU);
 	}
+	if (event.key === "p" && event.metaKey) {
+		return settingsStore.toggleIncognito();
+	}
 	if (event.key === "n" && event.metaKey) {
 		return createNote();
 	}
@@ -168,6 +172,10 @@ const inputProps = $derived(
 		.with(BAR_MODE.NOTES, () => ({
 			icon: StickyNoteIcon,
 			placeholder: $_("searchBar.placeholder.notes"),
+		}))
+		.with(BAR_MODE.CLIPBOARD, () => ({
+			icon: ClipboardIcon,
+			placeholder: $_("searchBar.placeholder.clipboard"),
 		}))
 		.exhaustive(),
 );

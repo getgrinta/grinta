@@ -12,8 +12,8 @@
 		"title": "Settings",
 		"tabs": {
 			"general": "General",
-			"ai": "AI",
-			"notes": "Notes"
+			"search": "Search",
+			"pro": "Pro"
 		},
 		"fields": {
 			"shortcut": "Shortcut",
@@ -23,20 +23,12 @@
 			"defaultSearchEngine": "Default Search Engine",
 			"dangerZone": "Danger Zone",
 			"wipeAllLocalData": "Wipe All Local Data",
-			"testingConnection": "Testing connection...",
 			"changeShortcut": "Change",
-			"ai": {
-				"modelName": "Model Name",
-				"customEndpoint": "Custom Endpoint",
-				"tokenSecret": "Token Secret",
-				"additionalContext": "Additional Context",
-				"testConnection": "Test Connection"
-			},
-			"notes": {
-				"aiEnabled": "AI Enabled",
-				"notesDirectory": "Notes Directory"
-			},
-			"checkForUpdate": "Check for update"
+			"recordShortcut": "Press to record",
+			"proAutocompleteEnabled": "Pro Autocomplete Enabled",
+			"notesDirectory": "Notes Directory",
+			"checkForUpdate": "Check for update",
+			"baseCurrency": "Base Currency"
 		},
 		"language": "Language"
 	},
@@ -52,7 +44,13 @@
 		"noteName": "Note name",
 		"closeSidebar": "close sidebar",
 		"createNote": "Create Note",
-		"retry": "Retry"
+		"retry": "Retry",
+		"rephrase": "Rephrase",
+		"longer": "Longer",
+		"shorter": "Shorter",
+		"grammar": "Improve grammar",
+		"professional": "Professional",
+		"askAi": "Ask AI"
 	},
 	"commands": {
 		"helperText": {
@@ -74,7 +72,8 @@
 			"settings": "Settings",
 			"exit": "Exit",
 			"signIn": "Sign In",
-			"profile": "Profile"
+			"profile": "Profile",
+			"clipboardHistory": "Clipboard History"
 		},
 		"actions": {
 			"search": "Search for \"{query}\"",
@@ -87,7 +86,8 @@
 		"placeholder": {
 			"initial": "Search web or apps",
 			"menu": "Menu",
-			"notes": "Search or create notes"
+			"notes": "Search or create notes",
+			"clipboard": "Search and copy from clipboard"
 		},
 		"actions": {
 			"menu": "Menu",

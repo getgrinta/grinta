@@ -3,6 +3,7 @@ import type { AppType } from "@getgrinta/api";
 import { install } from "@github/hotkey";
 import { fetch } from "@tauri-apps/plugin-http";
 import { Position, moveWindow } from "@tauri-apps/plugin-positioner";
+import AggregateError from "aggregate-error";
 import { hc } from "hono/client";
 import { useEventListener } from "runed";
 import { appStore } from "./store/app.svelte";
@@ -109,4 +110,12 @@ export function getApiClient() {
 		fetch,
 		headers: getHeaders(),
 	});
+}
+
+export function fail(message: string, cause?: Error) {
+	const errors = [new Error(message)];
+	if (cause) {
+		errors.push(cause);
+	}
+	return new AggregateError(errors);
 }

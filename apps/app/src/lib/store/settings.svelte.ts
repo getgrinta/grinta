@@ -51,6 +51,18 @@ const LANGUAGE_CODE_TO_ENUM = Object.entries(LANGUAGE).reduce(
 
 export type Language = (typeof LANGUAGE)[keyof typeof LANGUAGE];
 
+export const BASE_CURRENCY = {
+	EUR: "EUR",
+	PLN: "PLN",
+	CHF: "CHF",
+	GBP: "GBP",
+	USD: "USD",
+} as const;
+
+export type BaseCurrency = keyof typeof BASE_CURRENCY;
+
+export const baseCurrencies = Object.keys(BASE_CURRENCY);
+
 // Get browser language or default to English
 const getBrowserLanguage = (): Language => {
 	if (!browser) return LANGUAGE.EN;
@@ -66,16 +78,13 @@ export const SettingsSchema = z.object({
 	theme: z.nativeEnum(THEME).default(THEME.SYSTEM),
 	accentColor: z.nativeEnum(ACCENT_COLOR).default(ACCENT_COLOR.MARE),
 	language: z.nativeEnum(LANGUAGE).default(getBrowserLanguage()),
-	aiModelName: z.string().default("mistral-small-latest"),
 	defaultSearchEngine: z
 		.nativeEnum(SEARCH_ENGINE)
 		.default(SEARCH_ENGINE.STARTPAGE),
-	aiEndpointUrl: z.string().default("https://api.mistral.ai/v1"),
-	aiSecretKey: z.string().default(""),
-	aiAdditionalContext: z.string().default(""),
 	notesDir: z.array(z.string()).default(["Grinta", "notes"]),
-	notesAiEnabled: z.boolean().default(true),
+	proAutocompleteEnabled: z.boolean().default(true),
 	incognitoEnabled: z.boolean().default(false),
+	baseCurrency: z.nativeEnum(BASE_CURRENCY).default(BASE_CURRENCY.USD),
 });
 
 export type Settings = z.infer<typeof SettingsSchema>;

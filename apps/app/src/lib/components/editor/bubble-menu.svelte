@@ -2,6 +2,7 @@
 import { getApiClient } from "$lib/utils.svelte";
 import type { Editor } from "@tiptap/core";
 import { ChevronLeftIcon, QuoteIcon, SparklesIcon } from "lucide-svelte";
+import { _ } from "svelte-i18n";
 
 export const MENU_MODE = {
 	IDLE: "IDLE",
@@ -93,7 +94,7 @@ async function rephrase(rephraseAction: RephraseAction) {
 		<button type="button" class="btn btn-sm join-item items-center text-primary" onclick={() => toggleHeader(3)}>H3</button>
 		<button type="button" class="btn btn-sm join-item items-center text-primary" onclick={() => setMenuMode(MENU_MODE.REPHRASE_CHOICE)}>
 			<SparklesIcon size={16} />
-			<span>Rephrase</span>
+			<span>{$_("notes.rephrase")}</span>
 		</button>
 	{:else}
 		<button type="button" class="btn btn-sm join-item items-center text-primary" onclick={() => setMenuMode(MENU_MODE.IDLE)}>
@@ -101,7 +102,7 @@ async function rephrase(rephraseAction: RephraseAction) {
 		</button>
 		{#each rephraseAction as action}
 			<button type="button" class="btn btn-sm join-item items-center text-primary" onclick={() => rephrase(action)}>
-				{action}
+				{$_("notes." + action.toLowerCase())}
 			</button>
 		{/each}
 	{/if}

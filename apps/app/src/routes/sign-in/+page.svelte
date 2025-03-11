@@ -48,7 +48,7 @@ const { form } = createForm({
 					throw new Error("Auth cookie not found");
 				}
 				await vaultStore.setAuthCookie(authCookie);
-				await appStore.setSession();
+				await appStore.fetchSession();
 				return goto("/profile");
 			},
 		});

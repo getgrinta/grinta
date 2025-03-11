@@ -3,14 +3,15 @@ import { goto } from "$app/navigation";
 import PrimaryButton from "$lib/components/primary-button.svelte";
 import SegmentedControl from "$lib/components/segmented-control.svelte";
 import TopBar from "$lib/components/top-bar.svelte";
+import { appStore } from "$lib/store/app.svelte";
 import {
 	ACCENT_COLOR,
 	LANGUAGE,
 	SEARCH_ENGINE,
 	THEME,
+	baseCurrencies,
 	settingsStore,
 } from "$lib/store/settings.svelte";
-import { clsx } from "clsx";
 import humanizeString from "humanize-string";
 import { PressedKeys, watch } from "runed";
 import { _ } from "svelte-i18n";
@@ -18,11 +19,17 @@ import packageJson from "../../../package.json" with { type: "json" };
 
 const pressedKeys = new PressedKeys();
 
-const tabs = [
+const baseTabs = [
 	{ label: $_("settings.tabs.general"), value: "general", hotkey: "⌘1" },
-	{ label: $_("settings.tabs.ai"), value: "ai", hotkey: "⌘2" },
-	{ label: $_("settings.tabs.notes"), value: "notes", hotkey: "⌘3" },
+	{ label: $_("settings.tabs.search"), value: "search", hotkey: "⌘2" },
 ];
+
+const proTabs = [
+	...baseTabs,
+	{ label: $_("settings.tabs.pro"), value: "pro", hotkey: "⌘3" },
+];
+
+const tabs = $derived(appStore.subscriptions.length > 0 ? proTabs : baseTabs);
 
 let newToggleShortcut = $state<string[]>([]);
 let recordingShortcut = $state(false);
@@ -108,6 +115,16 @@ watch(
 );
 
 const isCmdPressed = $derived(pressedKeys.has("Meta"));
+
+const controls = $derived(
+	tabs.map((tab, i) => ({
+		text: $_(tab.label),
+		onClick: () => changeTab(tab.value),
+		active: currentTab === tab.value,
+		shortcut: isCmdPressed ? tab.hotkey : undefined,
+		hotkey: `Mod+${i + 1}`,
+	})),
+);
 </script>
 
 <div class="flex flex-1 flex-col">
@@ -115,17 +132,12 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
     <div slot="input" class="grow flex-1 truncate text-lg font-semibold">{$_("settings.title")}</div>
     <div slot="addon" role="tablist" class="join">
       <SegmentedControl
-      size="lg"
-        items={tabs.map((tab, index) => ({
-          text: $_(tab.label),
-          onClick: () => changeTab(tab.value),
-          active: currentTab === tab.value,
-          shortcut: isCmdPressed ? tab.hotkey : undefined
-        }))}
+        size="lg"
+        items={controls}
       />
     </div>
   </TopBar>
-   <div class="flex flex-1 flex-col mt-20 mb-8 mx-4">
+   <div class="flex flex-1 flex-col mt-24 mb-8 mx-8">
     {#if currentTab === 'general'}
       <form class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center">
         <label class="text-sm">{$_("settings.fields.shortcut")}</label>
@@ -139,50 +151,48 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
           <PrimaryButton class="flex-1" disabled>{packageJson.version}</PrimaryButton>
           <PrimaryButton class="flex-1">{$_("settings.fields.checkForUpdate")}</PrimaryButton>
         </div>
-        <label class="text-sm">{$_("settings.fields.theme")}</label>
-        <select name="theme" bind:value={settingsStore.data.theme} class="select select-bordered w-full">
+        <label class="text-sm" for="themeChoice">{$_("settings.fields.theme")}</label>
+        <select id="themeChoice" name="theme" bind:value={settingsStore.data.theme} class="select select-bordered w-full">
         	{#each themes as theme}
           	<option value={theme}>{humanizeString(theme)}</option>
           {/each}
         </select>
-		<label class="text-sm">{$_("settings.fields.defaultSearchEngine")}</label>
-        <select name="theme" bind:value={settingsStore.data.defaultSearchEngine} class="select select-bordered w-full">
-        	{#each searchEngines as searchEngine}
-          	<option value={searchEngine}>{humanizeString(searchEngine)}</option>
-          {/each}
-        </select>
-        <label class="text-sm">{$_("settings.fields.accentColor")}</label>
-        <select name="accentColor" bind:value={settingsStore.data.accentColor} class="select select-bordered w-full">
+        <label class="text-sm" for="accentColorChoice">{$_("settings.fields.accentColor")}</label>
+        <select id="accentColorChoice" name="accentColor" bind:value={settingsStore.data.accentColor} class="select select-bordered w-full">
         	{#each accentColors as color}
           	<option value={color}>{humanizeString(color)}</option>
           {/each}
         </select>
-        <label class="text-sm">{$_("settings.language")}</label>
-        <select name="language" bind:value={settingsStore.data.language} class="select select-bordered w-full">
+        <label class="text-sm" for="languageChoice">{$_("settings.language")}</label>
+        <select id="languageChoice" name="language" bind:value={settingsStore.data.language} class="select select-bordered w-full">
         	{#each languages as language}
           	<option value={language.code}>{language.name}</option>
           {/each}
         </select>
+		<label class="text-sm" for="notesDirInput">{$_("settings.fields.notesDirectory")}</label>
+        <input id="notesDirInput" class="input w-full" name="notesDir" value={notesDirString} onchange={updateNotesDir} />
         <label class="text-sm">{$_("settings.fields.dangerZone")}</label>
         <button type="button" class="btn btn-warning" onclick={wipeLocalData}>{$_("settings.fields.wipeAllLocalData")}</button>
       </form>
-    {:else if currentTab === 'ai'}
-      <form class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center"> 
-        <label class="text-sm">{$_("settings.fields.ai.modelName")}</label>
-        <input class="input w-full" name="modelName" placeholder="gpt-4o" bind:value={settingsStore.data.aiModelName} />
-        <label class="text-sm">{$_("settings.fields.ai.customEndpoint")}</label>
-        <input class="input w-full" name="endpointUrl" placeholder="https://api.openai.com/v1" bind:value={settingsStore.data.aiEndpointUrl} />
-        <label class="text-sm">{$_("settings.fields.ai.tokenSecret")}</label>
-        <input class="input w-full" type="password" name="secretKey" bind:value={settingsStore.data.aiSecretKey} />
-        <label class="text-sm">{$_("settings.fields.ai.additionalContext")}</label>
-        <textarea class="textarea w-full resize-none" placeholder="{$_("additionalContextPlaceholder")}" bind:value={settingsStore.data.aiAdditionalContext} />
-      </form>
-    {:else if currentTab === 'notes'}
+	{:else if currentTab === 'search'}
+	  <form class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center">
+		<label class="text-sm" for="defaultSearchEngineChoice">{$_("settings.fields.defaultSearchEngine")}</label>
+        <select id="defaultSearchEngineChoice" name="theme" bind:value={settingsStore.data.defaultSearchEngine} class="select select-bordered w-full">
+        	{#each searchEngines as searchEngine}
+          	<option value={searchEngine}>{humanizeString(searchEngine)}</option>
+          {/each}
+        </select>
+		<label class="text-sm" for="baseCurrencyChoice">{$_("settings.fields.baseCurrency")}</label>
+        <select id="baseCurrencyChoice" name="baseCurrency" bind:value={settingsStore.data.baseCurrency} class="select select-bordered w-full">
+        	{#each baseCurrencies as baseCurrency}
+          	<option value={baseCurrency}>{baseCurrency}</option>
+          {/each}
+        </select>
+	  </form>
+    {:else if currentTab === 'pro'}
       <form class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center">
-        <label class="text-sm">{$_("settings.fields.notes.aiEnabled")}</label>
-        <input type="checkbox" bind:checked={settingsStore.data.notesAiEnabled} class="toggle toggle-lg" />
-        <label class="text-sm">{$_("settings.fields.notes.notesDirectory")}</label>
-        <input class="input w-full" name="notesDir" value={notesDirString} onchange={updateNotesDir} />
+        <label class="text-sm">{$_("settings.fields.proAutocompleteEnabled")}</label>
+        <input type="checkbox" bind:checked={settingsStore.data.proAutocompleteEnabled} class="toggle toggle-lg" />
       </form>
     {/if}
   </div>

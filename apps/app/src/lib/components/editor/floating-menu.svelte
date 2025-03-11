@@ -47,12 +47,12 @@ function handlePromptKeyDown(event: KeyboardEvent) {
     {#if menuState === "idle"}
 		<PrimaryButton class="btn-sm rounded-full text-primary" onclick={toggleState}>	
 			<span>⌘I</span>
-            <span>{$_("editor.floatingMenu.askAI")}</span>
+            <span>{$_("notes.askAi")}</span>
         </PrimaryButton>
     {:else}
         <label class="input rounded-full !outline-none">
             <SparklesIcon size={16} />
-            <input bind:this={promptInput} name="prompt" type="text" placeholder={$_("editor.floatingMenu.askAI")} onblur={toggleState} onkeydown={handlePromptKeyDown} />
+            <input bind:this={promptInput} name="prompt" type="text" placeholder={$_("notes.askAi")} onblur={toggleState} onkeydown={handlePromptKeyDown} />
         </label>
     {/if}
 </form>
