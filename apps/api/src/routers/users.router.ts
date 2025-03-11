@@ -27,9 +27,8 @@ const ME_ROUTE = createRoute({
 	},
 });
 
-export const authRouter = createRouter().openapi(ME_ROUTE, async (c) => {
+export const usersRouter = createRouter().openapi(ME_ROUTE, async (c) => {
 	const user = c.get("user");
-	if (!user) return c.text("Unauthorized", 401);
 	const request = await fetch(
 		`${env.BETTER_AUTH_URL}/api/auth/subscription/list`,
 		{
