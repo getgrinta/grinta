@@ -12,8 +12,7 @@
 		"title": "Settings",
 		"tabs": {
 			"general": "General",
-			"ai": "AI",
-			"notes": "Notes"
+			"pro": "Pro"
 		},
 		"fields": {
 			"shortcut": "Shortcut",
@@ -23,19 +22,10 @@
 			"defaultSearchEngine": "Default Search Engine",
 			"dangerZone": "Danger Zone",
 			"wipeAllLocalData": "Wipe All Local Data",
-			"testingConnection": "Testing connection...",
 			"changeShortcut": "Change",
-			"ai": {
-				"modelName": "Model Name",
-				"customEndpoint": "Custom Endpoint",
-				"tokenSecret": "Token Secret",
-				"additionalContext": "Additional Context",
-				"testConnection": "Test Connection"
-			},
-			"notes": {
-				"aiEnabled": "AI Enabled",
-				"notesDirectory": "Notes Directory"
-			},
+			"recordShortcut": "Press to record",
+			"proAutocompleteEnabled": "Pro Autocomplete Enabled",
+			"notesDirectory": "Notes Directory",
 			"checkForUpdate": "Check for update"
 		},
 		"language": "Language"
@@ -52,7 +42,13 @@
 		"noteName": "Note name",
 		"closeSidebar": "close sidebar",
 		"createNote": "Create Note",
-		"retry": "Retry"
+		"retry": "Retry",
+		"rephrase": "Rephrase",
+		"longer": "Longer",
+		"shorter": "Shorter",
+		"grammar": "Improve grammar",
+		"professional": "Professional",
+		"askAi": "Ask AI"
 	},
 	"commands": {
 		"helperText": {

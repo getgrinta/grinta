@@ -12,8 +12,7 @@
 		"title": "Einstellungen",
 		"tabs": {
 			"general": "Allgemein",
-			"ai": "KI",
-			"notes": "Notizen"
+			"pro": "Pro"
 		},
 		"fields": {
 			"shortcut": "Tastenkürzel",
@@ -23,19 +22,9 @@
 			"dangerZone": "Gefahrenzone",
 			"defaultSearchEngine": "Standard-Suchmaschine",
 			"wipeAllLocalData": "Alle lokalen Daten löschen",
-			"testingConnection": "Verbindung wird getestet...",
-			"ai": {
-				"modelName": "Modellname",
-				"customEndpoint": "Benutzerdefinierter Endpunkt",
-				"tokenSecret": "Token-Geheimnis",
-				"additionalContext": "Zusätzlicher Kontext",
-				"testConnection": "Verbindung testen"
-			},
-			"notes": {
-				"aiEnabled": "KI aktiviert",
-				"notesDirectory": "Notizverzeichnis"
-			},
+			"notesDirectory": "Notizverzeichnis",
 			"checkForUpdate": "Nach Updates suchen",
+			"proAutocompleteEnabled": "Pro Autocomplete aktiviert",
 			"recordShortcut": "Drücken zum Speichern",
 			"changeShortcut": "Drücken zum Ändern"
 		},
@@ -53,7 +42,13 @@
 		"noteName": "Notizname",
 		"closeSidebar": "Seitenleiste schließen",
 		"createNote": "Notiz erstellen",
-		"retry": "Wiederholen"
+		"retry": "Wiederholen",
+		"rephrase": "Erneut formulieren",
+		"longer": "Länger",
+		"shorter": "Kürzer",
+		"grammar": "Grammatik verbessern",
+		"professional": "Professionell",
+		"askAi": "KI fragen"
 	},
 	"commands": {
 		"helperText": {

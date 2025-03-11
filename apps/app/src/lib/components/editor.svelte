@@ -3,6 +3,7 @@ import { goto } from "$app/navigation";
 import { TextSuggestion } from "$lib/editor/suggestion";
 import { aiStore } from "$lib/store/ai.svelte";
 import { BAR_MODE, appStore } from "$lib/store/app.svelte";
+import { settingsStore } from "$lib/store/settings.svelte";
 import { LogicalSize } from "@tauri-apps/api/dpi";
 import { currentMonitor } from "@tauri-apps/api/window";
 import { Editor, Extension } from "@tiptap/core";
@@ -61,6 +62,9 @@ function buildEditor(initialContent: string) {
 		name: "ChangeDefault",
 		addKeyboardShortcuts() {
 			return {
+				Escape() {
+					return editor?.view.dom.blur();
+				},
 				"Mod-k"() {
 					return goto(`/commands/${BAR_MODE.MENU}`);
 				},
@@ -97,28 +101,28 @@ function buildEditor(initialContent: string) {
 		},
 	});
 
-	// Create a new editor instance without any self-referencing
-	const newEditor = new Editor({
-		element: element,
-		editable: editable,
-		extensions: [
-			StarterKit,
-			ChangeDefaultExtension,
-			UnderlineExtension,
-			FloatingMenuExtension.configure({
-				element: floatingMenuTooltip,
-				tippyOptions: {
-					animation: "fade",
-					duration: 100,
-				},
-			}),
-			BubbleMenuExtension.configure({
-				element: bubbleMenuTooltip,
-				tippyOptions: {
-					animation: "fade",
-					duration: 100,
-				},
-			}),
+	const extensions = [
+		StarterKit,
+		ChangeDefaultExtension,
+		UnderlineExtension,
+		FloatingMenuExtension.configure({
+			element: floatingMenuTooltip,
+			tippyOptions: {
+				animation: "fade",
+				duration: 100,
+			},
+		}),
+		BubbleMenuExtension.configure({
+			element: bubbleMenuTooltip,
+			tippyOptions: {
+				animation: "fade",
+				duration: 100,
+			},
+		}),
+	];
+
+	if (settingsStore.data.proAutocompleteEnabled) {
+		extensions.push(
 			TextSuggestion.configure({
 				async fetchAutocompletion({ query }: Record<string, string>) {
 					// Safely access editor without self-referencing
@@ -133,7 +137,14 @@ function buildEditor(initialContent: string) {
 					return text;
 				},
 			}),
-		],
+		);
+	}
+
+	// Create a new editor instance without any self-referencing
+	const newEditor = new Editor({
+		element: element,
+		editable: editable,
+		extensions,
 		content: initialContent,
 		onTransaction() {
 			// Force re-render so editor.isActive works as expected

@@ -12,8 +12,7 @@
 		"title": "Ustawienia",
 		"tabs": {
 			"general": "Ogólne",
-			"ai": "AI",
-			"notes": "Notatki"
+			"pro": "Pro"
 		},
 		"fields": {
 			"shortcut": "Skrót",
@@ -22,16 +21,8 @@
 			"accentColor": "Akcent",
 			"dangerZone": "Strefa zagrożenia",
 			"defaultSearchEngine": "Domyślna wyszukiwarka",
-			"wipeData": "Wyczyść wszystkie dane lokalne",
-			"ai": {
-				"modelName": "Nazwa modelu",
-				"customEndpoint": "Endpoint",
-				"tokenSecret": "Sekret",
-				"additionalContext": "Dodatkowy kontekst",
-				"testConnection": "Testuj połączenie"
-			},
-			"aiEnabled": "AI",
 			"notesDirectory": "Lokalizacja notatek",
+			"proAutocompleteEnabled": "Automatyczne uzupełnianie",
 			"checkUpdate": "Sprawdź aktualizacje",
 			"wipeAllLocalData": "Wyczyść wszystkie dane lokalne",
 			"changeShortcut": "Naciśnij, aby zmienić",
@@ -56,7 +47,13 @@
 		"noteName": "Nazwa notatki",
 		"closeSidebar": "zamknij panel boczny",
 		"createNote": "Utwórz notatkę",
-		"retry": "Ponów"
+		"retry": "Ponów",
+		"rephrase": "Przepisz",
+		"longer": "Dłużej",
+		"shorter": "Krócej",
+		"grammar": "Popraw gramatykę",
+		"professional": "Profesjonalnie",
+		"askAi": "Zapytaj AI"
 	},
 	"commands": {
 		"helperText": {

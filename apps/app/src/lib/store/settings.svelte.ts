@@ -66,15 +66,11 @@ export const SettingsSchema = z.object({
 	theme: z.nativeEnum(THEME).default(THEME.SYSTEM),
 	accentColor: z.nativeEnum(ACCENT_COLOR).default(ACCENT_COLOR.MARE),
 	language: z.nativeEnum(LANGUAGE).default(getBrowserLanguage()),
-	aiModelName: z.string().default("mistral-small-latest"),
 	defaultSearchEngine: z
 		.nativeEnum(SEARCH_ENGINE)
 		.default(SEARCH_ENGINE.STARTPAGE),
-	aiEndpointUrl: z.string().default("https://api.mistral.ai/v1"),
-	aiSecretKey: z.string().default(""),
-	aiAdditionalContext: z.string().default(""),
 	notesDir: z.array(z.string()).default(["Grinta", "notes"]),
-	notesAiEnabled: z.boolean().default(true),
+	proAutocompleteEnabled: z.boolean().default(true),
 	incognitoEnabled: z.boolean().default(false),
 });
 

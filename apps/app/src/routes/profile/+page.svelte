@@ -3,6 +3,7 @@ import { goto } from "$app/navigation";
 import { getAuthClient } from "$lib/auth";
 import TopBar from "$lib/components/top-bar.svelte";
 import { appStore } from "$lib/store/app.svelte";
+import { fail } from "$lib/utils.svelte";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { onMount } from "svelte";
 
@@ -40,13 +41,16 @@ function goBack() {
 }
 
 async function upgradeToPro() {
-	const { data } = await authClient.subscription.upgrade({
+	const { data, error } = await authClient.subscription.upgrade({
 		plan: "pro",
 		successUrl: "/profile",
 		cancelUrl: "/profile",
 		uiMode: "hosted",
 		disableRedirect: true,
 	});
+	if (error) {
+		throw fail("Subscription Error", error);
+	}
 	if (!data?.url) return;
 	startSubscriptionCheck();
 	await openUrl(data.url);
@@ -58,6 +62,9 @@ async function cancelSubscription() {
 		uiMode: "hosted",
 		disableRedirect: true,
 	});
+	if (error) {
+		throw fail("Subscription Error", error);
+	}
 	if (!data?.url) return;
 	await openUrl(data.url);
 }
@@ -65,7 +72,6 @@ async function cancelSubscription() {
 onMount(initialize);
 
 $effect(() => {
-	console.log(appStore.subscriptions);
 	if ((appStore.subscriptions?.length ?? 0) > 0) {
 		stopSubscriptionCheck();
 	}

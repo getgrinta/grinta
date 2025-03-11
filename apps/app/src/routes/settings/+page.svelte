@@ -3,6 +3,7 @@ import { goto } from "$app/navigation";
 import PrimaryButton from "$lib/components/primary-button.svelte";
 import SegmentedControl from "$lib/components/segmented-control.svelte";
 import TopBar from "$lib/components/top-bar.svelte";
+import { appStore } from "$lib/store/app.svelte";
 import {
 	ACCENT_COLOR,
 	LANGUAGE,
@@ -17,10 +18,16 @@ import packageJson from "../../../package.json" with { type: "json" };
 
 const pressedKeys = new PressedKeys();
 
-const tabs = [
+const baseTabs = [
 	{ label: $_("settings.tabs.general"), value: "general", hotkey: "⌘1" },
-	{ label: $_("settings.tabs.notes"), value: "notes", hotkey: "⌘2" },
 ];
+
+const proTabs = [
+	...baseTabs,
+	{ label: $_("settings.tabs.pro"), value: "pro", hotkey: "⌘2" },
+];
+
+const tabs = $derived(appStore.subscriptions.length > 0 ? proTabs : baseTabs);
 
 let newToggleShortcut = $state<string[]>([]);
 let recordingShortcut = $state(false);
@@ -142,39 +149,39 @@ const controls = $derived(
           <PrimaryButton class="flex-1" disabled>{packageJson.version}</PrimaryButton>
           <PrimaryButton class="flex-1">{$_("settings.fields.checkForUpdate")}</PrimaryButton>
         </div>
-        <label class="text-sm">{$_("settings.fields.theme")}</label>
-        <select name="theme" bind:value={settingsStore.data.theme} class="select select-bordered w-full">
+        <label class="text-sm" for="themeChoice">{$_("settings.fields.theme")}</label>
+        <select id="themeChoice" name="theme" bind:value={settingsStore.data.theme} class="select select-bordered w-full">
         	{#each themes as theme}
           	<option value={theme}>{humanizeString(theme)}</option>
           {/each}
         </select>
-		    <label class="text-sm">{$_("settings.fields.defaultSearchEngine")}</label>
-        <select name="theme" bind:value={settingsStore.data.defaultSearchEngine} class="select select-bordered w-full">
+		<label class="text-sm" for="defaultSearchEngineChoice">{$_("settings.fields.defaultSearchEngine")}</label>
+        <select id="defaultSearchEngineChoice" name="theme" bind:value={settingsStore.data.defaultSearchEngine} class="select select-bordered w-full">
         	{#each searchEngines as searchEngine}
           	<option value={searchEngine}>{humanizeString(searchEngine)}</option>
           {/each}
         </select>
-        <label class="text-sm">{$_("settings.fields.accentColor")}</label>
-        <select name="accentColor" bind:value={settingsStore.data.accentColor} class="select select-bordered w-full">
+        <label class="text-sm" for="accentColorChoice">{$_("settings.fields.accentColor")}</label>
+        <select id="accentColorChoice" name="accentColor" bind:value={settingsStore.data.accentColor} class="select select-bordered w-full">
         	{#each accentColors as color}
           	<option value={color}>{humanizeString(color)}</option>
           {/each}
         </select>
-        <label class="text-sm">{$_("settings.language")}</label>
-        <select name="language" bind:value={settingsStore.data.language} class="select select-bordered w-full">
+        <label class="text-sm" for="languageChoice">{$_("settings.language")}</label>
+        <select id="languageChoice" name="language" bind:value={settingsStore.data.language} class="select select-bordered w-full">
         	{#each languages as language}
           	<option value={language.code}>{language.name}</option>
           {/each}
         </select>
+		<label class="text-sm" for="notesDirInput">{$_("settings.fields.notes.notesDirectory")}</label>
+        <input id="notesDirInput" class="input w-full" name="notesDir" value={notesDirString} onchange={updateNotesDir} />
         <label class="text-sm">{$_("settings.fields.dangerZone")}</label>
         <button type="button" class="btn btn-warning" onclick={wipeLocalData}>{$_("settings.fields.wipeAllLocalData")}</button>
       </form>
-    {:else if currentTab === 'notes'}
+    {:else if currentTab === 'pro'}
       <form class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center">
-        <label class="text-sm">{$_("settings.fields.notes.aiEnabled")}</label>
-        <input type="checkbox" bind:checked={settingsStore.data.notesAiEnabled} class="toggle toggle-lg" />
-        <label class="text-sm">{$_("settings.fields.notes.notesDirectory")}</label>
-        <input class="input w-full" name="notesDir" value={notesDirString} onchange={updateNotesDir} />
+        <label class="text-sm">{$_("settings.fields.proAutocompleteEnabled")}</label>
+        <input type="checkbox" bind:checked={settingsStore.data.proAutocompleteEnabled} class="toggle toggle-lg" />
       </form>
     {/if}
   </div>

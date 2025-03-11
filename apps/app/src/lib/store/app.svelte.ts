@@ -49,7 +49,6 @@ export class AppStore {
 		if (sessionError) {
 			throw fail("Session error", new Error(sessionError.message));
 		}
-		console.log(sessionData);
 		this.setSessionData(sessionData);
 		const { data: profileRequest, error: profileRequestError } = await until(
 			() => apiClient.api.users.me.$get(),
