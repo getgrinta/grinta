@@ -199,7 +199,7 @@ afterNavigate(({ to }) => {
 
 <Toaster theme="dark" position="bottom-center" richColors />
 
-<main id="mainLayout" class={clsx("flex-1 flex flex-col p-4", accentColorClass, bgClass)} data-theme={themeName}>
+<main id="mainLayout" class={clsx("flex-1 flex flex-col", accentColorClass, bgClass)} data-theme={themeName}>
 	<button type="button" class="hidden" onclick={openMenu} data-hotkey="Mod+k">Open Settings</button>
 	{#if initializing}
 		<div class="skeleton w-full h-10"></div>
