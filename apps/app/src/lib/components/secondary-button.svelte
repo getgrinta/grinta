@@ -22,8 +22,8 @@ const systemThemeWatcher = new SystemThemeWatcher();
 <button 
     type="button" 
     class={clsx(
-        `btn`,
-        systemThemeWatcher.theme === THEME.LIGHT ? "shadow-neutral-400/30 shadow-xs border-neutral-400/30 bg-neutral-200/50" : "shadow-neutral-400/30 shadow-xs border-neutral-400/30 !bg-base-100",
+        `btn border-0`,
+        systemThemeWatcher.theme === THEME.LIGHT ? "shadow-neutral-400/30 shadow-xs border-neutral-400/30 bg-neutral-200/50" : "shadow-neutral-800/30 shadow-xs disabled:!bg-neutral-100/20 bg-base-100 base-nonsemantic-dark",
         className,
     )}
     disabled={disabled}

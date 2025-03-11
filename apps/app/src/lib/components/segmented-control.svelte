@@ -3,7 +3,7 @@ import { THEME } from "$lib/store/settings.svelte";
 import { SystemThemeWatcher } from "$lib/utils.svelte";
 import clsx from "clsx";
 type Item = {
-	text: string;
+	text?: string;
 	onClick: () => void;
 	active?: boolean;
 	shortcut?: string;
@@ -24,10 +24,10 @@ const containerCss = $derived(
 );
 </script>
 
-<div class={clsx("join shadow-sm rounded-full overflow-hidden ring-1", containerCss)}>
+<div class={clsx("join shadow-sm rounded-full overflow-hidden ring-1 ring-base-100", containerCss)}>
     {#each items as item}
         {@const buttonClass = systemThemeWatcher.theme === THEME.LIGHT ? "border-0" : "border-neutral-800"}
-        {@const buttonActiveClass = (isActive: boolean) => systemThemeWatcher.theme === THEME.LIGHT ? (isActive ? 'text-primary' : 'text-neutral-500') : (isActive ? "border-0 bg-base-300 text-primary" : "text-neutral-500 border-neutral-800 bg-base-100")}
+        {@const buttonActiveClass = (isActive: boolean) => systemThemeWatcher.theme === THEME.LIGHT ? (isActive ? 'text-primary' : 'text-neutral-500') : (isActive ? "border-0 bg-base-300 text-primary" : "text-neutral-500 border-base-800 bg-base-100")}
 
         <button 
             type="button" 
@@ -41,7 +41,7 @@ const containerCss = $derived(
             {#if item.icon}
                 <item.icon size={size === "md" ? 16 : 18} />
             {/if}
-            {#if size === "lg" || item.active || !item.icon}
+            {#if item.text && (size === "lg" || item.active || !item.icon)}
                 <span>{item.text}</span>
             {/if}
             {#if item.shortcut}

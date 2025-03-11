@@ -25,9 +25,13 @@ function scrollDown() {
 const systemThemeWatcher = new SystemThemeWatcher();
 const topBarCss = $derived(
 	systemThemeWatcher.theme === THEME.DARK
-		? "backdrop-blur-lg bg-base-100 border-neutral-800 !outline-none px-6 h-14"
+		? "backdrop-blur-lg bg-base-100 base-nonsemantic-dark border-neutral-800 !outline-none px-6 h-14"
 		: "bg-neutral-300/50 border-neutral-400/30 !shadow-neutral-300/30 !shadow-xs !outline-none px-6 h-14",
 );
+
+$effect(() => {
+	console.log(systemThemeWatcher.theme);
+});
 </script>
 
 <button type="button" onclick={scrollUp} class="hidden" data-hotkey="k">Scroll Up</button>
