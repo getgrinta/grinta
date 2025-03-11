@@ -3,8 +3,9 @@ import { THEME } from "$lib/store/settings.svelte";
 import { SystemThemeWatcher } from "$lib/utils.svelte";
 import clsx from "clsx";
 
-const { children, onclick, hotkey } = $props<{
+const { children, onclick, hotkey, class: className } = $props<{
 	onClick: () => void;
+    className?: string;
 	hotkey?: string;
 }>();
 
@@ -19,7 +20,7 @@ const css = $derived(
 
 <button 
     type="button" 
-    class={clsx("btn btn-sm shadow-xs", css)}
+    class={clsx("btn btn-sm shadow-xs", css, className)}
     onclick={onclick}
     data-hotkey={hotkey}
 >

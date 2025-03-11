@@ -7,6 +7,7 @@ import SegmentedControl from "./segmented-control.svelte";
 const items = $derived([
 	{
 		icon: GlobeIcon,
+		text: $_(`searchMode.${SEARCH_MODE.WEB.toLowerCase()}`),
 		onClick: () => {
 			appStore.searchMode = SEARCH_MODE.WEB;
 		},
@@ -14,6 +15,7 @@ const items = $derived([
 	},
 	{
 		icon: SparklesIcon,
+		text: $_(`searchMode.${SEARCH_MODE.AI.toLowerCase()}`),
 		onClick: () => {
 			appStore.searchMode = SEARCH_MODE.AI;
 		},

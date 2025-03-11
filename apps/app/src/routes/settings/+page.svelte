@@ -132,6 +132,7 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
     <div slot="input" class="grow flex-1 truncate text-lg font-semibold">{$_("settings.title")}</div>
     <div slot="addon" role="tablist" class="join">
       <SegmentedControl
+      size="lg"
         items={tabs.map((tab, index) => ({
           text: $_(tab.label),
           onClick: () => changeTab(tab.value),

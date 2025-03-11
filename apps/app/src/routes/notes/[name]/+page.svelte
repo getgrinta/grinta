@@ -178,11 +178,10 @@ $effect(() => {
 			<TopBar goBack={goBack}>
 				<input bind:value={noteTitle} slot="input" class="grow h-8 font-semibold text-lg" onkeydown={handleNavigation} onchange={onNameUpdate} placeholder={$_("notes.noteName")} />
 				<SearchBarAccessoryLabel for="sidebar" slot="addon" hotkey="Mod+j">
-
-				<MoreVerticalIcon size={16} />
-				{#if isCmdPressed}
-					<span>⌘J</span>
-				{/if}
+					<MoreVerticalIcon size={16} />
+					{#if isCmdPressed}
+						<span>⌘J</span>
+					{/if}
 				</SearchBarAccessoryLabel>
 			</TopBar>
 		  	<div class="pt-20 px-8 pb-8">

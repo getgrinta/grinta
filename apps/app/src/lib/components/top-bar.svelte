@@ -29,9 +29,6 @@ const topBarCss = $derived(
 		: "bg-neutral-300/50 border-neutral-400/30 !shadow-neutral-300/30 !shadow-xs !outline-none px-6 h-14",
 );
 
-$effect(() => {
-	console.log(systemThemeWatcher.theme);
-});
 </script>
 
 <button type="button" onclick={scrollUp} class="hidden" data-hotkey="k">Scroll Up</button>
@@ -41,7 +38,7 @@ $effect(() => {
 
   <label class={clsx("input flex-1 flex items-center gap-4 w-full", topBarCss, fancyMode && "border-gradient")}>
   	<slot name="indicator">
-	    <SearchBarAccessoryButton onclick={goBack ?? defaultGoBack} hotkey="Escape,h">
+	    <SearchBarAccessoryButton class="text-primary" onclick={goBack ?? defaultGoBack} hotkey="Escape,h">
 	      <ChevronLeftIcon size={16} />
 	    </SearchBarAccessoryButton>
     </slot>
