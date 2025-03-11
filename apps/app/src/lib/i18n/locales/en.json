@@ -12,6 +12,7 @@
 		"title": "Settings",
 		"tabs": {
 			"general": "General",
+			"search": "Search",
 			"pro": "Pro"
 		},
 		"fields": {
@@ -26,7 +27,8 @@
 			"recordShortcut": "Press to record",
 			"proAutocompleteEnabled": "Pro Autocomplete Enabled",
 			"notesDirectory": "Notes Directory",
-			"checkForUpdate": "Check for update"
+			"checkForUpdate": "Check for update",
+			"baseCurrency": "Base Currency"
 		},
 		"language": "Language"
 	},

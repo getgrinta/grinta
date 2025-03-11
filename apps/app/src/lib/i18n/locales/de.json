@@ -12,6 +12,7 @@
 		"title": "Einstellungen",
 		"tabs": {
 			"general": "Allgemein",
+			"search": "Suche",
 			"pro": "Pro"
 		},
 		"fields": {
@@ -26,7 +27,8 @@
 			"checkForUpdate": "Nach Updates suchen",
 			"proAutocompleteEnabled": "Pro Autocomplete aktiviert",
 			"recordShortcut": "Drücken zum Speichern",
-			"changeShortcut": "Drücken zum Ändern"
+			"changeShortcut": "Drücken zum Ändern",
+			"baseCurrency": "Basis-Währung"
 		},
 		"language": "Sprache"
 	},

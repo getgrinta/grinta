@@ -262,6 +262,7 @@ export class CommandsStore extends SecureStore<Commands> {
 
 	getClipboardCommands(): ExecutableCommand[] {
 		return clipboardStore.data.clipboardHistory
+			.filter((clipboardEntry) => clipboardEntry.length > 0)
 			.reverse()
 			.map((clipboardEntry) => ({
 				label: clipboardEntry,

@@ -12,6 +12,7 @@
 		"title": "Ustawienia",
 		"tabs": {
 			"general": "Ogólne",
+			"search": "Wyszukiwanie",
 			"pro": "Pro"
 		},
 		"fields": {
@@ -26,7 +27,8 @@
 			"checkUpdate": "Sprawdź aktualizacje",
 			"wipeAllLocalData": "Wyczyść wszystkie dane lokalne",
 			"changeShortcut": "Naciśnij, aby zmienić",
-			"recordShortcut": "Naciśnij, aby zapisać"
+			"recordShortcut": "Naciśnij, aby zapisać",
+			"baseCurrency": "Waluta bazowa"
 		},
 		"language": "Język",
 		"languages": {

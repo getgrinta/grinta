@@ -9,6 +9,7 @@ import {
 	LANGUAGE,
 	SEARCH_ENGINE,
 	THEME,
+	baseCurrencies,
 	settingsStore,
 } from "$lib/store/settings.svelte";
 import humanizeString from "humanize-string";
@@ -20,11 +21,12 @@ const pressedKeys = new PressedKeys();
 
 const baseTabs = [
 	{ label: $_("settings.tabs.general"), value: "general", hotkey: "⌘1" },
+	{ label: $_("settings.tabs.search"), value: "search", hotkey: "⌘2" },
 ];
 
 const proTabs = [
 	...baseTabs,
-	{ label: $_("settings.tabs.pro"), value: "pro", hotkey: "⌘2" },
+	{ label: $_("settings.tabs.pro"), value: "pro", hotkey: "⌘3" },
 ];
 
 const tabs = $derived(appStore.subscriptions.length > 0 ? proTabs : baseTabs);
@@ -155,12 +157,6 @@ const controls = $derived(
           	<option value={theme}>{humanizeString(theme)}</option>
           {/each}
         </select>
-		<label class="text-sm" for="defaultSearchEngineChoice">{$_("settings.fields.defaultSearchEngine")}</label>
-        <select id="defaultSearchEngineChoice" name="theme" bind:value={settingsStore.data.defaultSearchEngine} class="select select-bordered w-full">
-        	{#each searchEngines as searchEngine}
-          	<option value={searchEngine}>{humanizeString(searchEngine)}</option>
-          {/each}
-        </select>
         <label class="text-sm" for="accentColorChoice">{$_("settings.fields.accentColor")}</label>
         <select id="accentColorChoice" name="accentColor" bind:value={settingsStore.data.accentColor} class="select select-bordered w-full">
         	{#each accentColors as color}
@@ -173,11 +169,26 @@ const controls = $derived(
           	<option value={language.code}>{language.name}</option>
           {/each}
         </select>
-		<label class="text-sm" for="notesDirInput">{$_("settings.fields.notes.notesDirectory")}</label>
+		<label class="text-sm" for="notesDirInput">{$_("settings.fields.notesDirectory")}</label>
         <input id="notesDirInput" class="input w-full" name="notesDir" value={notesDirString} onchange={updateNotesDir} />
         <label class="text-sm">{$_("settings.fields.dangerZone")}</label>
         <button type="button" class="btn btn-warning" onclick={wipeLocalData}>{$_("settings.fields.wipeAllLocalData")}</button>
       </form>
+	{:else if currentTab === 'search'}
+	  <form class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center">
+		<label class="text-sm" for="defaultSearchEngineChoice">{$_("settings.fields.defaultSearchEngine")}</label>
+        <select id="defaultSearchEngineChoice" name="theme" bind:value={settingsStore.data.defaultSearchEngine} class="select select-bordered w-full">
+        	{#each searchEngines as searchEngine}
+          	<option value={searchEngine}>{humanizeString(searchEngine)}</option>
+          {/each}
+        </select>
+		<label class="text-sm" for="baseCurrencyChoice">{$_("settings.fields.baseCurrency")}</label>
+        <select id="baseCurrencyChoice" name="baseCurrency" bind:value={settingsStore.data.baseCurrency} class="select select-bordered w-full">
+        	{#each baseCurrencies as baseCurrency}
+          	<option value={baseCurrency}>{baseCurrency}</option>
+          {/each}
+        </select>
+	  </form>
     {:else if currentTab === 'pro'}
       <form class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center">
         <label class="text-sm">{$_("settings.fields.proAutocompleteEnabled")}</label>

@@ -51,6 +51,18 @@ const LANGUAGE_CODE_TO_ENUM = Object.entries(LANGUAGE).reduce(
 
 export type Language = (typeof LANGUAGE)[keyof typeof LANGUAGE];
 
+export const BASE_CURRENCY = {
+	EUR: "EUR",
+	PLN: "PLN",
+	CHF: "CHF",
+	GBP: "GBP",
+	USD: "USD",
+} as const;
+
+export type BaseCurrency = keyof typeof BASE_CURRENCY;
+
+export const baseCurrencies = Object.keys(BASE_CURRENCY);
+
 // Get browser language or default to English
 const getBrowserLanguage = (): Language => {
 	if (!browser) return LANGUAGE.EN;
@@ -72,6 +84,7 @@ export const SettingsSchema = z.object({
 	notesDir: z.array(z.string()).default(["Grinta", "notes"]),
 	proAutocompleteEnabled: z.boolean().default(true),
 	incognitoEnabled: z.boolean().default(false),
+	baseCurrency: z.nativeEnum(BASE_CURRENCY).default(BASE_CURRENCY.USD),
 });
 
 export type Settings = z.infer<typeof SettingsSchema>;
