@@ -1,4 +1,5 @@
 import { goto } from "$app/navigation";
+import { parseMathExpression, parseRelativeTime } from "$lib/formula-commands";
 import { appMetadataStore } from "$lib/store/app-metadata.svelte";
 import { generateCancellationToken } from "$lib/utils.svelte";
 import { until } from "@open-draft/until";
@@ -8,10 +9,8 @@ import { openPath, openUrl } from "@tauri-apps/plugin-opener";
 import { exit } from "@tauri-apps/plugin-process";
 import { Command } from "@tauri-apps/plugin-shell";
 import nlp from "compromise";
-import datePlugin from "compromise-dates";
-import numbersPlugin from "compromise-numbers";
-import { parse } from "equation-parser";
-import { resolve } from "equation-resolver";
+import dates from "compromise-dates";
+import numbers from "compromise-numbers";
 import { matchSorter } from "match-sorter";
 import { uniq } from "rambda";
 import { _ } from "svelte-i18n";
@@ -29,8 +28,8 @@ import { type Note, notesStore } from "./notes.svelte";
 import { SecureStore } from "./secure.svelte";
 import { settingsStore } from "./settings.svelte";
 
-nlp.plugin(datePlugin);
-nlp.plugin(numbersPlugin);
+nlp.extend(dates);
+nlp.extend(numbers);
 
 function t(key: string, params: Record<string, string> = {}) {
 	try {
@@ -107,17 +106,19 @@ async function fetchCompletions(query: string) {
 }
 
 function buildFormulaCommands(currentQuery: string): ExecutableCommand[] {
-	const parsed = parse(currentQuery);
-	const resolved = resolve(parsed);
-	if (resolved.type !== "number") return [];
-	const value = resolved.value.toString();
-	return [
-		{
-			label: value,
-			value,
-			handler: COMMAND_HANDLER.FORMULA_RESULT,
-		},
-	];
+	// Try parsing as a mathematical expression first
+	const mathCommands = parseMathExpression(currentQuery);
+	if (mathCommands.length > 0) {
+		return mathCommands;
+	}
+
+	// Try parsing relative time expressions
+	const timeCommands = parseRelativeTime(currentQuery);
+	if (timeCommands.length > 0) {
+		return timeCommands;
+	}
+
+	return [];
 }
 
 async function buildAppCommands(
