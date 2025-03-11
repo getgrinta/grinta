@@ -69,7 +69,7 @@ const ExecutableCommandSchema = z.object({
 	handler: z.nativeEnum(COMMAND_HANDLER),
 });
 
-type ExecutableCommand = z.infer<typeof ExecutableCommandSchema>;
+export type ExecutableCommand = z.infer<typeof ExecutableCommandSchema>;
 
 export const SYSTEM_COMMAND = {
 	SIGN_IN: "SIGN_IN",

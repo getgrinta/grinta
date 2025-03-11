@@ -31,8 +31,13 @@ fn load_icns_file(path: &Path) -> Result<Option<Vec<u8>>, String> {
 
     // Try to get the largest icon (preferably 256x256 or 128x128)
     let icon_types = [
+        IconType::RGBA32_512x512,
         IconType::RGBA32_256x256,
         IconType::RGBA32_128x128,
+        IconType::RGB24_128x128,
+        IconType::RGBA32_512x512_2x,
+        IconType::RGBA32_256x256_2x,
+        IconType::RGBA32_128x128_2x,
         IconType::RGBA32_64x64,
         IconType::RGBA32_32x32,
     ];

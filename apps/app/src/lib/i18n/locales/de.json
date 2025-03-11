@@ -1,4 +1,13 @@
 {
+	"searchMode": {
+		"web": "Netz",
+		"ai": "KI"
+	},
+	"barMode": {
+		"initial": "Suche",
+		"notes": "Notizen",
+		"menu": "Menü"
+	},
 	"settings": {
 		"title": "Einstellungen",
 		"tabs": {
@@ -49,7 +58,7 @@
 	"commands": {
 		"helperText": {
 			"app": "App",
-			"web": "Web",
+			"web": "Netz",
 			"barCommand": "Befehlsleiste",
 			"changeMode": "Modus ändern",
 			"copyToClipboard": "In die Zwischenablage kopieren",

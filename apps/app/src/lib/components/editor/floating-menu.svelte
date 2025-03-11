@@ -4,6 +4,7 @@ import type { Editor } from "@tiptap/core";
 import { createForm } from "felte";
 import { SparklesIcon } from "lucide-svelte";
 import { _ } from "svelte-i18n";
+import PrimaryButton from "../primary-button.svelte";
 
 const { form } = createForm<{ prompt: string }>({
 	async onSubmit(values) {
@@ -44,10 +45,10 @@ function handlePromptKeyDown(event: KeyboardEvent) {
 
 <form use:form class="join">
     {#if menuState === "idle"}
-        <button type="button" class="btn btn-sm rounded-full text-primary" onclick={toggleState}>
+		<PrimaryButton class="btn-sm rounded-full text-primary" onclick={toggleState}>	
 			<span>⌘I</span>
             <span>{$_("editor.floatingMenu.askAI")}</span>
-        </button>
+        </PrimaryButton>
     {:else}
         <label class="input rounded-full !outline-none">
             <SparklesIcon size={16} />

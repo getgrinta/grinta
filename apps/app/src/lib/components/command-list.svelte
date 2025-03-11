@@ -6,7 +6,8 @@ import {
 	type CommandHandler,
 	commandsStore,
 } from "$lib/store/commands.svelte";
-import { highlightText } from "$lib/utils.svelte";
+import { THEME } from "$lib/store/settings.svelte";
+import { SystemThemeWatcher, highlightText } from "$lib/utils.svelte";
 import { clsx } from "clsx";
 import {
 	AppWindowIcon,
@@ -71,6 +72,8 @@ const itemCount = $derived(commandsStore.commands.length);
 const scrollToIndex = $derived(
 	itemCount > 0 ? commandsStore.selectedIndex : undefined,
 );
+
+const systemThemeWatcher = new SystemThemeWatcher();
 </script>
 
 <div class="flex flex-1 flex-col mt-[5rem] overflow-hidden">
@@ -80,29 +83,37 @@ const scrollToIndex = $derived(
   >
 	<VirtualList scrollToIndex={scrollToIndex} width="100%" height={316} {itemCount} itemSize={65}>
 		<li let:index class="!w-[calc(100%-2rem)] mx-4 !mb-4" data-command-index={index} slot="item" let:style transition:fade={{ duration: 150 }} {style}>
-			{#if true}
 			{@const active = commandsStore.selectedIndex === index}
 			{@const IconComponent = getIcon(commandsStore.commands[index].handler)}
 			{@const command = commandsStore.commands[index]}
 			{@const currentLabel = command.localizedLabel ?? command.label}
 			{@const labelChunks = highlightText(currentLabel, appStore.query)}
-			<div class={clsx("flex justify-between gap-4 border-1 border-transparent text-neutral-300", active && 'menu-active !bg-base-100/40 !text-primary !border-neutral-600')}>
+
+			{@const rowCss = systemThemeWatcher.theme === THEME.LIGHT ? "border-1 border-transparent hover:bg-neutral-300/30 color-base-100" : "border-1 border-transparent color-base-100"}
+			{@const rowActiveCss = systemThemeWatcher.theme === THEME.DARK ? 'menu-active !bg-base-100/40 !text-primary !border-neutral-600' : 'menu-active !bg-neutral-300/30 color-base-10 border-1 !border-neutral-400/30'}
+
+			{@const labelChunkCss = (isHiglighted: boolean) => systemThemeWatcher.theme === THEME.DARK ? (isHiglighted ? "text-neutral-300" : "text-primary font-semibold") : (isHiglighted ? "color-base-100 text-neutral-800" : "color-base-100 text-neutral-800 font-semibold")}
+			{@const badgeCss = (isHiglighted: boolean) => systemThemeWatcher.theme === THEME.DARK ? (isHiglighted ? "badge-outline !text-primary !border-primary" : "badge-soft text-neutral-300") : (isHiglighted ? "badge-outline !text-primary !border-primary" : " !bg-neutral-300/50 border-0 badge-soft text-neutral-300")}
+			
+			{@const arrowDownLeftCss = systemThemeWatcher.theme === THEME.LIGHT && "text-neutral-600 hover:!bg-neutral-300/50"}
+
+			<div class={clsx("flex justify-between gap-4", rowCss, active && rowActiveCss)}>
 				<button type="button" onclick={() => commandsStore.handleCommand(index)} class="flex flex-1 h-full gap-4 py-[0.75rem] items-center overflow-hidden cursor-pointer">
 					{#if command.handler === COMMAND_HANDLER.APP}
 						{@const icon = appMetadataStore.getIcon(command.label)}
 
 						{#if icon}
-							<img src={icon} alt={currentLabel} width="24" height="24" class="w-6 h-6 object-contain" />
+							<img src={icon} alt={currentLabel} width="24" height="24" class="w-8 h-8 object-contain" />
 						{:else}
 							<IconComponent size={24} />
 						{/if}
 					{:else}
 						<IconComponent size={24} />
-					{/if}
+					{/if} 
 					<h2 class={clsx("flex-1 text-left truncate")}>
 						{#if appStore.query.length > 0}
 							{#each labelChunks as chunk}
-								<span class={clsx(chunk.highlight ? "text-neutral-300" : "text-primary font-semibold")}>{chunk.text}</span>
+								<span class={clsx(labelChunkCss(chunk.highlight))}>{chunk.text}</span>
 							{/each}
 						{:else}
 							<span>{currentLabel}</span>
@@ -110,13 +121,14 @@ const scrollToIndex = $derived(
 					</h2>
 				</button>
 				<div class="flex gap-1 items-center">
-					<span class={clsx("badge", active ? "badge-outline !text-primary !border-primary" : "badge-soft text-neutral-300")}>{getHelperText({ value: command.value, handler: command.handler })}</span>
-					<button type="button" class="btn btn-square btn-ghost btn-sm" onclick={() => appStore.setQuery(currentLabel)}>
+					<span class={clsx("badge", badgeCss(active))}>
+						{getHelperText({ value: command.value, handler: command.handler })}
+					</span>
+					<button type="button" class={clsx("btn btn-square btn-ghost btn-sm !border-0 p-[1px]", arrowDownLeftCss)} onclick={() => appStore.setQuery(currentLabel)}>
 						<ArrowDownLeftIcon size={16} />
 					</button>
 				</div>
 			</div>
-			{/if}
 		</li>
 	</VirtualList>
   </ul>

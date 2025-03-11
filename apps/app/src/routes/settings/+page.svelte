@@ -1,5 +1,7 @@
 <script lang="ts">
 import { goto } from "$app/navigation";
+import PrimaryButton from "$lib/components/primary-button.svelte";
+import SegmentedControl from "$lib/components/segmented-control.svelte";
 import TopBar from "$lib/components/top-bar.svelte";
 import {
 	ACCENT_COLOR,
@@ -112,16 +114,15 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
   <TopBar>
     <div slot="input" class="grow flex-1 truncate text-lg font-semibold">{$_("settings.title")}</div>
     <div slot="addon" role="tablist" class="join">
-      {#each tabs as tab, index}
-      	{@const active = currentTab === tab.value}
-      	{@const hotkey = `Meta+${index + 1}`}
-        <button type="button" class={clsx("btn join-item", active && 'text-primary')} onclick={() => changeTab(tab.value)} data-hotkey={hotkey}>
-        	<span>{$_(tab.label)}</span>
-        	{#if isCmdPressed}
-	        	<span>{tab.hotkey}</span>
-        	{/if}
-        </button>
-      {/each}
+      <SegmentedControl
+      size="lg"
+        items={tabs.map((tab, index) => ({
+          text: $_(tab.label),
+          onClick: () => changeTab(tab.value),
+          active: currentTab === tab.value,
+          shortcut: isCmdPressed ? tab.hotkey : undefined
+        }))}
+      />
     </div>
   </TopBar>
    <div class="flex flex-1 flex-col mt-20 mb-8 mx-4">
@@ -130,13 +131,13 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
         <label class="text-sm">{$_("settings.fields.shortcut")}</label>
         <div class="flex gap-2 items-center">
           <input type="hidden" name="toggleShortcut" value={toggleShortcut} />
-          <button type="button" class="btn flex-1" disabled>{toggleShortcut}</button>
-          <button type="button" class="btn flex-1" onclick={toggleShortcutRecording}>{recordShortcutLabel}</button>
+          <PrimaryButton class="flex-1" disabled>{toggleShortcut}</PrimaryButton>
+          <PrimaryButton class="flex-1" onclick={toggleShortcutRecording}>{recordShortcutLabel}</PrimaryButton>
         </div>
         <label class="text-sm">{$_("settings.fields.version")}</label>
         <div class="flex gap-2 items-center">
-          <button type="button" class="btn flex-1" disabled>{packageJson.version}</button>
-          <button type="button" class="btn flex-1">{$_("settings.fields.checkForUpdate")}</button>
+          <PrimaryButton class="flex-1" disabled>{packageJson.version}</PrimaryButton>
+          <PrimaryButton class="flex-1">{$_("settings.fields.checkForUpdate")}</PrimaryButton>
         </div>
         <label class="text-sm">{$_("settings.fields.theme")}</label>
         <select name="theme" bind:value={settingsStore.data.theme} class="select select-bordered w-full">
