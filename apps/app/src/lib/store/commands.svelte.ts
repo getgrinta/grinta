@@ -4,7 +4,7 @@ import { generateCancellationToken } from "$lib/utils.svelte";
 import { until } from "@open-draft/until";
 import { type DirEntry, readDir, watch } from "@tauri-apps/plugin-fs";
 import { fetch } from "@tauri-apps/plugin-http";
-import { openPath, openUrl } from "@tauri-apps/plugin-opener";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import { exit } from "@tauri-apps/plugin-process";
 import { Command } from "@tauri-apps/plugin-shell";
 import nlp from "compromise";
@@ -262,7 +262,7 @@ export class CommandsStore extends SecureStore<Commands> {
 
 	getClipboardCommands(): ExecutableCommand[] {
 		return clipboardStore.data.clipboardHistory
-			.filter((clipboardEntry) => clipboardEntry.length > 0)
+			.filter((clipboardEntry) => clipboardEntry.trim().length > 0)
 			.reverse()
 			.map((clipboardEntry) => ({
 				label: clipboardEntry,

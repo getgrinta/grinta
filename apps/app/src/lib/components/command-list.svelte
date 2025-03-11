@@ -105,13 +105,13 @@ const systemThemeWatcher = new SystemThemeWatcher();
 					{:else}
 						<IconComponent size={24} />
 					{/if} 
-					<h2 class={clsx("flex-1 text-left truncate")}>
+					<h2 class={clsx("flex-1 flex text-left truncate max-w-[34rem]")}>
 						{#if appStore.query.length > 0}
 							{#each labelChunks as chunk}
 								<span class={clsx(labelChunkCss(chunk.highlight))}>{chunk.text}</span>
 							{/each}
 						{:else}
-							<span>{currentLabel}</span>
+							<span class="flex-1 truncate">{currentLabel}</span>
 						{/if}
 					</h2>
 				</button>
