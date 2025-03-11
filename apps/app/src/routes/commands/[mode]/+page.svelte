@@ -7,7 +7,6 @@ import SearchModeToggle from "$lib/components/search-mode-toggle.svelte";
 import ViewActions from "$lib/components/view-actions.svelte";
 import { BAR_MODE, appStore } from "$lib/store/app.svelte";
 import { notesStore } from "$lib/store/notes.svelte";
-import { onMount } from "svelte";
 import { _ } from "svelte-i18n";
 
 async function createNote() {
@@ -33,7 +32,7 @@ $effect(() => {
 	<div class="flex fixed bottom-4 right-4 left-4 justify-end">
 		{#if appStore.barMode === BAR_MODE.INITIAL}
 			<SearchModeToggle />
-		{:else}
+		{:else if appStore.barMode === BAR_MODE.NOTES}
 			<ViewActions actions={viewActions} />
 		{/if}
 	</div>

@@ -75,7 +75,8 @@
 			"settings": "Ustawienia",
 			"exit": "Wyjść",
 			"signIn": "Zaloguj",
-			"profile": "Profil"
+			"profile": "Profil",
+			"clipboardHistory": "Historia schowka"
 		},
 		"actions": {
 			"search": "Szukaj \"{query}\"",
@@ -88,7 +89,8 @@
 		"placeholder": {
 			"initial": "Szukaj w sieci lub aplikacjach",
 			"menu": "Menu",
-			"notes": "Szukaj lub twórz notatki"
+			"notes": "Szukaj lub twórz notatki",
+			"clipboard": "Szukaj i kopiuj ze schowka"
 		},
 		"actions": {
 			"menu": "Menu",

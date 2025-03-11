@@ -70,7 +70,8 @@
 			"settings": "Einstellungen",
 			"exit": "Beenden",
 			"signIn": "Anmelden",
-			"profile": "Profil"
+			"profile": "Profil",
+			"clipboardHistory": "Zwischenablage"
 		},
 		"actions": {
 			"search": "Nach \"{query}\" suchen",
@@ -83,7 +84,8 @@
 		"placeholder": {
 			"initial": "Web oder Apps durchsuchen",
 			"menu": "Menü",
-			"notes": "Notizen suchen oder erstellen"
+			"notes": "Notizen suchen oder erstellen",
+			"clipboard": "Zwischenablage durchsuchen und kopieren"
 		},
 		"actions": {
 			"menu": "Menü",

@@ -25,6 +25,7 @@ import {
 	type SearchMode,
 	appStore,
 } from "./app.svelte";
+import { clipboardStore } from "./clipboard.svelte";
 import { type Note, notesStore } from "./notes.svelte";
 import { SecureStore } from "./secure.svelte";
 import { settingsStore } from "./settings.svelte";
@@ -79,6 +80,7 @@ export const SYSTEM_COMMAND = {
 	HELP: "HELP",
 	SETTINGS: "SETTINGS",
 	EXIT: "EXIT",
+	CLIPBOARD: "CLIPBOARD",
 } as const;
 
 export type SystemCommand = keyof typeof SYSTEM_COMMAND;
@@ -226,6 +228,11 @@ export class CommandsStore extends SecureStore<Commands> {
 		return [
 			...userCommands,
 			{
+				label: t("commands.menuItems.clipboardHistory"),
+				value: SYSTEM_COMMAND.CLIPBOARD,
+				handler: COMMAND_HANDLER.SYSTEM,
+			},
+			{
 				label: t("commands.menuItems.clearNotes"),
 				value: SYSTEM_COMMAND.CLEAR_NOTES,
 				handler: COMMAND_HANDLER.SYSTEM,
@@ -251,6 +258,16 @@ export class CommandsStore extends SecureStore<Commands> {
 				handler: COMMAND_HANDLER.SYSTEM,
 			},
 		];
+	}
+
+	getClipboardCommands(): ExecutableCommand[] {
+		return clipboardStore.data.clipboardHistory
+			.reverse()
+			.map((clipboardEntry) => ({
+				label: clipboardEntry,
+				value: clipboardEntry,
+				handler: COMMAND_HANDLER.COPY_TO_CLIPBOARD,
+			}));
 	}
 
 	async initialize() {
@@ -392,6 +409,9 @@ export class CommandsStore extends SecureStore<Commands> {
 			})
 			.with(BAR_MODE.MENU, () => {
 				return this.getMenuItems();
+			})
+			.with(BAR_MODE.CLIPBOARD, async () => {
+				return this.getClipboardCommands();
 			})
 			.with(BAR_MODE.NOTES, async () => {
 				const createNoteCommand =
@@ -562,6 +582,9 @@ export class CommandsStore extends SecureStore<Commands> {
 					})
 					.with(SYSTEM_COMMAND.PROFILE, async () => {
 						return goto("/profile");
+					})
+					.with(SYSTEM_COMMAND.CLIPBOARD, async () => {
+						return appStore.switchMode(BAR_MODE.CLIPBOARD);
 					})
 					.exhaustive();
 			})

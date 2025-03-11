@@ -15,7 +15,6 @@ import {
 	ChevronRightIcon,
 	EqualIcon,
 	GlobeIcon,
-	SparklesIcon,
 	StickyNoteIcon,
 } from "lucide-svelte";
 import { _ } from "svelte-i18n";
@@ -47,9 +46,6 @@ function getHelperText({ value, handler }: GetHelperProps) {
 		.with(COMMAND_HANDLER.CREATE_NOTE, () =>
 			$_("commands.helperText.createNote"),
 		)
-		.with(COMMAND_HANDLER.COMPLETE_NOTE, () =>
-			$_("commands.helperText.createSmartNote"),
-		)
 		.with(COMMAND_HANDLER.RUN_SHORTCUT, () =>
 			$_("commands.helperText.runShortcut"),
 		)
@@ -63,7 +59,6 @@ function getIcon(handler: CommandHandler) {
 		.with(COMMAND_HANDLER.APP, () => AppWindowIcon)
 		.with(COMMAND_HANDLER.OPEN_NOTE, () => StickyNoteIcon)
 		.with(COMMAND_HANDLER.CREATE_NOTE, () => StickyNoteIcon)
-		.with(COMMAND_HANDLER.COMPLETE_NOTE, () => SparklesIcon)
 		.with(COMMAND_HANDLER.FORMULA_RESULT, () => EqualIcon)
 		.otherwise(() => ChevronRightIcon);
 }

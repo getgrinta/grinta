@@ -10,6 +10,7 @@ export const BAR_MODE = {
 	INITIAL: "INITIAL",
 	MENU: "MENU",
 	NOTES: "NOTES",
+	CLIPBOARD: "CLIPBOARD",
 } as const;
 
 export type BarMode = keyof typeof BAR_MODE;

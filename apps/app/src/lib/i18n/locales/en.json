@@ -70,7 +70,8 @@
 			"settings": "Settings",
 			"exit": "Exit",
 			"signIn": "Sign In",
-			"profile": "Profile"
+			"profile": "Profile",
+			"clipboardHistory": "Clipboard History"
 		},
 		"actions": {
 			"search": "Search for \"{query}\"",
@@ -83,7 +84,8 @@
 		"placeholder": {
 			"initial": "Search web or apps",
 			"menu": "Menu",
-			"notes": "Search or create notes"
+			"notes": "Search or create notes",
+			"clipboard": "Search and copy from clipboard"
 		},
 		"actions": {
 			"menu": "Menu",

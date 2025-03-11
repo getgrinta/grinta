@@ -14,6 +14,7 @@ import { SystemThemeWatcher } from "$lib/utils.svelte";
 import { clsx } from "clsx";
 import { createForm } from "felte";
 import {
+	ClipboardIcon,
 	EyeIcon,
 	EyeOffIcon,
 	MenuIcon,
@@ -168,6 +169,10 @@ const inputProps = $derived(
 		.with(BAR_MODE.NOTES, () => ({
 			icon: StickyNoteIcon,
 			placeholder: $_("searchBar.placeholder.notes"),
+		}))
+		.with(BAR_MODE.CLIPBOARD, () => ({
+			icon: ClipboardIcon,
+			placeholder: $_("searchBar.placeholder.clipboard"),
 		}))
 		.exhaustive(),
 );
