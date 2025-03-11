@@ -6,17 +6,17 @@ import SearchBarAccessoryLabel from "$lib/components/search-bar-accessory-label.
 import TopBar from "$lib/components/top-bar.svelte";
 import { BAR_MODE } from "$lib/store/app.svelte";
 import { type ExtendedNote, notesStore } from "$lib/store/notes.svelte";
-import { generateCancellationToken } from "$lib/utils.svelte";
 import { BaseDirectory, type UnwatchFn, watch } from "@tauri-apps/plugin-fs";
 import clsx from "clsx";
-import { LoaderCircleIcon, MoreVerticalIcon, SquareIcon } from "lucide-svelte";
+import { MoreVerticalIcon } from "lucide-svelte";
 import { marked } from "marked";
 import { PressedKeys } from "runed";
 import { onMount } from "svelte";
 import { _ } from "svelte-i18n";
 import { toast } from "svelte-sonner";
 
-const TO_COMPLETE_PROMPT = "%G4TW%";
+// Initialize state
+
 const pressedKeys = new PressedKeys();
 
 const filename = $derived(decodeURIComponent(page.params.name));
@@ -26,7 +26,7 @@ let noteTitle = $state<string>();
 let generatingNote = $state<boolean>(false);
 let unsubWatcher = $state<UnwatchFn>();
 let sidebarOpened = $state(false);
-const content = $derived(note ? marked.parse(note.content) : "");
+let editorContent = $state<string>(""); // Track editor's raw markdown content
 
 function toggleSidebar() {
 	sidebarOpened = !sidebarOpened;
@@ -34,11 +34,42 @@ function toggleSidebar() {
 }
 
 async function fetchNote() {
-	note = await notesStore.fetchNote(filename);
-	noteTitle = note?.title ?? "";
+	const updatedNote = await notesStore.fetchNote(filename);
+
+	// Only update if the content has actually changed
+	// This prevents cursor reset and unnecessary rerenders
+	if (!note || note.content !== updatedNote.content) {
+		// Store editor content before updating note
+		const currentEditorContent = note?.content || "";
+
+		// Update the note
+		note = updatedNote;
+		noteTitle = updatedNote?.title ?? "";
+
+		// If editor content wasn't modified by the user (matches what was previously loaded)
+		// then we can safely update it with the markdown content
+		if (
+			editorContent === currentEditorContent ||
+			editorContent === "" ||
+			currentEditorContent === ""
+		) {
+			// Set raw markdown content - TipTap will parse it internally
+			editorContent = updatedNote.content || "";
+		} else {
+			console.debug("Note content changed externally while user was editing");
+		}
+	} else {
+		// Just update title if needed but keep content as is
+		if (note.title !== updatedNote.title) {
+			noteTitle = updatedNote.title ?? "";
+		}
+	}
 }
 
 async function onContentUpdate(markdownContent: string) {
+	// Update our tracked editor content - this is raw markdown
+	editorContent = markdownContent;
+	// Save to the store (still as markdown)
 	await notesStore.updateNote({ filename, content: markdownContent });
 }
 
@@ -79,54 +110,6 @@ function goBack() {
 	return window.history.back();
 }
 
-let completePromptCancellationToken: string | null = null;
-
-function getCurrentPromptCancellationToken(): string | null {
-	return completePromptCancellationToken;
-}
-
-async function completePrompt() {
-	if (!note) return;
-
-	await notesStore.updateNote({ filename: note.filename, content: "" });
-
-	const completePromptToken = generateCancellationToken();
-	completePromptCancellationToken = completePromptToken;
-
-	generatingNote = true;
-	note.content = "";
-
-	try {
-		await notesStore.completePrompt({
-			filename: note.filename,
-			prompt: note.filename,
-			isCompletionActive: () => {
-				return (
-					note != null &&
-					getCurrentPromptCancellationToken() === completePromptToken
-				);
-			},
-		});
-	} catch (error) {
-		let toastId = toast.error(`Failed to complete prompt: ${error}`, {
-			action: {
-				label: $_("notes.retry"),
-				onClick: () => {
-					toast.dismiss(toastId);
-					completePrompt();
-				},
-			},
-		});
-	} finally {
-		generatingNote = false;
-	}
-}
-
-async function stopGeneratingNote() {
-	generatingNote = false;
-	completePromptCancellationToken = null;
-}
-
 async function deleteNote() {
 	if (!deleteConfirmationMode) {
 		deleteConfirmationMode = true;
@@ -147,27 +130,11 @@ async function setupNoteWatcher() {
 	});
 }
 
-async function regenerateNote() {
-	if (!note) return;
-	await notesStore.updateNote({
-		filename: note.filename,
-		content: TO_COMPLETE_PROMPT,
-	});
-	note.content = TO_COMPLETE_PROMPT;
-	return toggleSidebar();
-}
-
 onMount(() => {
 	setupNoteWatcher();
 	return () => {
 		unsubWatcher?.();
 	};
-});
-
-$effect(() => {
-	if (!note) return;
-	if (note.content !== TO_COMPLETE_PROMPT) return;
-	completePrompt();
 });
 </script>
 
@@ -185,36 +152,15 @@ $effect(() => {
 				</SearchBarAccessoryLabel>
 			</TopBar>
 		  	<div class="pt-20 px-8 pb-8">
-				{#if note} 
-					<NoteEditor {content} editable={!generatingNote} onUpdate={onContentUpdate} {toggleSidebar} />
+				{#if note}
+					<NoteEditor content={editorContent} editable={!generatingNote} onUpdate={onContentUpdate} {toggleSidebar} />
 				{/if}
-
-				{#if generatingNote}
-				<div class="flex fixed bottom-4 right-4 left-4 justify-end">			
-					<div class="join">
-						<button type="button" class={clsx("btn btn-sm join-item", 'text-neutral-500')}>	
-							<SquareIcon size={16} class="text-neutral-500" onclick={stopGeneratingNote} />
-						</button>
-
-						<button type="button" class={clsx("btn btn-sm join-item", 'text-neutral-500')}>	
-							<LoaderCircleIcon class="animate-spin" size={16} />
-						</button>
-					</div>
-				</div>
-				{/if}
-		
 			</div>
 		</div>
   </div>
   <div id="sidebarContent" class="drawer-side z-20">
     <label for="sidebar" aria-label={$_("notes.closeSidebar")} class="drawer-overlay"></label>
     <ul class="menu menu-lg bg-base-200 text-base-content min-h-full w-80 p-4">
-		<li>
-			<button type="button" class="justify-between" onclick={regenerateNote} data-hotkey="a">
-      			<span>{$_("notes.regenerateWithAI")}</span>
-      			<kbd class="kbd">a</kbd>
-	  		</button>
-		</li>
       	<li>
 			<button type="button" class="justify-between" onclick={copyMarkdown} data-hotkey="c">
       			<span>{$_("notes.copyMarkdown")}</span>

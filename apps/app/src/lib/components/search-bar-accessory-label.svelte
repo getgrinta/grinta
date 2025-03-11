@@ -2,7 +2,7 @@
 import { THEME } from "$lib/store/settings.svelte";
 import { SystemThemeWatcher } from "$lib/utils.svelte";
 import clsx from "clsx";
-    import type { Snippet } from "svelte";
+import type { Snippet } from "svelte";
 
 const {
 	children,

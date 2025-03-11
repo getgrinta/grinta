@@ -1,6 +1,6 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { createMiddleware } from "hono/factory";
-import { auth } from "../auth";
+import { auth } from "../auth/index.js";
 
 export function createRouter() {
 	return new OpenAPIHono<{

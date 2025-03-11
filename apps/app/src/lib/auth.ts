@@ -3,16 +3,14 @@ import { stripeClient } from "@better-auth/stripe/client";
 import { fetch as tauriFetch } from "@tauri-apps/plugin-http";
 import { emailOTPClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/svelte";
-import { vaultStore } from "./store/vault.svelte";
+import { getHeaders } from "./utils.svelte";
 
 export function getAuthClient() {
 	return createAuthClient({
-		baseURL: env.PUBLIC_BETTER_AUTH_URL,
+		baseURL: env.PUBLIC_API_URL,
 		fetchOptions: {
 			customFetchImpl: tauriFetch,
-			headers: {
-				Cookie: vaultStore.data?.authCookie ?? "",
-			},
+			headers: getHeaders(),
 		},
 		plugins: [
 			emailOTPClient(),

@@ -1,29 +1,35 @@
-import { OpenAPIHono } from "@hono/zod-openapi";
-import type { auth } from "./auth";
-import { aiRouter } from "./routers/ai.router";
-import { authRouter } from "./routers/auth.router";
-import { docsRouter } from "./routers/docs.router";
-import { authSession } from "./utils/router.utils";
+import { logger } from "hono/logger";
+import { auth } from "./auth/index.js";
+import { aiRouter } from "./routers/ai.router.js";
+import { docsRouter } from "./routers/docs.router.js";
+import { usersRouter } from "./routers/users.router.js";
+import {
+	authSession,
+	authenticatedGuard,
+	createRouter,
+} from "./utils/router.utils.js";
 
-const app = new OpenAPIHono<{
-	Variables: {
-		user: typeof auth.$Infer.Session.user | null;
-		session: typeof auth.$Infer.Session.session | null;
-	};
-}>();
+const app = createRouter()
+	.doc("/openapi.json", {
+		openapi: "3.0.0",
+		info: {
+			version: "1.0.0",
+			title: "Grinta",
+		},
+	})
+	.use(logger())
+	.use("*", authSession)
+	.use("/api/ai/*", authenticatedGuard)
+	.use("/api/users/*", authenticatedGuard)
+	.on(["POST", "GET"], "/api/auth/*", (c) => {
+		return auth.handler(c.req.raw);
+	})
+	.route("/api/ai", aiRouter)
+	.route("/api/users", usersRouter)
+	.route("/docs", docsRouter);
 
-app.use("*", authSession);
+export type AppType = typeof app;
 
-app.route("/api/ai", aiRouter);
-app.route("/api/auth", authRouter);
-app.route("/docs", docsRouter);
-
-app.doc("/openapi.json", {
-	openapi: "3.0.0",
-	info: {
-		version: "1.0.0",
-		title: "Grinta",
-	},
-});
+export type { ContentType } from "./routers/ai.router.js";
 
 export default app;

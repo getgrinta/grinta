@@ -1,7 +1,6 @@
 import { createFsStorage } from "$lib/storage";
 import * as PathApi from "@tauri-apps/api/path";
 import dayjs from "dayjs";
-import { aiStore } from "./ai.svelte";
 import { COMMAND_HANDLER, commandsStore } from "./commands.svelte";
 import { settingsStore } from "./settings.svelte";
 
@@ -102,35 +101,6 @@ export class NotesStore {
 			value: filename,
 			handler: COMMAND_HANDLER.OPEN_NOTE,
 		});
-	}
-
-	async completePrompt({
-		filename,
-		prompt,
-		isCompletionActive,
-	}: { filename: string; prompt: string; isCompletionActive: () => boolean }) {
-		const note = await this.fetchNote(filename);
-		const result = aiStore.streamNoteText(prompt);
-		let content = note.content;
-
-		for await (const chunk of result.textStream) {
-			if (!isCompletionActive()) break;
-			content = note.content + chunk;
-			await this.updateNote({
-				filename,
-				content,
-			});
-			note.content = content;
-		}
-
-		if (!isCompletionActive()) return;
-
-		await this.updateNote({
-			filename,
-			content,
-		});
-
-		return note;
 	}
 
 	async deleteNote(filename: string) {

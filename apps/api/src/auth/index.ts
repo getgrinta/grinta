@@ -3,13 +3,14 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { emailOTP, openAPI } from "better-auth/plugins";
 import Stripe from "stripe";
-import { db } from "../db";
-import { env } from "../utils/env.utils";
-import { sendOtp } from "../utils/mail.utils";
+import { db } from "../db/index.js";
+import { env } from "../utils/env.utils.js";
+import { sendOtp } from "../utils/mail.utils.js";
 
 const stripeClient = new Stripe(env.STRIPE_SECRET_KEY);
 
 export const auth = betterAuth({
+	basePath: "/api/auth",
 	trustedOrigins: ["*"],
 	database: drizzleAdapter(db, {
 		provider: "pg",
@@ -20,6 +21,7 @@ export const auth = betterAuth({
 				await sendOtp({ to: email, code: otp });
 			},
 		}),
+		// @ts-expect-error
 		stripe({
 			stripeClient,
 			stripeWebhookSecret: env.STRIPE_WEBHOOK_SECRET,

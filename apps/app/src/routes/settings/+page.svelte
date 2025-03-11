@@ -1,9 +1,8 @@
 <script lang="ts">
 import { goto } from "$app/navigation";
-import SecondaryButton from "$lib/components/secondary-button.svelte";
+import PrimaryButton from "$lib/components/primary-button.svelte";
 import SegmentedControl from "$lib/components/segmented-control.svelte";
 import TopBar from "$lib/components/top-bar.svelte";
-import { aiStore } from "$lib/store/ai.svelte";
 import {
 	ACCENT_COLOR,
 	LANGUAGE,
@@ -27,18 +26,14 @@ const tabs = [
 
 let newToggleShortcut = $state<string[]>([]);
 let recordingShortcut = $state(false);
-let connectionStatus = $state<{
-	status: "loading" | "error" | "success";
-	text?: string;
-} | null>(null);
 let currentTab = $state("general");
 const themes = Object.keys(THEME);
 const searchEngines = Object.keys(SEARCH_ENGINE);
 const accentColors = Object.keys(ACCENT_COLOR);
 const languages = [
-	{ code: LANGUAGE.EN, name: $_("settings.languages.EN") },
-	{ code: LANGUAGE.PL, name: $_("settings.languages.PL") },
-	{ code: LANGUAGE.DE, name: $_("settings.languages.DE") },
+	{ code: LANGUAGE.EN, name: "English" },
+	{ code: LANGUAGE.PL, name: "Polski" },
+	{ code: LANGUAGE.DE, name: "Deutsch" },
 ];
 
 function changeTab(tab: string) {
@@ -75,8 +70,8 @@ function processShortcut(keys: string[]) {
 		.join("+");
 }
 
-function updateNotesDir(event: any) {
-	const notesDirSplit = event.target.value.split("/");
+function updateNotesDir(event: Event) {
+	const notesDirSplit = (event.target as HTMLInputElement).value.split("/");
 	return settingsStore.setNotesDir(notesDirSplit);
 }
 
@@ -85,18 +80,6 @@ const notesDirString = $derived(settingsStore.data.notesDir.join("/"));
 async function wipeLocalData() {
 	await settingsStore.wipeLocalData();
 	return goto("/");
-}
-
-async function testConnection() {
-	connectionStatus = {
-		status: "loading",
-		text: $_("settings.fields.testingConnection"),
-	};
-	const result = await aiStore.testConnection();
-	connectionStatus = {
-		status: result.success ? "success" : "error",
-		text: result.message,
-	};
 }
 
 $effect(() => {
@@ -148,13 +131,13 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
         <label class="text-sm">{$_("settings.fields.shortcut")}</label>
         <div class="flex gap-2 items-center">
           <input type="hidden" name="toggleShortcut" value={toggleShortcut} />
-          <SecondaryButton class="flex-1" disabled>{toggleShortcut}</SecondaryButton>
-          <SecondaryButton class="flex-1" onclick={toggleShortcutRecording}>{recordShortcutLabel}</SecondaryButton>
+          <PrimaryButton class="flex-1" disabled>{toggleShortcut}</PrimaryButton>
+          <PrimaryButton class="flex-1" onclick={toggleShortcutRecording}>{recordShortcutLabel}</PrimaryButton>
         </div>
         <label class="text-sm">{$_("settings.fields.version")}</label>
         <div class="flex gap-2 items-center">
-          <SecondaryButton class="flex-1" disabled>{packageJson.version}</SecondaryButton>
-          <SecondaryButton class="flex-1">{$_("settings.fields.checkForUpdate")}</SecondaryButton>
+          <PrimaryButton class="flex-1" disabled>{packageJson.version}</PrimaryButton>
+          <PrimaryButton class="flex-1">{$_("settings.fields.checkForUpdate")}</PrimaryButton>
         </div>
         <label class="text-sm">{$_("settings.fields.theme")}</label>
         <select name="theme" bind:value={settingsStore.data.theme} class="select select-bordered w-full">
@@ -177,7 +160,7 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
         <label class="text-sm">{$_("settings.language")}</label>
         <select name="language" bind:value={settingsStore.data.language} class="select select-bordered w-full">
         	{#each languages as language}
-          	<option value={language.code}>{$_(`settings.languages.${language.code}`)}</option>
+          	<option value={language.code}>{language.name}</option>
           {/each}
         </select>
         <label class="text-sm">{$_("settings.fields.dangerZone")}</label>
@@ -193,15 +176,6 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
         <input class="input w-full" type="password" name="secretKey" bind:value={settingsStore.data.aiSecretKey} />
         <label class="text-sm">{$_("settings.fields.ai.additionalContext")}</label>
         <textarea class="textarea w-full resize-none" placeholder="{$_("additionalContextPlaceholder")}" bind:value={settingsStore.data.aiAdditionalContext} />
-        <span></span>
-        <div>
-        <button type="button" class="btn btn-warning w-[100%]" onclick={testConnection}>{$_("settings.fields.ai.testConnection")}</button>
-        <div class={clsx("text-sm text-center mt-2", {
-          "text-success": connectionStatus?.status === "success",
-          "text-error": connectionStatus?.status === "error"
-        })}>{connectionStatus?.text}</div>
-      </div>
-    
       </form>
     {:else if currentTab === 'notes'}
       <form class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center">

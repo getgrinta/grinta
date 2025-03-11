@@ -1,7 +1,7 @@
 import { createRoute } from "@hono/zod-openapi";
 import { z } from "zod";
-import { auth } from "../auth";
-import { createRouter } from "../utils/router.utils";
+import { env } from "../utils/env.utils.js";
+import { createRouter } from "../utils/router.utils.js";
 
 export const MeSchema = z.object({
 	id: z.string(),
@@ -9,9 +9,8 @@ export const MeSchema = z.object({
 	email: z.string(),
 	emailVerified: z.boolean(),
 	image: z.string().nullable(),
+	subscription: z.any(),
 });
-
-export const authRouter = createRouter();
 
 const ME_ROUTE = createRoute({
 	method: "get",
@@ -28,13 +27,17 @@ const ME_ROUTE = createRoute({
 	},
 });
 
-authRouter.openapi(ME_ROUTE, (c) => {
+export const usersRouter = createRouter().openapi(ME_ROUTE, async (c) => {
 	const user = c.get("user");
-	if (!user) return c.text("Unauthorized", 401);
-	const sanitizedUser = MeSchema.parse(user);
+	const request = await fetch(
+		`${env.BETTER_AUTH_URL}/api/auth/subscription/list`,
+		{
+			headers: {
+				Cookie: c.req.header("Cookie") ?? "",
+			},
+		},
+	);
+	const subscription = request.ok ? await request.json() : {};
+	const sanitizedUser = MeSchema.parse({ ...user, subscription });
 	return c.json(sanitizedUser, 200);
-});
-
-authRouter.on(["POST", "GET"], "*", (c) => {
-	return auth.handler(c.req.raw);
 });

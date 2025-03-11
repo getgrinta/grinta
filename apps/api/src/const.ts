@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { env } from "./utils/env.utils";
+import { env } from "./utils/env.utils.js";
 
 export const AI_PROVIDER = {
 	MISTRAL: "MISTRAL",

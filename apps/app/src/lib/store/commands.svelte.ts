@@ -1,8 +1,10 @@
 import { goto } from "$app/navigation";
 import { appMetadataStore } from "$lib/store/app-metadata.svelte";
 import { generateCancellationToken } from "$lib/utils.svelte";
+import { until } from "@open-draft/until";
 import { type DirEntry, readDir, watch } from "@tauri-apps/plugin-fs";
 import { fetch } from "@tauri-apps/plugin-http";
+import { openPath, openUrl } from "@tauri-apps/plugin-opener";
 import { exit } from "@tauri-apps/plugin-process";
 import { Command } from "@tauri-apps/plugin-shell";
 import nlp from "compromise";
@@ -11,9 +13,9 @@ import numbersPlugin from "compromise-numbers";
 import { parse } from "equation-parser";
 import { resolve } from "equation-resolver";
 import { matchSorter } from "match-sorter";
-import { ResultAsync } from "neverthrow";
 import { uniq } from "rambda";
 import { _ } from "svelte-i18n";
+import { toast } from "svelte-sonner";
 import { get } from "svelte/store";
 import { P, match } from "ts-pattern";
 import { z } from "zod";
@@ -52,7 +54,6 @@ export const COMMAND_HANDLER = {
 	RUN_SHORTCUT: "RUN_SHORTCUT",
 	OPEN_NOTE: "OPEN_NOTE",
 	CREATE_NOTE: "CREATE_NOTE",
-	COMPLETE_NOTE: "COMPLETE_NOTE",
 	URL: "URL",
 	EMBEDDED_URL: "EMBEDDED_URL",
 } as const;
@@ -88,12 +89,21 @@ async function fetchCompletions(query: string) {
 	type CompletionResult = [string, string[]];
 	const encodedQuery = encodeURIComponent(query);
 	const completionUrl = `https://www.startpage.com/osuggestions?q=${encodedQuery}`;
-	return ResultAsync.fromPromise(
+	const { data: response, error: fetchError } = await until(() =>
 		fetch(completionUrl),
-		() => new Error("Failed to fetch completions"),
-	)
-		.map<CompletionResult>((res) => res.json())
-		.unwrapOr<CompletionResult>([encodedQuery, []]);
+	);
+	if (fetchError) {
+		toast.error("Failed to fetch completions");
+	}
+	if (!response) return [query, []] as CompletionResult;
+	const { data: json, error: jsonError } = await until<Error, CompletionResult>(
+		() => response.json(),
+	);
+	if (jsonError) {
+		toast.error("Failed to parse completions");
+	}
+	if (!json) return [query, []] as CompletionResult;
+	return json;
 }
 
 function buildFormulaCommands(currentQuery: string): ExecutableCommand[] {
@@ -168,11 +178,6 @@ async function buildQueryCommands(
 	return [
 		...completionList,
 		...literalSearch,
-		{
-			label: t("commands.actions.smartNote", { query }),
-			value: query,
-			handler: COMMAND_HANDLER.COMPLETE_NOTE,
-		},
 		{
 			label: t("commands.actions.createNote", { query }),
 			value: query,
@@ -277,13 +282,50 @@ export class CommandsStore extends SecureStore<Commands> {
 	}
 
 	async buildAppCommands() {
-		const appsFromApplications = await readDir("/Applications");
-		const appsFromSystemApplications = await readDir("/System/Applications");
+		// Use spotlight query through rust in the future
+		/*
+        let query = NSMetadataQuery()
+        query.searchScopes = [NSMetadataQueryLocalComputerScope]
+        query.predicate = NSPredicate(format: "kMDItemContentType == 'com.apple.application-bundle'")
+		*/
+
+		async function findAppsInDirectory(path: string): Promise<DirEntry[]> {
+			const entries = await readDir(path);
+			const apps: DirEntry[] = [];
+
+			for (const entry of entries) {
+				if (entry.isDirectory) {
+					if (entry.name.endsWith(".app")) {
+						apps.push(entry);
+					} else {
+						// Don't recurse into .app directories
+						if (!entry.name.includes(".app/")) {
+							try {
+								const subApps = await findAppsInDirectory(
+									`${path}/${entry.name}`,
+								);
+								apps.push(...subApps);
+							} catch {
+								// Permission errors
+							}
+						}
+					}
+				}
+			}
+
+			return apps;
+		}
+
+		const [appsFromApplications, appsFromSystemApplications] =
+			await Promise.all([
+				findAppsInDirectory("/Applications"),
+				findAppsInDirectory("/System/Applications"),
+			]);
+
 		this.installedApps = [
 			...appsFromApplications,
 			...appsFromSystemApplications,
-		].filter((app) => app.isDirectory && app.name.endsWith(".app"));
-
+		];
 		this.appCommands = await buildAppCommands(this.installedApps);
 	}
 
@@ -439,7 +481,7 @@ export class CommandsStore extends SecureStore<Commands> {
 	}
 
 	async openUrl(url: string) {
-		return Command.create("open", ["-u", url]).execute();
+		return openUrl(url);
 	}
 
 	async handleCommand(commandIndex: number | undefined) {
@@ -449,7 +491,6 @@ export class CommandsStore extends SecureStore<Commands> {
 			this.commandHistory[this.commandHistory.length - 1]?.value !==
 			command.value;
 		const commandsToSkip = [
-			COMMAND_HANDLER.COMPLETE_NOTE,
 			COMMAND_HANDLER.CREATE_NOTE,
 			COMMAND_HANDLER.SYSTEM,
 		] as string[];
@@ -531,12 +572,6 @@ export class CommandsStore extends SecureStore<Commands> {
 			.with({ handler: COMMAND_HANDLER.CREATE_NOTE }, async ({ value }) => {
 				const filename = await notesStore.createNote(value);
 				const encodedFilename = encodeURIComponent(filename);
-				return goto(`/notes/${encodedFilename}`);
-			})
-			.with({ handler: COMMAND_HANDLER.COMPLETE_NOTE }, async ({ value }) => {
-				const filename = await notesStore.createNote(value);
-				const encodedFilename = encodeURIComponent(filename);
-				await notesStore.updateNote({ filename, content: "%G4TW%" });
 				return goto(`/notes/${encodedFilename}`);
 			})
 			.with({ handler: COMMAND_HANDLER.RUN_SHORTCUT }, async ({ value }) => {

@@ -3,9 +3,14 @@ import { THEME } from "$lib/store/settings.svelte";
 import { SystemThemeWatcher } from "$lib/utils.svelte";
 import clsx from "clsx";
 
-const { children, onclick, hotkey, class: className } = $props<{
+const {
+	children,
+	onclick,
+	hotkey,
+	class: className,
+} = $props<{
 	onClick: () => void;
-    className?: string;
+	className?: string;
 	hotkey?: string;
 }>();
 

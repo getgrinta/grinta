@@ -3,7 +3,12 @@ import { goto } from "$app/navigation";
 import { getAuthClient } from "$lib/auth";
 import TopBar from "$lib/components/top-bar.svelte";
 import { appStore } from "$lib/store/app.svelte";
+import { getApiClient } from "$lib/utils.svelte";
+import { openUrl } from "@tauri-apps/plugin-opener";
+import { onMount } from "svelte";
 
+let profile = $state();
+const apiClient = getApiClient();
 const authClient = getAuthClient();
 
 function goBack() {
@@ -11,14 +16,28 @@ function goBack() {
 }
 
 async function upgradeToPro() {
-	const data = await authClient.subscription.upgrade({
+	const { data } = await authClient.subscription.upgrade({
 		plan: "pro",
 		successUrl: "/profile",
 		cancelUrl: "/profile",
 		uiMode: "hosted",
+		disableRedirect: true,
 	});
-	console.log(data);
+	if (!data?.url) return;
+	await openUrl(data.url);
 }
+
+async function fetchProfile() {
+	const res = await apiClient.api.auth.me.$get();
+	console.log(res);
+	// profile = await json()
+}
+
+onMount(fetchProfile);
+
+$effect(() => {
+	console.log(profile);
+});
 </script>
 
 <div class="flex flex-1 flex-col">
