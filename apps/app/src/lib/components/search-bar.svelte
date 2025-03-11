@@ -106,6 +106,9 @@ async function handleNavigation(event: KeyboardEvent) {
 		if (shouldGoBack) return window.history.back();
 		return switchMode(BAR_MODE.MENU);
 	}
+	if (event.key === "p" && event.metaKey) {
+		return settingsStore.toggleIncognito();
+	}
 	if (event.key === "n" && event.metaKey) {
 		return createNote();
 	}

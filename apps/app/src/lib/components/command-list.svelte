@@ -71,13 +71,13 @@ const scrollToIndex = $derived(
 const systemThemeWatcher = new SystemThemeWatcher();
 </script>
 
-<div class="flex flex-1 flex-col mt-[5rem] overflow-hidden">
+<div class="flex flex-1 flex-col mt-[4.25rem] overflow-hidden">
   <ul
   	id="commandList"
     class="menu menu-lg flex-1 menu-vertical flex-nowrap w-full p-0"
   >
-	<VirtualList scrollToIndex={scrollToIndex} width="100%" height={316} {itemCount} itemSize={65}>
-		<li let:index class="!w-[calc(100%-2rem)] mx-4 !mb-4" data-command-index={index} slot="item" let:style transition:fade={{ duration: 150 }} {style}>
+	<VirtualList scrollToIndex={scrollToIndex} width="100%" height={328} {itemCount} itemSize={65}>
+		<li let:index class="!w-[calc(100%-2rem)] !m-4" data-command-index={index} slot="item" let:style transition:fade={{ duration: 150 }} {style}>
 			{@const active = commandsStore.selectedIndex === index}
 			{@const IconComponent = getIcon(commandsStore.commands[index].handler)}
 			{@const command = commandsStore.commands[index]}

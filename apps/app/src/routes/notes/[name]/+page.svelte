@@ -151,7 +151,7 @@ onMount(() => {
 					{/if}
 				</SearchBarAccessoryLabel>
 			</TopBar>
-		  	<div class="pt-20 px-8 pb-8">
+		  	<div class="mt-24 px-8 pb-8">
 				{#if note}
 					<NoteEditor content={editorContent} editable={!generatingNote} onUpdate={onContentUpdate} {toggleSidebar} />
 				{/if}
