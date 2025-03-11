@@ -31,3 +31,6 @@ export const sanitizedSubscriptionSchema = z.object({
 	status: z.union([z.literal("active"), z.literal("trialing")]),
 	periodEnd: z.string(),
 });
+
+export type Subscription = z.infer<typeof subscriptionSchema>;
+export type SanitizedSubscription = z.infer<typeof sanitizedSubscriptionSchema>;

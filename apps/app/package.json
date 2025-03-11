@@ -42,6 +42,7 @@
 		"@tiptap/extension-underline": "2.11.5",
 		"@tiptap/starter-kit": "2.11.5",
 		"@tiptap/suggestion": "2.11.5",
+		"aggregate-error": "^5.0.0",
 		"ai": "4.1.54",
 		"better-auth": "1.2.3",
 		"clsx": "2.1.1",

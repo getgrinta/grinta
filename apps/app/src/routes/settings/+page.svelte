@@ -10,7 +10,6 @@ import {
 	THEME,
 	settingsStore,
 } from "$lib/store/settings.svelte";
-import { clsx } from "clsx";
 import humanizeString from "humanize-string";
 import { PressedKeys, watch } from "runed";
 import { _ } from "svelte-i18n";
@@ -20,8 +19,7 @@ const pressedKeys = new PressedKeys();
 
 const tabs = [
 	{ label: $_("settings.tabs.general"), value: "general", hotkey: "⌘1" },
-	{ label: $_("settings.tabs.ai"), value: "ai", hotkey: "⌘2" },
-	{ label: $_("settings.tabs.notes"), value: "notes", hotkey: "⌘3" },
+	{ label: $_("settings.tabs.notes"), value: "notes", hotkey: "⌘2" },
 ];
 
 let newToggleShortcut = $state<string[]>([]);
@@ -108,6 +106,16 @@ watch(
 );
 
 const isCmdPressed = $derived(pressedKeys.has("Meta"));
+
+const controls = $derived(
+	tabs.map((tab, i) => ({
+		text: $_(tab.label),
+		onClick: () => changeTab(tab.value),
+		active: currentTab === tab.value,
+		shortcut: isCmdPressed ? tab.hotkey : undefined,
+		hotkey: `Mod+${i + 1}`,
+	})),
+);
 </script>
 
 <div class="flex flex-1 flex-col">
@@ -115,17 +123,12 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
     <div slot="input" class="grow flex-1 truncate text-lg font-semibold">{$_("settings.title")}</div>
     <div slot="addon" role="tablist" class="join">
       <SegmentedControl
-      size="lg"
-        items={tabs.map((tab, index) => ({
-          text: $_(tab.label),
-          onClick: () => changeTab(tab.value),
-          active: currentTab === tab.value,
-          shortcut: isCmdPressed ? tab.hotkey : undefined
-        }))}
+        size="lg"
+        items={controls}
       />
     </div>
   </TopBar>
-   <div class="flex flex-1 flex-col mt-20 mb-8 mx-4">
+   <div class="flex flex-1 flex-col mt-24 mb-8 mx-8">
     {#if currentTab === 'general'}
       <form class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center">
         <label class="text-sm">{$_("settings.fields.shortcut")}</label>
@@ -145,7 +148,7 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
           	<option value={theme}>{humanizeString(theme)}</option>
           {/each}
         </select>
-		<label class="text-sm">{$_("settings.fields.defaultSearchEngine")}</label>
+		    <label class="text-sm">{$_("settings.fields.defaultSearchEngine")}</label>
         <select name="theme" bind:value={settingsStore.data.defaultSearchEngine} class="select select-bordered w-full">
         	{#each searchEngines as searchEngine}
           	<option value={searchEngine}>{humanizeString(searchEngine)}</option>
@@ -165,17 +168,6 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
         </select>
         <label class="text-sm">{$_("settings.fields.dangerZone")}</label>
         <button type="button" class="btn btn-warning" onclick={wipeLocalData}>{$_("settings.fields.wipeAllLocalData")}</button>
-      </form>
-    {:else if currentTab === 'ai'}
-      <form class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center"> 
-        <label class="text-sm">{$_("settings.fields.ai.modelName")}</label>
-        <input class="input w-full" name="modelName" placeholder="gpt-4o" bind:value={settingsStore.data.aiModelName} />
-        <label class="text-sm">{$_("settings.fields.ai.customEndpoint")}</label>
-        <input class="input w-full" name="endpointUrl" placeholder="https://api.openai.com/v1" bind:value={settingsStore.data.aiEndpointUrl} />
-        <label class="text-sm">{$_("settings.fields.ai.tokenSecret")}</label>
-        <input class="input w-full" type="password" name="secretKey" bind:value={settingsStore.data.aiSecretKey} />
-        <label class="text-sm">{$_("settings.fields.ai.additionalContext")}</label>
-        <textarea class="textarea w-full resize-none" placeholder="{$_("additionalContextPlaceholder")}" bind:value={settingsStore.data.aiAdditionalContext} />
       </form>
     {:else if currentTab === 'notes'}
       <form class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center">

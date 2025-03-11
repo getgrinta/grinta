@@ -1,4 +1,6 @@
 import { getAuthClient } from "$lib/auth";
+import { fail, getApiClient } from "$lib/utils.svelte";
+import type { SanitizedSubscription } from "@getgrinta/api";
 import { until } from "@open-draft/until";
 import { type Window, getCurrentWindow } from "@tauri-apps/api/window";
 import type { Session, User } from "better-auth";
@@ -28,19 +30,43 @@ export class AppStore {
 	appWindow = $state<Window>();
 	session = $state<Session>();
 	user = $state<User>();
+	subscriptions = $state<SanitizedSubscription[]>([]);
 
 	constructor() {
 		this.appWindow = getCurrentWindow();
 	}
 
-	async setSession() {
+	setSessionData({ session, user }: { session: Session; user: User }) {
+		this.session = session;
+		this.user = user;
+	}
+
+	async fetchSession() {
+		const apiClient = getApiClient();
 		const authClient = getAuthClient();
-		const { data, error } = await until(authClient.getSession);
-		if (error) {
-			console.log("No session found");
+		const { data: sessionData, error: sessionError } =
+			await authClient.getSession();
+		if (sessionError) {
+			throw fail("Session error", new Error(sessionError.message));
 		}
-		this.session = data?.data?.session;
-		this.user = data?.data?.user;
+		console.log(sessionData);
+		this.setSessionData(sessionData);
+		const { data: profileRequest, error: profileRequestError } = await until(
+			() => apiClient.api.users.me.$get(),
+		);
+		if (profileRequestError) {
+			throw fail("Profile request error", profileRequestError);
+		}
+		if (!profileRequest) {
+			throw fail("Profile request error");
+		}
+		const { data: profile, error: profileError } = await until(() =>
+			profileRequest.json(),
+		);
+		if (profileError) {
+			throw fail("Profile error", profileError);
+		}
+		this.subscriptions = profile?.subscriptions ?? [];
 	}
 
 	async switchMode(mode: string) {

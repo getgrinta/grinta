@@ -140,7 +140,7 @@ async function initializeApp() {
 	initializing = true;
 	await setupI18n();
 	await vaultStore.initialize();
-	await appStore.setSession();
+	await appStore.fetchSession();
 	await commandsStore.initialize();
 	await settingsStore.initialize();
 	await clipboardStore.initialize();

@@ -31,5 +31,6 @@ const app = createRouter()
 export type AppType = typeof app;
 
 export type { ContentType } from "./routers/ai.router.js";
+export type { SanitizedSubscription } from "./utils/schema.utils.js";
 
 export default app;
