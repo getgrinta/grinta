@@ -1,13 +1,17 @@
 import { z } from "zod";
 import { BAR_MODE, appStore } from "./app.svelte";
-import {
-	type ExecutableCommand,
-	ExecutableCommandSchema,
-} from "./commands.svelte";
+import { ExecutableCommandSchema } from "./commands.svelte";
 import { SecureStore } from "./secure.svelte";
 
+export const WidgetSchema = z.object({
+	type: z.enum(["command"]),
+	data: ExecutableCommandSchema,
+});
+
+type Widget = z.infer<typeof WidgetSchema>;
+
 export const WidgetsSchema = z.object({
-	widgets: z.array(ExecutableCommandSchema).default([]),
+	widgets: z.array(WidgetSchema).default([]),
 });
 
 type Widgets = z.infer<typeof WidgetsSchema>;
@@ -23,7 +27,7 @@ export class WidgetsStore extends SecureStore<Widgets> {
 		await this.restore();
 	}
 
-	addWidget(widget: ExecutableCommand) {
+	addWidget(widget: Widget) {
 		const widgets = this.data.widgets ?? [];
 		this.updateData({
 			widgets: [...widgets, widget],

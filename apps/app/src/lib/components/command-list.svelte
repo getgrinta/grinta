@@ -28,7 +28,11 @@ const contextMenuItems: MenuItem[] = [
 	{
 		label: "Pin",
 		icon: PinIcon as any,
-		onClick: (context) => widgetsStore.addWidget(context as ExecutableCommand),
+		onClick: (context) =>
+			widgetsStore.addWidget({
+				type: "command",
+				data: context as ExecutableCommand,
+			}),
 	},
 ];
 

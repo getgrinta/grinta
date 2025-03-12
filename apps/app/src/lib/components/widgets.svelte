@@ -22,13 +22,13 @@ $effect(clickListener);
 <ContextMenu name="widgets" items={contextMenuItems} />
 
 {#if widgetsStore.showWidgets}
-    <div class="absolute left-0 right-0 top-20 carousel gap-2 !px-4 z-10">
+    <div class="absolute left-0 right-0 top-20 carousel gap-2 z-10">
         {#each widgets as widget, i}
-			{@const IconComponent = getIcon(widget.handler)}
+			{@const IconComponent = getIcon(widget.data.handler)}
             <div class="carousel-item select-none" oncontextmenu={(event) => handleContextMenu({ event, name: "widgets", context: { i } })}>
-                <button type="button" class={clsx("btn", i === 0 && "ml-4")} onclick={() => commandsStore.handleCommand(widget)}>
+                <button type="button" class={clsx("btn", i === 0 && "ml-4", i === widgets.length - 1 && "mr-4")} onclick={() => commandsStore.handleCommand(widget.data)}>
                     <IconComponent size={20} />
-                    <span>{widget.localizedLabel ?? widget.label}</span>
+                    <span>{widget.data.localizedLabel ?? widget.data.label}</span>
                 </button>
             </div>
         {/each}
