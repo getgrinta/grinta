@@ -145,6 +145,7 @@ async function initializeApp() {
 	await commandsStore.initialize();
 	await settingsStore.initialize();
 	await clipboardStore.initialize();
+	await widgetsStore.initialize();
 	appMetadataStore.initializeIcons();
 	initTrayIcon();
 
