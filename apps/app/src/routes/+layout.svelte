@@ -146,7 +146,11 @@ async function initializeApp() {
 	await clipboardStore.initialize();
 	appMetadataStore.initializeIcons();
 	initTrayIcon();
-	moveWindow(Position.TopCenter);
+
+	moveWindow(Position.TopCenter).then(() => {
+		appStore.appWindow?.show();
+	});
+
 	initializing = false;
 }
 

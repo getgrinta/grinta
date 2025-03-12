@@ -26,6 +26,7 @@
 				"minimizable": false,
 				"resizable": false,
 				"closable": false,
+				"visible": false,
 				"windowEffects": {
 					"effects": ["blur"],
 					"state": "active"
