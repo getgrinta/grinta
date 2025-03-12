@@ -1,6 +1,7 @@
 import { logger } from "hono/logger";
 import { auth } from "./auth/index.js";
 import { aiRouter } from "./routers/ai.router.js";
+import { dataRouter } from "./routers/data.router.js";
 import { docsRouter } from "./routers/docs.router.js";
 import { usersRouter } from "./routers/users.router.js";
 import {
@@ -26,6 +27,7 @@ const app = createRouter()
 	})
 	.route("/api/ai", aiRouter)
 	.route("/api/users", usersRouter)
+	.route("/api/data", dataRouter)
 	.route("/docs", docsRouter);
 
 export type AppType = typeof app;
