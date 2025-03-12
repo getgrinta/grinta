@@ -41,14 +41,14 @@ export function parseMathExpression(query: string): ExecutableCommand[] {
 export function parseRelativeTime(query: string): ExecutableCommand[] {
 	const doc = nlp(query);
 	const nlpMatch = doc.match(
-		"[<have>#Value+] (minute|minutes|hour|hours|day|days|week|weeks|month|months|year|years) (ago|from now)",
+		"[<ordinal>#Value+] (minute|minutes|hour|hours|day|days|week|weeks|month|months|year|years) (ago|from) [<reference>#Date+]?",
 	);
 
 	if (!nlpMatch.found) {
 		return [];
 	}
 
-	const numberText = Number(nlpMatch.groups("have").text());
+	const numberText = Number(nlpMatch.groups("ordinal").text());
 	const unit = nlpMatch
 		.match(
 			"(minute|minutes|hour|hours|day|days|week|weeks|month|months|year|years)",
@@ -66,7 +66,21 @@ export function parseRelativeTime(query: string): ExecutableCommand[] {
 		.with("year", "years", () => msPerDay * 365)
 		.exhaustive();
 
-	const date = new Date(Date.now() + ms * numberText * direction);
+	let referenceDate: number;
+
+	if (direction === -1) {
+		referenceDate = Date.now();
+	} else {
+		const referenceGroups = nlpMatch.groups("reference").dates().get();
+
+		if (referenceGroups.length > 0) {
+			referenceDate = Number(new Date(referenceGroups[0].start));
+		} else {
+			referenceDate = Date.now();
+		}
+	}
+
+	const date = new Date(referenceDate + ms * numberText * direction);
 	const value = date.toISOString();
 	const label = match(unit)
 		.with("minute", "minutes", "hour", "hours", () =>
