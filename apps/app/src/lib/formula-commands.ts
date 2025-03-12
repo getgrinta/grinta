@@ -40,47 +40,62 @@ export function parseMathExpression(query: string): ExecutableCommand[] {
 
 export function parseRelativeTime(query: string): ExecutableCommand[] {
 	const doc = nlp(query);
-	const nlpMatch = doc.match(
-		"[<ordinal>#Value+] (minute|minutes|hour|hours|day|days|week|weeks|month|months|year|years) (ago|from) [<reference>#Date+]?",
-	);
+	let unit: TimeUnit;
+	let date: Date;
 
-	if (!nlpMatch.found) {
-		return [];
-	}
+	const simpleDateMatch = doc.match("(next|last|past) [<reference>#Date+]?");
 
-	const numberText = Number(nlpMatch.groups("ordinal").text());
-	const unit = nlpMatch
-		.match(
-			"(minute|minutes|hour|hours|day|days|week|weeks|month|months|year|years)",
-		)
-		.text() as TimeUnit;
-	const direction = nlpMatch.has("ago") ? -1 : 1;
+	if (simpleDateMatch.found) {
+		const referenceDates = simpleDateMatch.groups("reference").dates().get();
 
-	const msPerDay = 24 * 60 * 60 * 1000;
-	const ms = match(unit)
-		.with("minute", "minutes", () => 60 * 1000)
-		.with("hour", "hours", () => 60 * 60 * 1000)
-		.with("day", "days", () => msPerDay)
-		.with("week", "weeks", () => msPerDay * 7)
-		.with("month", "months", () => msPerDay * 30)
-		.with("year", "years", () => msPerDay * 365)
-		.exhaustive();
-
-	let referenceDate: number;
-
-	if (direction === -1) {
-		referenceDate = Date.now();
-	} else {
-		const referenceGroups = nlpMatch.groups("reference").dates().get();
-
-		if (referenceGroups.length > 0) {
-			referenceDate = Number(new Date(referenceGroups[0].start));
-		} else {
-			referenceDate = Date.now();
+		if (referenceDates.length === 0) {
+			return [];
 		}
-	}
 
-	const date = new Date(referenceDate + ms * numberText * direction);
+		date = new Date(referenceDates[0].start);
+	} else {
+		const nlpMatch = doc.match(
+			"[<ordinal>#Value+] (minute|minutes|hour|hours|day|days|week|weeks|month|months|year|years) (ago|from) [<reference>#Date+]?",
+		);
+
+		if (!nlpMatch.found) {
+			return [];
+		}
+
+		const numberText = Number(nlpMatch.groups("ordinal").text());
+		unit = nlpMatch
+			.match(
+				"(minute|minutes|hour|hours|day|days|week|weeks|month|months|year|years)",
+			)
+			.text() as TimeUnit;
+		const direction = nlpMatch.has("ago") ? -1 : 1;
+
+		const msPerDay = 24 * 60 * 60 * 1000;
+		const ms = match(unit)
+			.with("minute", "minutes", () => 60 * 1000)
+			.with("hour", "hours", () => 60 * 60 * 1000)
+			.with("day", "days", () => msPerDay)
+			.with("week", "weeks", () => msPerDay * 7)
+			.with("month", "months", () => msPerDay * 30)
+			.with("year", "years", () => msPerDay * 365)
+			.exhaustive();
+
+		let referenceDate: number;
+
+		if (direction === -1) {
+			referenceDate = Date.now();
+		} else {
+			const referenceGroups = nlpMatch.groups("reference").dates().get();
+
+			if (referenceGroups.length > 0) {
+				referenceDate = Number(new Date(referenceGroups[0].start));
+			} else {
+				referenceDate = Date.now();
+			}
+		}
+
+		date = new Date(referenceDate + ms * numberText * direction);
+	}
 	const value = date.toISOString();
 	const label = match(unit)
 		.with("minute", "minutes", "hour", "hours", () =>
