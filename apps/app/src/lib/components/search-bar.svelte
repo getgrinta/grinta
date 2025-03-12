@@ -10,7 +10,7 @@ import { BAR_MODE, type BarMode, appStore } from "$lib/store/app.svelte";
 import { commandsStore } from "$lib/store/commands.svelte";
 import { notesStore } from "$lib/store/notes.svelte";
 import { THEME, settingsStore } from "$lib/store/settings.svelte";
-import { SystemThemeWatcher } from "$lib/utils.svelte";
+import { SystemThemeWatcher } from "$lib/system-theme-watcher.svelte";
 import { clsx } from "clsx";
 import { createForm } from "felte";
 import {

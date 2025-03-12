@@ -1,16 +1,16 @@
-import { afterEach, beforeEach, mock } from "bun:test";
+import { mock } from "bun:test";
 import { readFileSync } from "node:fs";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
+import { mockWindows } from "@tauri-apps/api/mocks";
 import { plugin } from "bun";
+import BunPluginSvelte from "bun-plugin-svelte";
 import { compile } from "svelte/compiler";
 
-beforeEach(async () => {
-	await GlobalRegistrator.register();
-});
+GlobalRegistrator.register();
 
-afterEach(async () => {
-	await GlobalRegistrator.unregister();
-});
+mockWindows("main");
+
+plugin(BunPluginSvelte);
 
 plugin({
 	name: "svelte loader",
@@ -59,14 +59,6 @@ plugin({
 			return {
 				exports: {
 					goto: mock((path: string) => {}),
-				},
-				loader: "object",
-			};
-		});
-		builder.module("runed", () => {
-			return {
-				exports: {
-					useEventListener: mock(() => {}),
 				},
 				loader: "object",
 			};

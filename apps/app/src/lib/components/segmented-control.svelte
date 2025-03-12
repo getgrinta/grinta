@@ -1,6 +1,6 @@
 <script lang="ts">
 import { THEME } from "$lib/store/settings.svelte";
-import { SystemThemeWatcher } from "$lib/utils.svelte";
+import { SystemThemeWatcher } from "$lib/system-theme-watcher.svelte";
 import clsx from "clsx";
 import { match } from "ts-pattern";
 type Item = {

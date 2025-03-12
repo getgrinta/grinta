@@ -4,6 +4,7 @@ Maintain the existing structure of the README.md file
 Use /apps/website/src/content/docs as the main documentation directory.
 Use Svelte 5 for the UI.
 The desktop app is developed with Tauri.
+Do not run any server commands if not asked.
 
 // Code guidelines
 This project uses Bun as the JavaScript and TypeScript runtime.

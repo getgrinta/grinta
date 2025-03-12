@@ -9,8 +9,8 @@ import {
 } from "$lib/store/commands.svelte";
 import { THEME } from "$lib/store/settings.svelte";
 import { widgetsStore } from "$lib/store/widgets.svelte";
+import { SystemThemeWatcher } from "$lib/system-theme-watcher.svelte";
 import {
-	SystemThemeWatcher,
 	clickListener,
 	getIcon,
 	handleContextMenu,
@@ -23,7 +23,6 @@ import VirtualList from "svelte-tiny-virtual-list";
 import { fade } from "svelte/transition";
 import { P, match } from "ts-pattern";
 import ContextMenu, { type MenuItem } from "./context-menu.svelte";
-
 const contextMenuItems: MenuItem[] = [
 	{
 		label: "Pin",
@@ -86,7 +85,7 @@ $effect(clickListener);
 <VirtualList scrollToIndex={scrollToIndex} width="100%" height={396} {itemCount} itemSize={65}>
 	<li 
 		let:index 
-		class="!w-[calc(100%-2rem)] mx-4 select-none" 
+		class={clsx("!w-[calc(100%-2rem)] mx-4 select-none", commandsStore.commands[index].smartMatch && "border-gradient")} 
 		data-command-index={index} 
 		slot="item" 
 		let:style 

@@ -16,49 +16,10 @@ import {
 	Layers2Icon,
 	StickyNoteIcon,
 } from "lucide-svelte";
-import { useEventListener } from "runed";
 import { match } from "ts-pattern";
 import { BAR_MODE, appStore } from "./store/app.svelte";
 import { COMMAND_HANDLER, type CommandHandler } from "./store/commands.svelte";
-import { settingsStore } from "./store/settings.svelte";
 import { vaultStore } from "./store/vault.svelte";
-
-const THEME_QUERY = "(prefers-color-scheme: dark)";
-
-const THEME = {
-	DARK: "DARK",
-	LIGHT: "LIGHT",
-} as const;
-
-type Theme = keyof typeof THEME;
-
-export class SystemThemeWatcher {
-	systemTheme = $state<Theme>();
-	theme = $derived(
-		settingsStore.data.theme === "SYSTEM"
-			? (this.systemTheme ?? "DARK")
-			: settingsStore.data.theme,
-	);
-
-	constructor() {
-		this.setInitialSystemTheme();
-		useEventListener(
-			() => window.matchMedia(THEME_QUERY),
-			"change",
-			this.handleSystemThemeChange,
-		);
-	}
-
-	setInitialSystemTheme() {
-		this.systemTheme = window?.matchMedia?.(THEME_QUERY)?.matches
-			? THEME.DARK
-			: THEME.LIGHT;
-	}
-
-	handleSystemThemeChange(event: MediaQueryListEvent) {
-		this.systemTheme = event.matches ? THEME.DARK : THEME.LIGHT;
-	}
-}
 
 export async function installHotkeys() {
 	for (const el of document.querySelectorAll("[data-hotkey]")) {

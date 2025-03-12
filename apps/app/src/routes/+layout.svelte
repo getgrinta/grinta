@@ -12,8 +12,8 @@ import { commandsStore } from "$lib/store/commands.svelte";
 import { THEME, settingsStore } from "$lib/store/settings.svelte";
 import { vaultStore } from "$lib/store/vault.svelte";
 import { widgetsStore } from "$lib/store/widgets.svelte";
+import { SystemThemeWatcher } from "$lib/system-theme-watcher.svelte";
 import { installHotkeys } from "$lib/utils.svelte";
-import { SystemThemeWatcher } from "$lib/utils.svelte";
 import { defaultWindowIcon } from "@tauri-apps/api/app";
 import { invoke } from "@tauri-apps/api/core";
 import { Menu } from "@tauri-apps/api/menu";
@@ -73,6 +73,15 @@ async function initTrayIcon() {
 					appStore.appWindow?.show();
 					appStore.appWindow?.setFocus();
 					return goto(`/commands/${BAR_MODE.NOTES}`);
+				},
+			},
+			{
+				id: "clipboard",
+				text: "Clipboard",
+				action() {
+					appStore.appWindow?.show();
+					appStore.appWindow?.setFocus();
+					return goto(`/commands/${BAR_MODE.CLIPBOARD}`);
 				},
 			},
 			{

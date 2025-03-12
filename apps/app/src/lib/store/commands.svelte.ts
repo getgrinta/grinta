@@ -1,5 +1,10 @@
 import { goto } from "$app/navigation";
-import { parseMathExpression, parseRelativeTime } from "$lib/formula-commands";
+import {
+	parseFraction,
+	parseMathExpression,
+	parseRelativeTime,
+	parseTextMathExpression,
+} from "$lib/formula-commands";
 import { appMetadataStore } from "$lib/store/app-metadata.svelte";
 import { generateCancellationToken } from "$lib/utils.svelte";
 import { until } from "@open-draft/until";
@@ -45,7 +50,6 @@ const HOSTNAME_REGEX = /[a-zA-Z0-9\-\.]{1,61}\.[a-zA-Z]{2,}/;
 
 // The order is important for command sorting.
 export const COMMAND_HANDLER = {
-	SMART_MATCH: "SMART_MATCH",
 	SYSTEM: "SYSTEM",
 	APP: "APP",
 	CHANGE_MODE: "CHANGE_MODE",
@@ -67,6 +71,7 @@ export const ExecutableCommandSchema = z.object({
 	localizedLabel: z.string().optional(),
 	value: z.string(),
 	handler: z.nativeEnum(COMMAND_HANDLER),
+	smartMatch: z.boolean().optional().default(false),
 });
 
 export type ExecutableCommand = z.infer<typeof ExecutableCommandSchema>;
@@ -114,6 +119,18 @@ function buildFormulaCommands(currentQuery: string): ExecutableCommand[] {
 		return mathCommands;
 	}
 
+	// Try parsing text-based math expressions like "five times seven"
+	const textMathCommands = parseTextMathExpression(currentQuery);
+	if (textMathCommands.length > 0) {
+		return textMathCommands;
+	}
+
+	// Try parsing text fractions like "two thirds"
+	const fractionCommands = parseFraction(currentQuery);
+	if (fractionCommands.length > 0) {
+		return fractionCommands;
+	}
+
 	// Try parsing relative time expressions
 	const timeCommands = parseRelativeTime(currentQuery);
 	if (timeCommands.length > 0) {
@@ -135,6 +152,7 @@ async function buildAppCommands(
 			localizedLabel: localizedName,
 			value: app.name,
 			handler: COMMAND_HANDLER.APP,
+			smartMatch: false,
 		};
 	});
 }
@@ -144,6 +162,7 @@ function buildNoteCommands(notes: Note[]): ExecutableCommand[] {
 		label: note.title,
 		value: note.filename,
 		handler: COMMAND_HANDLER.OPEN_NOTE,
+		smartMatch: false,
 	}));
 }
 
@@ -153,6 +172,7 @@ function buildShortcutCommands(stdout: string) {
 		label: shortcut,
 		value: shortcut,
 		handler: COMMAND_HANDLER.RUN_SHORTCUT,
+		smartMatch: false,
 	}));
 }
 
@@ -165,6 +185,7 @@ async function buildQueryCommands(
 			label: t("commands.actions.search", { query }),
 			value: settingsStore.getSearchUrl(query),
 			handler: COMMAND_HANDLER.URL,
+			smartMatch: false,
 		},
 	];
 	if (query.length < 3) return queryMatchSearch;
@@ -175,6 +196,7 @@ async function buildQueryCommands(
 			label: completion,
 			value: settingsStore.getSearchUrl(completionQuery),
 			handler: COMMAND_HANDLER.URL,
+			smartMatch: false,
 		};
 	});
 	const literalSearch = completionList.length > 0 ? [] : queryMatchSearch;
@@ -185,6 +207,7 @@ async function buildQueryCommands(
 			label: t("commands.actions.createNote", { query }),
 			value: query,
 			handler: COMMAND_HANDLER.CREATE_NOTE,
+			smartMatch: false,
 		},
 	].filter((a) => a.label !== excludeResult);
 }
@@ -220,6 +243,7 @@ export class CommandsStore extends SecureStore<Commands> {
 						label: t("commands.menuItems.profile"),
 						value: SYSTEM_COMMAND.PROFILE,
 						handler: COMMAND_HANDLER.SYSTEM,
+						smartMatch: false,
 					},
 				]
 			: [
@@ -227,6 +251,7 @@ export class CommandsStore extends SecureStore<Commands> {
 						label: t("commands.menuItems.signIn"),
 						value: SYSTEM_COMMAND.SIGN_IN,
 						handler: COMMAND_HANDLER.SYSTEM,
+						smartMatch: false,
 					},
 				];
 		return [
@@ -235,31 +260,37 @@ export class CommandsStore extends SecureStore<Commands> {
 				label: t("commands.menuItems.clipboardHistory"),
 				value: SYSTEM_COMMAND.CLIPBOARD,
 				handler: COMMAND_HANDLER.SYSTEM,
+				smartMatch: false,
 			},
 			{
 				label: t("commands.menuItems.clearNotes"),
 				value: SYSTEM_COMMAND.CLEAR_NOTES,
 				handler: COMMAND_HANDLER.SYSTEM,
+				smartMatch: false,
 			},
 			{
 				label: t("commands.menuItems.clearHistory"),
 				value: SYSTEM_COMMAND.CLEAR_HISTORY,
 				handler: COMMAND_HANDLER.SYSTEM,
+				smartMatch: false,
 			},
 			{
 				label: t("commands.menuItems.help"),
 				value: SYSTEM_COMMAND.HELP,
 				handler: COMMAND_HANDLER.SYSTEM,
+				smartMatch: false,
 			},
 			{
 				label: t("commands.menuItems.settings"),
 				value: SYSTEM_COMMAND.SETTINGS,
 				handler: COMMAND_HANDLER.SYSTEM,
+				smartMatch: false,
 			},
 			{
 				label: t("commands.menuItems.exit"),
 				value: SYSTEM_COMMAND.EXIT,
 				handler: COMMAND_HANDLER.SYSTEM,
+				smartMatch: false,
 			},
 		];
 	}
@@ -272,6 +303,7 @@ export class CommandsStore extends SecureStore<Commands> {
 				label: clipboardEntry,
 				value: clipboardEntry,
 				handler: COMMAND_HANDLER.COPY_TO_CLIPBOARD,
+				smartMatch: false,
 			}));
 	}
 
@@ -426,6 +458,7 @@ export class CommandsStore extends SecureStore<Commands> {
 									label: t("commands.actions.createNote", { query }),
 									value: query,
 									handler: COMMAND_HANDLER.CREATE_NOTE,
+									smartMatch: false,
 								},
 							]
 						: [];
@@ -472,6 +505,7 @@ export class CommandsStore extends SecureStore<Commands> {
 								? query
 								: `https://${query}`,
 						handler: COMMAND_HANDLER.URL,
+						smartMatch: false,
 					},
 				]
 			: [];
@@ -607,9 +641,6 @@ export class CommandsStore extends SecureStore<Commands> {
 					value,
 				]).execute();
 				return result.code === 0;
-			})
-			.with({ handler: COMMAND_HANDLER.SMART_MATCH }, async ({ value }) => {
-				console.log(">>>SMART_MATCH", value);
 			})
 			.with({ handler: COMMAND_HANDLER.EMBEDDED_URL }, async ({ value }) => {
 				const encodedValue = encodeURIComponent(value);

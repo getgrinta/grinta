@@ -85,12 +85,14 @@
 		"@tailwindcss/vite": "4.0.12",
 		"@tauri-apps/cli": "2.3.1",
 		"@testing-library/svelte": "^5.2.7",
+		"bun-plugin-svelte": "^0.0.5",
 		"daisyui": "5.0.0",
 		"dotenv-cli": "8.0.0",
 		"svelte": "5.22.6",
 		"svelte-check": "4.1.5",
 		"tailwindcss": "4.0.12",
 		"tailwindcss-motion": "1.1.0",
-		"vite": "6.2.1"
+		"vite": "6.2.1",
+		"vitest": "^3.0.8"
 	}
 }
