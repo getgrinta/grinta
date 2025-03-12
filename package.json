@@ -6,6 +6,7 @@
 		"dev": "turbo dev",
 		"lint": "bunx --bun biome check .",
 		"lint:staged": "biome check --no-errors-on-unmatched --staged ./{apps,packages}/**/*.{ts}",
+		"test": "turbo test",
 		"format": "bunx --bun biome check --write --unsafe .",
 		"cleanup": "turbo cleanup && rimraf node_modules bun.lock",
 		"prepare": "husky"

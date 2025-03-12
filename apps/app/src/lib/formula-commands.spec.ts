@@ -16,6 +16,7 @@ describe("parseTextMathExpression", () => {
 				label: "2",
 				value: "2",
 				handler: COMMAND_HANDLER.FORMULA_RESULT,
+				smartMatch: true,
 			},
 		]);
 	});
@@ -27,6 +28,7 @@ describe("parseTextMathExpression", () => {
 				label: "3",
 				value: "3",
 				handler: COMMAND_HANDLER.FORMULA_RESULT,
+				smartMatch: true,
 			},
 		]);
 	});
@@ -38,6 +40,7 @@ describe("parseTextMathExpression", () => {
 				label: "50",
 				value: "50",
 				handler: COMMAND_HANDLER.FORMULA_RESULT,
+				smartMatch: true,
 			},
 		]);
 	});
@@ -49,6 +52,7 @@ describe("parseTextMathExpression", () => {
 				label: "5",
 				value: "5",
 				handler: COMMAND_HANDLER.FORMULA_RESULT,
+				smartMatch: true,
 			},
 		]);
 	});
@@ -60,6 +64,7 @@ describe("parseTextMathExpression", () => {
 				label: "7",
 				value: "7",
 				handler: COMMAND_HANDLER.FORMULA_RESULT,
+				smartMatch: true,
 			},
 		]);
 	});
@@ -72,6 +77,7 @@ describe("parseTextMathExpression", () => {
 				label: "4",
 				value: "4",
 				handler: COMMAND_HANDLER.FORMULA_RESULT,
+				smartMatch: true,
 			},
 		]);
 	});
@@ -85,6 +91,7 @@ describe("parseTextMathExpression", () => {
 				label: "2.67",
 				value: "2.67",
 				handler: COMMAND_HANDLER.FORMULA_RESULT,
+				smartMatch: true,
 			},
 		]);
 	});
@@ -96,6 +103,7 @@ describe("parseTextMathExpression", () => {
 				label: "50",
 				value: "50",
 				handler: COMMAND_HANDLER.FORMULA_RESULT,
+				smartMatch: true,
 			},
 		]);
 	});
@@ -107,6 +115,7 @@ describe("parseTextMathExpression", () => {
 				label: "25",
 				value: "25",
 				handler: COMMAND_HANDLER.FORMULA_RESULT,
+				smartMatch: true,
 			},
 		]);
 	});
@@ -118,6 +127,7 @@ describe("parseTextMathExpression", () => {
 				label: "27",
 				value: "27",
 				handler: COMMAND_HANDLER.FORMULA_RESULT,
+				smartMatch: true,
 			},
 		]);
 	});
@@ -129,6 +139,7 @@ describe("parseTextMathExpression", () => {
 				label: "24",
 				value: "24",
 				handler: COMMAND_HANDLER.FORMULA_RESULT,
+				smartMatch: true,
 			},
 		]);
 	});
@@ -142,6 +153,7 @@ describe("parseTextMathExpression", () => {
 				label: "76192.57",
 				value: "76192.57",
 				handler: COMMAND_HANDLER.FORMULA_RESULT,
+				smartMatch: true,
 			},
 		]);
 	});
@@ -155,6 +167,7 @@ describe("parseTextMathExpression", () => {
 				label: "76192.57",
 				value: "76192.57",
 				handler: COMMAND_HANDLER.FORMULA_RESULT,
+				smartMatch: true,
 			},
 		]);
 	});
@@ -184,6 +197,7 @@ describe("parseFraction", () => {
 				label: "0.5",
 				value: "0.5",
 				handler: COMMAND_HANDLER.FORMULA_RESULT,
+				smartMatch: true,
 			},
 		]);
 	});
@@ -195,6 +209,7 @@ describe("parseFraction", () => {
 				label: "60",
 				value: "60",
 				handler: COMMAND_HANDLER.FORMULA_RESULT,
+				smartMatch: true,
 			},
 		]);
 	});
@@ -213,6 +228,7 @@ describe("parseMathExpression", () => {
 				label: "2",
 				value: "2",
 				handler: COMMAND_HANDLER.FORMULA_RESULT,
+				smartMatch: true,
 			},
 		]);
 	});
@@ -229,6 +245,7 @@ describe("parseRelativeTime", () => {
 		expect(result[0].handler).toBe(COMMAND_HANDLER.FORMULA_RESULT);
 		expect(result[0].value).toBeDefined();
 		expect(result[0].label).toBeDefined();
+		expect(result[0].smartMatch).toBe(true);
 	});
 
 	it("handles 'after' keyword for future time", () => {
@@ -236,6 +253,7 @@ describe("parseRelativeTime", () => {
 		expect(result[0].handler).toBe(COMMAND_HANDLER.FORMULA_RESULT);
 		expect(result[0].value).toBeDefined();
 		expect(result[0].label).toBeDefined();
+		expect(result[0].smartMatch).toBe(true);
 	});
 
 	it("handles past time", () => {
@@ -243,6 +261,7 @@ describe("parseRelativeTime", () => {
 		expect(result[0].handler).toBe(COMMAND_HANDLER.FORMULA_RESULT);
 		expect(result[0].value).toBeDefined();
 		expect(result[0].label).toBeDefined();
+		expect(result[0].smartMatch).toBe(true);
 	});
 
 	it("returns empty array for invalid time", () => {
