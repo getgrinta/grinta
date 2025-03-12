@@ -62,7 +62,7 @@ export type CommandHandler = keyof typeof COMMAND_HANDLER;
 
 const commandsPriority = Object.keys(COMMAND_HANDLER);
 
-const ExecutableCommandSchema = z.object({
+export const ExecutableCommandSchema = z.object({
 	label: z.string(),
 	localizedLabel: z.string().optional(),
 	value: z.string(),
@@ -199,6 +199,9 @@ export class CommandsStore extends SecureStore<Commands> {
 	commands = $state<ExecutableCommand[]>([]);
 	buildCommandsToken = $state<string>("");
 	selectedIndex = $state<number>(0);
+	currentCommand = $derived<ExecutableCommand>(
+		this.commands[this.selectedIndex],
+	);
 	installedApps = $state<DirEntry[]>([]);
 	appCommands = $state<ExecutableCommand[]>([]);
 	shortcutCommands = $state<ExecutableCommand[]>([]);
@@ -506,9 +509,8 @@ export class CommandsStore extends SecureStore<Commands> {
 		return openUrl(url);
 	}
 
-	async handleCommand(commandIndex: number | undefined) {
+	async handleCommand(command: ExecutableCommand) {
 		if (!appStore.appWindow) return;
-		const command = this.commands[commandIndex ?? this.selectedIndex];
 		const otherThanLast =
 			this.commandHistory[this.commandHistory.length - 1]?.value !==
 			command.value;

@@ -133,7 +133,7 @@
 }
 
 .virtual-list-wrapper {
-	@apply !py-4;
+	@apply !pt-[var(--commands-padding)] !pb-4;
 }
 
 body {
@@ -142,7 +142,12 @@ body {
 
 :root {
 	--animation-btn: 0;
+	--commands-padding: 80px;
 	overscroll-behavior: none;
+}
+
+.widgets-visible {
+	--commands-padding: 128px;
 }
 
 @layer utilities {

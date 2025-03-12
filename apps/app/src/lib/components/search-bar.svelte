@@ -39,7 +39,7 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
 
 const { form } = createForm({
 	async onSubmit() {
-		return commandsStore.handleCommand(undefined);
+		return commandsStore.handleCommand(commandsStore.currentCommand);
 	},
 });
 

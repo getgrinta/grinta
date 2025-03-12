@@ -5,6 +5,7 @@ import CommandList from "$lib/components/command-list.svelte";
 import SearchBar from "$lib/components/search-bar.svelte";
 import SearchModeToggle from "$lib/components/search-mode-toggle.svelte";
 import ViewActions from "$lib/components/view-actions.svelte";
+import Widgets from "$lib/components/widgets.svelte";
 import { BAR_MODE, appStore } from "$lib/store/app.svelte";
 import { notesStore } from "$lib/store/notes.svelte";
 import { _ } from "svelte-i18n";
@@ -27,7 +28,10 @@ $effect(() => {
 
 <div class="flex flex-1 flex-col gap-1">
   <SearchBar />
-  <CommandList />
+  <div class="flex flex-col relative">
+	<Widgets />
+	<CommandList />
+  </div>
   {#if appStore.barMode !== BAR_MODE.MENU}
 	<div class="flex fixed bottom-4 right-4 left-4 justify-end">
 		{#if appStore.barMode === BAR_MODE.INITIAL}
