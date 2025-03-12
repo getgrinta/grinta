@@ -24,7 +24,7 @@
 		"@hono/zod-openapi": "0.19.2",
 		"@scalar/hono-api-reference": "0.5.184",
 		"ai": "4.1.54",
-		"better-auth": "1.2.3",
+		"better-auth": "1.2.4-beta.8",
 		"dedent": "1.5.3",
 		"drizzle-orm": "0.40.0",
 		"drizzle-zod": "0.7.0",

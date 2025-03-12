@@ -3,6 +3,7 @@ import type { AppType } from "@getgrinta/api";
 import { install } from "@github/hotkey";
 import { fetch } from "@tauri-apps/plugin-http";
 import { Position, moveWindow } from "@tauri-apps/plugin-positioner";
+// biome-ignore lint/suspicious/noShadowRestrictedNames: nah
 import AggregateError from "aggregate-error";
 import { hc } from "hono/client";
 import { useEventListener } from "runed";

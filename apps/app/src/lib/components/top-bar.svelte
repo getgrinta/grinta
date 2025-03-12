@@ -35,7 +35,7 @@ const topBarCss = $derived(
 
 <div class="fixed flex flex-row left-4 top-4 right-4 z-10 items-center gap-2">
 
-  <label class={clsx("input flex-1 flex items-center gap-4 w-full", topBarCss, fancyMode && "border-gradient")}>
+  <label class={clsx("input flex-1 flex items-center gap-4 w-full", topBarCss, fancyMode ? "border-gradient" : "border-invisible")}>
   	<slot name="indicator">
 	    <SearchBarAccessoryButton class="text-primary" onclick={goBack ?? defaultGoBack} hotkey="Escape,h">
 	      <ChevronLeftIcon size={16} />

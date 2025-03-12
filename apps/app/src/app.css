@@ -114,19 +114,26 @@
 	--color-primary: #24a2b8;
 }
 
+.border-invisible {
+	@apply border-none;
+}
+
+.border-invisible::before {
+	@apply content-[''] absolute inset-0 pointer-events-none rounded-[1.25rem] p-[2px] bg-transparent;
+}
+
 .border-gradient {
 	@apply border-none;
 }
 
 .border-gradient::before {
-	content: "";
 	mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
 	mask-composite: exclude;
 	@apply content-[''] absolute inset-0 pointer-events-none rounded-[1.25rem] p-[2px] bg-gradient-to-br from-blue-500 to-indigo-500;
 }
 
 .virtual-list-wrapper {
-	@apply pb-4;
+	@apply !py-4;
 }
 
 body {

@@ -13,8 +13,10 @@ import {
 	AppWindowIcon,
 	ArrowDownLeftIcon,
 	ChevronRightIcon,
+	CopyIcon,
 	EqualIcon,
 	GlobeIcon,
+	Layers2Icon,
 	StickyNoteIcon,
 } from "lucide-svelte";
 import { _ } from "svelte-i18n";
@@ -60,6 +62,8 @@ function getIcon(handler: CommandHandler) {
 		.with(COMMAND_HANDLER.OPEN_NOTE, () => StickyNoteIcon)
 		.with(COMMAND_HANDLER.CREATE_NOTE, () => StickyNoteIcon)
 		.with(COMMAND_HANDLER.FORMULA_RESULT, () => EqualIcon)
+		.with(COMMAND_HANDLER.RUN_SHORTCUT, () => Layers2Icon)
+		.with(COMMAND_HANDLER.COPY_TO_CLIPBOARD, () => CopyIcon)
 		.otherwise(() => ChevronRightIcon);
 }
 
@@ -77,7 +81,7 @@ const systemThemeWatcher = new SystemThemeWatcher();
     class="menu menu-lg flex-1 menu-vertical flex-nowrap w-full p-0"
   >
 	<VirtualList scrollToIndex={scrollToIndex} width="100%" height={328} {itemCount} itemSize={65}>
-		<li let:index class="!w-[calc(100%-2rem)] !m-4" data-command-index={index} slot="item" let:style transition:fade={{ duration: 150 }} {style}>
+		<li let:index class="!w-[calc(100%-2rem)] mx-4" data-command-index={index} slot="item" let:style transition:fade={{ duration: 150 }} {style}>
 			{@const active = commandsStore.selectedIndex === index}
 			{@const IconComponent = getIcon(commandsStore.commands[index].handler)}
 			{@const command = commandsStore.commands[index]}
