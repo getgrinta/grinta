@@ -6,6 +6,9 @@ mod spotlight_utils;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    // Initialize the spotlight state
+    let spotlight_state = spotlight_utils::SpotlightState::new();
+
     tauri::Builder::default()
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_process::init())
@@ -24,7 +27,7 @@ pub fn run() {
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_opener::init())
-        .manage(spotlight_utils::SpotlightState::new())
+        .manage(spotlight_state)
         .invoke_handler(tauri::generate_handler![
             theme_utils::set_vibrancy,
             theme_utils::set_appearance,

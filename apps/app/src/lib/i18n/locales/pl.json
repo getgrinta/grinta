@@ -60,6 +60,8 @@
 	"commands": {
 		"helperText": {
 			"app": "Aplikacja",
+			"file": "Plik",
+			"folder": "Folder",
 			"web": "Sieć",
 			"barCommand": "Polecenie paska",
 			"changeMode": "Zmień tryb",

@@ -55,6 +55,8 @@
 	"commands": {
 		"helperText": {
 			"app": "App",
+			"file": "File",
+			"folder": "Folder",
 			"web": "Web",
 			"barCommand": "Bar Command",
 			"changeMode": "Change Mode",

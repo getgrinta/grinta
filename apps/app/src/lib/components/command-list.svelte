@@ -4,6 +4,8 @@ import { BAR_MODE, appStore } from "$lib/store/app.svelte";
 import {
 	COMMAND_HANDLER,
 	type CommandHandler,
+	type ExecutableCommand,
+	FileMetadataSchema,
 	commandsStore,
 } from "$lib/store/commands.svelte";
 import { THEME } from "$lib/store/settings.svelte";
@@ -14,6 +16,8 @@ import {
 	ArrowDownLeftIcon,
 	ChevronRightIcon,
 	EqualIcon,
+	FileIcon,
+	FolderIcon,
 	GlobeIcon,
 	StickyNoteIcon,
 } from "lucide-svelte";
@@ -21,15 +25,23 @@ import { _ } from "svelte-i18n";
 import VirtualList from "svelte-tiny-virtual-list";
 import { fade } from "svelte/transition";
 import { P, match } from "ts-pattern";
+import { z } from "zod";
 
 type GetHelperProps = {
 	value: string;
 	handler: CommandHandler;
+	metadata?: z.infer<typeof FileMetadataSchema>;
 };
 
-function getHelperText({ value, handler }: GetHelperProps) {
+function getCommandTypeLabel({ value, handler, metadata }: GetHelperProps) {
 	return match(handler)
 		.with(COMMAND_HANDLER.APP, () => $_("commands.helperText.app"))
+		.with(COMMAND_HANDLER.FS_ITEM, () => {
+			if (metadata?.contentType === "public.folder") {
+				return $_("commands.helperText.folder");
+			}
+			return $_("commands.helperText.file");
+		})
 		.with(COMMAND_HANDLER.URL, () => $_("commands.helperText.web"))
 		.with(COMMAND_HANDLER.SYSTEM, () => $_("commands.helperText.barCommand"))
 		.with(COMMAND_HANDLER.CHANGE_MODE, () =>
@@ -52,10 +64,16 @@ function getHelperText({ value, handler }: GetHelperProps) {
 		.otherwise(() => value);
 }
 
-function getIcon(handler: CommandHandler) {
+function getIcon(comand: ExecutableCommand) {
 	if (appStore.barMode !== BAR_MODE.INITIAL) return ChevronRightIcon;
-	return match(handler)
+	return match(comand.handler)
 		.with(COMMAND_HANDLER.URL, () => GlobeIcon)
+		.with(COMMAND_HANDLER.FS_ITEM, () => {
+			if (comand.metadata?.contentType === "public.folder") {
+				return FolderIcon;
+			}
+			return FileIcon;
+		})
 		.with(COMMAND_HANDLER.APP, () => AppWindowIcon)
 		.with(COMMAND_HANDLER.OPEN_NOTE, () => StickyNoteIcon)
 		.with(COMMAND_HANDLER.CREATE_NOTE, () => StickyNoteIcon)
@@ -79,7 +97,7 @@ const systemThemeWatcher = new SystemThemeWatcher();
 	<VirtualList scrollToIndex={scrollToIndex} width="100%" height={328} {itemCount} itemSize={65}>
 		<li let:index class="!w-[calc(100%-2rem)] !m-4" data-command-index={index} slot="item" let:style transition:fade={{ duration: 150 }} {style}>
 			{@const active = commandsStore.selectedIndex === index}
-			{@const IconComponent = getIcon(commandsStore.commands[index].handler)}
+			{@const IconComponent = getIcon(commandsStore.commands[index])}
 			{@const command = commandsStore.commands[index]}
 			{@const currentLabel = command.localizedLabel ?? command.label}
 			{@const labelChunks = highlightText(currentLabel, appStore.query)}
@@ -117,7 +135,7 @@ const systemThemeWatcher = new SystemThemeWatcher();
 				</button>
 				<div class="flex gap-1 items-center">
 					<span class={clsx("badge", badgeCss(active))}>
-						{getHelperText({ value: command.value, handler: command.handler })}
+						{getCommandTypeLabel({ value: command.value, handler: command.handler, metadata: command.metadata })}
 					</span>
 					<button type="button" class={clsx("btn btn-square btn-ghost btn-sm !border-0 p-[1px]", arrowDownLeftCss)} onclick={() => appStore.setQuery(currentLabel)}>
 						<ArrowDownLeftIcon size={16} />

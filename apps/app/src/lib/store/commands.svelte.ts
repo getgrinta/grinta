@@ -1,5 +1,6 @@
 import { goto } from "$app/navigation";
 import { parseMathExpression, parseRelativeTime } from "$lib/formula-commands";
+import { searchSpotlightApps } from "$lib/grinta-invoke";
 import { appMetadataStore } from "$lib/store/app-metadata.svelte";
 import { generateCancellationToken } from "$lib/utils.svelte";
 import { until } from "@open-draft/until";
@@ -25,6 +26,7 @@ import {
 	appStore,
 } from "./app.svelte";
 import { clipboardStore } from "./clipboard.svelte";
+import { featureFlagStore } from "./feature-flag-store";
 import { type Note, notesStore } from "./notes.svelte";
 import { SecureStore } from "./secure.svelte";
 import { settingsStore } from "./settings.svelte";
@@ -56,16 +58,21 @@ export const COMMAND_HANDLER = {
 	CREATE_NOTE: "CREATE_NOTE",
 	URL: "URL",
 	EMBEDDED_URL: "EMBEDDED_URL",
+	FS_ITEM: "FS_ITEM",
 } as const;
 
 export type CommandHandler = keyof typeof COMMAND_HANDLER;
 
 const commandsPriority = Object.keys(COMMAND_HANDLER);
+export const FileMetadataSchema = z.object({
+	contentType: z.string(),
+});
 
 const ExecutableCommandSchema = z.object({
 	label: z.string(),
 	localizedLabel: z.string().optional(),
 	value: z.string(),
+	metadata: FileMetadataSchema.optional().nullable(),
 	handler: z.nativeEnum(COMMAND_HANDLER),
 });
 
@@ -198,12 +205,14 @@ export type Commands = z.infer<typeof CommandsSchema>;
 export class CommandsStore extends SecureStore<Commands> {
 	commands = $state<ExecutableCommand[]>([]);
 	buildCommandsToken = $state<string>("");
+	spotlightSearchToken = $state<string>("");
 	selectedIndex = $state<number>(0);
 	installedApps = $state<DirEntry[]>([]);
 	appCommands = $state<ExecutableCommand[]>([]);
 	shortcutCommands = $state<ExecutableCommand[]>([]);
 	webSearchCommands = $state<ExecutableCommand[]>([]);
-	isUpdatingFromWebSearch = $state<boolean>(false);
+	spotlightCommands = $state<ExecutableCommand[]>([]);
+	isUpdatingExternalSource = $state<boolean>(false);
 
 	// Ensure we have a valid commandHistory even before initialization
 	get commandHistory(): ExecutableCommand[] {
@@ -284,7 +293,7 @@ export class CommandsStore extends SecureStore<Commands> {
 			console.error("Error initializing CommandsStore:", error);
 		}
 
-		await this.watchForApplicationChanges();
+		this.watchForApplicationChanges();
 
 		setInterval(() => {
 			(async () => {
@@ -345,6 +354,7 @@ export class CommandsStore extends SecureStore<Commands> {
 			...appsFromApplications,
 			...appsFromSystemApplications,
 		];
+
 		this.appCommands = await buildAppCommands(this.installedApps);
 	}
 
@@ -373,12 +383,13 @@ export class CommandsStore extends SecureStore<Commands> {
 	async buildCommands({
 		query,
 		barMode,
-	}: { query: string; searchMode: SearchMode; barMode: BarMode }) {
-		// Skip if we're currently updating from web search to prevent infinite loop
-		if (this.isUpdatingFromWebSearch) {
-			return;
-		}
-
+		isRefresh = false,
+	}: {
+		query: string;
+		searchMode: SearchMode;
+		barMode: BarMode;
+		isRefresh: boolean;
+	}) {
 		this.selectedIndex = 0;
 		const queryIsUrl = HOSTNAME_REGEX.test(query);
 		const newCommandsToken = generateCancellationToken();
@@ -404,6 +415,7 @@ export class CommandsStore extends SecureStore<Commands> {
 					...this.appCommands,
 					...this.buildUrlCommands(queryIsUrl, query),
 					...this.webSearchCommands,
+					...this.spotlightCommands,
 					...commandHistory,
 					...this.shortcutCommands,
 					...this.getMenuItems(),
@@ -448,30 +460,59 @@ export class CommandsStore extends SecureStore<Commands> {
 
 		this.commands = uniq([...formulaCommands, ...sortedAndFilteredCommands]);
 
-		if (query.length > 0 && barMode === "INITIAL") {
-			setTimeout(() => {
-				this.fetchWebSearchCommands(
-					query,
-					newCommandsToken,
-					queryIsUrl ? query : null,
-				);
-			}, 0);
+		if (barMode === "INITIAL" && !isRefresh && !this.isUpdatingExternalSource) {
+			if (query.length > 0) {
+				setTimeout(() => {
+					this.fetchWebSearchCommands(
+						query,
+						barMode,
+						newCommandsToken,
+						queryIsUrl ? query : null,
+					);
+				}, 0);
+			}
+
+			if (
+				featureFlagStore.isFeatureEnabled("spotlight_search") &&
+				query.length > 2
+			) {
+				this.startSpotlightSearch(query, barMode);
+			}
 		}
 	}
 
-	private buildUrlCommands(queryIsUrl: boolean, query: string) {
-		return queryIsUrl
-			? [
-					{
-						label: query,
-						value:
-							query.startsWith("http://") || query.startsWith("https://")
-								? query
-								: `https://${query}`,
-						handler: COMMAND_HANDLER.URL,
-					},
-				]
-			: [];
+	private startSpotlightSearch(query: string, barMode: BarMode) {
+		const spotlightToken = generateCancellationToken();
+		this.spotlightSearchToken = spotlightToken;
+
+		searchSpotlightApps(query).then((result) => {
+			if (spotlightToken !== this.spotlightSearchToken) {
+				return;
+			}
+
+			this.spotlightCommands = result.map((app) => ({
+				label: app.display_name,
+				value: app.path,
+				metadata: { contentType: app.content_type },
+				handler: COMMAND_HANDLER.FS_ITEM,
+			}));
+
+			this.isUpdatingExternalSource = true;
+			this.buildCommands({ query, barMode: barMode, isRefresh: true });
+			this.isUpdatingExternalSource = false;
+		});
+	}
+
+	private buildUrlCommands(
+		queryIsUrl: boolean,
+		query: string,
+	): ExecutableCommand[] {
+		if (!queryIsUrl) {
+			return [];
+		}
+		const value = query.match(/^https?:\/\//) ? query : `https://${query}`;
+		const command = { label: query, value, handler: COMMAND_HANDLER.URL };
+		return [command];
 	}
 
 	sortCommands({
@@ -536,6 +577,10 @@ export class CommandsStore extends SecureStore<Commands> {
 		return match(command)
 			.with({ handler: COMMAND_HANDLER.APP }, async ({ value }) => {
 				await Command.create("open", ["-a", value]).execute();
+				return appStore.appWindow?.hide();
+			})
+			.with({ handler: COMMAND_HANDLER.FS_ITEM }, async ({ value }) => {
+				await Command.create("open", [value]).execute();
 				return appStore.appWindow?.hide();
 			})
 			.with({ handler: COMMAND_HANDLER.URL }, async ({ value }) => {
@@ -618,15 +663,10 @@ export class CommandsStore extends SecureStore<Commands> {
 
 	async fetchWebSearchCommands(
 		query: string,
+		barMode: BarMode,
 		token: string,
 		excludeResult: string | null = null,
 	) {
-		if (query.length < 1) {
-			return;
-		}
-
-		const queryIsUrl = HOSTNAME_REGEX.test(query);
-
 		try {
 			const webSearchCommands = await buildQueryCommands(query, excludeResult);
 
@@ -636,43 +676,15 @@ export class CommandsStore extends SecureStore<Commands> {
 			}
 
 			// Set flag to prevent infinite loop
-			this.isUpdatingFromWebSearch = true;
+			this.isUpdatingExternalSource = true;
 
-			// Update web search commands
 			this.webSearchCommands = webSearchCommands;
-
-			// Rebuild the commands with the new web search results
-			let commandHistory = this.commandHistory.slice().reverse();
-
-			// Filter out commands of the same url as the current query
-			if (queryIsUrl) {
-				commandHistory = commandHistory.filter(
-					(a) => a.label !== query && a.handler !== COMMAND_HANDLER.URL,
-				);
-			}
-
-			const commands = [
-				...this.appCommands,
-				...this.buildUrlCommands(queryIsUrl, query),
-				...this.webSearchCommands,
-				...commandHistory,
-				...this.shortcutCommands,
-				...this.getMenuItems(),
-			];
-
-			const sortedAndFilteredCommands = matchSorter(commands, query, {
-				keys: ["localizedLabel", "label"],
-			}).sort((a, b) => this.sortCommands({ prev: a, next: b }));
-
-			const formulaCommands = buildFormulaCommands(query);
-
-			// Update the commands list
-			this.commands = uniq([...formulaCommands, ...sortedAndFilteredCommands]);
+			this.buildCommands({ query, barMode: barMode, isRefresh: true });
 
 			// Reset the flag after updating
-			this.isUpdatingFromWebSearch = false;
+			this.isUpdatingExternalSource = false;
 		} catch (error) {
-			this.isUpdatingFromWebSearch = false;
+			this.isUpdatingExternalSource = false;
 			console.error("Error fetching web search commands:", error);
 		}
 	}

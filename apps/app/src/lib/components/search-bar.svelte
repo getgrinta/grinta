@@ -140,6 +140,7 @@ watch(
 				query: appStore.query,
 				searchMode: appStore.searchMode,
 				barMode: appStore.barMode,
+				isRefresh: false,
 			});
 		}
 		buildCommands();

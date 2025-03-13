@@ -55,6 +55,8 @@
 	"commands": {
 		"helperText": {
 			"app": "App",
+			"file": "Datei",
+			"folder": "Ordner",
 			"web": "Netz",
 			"barCommand": "Befehlsleiste",
 			"changeMode": "Modus ändern",
