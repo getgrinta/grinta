@@ -1,6 +1,6 @@
 <script lang="ts">
 import { THEME } from "$lib/store/settings.svelte";
-import { SystemThemeWatcher } from "$lib/utils.svelte";
+import { SystemThemeWatcher } from "$lib/system-theme-watcher.svelte";
 import clsx from "clsx";
 import { ChevronLeftIcon } from "lucide-svelte";
 import SearchBarAccessoryButton from "./search-bar-accessory-button.svelte";
@@ -35,7 +35,7 @@ const topBarCss = $derived(
 
 <div class="fixed flex flex-row left-4 top-4 right-4 z-10 items-center gap-2">
 
-  <label class={clsx("input flex-1 flex items-center gap-4 w-full", topBarCss, fancyMode && "border-gradient")}>
+  <label class={clsx("input flex-1 flex items-center gap-4 w-full", topBarCss, fancyMode ? "border-gradient" : "border-invisible")}>
   	<slot name="indicator">
 	    <SearchBarAccessoryButton class="text-primary" onclick={goBack ?? defaultGoBack} hotkey="Escape,h">
 	      <ChevronLeftIcon size={16} />

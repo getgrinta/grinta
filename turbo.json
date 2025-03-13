@@ -11,6 +11,9 @@
 			"cache": false,
 			"persistent": true
 		},
-		"cleanup": {}
+		"cleanup": {},
+		"test": {
+			"cache": false
+		}
 	}
 }

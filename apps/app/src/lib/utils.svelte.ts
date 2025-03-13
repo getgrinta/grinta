@@ -1,51 +1,31 @@
 import { env } from "$env/dynamic/public";
 import type { AppType } from "@getgrinta/api";
 import { install } from "@github/hotkey";
+import { type UnlistenFn, emit, listen } from "@tauri-apps/api/event";
 import { fetch } from "@tauri-apps/plugin-http";
 import { Position, moveWindow } from "@tauri-apps/plugin-positioner";
+// biome-ignore lint/suspicious/noShadowRestrictedNames: nah
 import AggregateError from "aggregate-error";
 import { hc } from "hono/client";
-import { useEventListener } from "runed";
-import { appStore } from "./store/app.svelte";
-import { settingsStore } from "./store/settings.svelte";
+import {
+	AppWindowIcon,
+	ChevronRightIcon,
+	CopyIcon,
+	EqualIcon,
+	FileIcon,
+	FolderIcon,
+	GlobeIcon,
+	Layers2Icon,
+	StickyNoteIcon,
+} from "lucide-svelte";
+import { match } from "ts-pattern";
+import { BAR_MODE, appStore } from "./store/app.svelte";
+import {
+	COMMAND_HANDLER,
+	type CommandHandler,
+	type ExecutableCommand,
+} from "./store/commands.svelte";
 import { vaultStore } from "./store/vault.svelte";
-
-const THEME_QUERY = "(prefers-color-scheme: dark)";
-
-const THEME = {
-	DARK: "DARK",
-	LIGHT: "LIGHT",
-} as const;
-
-type Theme = keyof typeof THEME;
-
-export class SystemThemeWatcher {
-	systemTheme = $state<Theme>();
-	theme = $derived(
-		settingsStore.data.theme === "SYSTEM"
-			? (this.systemTheme ?? "DARK")
-			: settingsStore.data.theme,
-	);
-
-	constructor() {
-		this.setInitialSystemTheme();
-		useEventListener(
-			() => window.matchMedia(THEME_QUERY),
-			"change",
-			this.handleSystemThemeChange,
-		);
-	}
-
-	setInitialSystemTheme() {
-		this.systemTheme = window?.matchMedia?.(THEME_QUERY)?.matches
-			? THEME.DARK
-			: THEME.LIGHT;
-	}
-
-	handleSystemThemeChange(event: MediaQueryListEvent) {
-		this.systemTheme = event.matches ? THEME.DARK : THEME.LIGHT;
-	}
-}
 
 export async function installHotkeys() {
 	for (const el of document.querySelectorAll("[data-hotkey]")) {
@@ -118,4 +98,54 @@ export function fail(message: string, cause?: Error) {
 		errors.push(cause);
 	}
 	return new AggregateError(errors);
+}
+
+export async function handleContextMenu({
+	event,
+	name,
+	context,
+}: { event: MouseEvent; name: string; context: unknown }) {
+	event.preventDefault();
+	event.stopPropagation();
+	await emit("show-context-menu", {
+		x: event.clientX,
+		y: event.clientY,
+		name,
+		context,
+	});
+}
+
+export function clickListener() {
+	let unlisten: UnlistenFn;
+
+	async function setup() {
+		unlisten = await listen("click", async () => {
+			await emit("hide-context-menu");
+		});
+	}
+
+	setup();
+
+	return () => {
+		if (unlisten) unlisten();
+	};
+}
+
+export function getIcon(command: ExecutableCommand) {
+	if (appStore.barMode !== BAR_MODE.INITIAL) return ChevronRightIcon;
+	return match(command.handler)
+		.with(COMMAND_HANDLER.URL, () => GlobeIcon)
+		.with(COMMAND_HANDLER.APP, () => AppWindowIcon)
+		.with(COMMAND_HANDLER.OPEN_NOTE, () => StickyNoteIcon)
+		.with(COMMAND_HANDLER.CREATE_NOTE, () => StickyNoteIcon)
+		.with(COMMAND_HANDLER.FORMULA_RESULT, () => EqualIcon)
+		.with(COMMAND_HANDLER.RUN_SHORTCUT, () => Layers2Icon)
+		.with(COMMAND_HANDLER.COPY_TO_CLIPBOARD, () => CopyIcon)
+		.with(COMMAND_HANDLER.FS_ITEM, () => {
+			if (command.metadata?.contentType === "public.folder") {
+				return FolderIcon;
+			}
+			return FileIcon;
+		})
+		.otherwise(() => ChevronRightIcon);
 }

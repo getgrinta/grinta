@@ -12,8 +12,9 @@ import { clipboardStore } from "$lib/store/clipboard.svelte";
 import { commandsStore } from "$lib/store/commands.svelte";
 import { THEME, settingsStore } from "$lib/store/settings.svelte";
 import { vaultStore } from "$lib/store/vault.svelte";
+import { widgetsStore } from "$lib/store/widgets.svelte";
+import { SystemThemeWatcher } from "$lib/system-theme-watcher.svelte";
 import { installHotkeys } from "$lib/utils.svelte";
-import { SystemThemeWatcher } from "$lib/utils.svelte";
 import { defaultWindowIcon } from "@tauri-apps/api/app";
 import { invoke } from "@tauri-apps/api/core";
 import { Menu } from "@tauri-apps/api/menu";
@@ -73,6 +74,15 @@ async function initTrayIcon() {
 					appStore.appWindow?.show();
 					appStore.appWindow?.setFocus();
 					return goto(`/commands/${BAR_MODE.NOTES}`);
+				},
+			},
+			{
+				id: "clipboard",
+				text: "Clipboard",
+				action() {
+					appStore.appWindow?.show();
+					appStore.appWindow?.setFocus();
+					return goto(`/commands/${BAR_MODE.CLIPBOARD}`);
 				},
 			},
 			{
@@ -145,6 +155,7 @@ async function initializeApp() {
 	await commandsStore.initialize();
 	await settingsStore.initialize();
 	await clipboardStore.initialize();
+	await widgetsStore.initialize();
 	appMetadataStore.initializeIcons();
 	initTrayIcon();
 
@@ -202,7 +213,7 @@ afterNavigate(({ to }) => {
 
 <Toaster theme="dark" position="bottom-center" richColors />
 
-<main id="mainLayout" class={clsx("flex-1 flex flex-col", accentColorClass, bgClass)} data-theme={themeName}>
+<main id="mainLayout" class={clsx("flex-1 flex flex-col", accentColorClass, bgClass, widgetsStore.showWidgets && "widgets-visible")} data-theme={themeName}>
 	<button type="button" class="hidden" onclick={openMenu} data-hotkey="Mod+k">Open Settings</button>
 	{#if initializing}
 		<div class="skeleton w-full h-10"></div>

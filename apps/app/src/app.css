@@ -3,8 +3,11 @@
 @plugin "@tailwindcss/typography";
 
 @plugin "daisyui/theme" {
+	/* biome-ignore lint/correctness/noUnknownProperty: tauri */
 	name: "grinta-dark";
+	/* biome-ignore lint/correctness/noUnknownProperty: tauri */
 	default: false;
+	/* biome-ignore lint/correctness/noUnknownProperty: tauri */
 	prefersdark: true;
 	color-scheme: "dark";
 	--color-base-100: #0a0e17;
@@ -36,8 +39,11 @@
 }
 
 @plugin "daisyui/theme" {
+	/* biome-ignore lint/correctness/noUnknownProperty: tauri */
 	name: "grinta-light";
+	/* biome-ignore lint/correctness/noUnknownProperty: tauri */
 	default: false;
+	/* biome-ignore lint/correctness/noUnknownProperty: tauri */
 	prefersdark: false;
 	color-scheme: "light";
 	--color-base-100: #dedede;
@@ -114,19 +120,26 @@
 	--color-primary: #24a2b8;
 }
 
+.border-invisible {
+	@apply border-none;
+}
+
+.border-invisible::before {
+	@apply content-[''] absolute inset-0 pointer-events-none rounded-[1.25rem] p-[2px] bg-transparent;
+}
+
 .border-gradient {
 	@apply border-none;
 }
 
 .border-gradient::before {
-	content: "";
 	mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
 	mask-composite: exclude;
 	@apply content-[''] absolute inset-0 pointer-events-none rounded-[1.25rem] p-[2px] bg-gradient-to-br from-blue-500 to-indigo-500;
 }
 
 .virtual-list-wrapper {
-	@apply pb-4;
+	@apply !pt-[var(--commands-padding)] !pb-4;
 }
 
 body {
@@ -135,7 +148,12 @@ body {
 
 :root {
 	--animation-btn: 0;
+	--commands-padding: 80px;
 	overscroll-behavior: none;
+}
+
+.widgets-visible {
+	--commands-padding: 128px;
 }
 
 @layer utilities {

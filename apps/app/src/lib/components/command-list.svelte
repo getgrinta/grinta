@@ -9,23 +9,34 @@ import {
 	commandsStore,
 } from "$lib/store/commands.svelte";
 import { THEME } from "$lib/store/settings.svelte";
-import { SystemThemeWatcher, highlightText } from "$lib/utils.svelte";
-import { clsx } from "clsx";
+import { widgetsStore } from "$lib/store/widgets.svelte";
+import { SystemThemeWatcher } from "$lib/system-theme-watcher.svelte";
 import {
-	AppWindowIcon,
-	ArrowDownLeftIcon,
-	ChevronRightIcon,
-	EqualIcon,
-	FileIcon,
-	FolderIcon,
-	GlobeIcon,
-	StickyNoteIcon,
-} from "lucide-svelte";
+	clickListener,
+	getIcon,
+	handleContextMenu,
+	highlightText,
+} from "$lib/utils.svelte";
+import { clsx } from "clsx";
+import { ArrowDownLeftIcon, PinIcon } from "lucide-svelte";
 import { _ } from "svelte-i18n";
 import VirtualList from "svelte-tiny-virtual-list";
 import { fade } from "svelte/transition";
 import { P, match } from "ts-pattern";
 import { z } from "zod";
+import ContextMenu, { type MenuItem } from "./context-menu.svelte";
+const contextMenuItems: MenuItem[] = [
+	{
+		label: "Pin",
+		// biome-ignore lint/suspicious/noExplicitAny: fix
+		icon: PinIcon as any,
+		onClick: (context) =>
+			widgetsStore.addWidget({
+				type: "command",
+				data: context as ExecutableCommand,
+			}),
+	},
+];
 
 type GetHelperProps = {
 	value: string;
@@ -64,85 +75,82 @@ function getCommandTypeLabel({ value, handler, metadata }: GetHelperProps) {
 		.otherwise(() => value);
 }
 
-function getIcon(comand: ExecutableCommand) {
-	if (appStore.barMode !== BAR_MODE.INITIAL) return ChevronRightIcon;
-	return match(comand.handler)
-		.with(COMMAND_HANDLER.URL, () => GlobeIcon)
-		.with(COMMAND_HANDLER.FS_ITEM, () => {
-			if (comand.metadata?.contentType === "public.folder") {
-				return FolderIcon;
-			}
-			return FileIcon;
-		})
-		.with(COMMAND_HANDLER.APP, () => AppWindowIcon)
-		.with(COMMAND_HANDLER.OPEN_NOTE, () => StickyNoteIcon)
-		.with(COMMAND_HANDLER.CREATE_NOTE, () => StickyNoteIcon)
-		.with(COMMAND_HANDLER.FORMULA_RESULT, () => EqualIcon)
-		.otherwise(() => ChevronRightIcon);
-}
-
 const itemCount = $derived(commandsStore.commands.length);
 const scrollToIndex = $derived(
 	itemCount > 0 ? commandsStore.selectedIndex : undefined,
 );
 
 const systemThemeWatcher = new SystemThemeWatcher();
+
+// Hide context menu when clicking outside
+$effect(clickListener);
 </script>
 
-<div class="flex flex-1 flex-col mt-[4.25rem] overflow-hidden">
-  <ul
-  	id="commandList"
-    class="menu menu-lg flex-1 menu-vertical flex-nowrap w-full p-0"
-  >
-	<VirtualList scrollToIndex={scrollToIndex} width="100%" height={328} {itemCount} itemSize={65}>
-		<li let:index class="!w-[calc(100%-2rem)] !m-4" data-command-index={index} slot="item" let:style transition:fade={{ duration: 150 }} {style}>
-			{@const active = commandsStore.selectedIndex === index}
-			{@const IconComponent = getIcon(commandsStore.commands[index])}
-			{@const command = commandsStore.commands[index]}
-			{@const currentLabel = command.localizedLabel ?? command.label}
-			{@const labelChunks = highlightText(currentLabel, appStore.query)}
+<ContextMenu name="commandList" items={contextMenuItems} />
 
-			{@const rowCss = systemThemeWatcher.theme === THEME.LIGHT ? "border-1 border-transparent hover:bg-neutral-300/30 color-base-100" : "border-1 border-transparent color-base-100"}
-			{@const rowActiveCss = systemThemeWatcher.theme === THEME.DARK ? 'menu-active !bg-base-100/40 !text-primary !border-neutral-600' : 'menu-active !bg-neutral-300/30 color-base-10 border-1 !border-neutral-400/30'}
+<ul
+	id="commandList"
+	class="menu menu-lg flex-1 menu-vertical flex-nowrap overflow-hidden w-full p-0"
+>
+<VirtualList scrollToIndex={scrollToIndex} width="100%" height={396} {itemCount} itemSize={65}>
+	<li 
+		let:index 
+		class={clsx("!w-[calc(100%-2rem)] mx-4 select-none", commandsStore.commands[index].smartMatch && "border-gradient")} 
+		data-command-index={index} 
+		slot="item" 
+		let:style 
+		transition:fade={{ duration: 150 }} 
+		oncontextmenu={(event) => handleContextMenu({ event, name: "commandList", context: commandsStore.commands[index] })}
+		{style}
+	>
+		{@const active = commandsStore.selectedIndex === index}
+		{@const IconComponent = getIcon(commandsStore.commands[index])}
+		{@const command = commandsStore.commands[index]}
+		{@const currentLabel = command.localizedLabel ?? command.label}
+		{@const labelChunks = highlightText(currentLabel, appStore.query)}
 
-			{@const labelChunkCss = (isHiglighted: boolean) => systemThemeWatcher.theme === THEME.DARK ? (isHiglighted ? "text-neutral-300" : "text-primary font-semibold") : (isHiglighted ? "color-base-100 text-neutral-800" : "color-base-100 text-neutral-800 font-semibold")}
-			{@const badgeCss = (isHiglighted: boolean) => systemThemeWatcher.theme === THEME.DARK ? (isHiglighted ? "badge-outline !text-primary !border-primary" : "badge-soft text-neutral-300") : (isHiglighted ? "badge-outline !text-primary !border-primary" : " !bg-neutral-300/50 border-0 badge-soft text-neutral-300")}
-			
-			{@const arrowDownLeftCss = systemThemeWatcher.theme === THEME.LIGHT && "text-neutral-600 hover:!bg-neutral-300/50"}
+		{@const rowCss = systemThemeWatcher.theme === THEME.LIGHT ? "border-1 border-transparent hover:bg-neutral-300/30 color-base-100" : "border-1 border-transparent color-base-100"}
+		{@const rowActiveCss = systemThemeWatcher.theme === THEME.DARK ? 'menu-active !bg-base-100/40 !text-primary !border-neutral-600' : 'menu-active !bg-neutral-300/30 color-base-10 border-1 !border-neutral-400/30'}
 
-			<div class={clsx("flex justify-between gap-4", rowCss, active && rowActiveCss)}>
-				<button type="button" onclick={() => commandsStore.handleCommand(index)} class="flex flex-1 h-full gap-4 py-[0.75rem] items-center overflow-hidden cursor-pointer">
-					{#if command.handler === COMMAND_HANDLER.APP}
-						{@const icon = appMetadataStore.getIcon(command.label)}
+		{@const labelChunkCss = (isHiglighted: boolean) => systemThemeWatcher.theme === THEME.DARK ? (isHiglighted ? "text-neutral-300" : "text-primary font-semibold") : (isHiglighted ? "color-base-100 text-neutral-800" : "color-base-100 text-neutral-800 font-semibold")}
+		{@const badgeCss = (isHiglighted: boolean) => systemThemeWatcher.theme === THEME.DARK ? (isHiglighted ? "badge-outline !text-primary !border-primary" : "badge-soft text-neutral-300") : (isHiglighted ? "badge-outline !text-primary !border-primary" : " !bg-neutral-300/50 border-0 badge-soft text-neutral-300")}
+		
+		{@const arrowDownLeftCss = systemThemeWatcher.theme === THEME.LIGHT && "text-neutral-600 hover:!bg-neutral-300/50"}
 
-						{#if icon}
-							<img src={icon} alt={currentLabel} width="24" height="24" class="w-8 h-8 object-contain" />
-						{:else}
-							<IconComponent size={24} />
-						{/if}
+		<div 
+			class={clsx("flex justify-between gap-4", rowCss, active && rowActiveCss)}
+		>
+			<button type="button" onclick={() => commandsStore.handleCommand(command)} class="flex flex-1 h-full gap-4 py-[0.75rem] items-center overflow-hidden cursor-pointer">
+				{#if command.handler === COMMAND_HANDLER.APP}
+					{@const icon = appMetadataStore.getIcon(command.label)}
+
+					{#if icon}
+						<img src={icon} alt={currentLabel} width="24" height="24" class="w-8 h-8 object-contain" />
 					{:else}
 						<IconComponent size={24} />
-					{/if} 
-					<h2 class={clsx("flex-1 flex text-left truncate max-w-[34rem]")}>
-						{#if appStore.query.length > 0}
-							{#each labelChunks as chunk}
-								<span class={clsx(labelChunkCss(chunk.highlight))}>{chunk.text}</span>
-							{/each}
-						{:else}
-							<span class="flex-1 truncate">{currentLabel}</span>
-						{/if}
-					</h2>
+					{/if}
+				{:else}
+					<IconComponent size={24} />
+				{/if} 
+				<h2 class={clsx("flex-1 flex text-left truncate max-w-[34rem]")}>
+					{#if appStore.query.length > 0}
+						{#each labelChunks as chunk}
+							<span class={clsx(labelChunkCss(chunk.highlight))}>{chunk.text}</span>
+						{/each}
+					{:else}
+						<span class="flex-1 truncate">{currentLabel}</span>
+					{/if}
+				</h2>
+			</button>
+			<div class="flex gap-1 items-center">
+				<span class={clsx("badge", badgeCss(active))}>
+					{getCommandTypeLabel({ value: command.value, handler: command.handler, metadata: command.metadata })}
+				</span>
+				<button type="button" class={clsx("btn btn-square btn-ghost btn-sm !border-0 p-[1px]", arrowDownLeftCss)} onclick={() => appStore.setQuery(currentLabel)}>
+					<ArrowDownLeftIcon size={16} />
 				</button>
-				<div class="flex gap-1 items-center">
-					<span class={clsx("badge", badgeCss(active))}>
-						{getCommandTypeLabel({ value: command.value, handler: command.handler, metadata: command.metadata })}
-					</span>
-					<button type="button" class={clsx("btn btn-square btn-ghost btn-sm !border-0 p-[1px]", arrowDownLeftCss)} onclick={() => appStore.setQuery(currentLabel)}>
-						<ArrowDownLeftIcon size={16} />
-					</button>
-				</div>
 			</div>
-		</li>
-	</VirtualList>
-  </ul>
-</div>
+		</div>
+	</li>
+</VirtualList>
+</ul>
