@@ -1,22 +1,10 @@
 <script lang="ts">
 import { THEME } from "$lib/store/settings.svelte";
-import { SystemThemeWatcher } from "$lib/utils.svelte";
+import { SystemThemeWatcher } from "$lib/system-theme-watcher.svelte";
 import clsx from "clsx";
-import type { SvelteComponent } from "svelte";
 import { match } from "ts-pattern";
-type Item = {
-	text?: string;
-	onClick: () => void;
-	active?: boolean;
-	hotkey?: string;
-	shortcut?: string;
-	icon?: SvelteComponent;
-};
 
-const { items, size = "md" } = $props<{
-	items: Item[];
-	size?: "md" | "lg";
-}>();
+const { items, size = "md" } = $props();
 
 const systemThemeWatcher = new SystemThemeWatcher();
 
@@ -54,7 +42,7 @@ const containerCss = $derived(
                 }
 
                 // When active item is clicked, activate the other item (there are only 2 items)
-                const otherItem = items.find((i: Item) => i !== item);
+                const otherItem = items.find((i: any) => i !== item);
                 if (otherItem) {
                     otherItem.onClick();
                 }

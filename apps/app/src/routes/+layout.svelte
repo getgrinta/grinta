@@ -16,7 +16,6 @@ import { widgetsStore } from "$lib/store/widgets.svelte";
 import { SystemThemeWatcher } from "$lib/system-theme-watcher.svelte";
 import { installHotkeys } from "$lib/utils.svelte";
 import { defaultWindowIcon } from "@tauri-apps/api/app";
-import { invoke } from "@tauri-apps/api/core";
 import { Menu } from "@tauri-apps/api/menu";
 import { TrayIcon } from "@tauri-apps/api/tray";
 import { readText } from "@tauri-apps/plugin-clipboard-manager";
