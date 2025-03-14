@@ -116,8 +116,7 @@ export function createContextMenuItems(command: ExecutableCommand): MenuItem[] {
 
 				Command.create("osascript", [
 					"-e",
-					`set aFile to (POSIX file "${path}") as alias
-					tell application "Finder" to open information window of aFile`,
+					`tell application "Finder" to open information window of file (POSIX file "${path}")`,
 				]).execute();
 			},
 		});
