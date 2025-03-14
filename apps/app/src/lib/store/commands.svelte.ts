@@ -9,7 +9,7 @@ import { searchSpotlightApps } from "$lib/grinta-invoke";
 import { appMetadataStore } from "$lib/store/app-metadata.svelte";
 import { generateCancellationToken } from "$lib/utils.svelte";
 import { until } from "@open-draft/until";
-import { type DirEntry, readDir, watch } from "@tauri-apps/plugin-fs";
+import { readDir, watch } from "@tauri-apps/plugin-fs";
 import { fetch } from "@tauri-apps/plugin-http";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { exit } from "@tauri-apps/plugin-process";
@@ -76,12 +76,21 @@ export const ExecutableCommandSchema = z.object({
 	label: z.string(),
 	localizedLabel: z.string().optional(),
 	value: z.string(),
+	path: z.string().nullable().optional(),
 	metadata: FileMetadataSchema.optional().nullable(),
 	handler: z.nativeEnum(COMMAND_HANDLER),
 	smartMatch: z.boolean().optional().default(false),
 });
 
 export type ExecutableCommand = z.infer<typeof ExecutableCommandSchema>;
+
+type FileEntry = {
+	name: string;
+	isDirectory: boolean;
+	isFile: boolean;
+	isSymlink: boolean;
+	path: string;
+};
 
 export const SYSTEM_COMMAND = {
 	SIGN_IN: "SIGN_IN",
@@ -148,7 +157,7 @@ function buildFormulaCommands(currentQuery: string): ExecutableCommand[] {
 }
 
 async function buildAppCommands(
-	apps: DirEntry[],
+	apps: FileEntry[],
 ): Promise<ExecutableCommand[]> {
 	return apps.map((app) => {
 		const defaultName = app.name.slice(0, -4);
@@ -158,6 +167,7 @@ async function buildAppCommands(
 			label: defaultName,
 			localizedLabel: localizedName,
 			value: app.name,
+			path: app.path,
 			handler: COMMAND_HANDLER.APP,
 			smartMatch: false,
 		};
@@ -233,7 +243,7 @@ export class CommandsStore extends SecureStore<Commands> {
 	currentCommand = $derived<ExecutableCommand>(
 		this.commands[this.selectedIndex],
 	);
-	installedApps = $state<DirEntry[]>([]);
+	installedApps = $state<FileEntry[]>([]);
 	appCommands = $state<ExecutableCommand[]>([]);
 	shortcutCommands = $state<ExecutableCommand[]>([]);
 	webSearchCommands = $state<ExecutableCommand[]>([]);
@@ -352,14 +362,18 @@ export class CommandsStore extends SecureStore<Commands> {
         query.predicate = NSPredicate(format: "kMDItemContentType == 'com.apple.application-bundle'")
 		*/
 
-		async function findAppsInDirectory(path: string): Promise<DirEntry[]> {
+		async function findAppsInDirectory(path: string): Promise<FileEntry[]> {
 			const entries = await readDir(path);
-			const apps: DirEntry[] = [];
+			const apps: FileEntry[] = [];
 
 			for (const entry of entries) {
 				if (entry.isDirectory) {
 					if (entry.name.endsWith(".app")) {
-						apps.push(entry);
+						apps.push({
+							...entry,
+							path: `${path}/${entry.name}`,
+						});
+						console.log(`${path}/${entry.name}`);
 					} else {
 						// Don't recurse into .app directories
 						if (!entry.name.includes(".app/")) {
@@ -532,11 +546,12 @@ export class CommandsStore extends SecureStore<Commands> {
 				return;
 			}
 
-			this.spotlightCommands = result.map((app) => ({
-				label: app.display_name,
+			this.spotlightCommands = result.map((entry) => ({
+				label: entry.display_name,
 				smartMatch: false,
-				value: app.path,
-				metadata: { contentType: app.content_type },
+				value: entry.path,
+				path: entry.path,
+				metadata: { contentType: entry.content_type },
 				handler: COMMAND_HANDLER.FS_ITEM,
 			}));
 

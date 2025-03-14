@@ -103,15 +103,13 @@ export function fail(message: string, cause?: Error) {
 export async function handleContextMenu({
 	event,
 	name,
-	context,
-}: { event: MouseEvent; name: string; context: unknown }) {
+}: { event: MouseEvent; name: string }) {
 	event.preventDefault();
 	event.stopPropagation();
 	await emit("show-context-menu", {
 		x: event.clientX,
 		y: event.clientY,
 		name,
-		context,
 	});
 }
 

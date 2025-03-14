@@ -68,9 +68,18 @@
 			"copyToClipboard": "Kopiuj do schowka",
 			"openNote": "Otwórz notatkę",
 			"createNote": "Utwórz notatkę",
-			"createSmartNote": "Utwórz smart notatkę",
+			"createSmartNote": "Utwórz smart notatkę",
 			"askAI": "Zapytaj AI",
 			"runShortcut": "Uruchom skrót"
+		},
+		"contextMenu": {
+			"pin": "Przypnij",
+			"open": "Otwórz",
+			"showInFinder": "Pokaż w Finderze",
+			"quickLook": "Szybki podgląd",
+			"getInfo": "Informacje",
+			"copyName": "Kopiuj nazwę",
+			"copyPath": "Kopiuj ścieżkę"
 		},
 		"menuItems": {
 			"clearNotes": "Wyczyść notatki",

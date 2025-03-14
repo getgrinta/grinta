@@ -41,8 +41,18 @@
 					"args": true
 				},
 				{
+					"name": "qlmanage",
+					"cmd": "qlmanage",
+					"args": true
+				},
+				{
 					"name": "shortcuts",
 					"cmd": "shortcuts",
+					"args": true
+				},
+				{
+					"name": "osascript",
+					"cmd": "osascript",
 					"args": true
 				}
 			]

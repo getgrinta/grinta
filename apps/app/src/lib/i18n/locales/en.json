@@ -67,6 +67,15 @@
 			"askAI": "Ask AI",
 			"runShortcut": "Run Shortcut"
 		},
+		"contextMenu": {
+			"pin": "Pin",
+			"open": "Open",
+			"showInFinder": "Show in Finder",
+			"quickLook": "Quick Look",
+			"getInfo": "Get Info",
+			"copyName": "Copy Name",
+			"copyPath": "Copy Path"
+		},
 		"menuItems": {
 			"clearNotes": "Clear notes",
 			"clearHistory": "Clear commands history",

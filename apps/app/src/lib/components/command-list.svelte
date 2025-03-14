@@ -1,10 +1,9 @@
 <script lang="ts">
 import { appMetadataStore } from "$lib/store/app-metadata.svelte";
-import { BAR_MODE, appStore } from "$lib/store/app.svelte";
+import { appStore } from "$lib/store/app.svelte";
 import {
 	COMMAND_HANDLER,
 	type CommandHandler,
-	type ExecutableCommand,
 	FileMetadataSchema,
 	commandsStore,
 } from "$lib/store/commands.svelte";
@@ -18,25 +17,17 @@ import {
 	highlightText,
 } from "$lib/utils.svelte";
 import { clsx } from "clsx";
-import { ArrowDownLeftIcon, PinIcon } from "lucide-svelte";
+import { ArrowDownLeftIcon } from "lucide-svelte";
 import { _ } from "svelte-i18n";
 import VirtualList from "svelte-tiny-virtual-list";
 import { fade } from "svelte/transition";
 import { P, match } from "ts-pattern";
 import { z } from "zod";
 import ContextMenu, { type MenuItem } from "./context-menu.svelte";
-const contextMenuItems: MenuItem[] = [
-	{
-		label: "Pin",
-		// biome-ignore lint/suspicious/noExplicitAny: fix
-		icon: PinIcon as any,
-		onClick: (context) =>
-			widgetsStore.addWidget({
-				type: "command",
-				data: context as ExecutableCommand,
-			}),
-	},
-];
+
+let contextMenuItems = $state<MenuItem[]>([]);
+
+import { createContextMenuItems } from "$lib/components/create-context-menu-items.svelte";
 
 type GetHelperProps = {
 	value: string;
@@ -100,7 +91,10 @@ $effect(clickListener);
 		slot="item" 
 		let:style 
 		transition:fade={{ duration: 150 }} 
-		oncontextmenu={(event) => handleContextMenu({ event, name: "commandList", context: commandsStore.commands[index] })}
+		oncontextmenu={(event) => {
+			contextMenuItems = createContextMenuItems(commandsStore.commands[index]);
+			handleContextMenu({ event, name: "commandList" })
+		}}
 		{style}
 	>
 		{@const active = commandsStore.selectedIndex === index}
