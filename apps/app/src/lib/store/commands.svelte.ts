@@ -7,9 +7,13 @@ import {
 } from "$lib/formula-commands";
 import { searchSpotlightApps } from "$lib/grinta-invoke";
 import { appMetadataStore } from "$lib/store/app-metadata.svelte";
-import { generateCancellationToken } from "$lib/utils.svelte";
+import {
+	type FileEntry,
+	findApps,
+	generateCancellationToken,
+} from "$lib/utils.svelte";
 import { until } from "@open-draft/until";
-import { readDir, watch } from "@tauri-apps/plugin-fs";
+import { watch } from "@tauri-apps/plugin-fs";
 import { fetch } from "@tauri-apps/plugin-http";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { exit } from "@tauri-apps/plugin-process";
@@ -83,14 +87,6 @@ export const ExecutableCommandSchema = z.object({
 });
 
 export type ExecutableCommand = z.infer<typeof ExecutableCommandSchema>;
-
-type FileEntry = {
-	name: string;
-	isDirectory: boolean;
-	isFile: boolean;
-	isSymlink: boolean;
-	path: string;
-};
 
 export const SYSTEM_COMMAND = {
 	SIGN_IN: "SIGN_IN",
@@ -362,48 +358,8 @@ export class CommandsStore extends SecureStore<Commands> {
         query.predicate = NSPredicate(format: "kMDItemContentType == 'com.apple.application-bundle'")
 		*/
 
-		async function findAppsInDirectory(path: string): Promise<FileEntry[]> {
-			const entries = await readDir(path);
-			const apps: FileEntry[] = [];
-
-			for (const entry of entries) {
-				if (entry.isDirectory) {
-					if (entry.name.endsWith(".app")) {
-						apps.push({
-							...entry,
-							path: `${path}/${entry.name}`,
-						});
-						console.log(`${path}/${entry.name}`);
-					} else {
-						// Don't recurse into .app directories
-						if (!entry.name.includes(".app/")) {
-							try {
-								const subApps = await findAppsInDirectory(
-									`${path}/${entry.name}`,
-								);
-								apps.push(...subApps);
-							} catch {
-								// Permission errors
-							}
-						}
-					}
-				}
-			}
-
-			return apps;
-		}
-
-		const [appsFromApplications, appsFromSystemApplications] =
-			await Promise.all([
-				findAppsInDirectory("/Applications"),
-				findAppsInDirectory("/System/Applications"),
-			]);
-
-		this.installedApps = [
-			...appsFromApplications,
-			...appsFromSystemApplications,
-		];
-
+		const apps = await findApps();
+		this.installedApps = apps;
 		this.appCommands = await buildAppCommands(this.installedApps);
 	}
 

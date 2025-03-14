@@ -2,6 +2,7 @@ import { env } from "$env/dynamic/public";
 import type { AppType } from "@getgrinta/api";
 import { install } from "@github/hotkey";
 import { type UnlistenFn, emit, listen } from "@tauri-apps/api/event";
+import { readDir } from "@tauri-apps/plugin-fs";
 import { fetch } from "@tauri-apps/plugin-http";
 import { Position, moveWindow } from "@tauri-apps/plugin-positioner";
 // biome-ignore lint/suspicious/noShadowRestrictedNames: nah
@@ -146,4 +147,53 @@ export function getIcon(command: ExecutableCommand) {
 			return FileIcon;
 		})
 		.otherwise(() => ChevronRightIcon);
+}
+
+export type FileEntry = {
+	name: string;
+	isDirectory: boolean;
+	isFile: boolean;
+	isSymlink: boolean;
+	path: string;
+};
+
+export async function findApps(): Promise<FileEntry[]> {
+	const apps = [
+		...(
+			await Promise.all([
+				findAppsInDirectory("/Applications"),
+				findAppsInDirectory("/System/Applications"),
+			])
+		).flat(),
+	];
+
+	return apps;
+}
+
+async function findAppsInDirectory(path: string): Promise<FileEntry[]> {
+	const entries = await readDir(path);
+	const apps: FileEntry[] = [];
+
+	for (const entry of entries) {
+		if (entry.isDirectory) {
+			if (entry.name.endsWith(".app")) {
+				apps.push({
+					...entry,
+					path: `${path}/${entry.name}`,
+				});
+			} else {
+				// Don't recurse into .app directories
+				if (!entry.name.includes(".app/")) {
+					try {
+						const subApps = await findAppsInDirectory(`${path}/${entry.name}`);
+						apps.push(...subApps);
+					} catch {
+						// Permission errors
+					}
+				}
+			}
+		}
+	}
+
+	return apps;
 }

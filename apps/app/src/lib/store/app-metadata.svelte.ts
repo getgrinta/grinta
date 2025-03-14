@@ -1,5 +1,5 @@
+import { findApps } from "$lib/utils.svelte";
 import { invoke } from "@tauri-apps/api/core";
-import { readDir } from "@tauri-apps/plugin-fs";
 
 type AppInfo = { base64Image: string; localizedName: string };
 
@@ -17,26 +17,16 @@ export class AppMetadataStore {
 			const resourcesPaths: string[] = [];
 			const appNameMap: Record<string, string> = {};
 
-			// Process apps from multiple directories
-			const appDirectories = [
-				{ path: "/Applications", apps: await readDir("/Applications") },
-				{
-					path: "/System/Applications",
-					apps: await readDir("/System/Applications"),
-				},
-			];
+			const apps = await findApps();
 
-			// Process all app directories
-			for (const { path, apps } of appDirectories) {
-				for (const app of apps) {
-					if (!app.name.endsWith(".app") || !app.isDirectory) continue;
+			for (const app of apps) {
+				if (!app.name.endsWith(".app") || !app.isDirectory) continue;
 
-					const appName = app.name.replace(".app", "");
-					const resourcesPath = `${path}/${app.name}/Contents/Resources/`;
+				const appName = app.name.replace(".app", "");
+				const resourcesPath = `${app.path}/Contents/Resources/`;
 
-					resourcesPaths.push(resourcesPath);
-					appNameMap[appName] = resourcesPath;
-				}
+				resourcesPaths.push(resourcesPath);
+				appNameMap[appName] = resourcesPath;
 			}
 
 			// Load app icons in batches to avoid overloading the system

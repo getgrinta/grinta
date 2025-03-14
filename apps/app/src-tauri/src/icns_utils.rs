@@ -295,6 +295,8 @@ fn get_localized_app_names(app_paths: &[String]) -> HashMap<String, String> {
                 current_app_index += 1;
             }
         }
+    } else {
+        println!("Failed to execute mdls command");
     }
 
     localized_names
