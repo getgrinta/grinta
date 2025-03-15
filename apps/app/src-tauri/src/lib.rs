@@ -1,8 +1,8 @@
 use tauri_plugin_autostart::MacosLauncher;
 
 mod icns_utils;
-mod theme_utils;
 mod spotlight_utils;
+mod theme_utils;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {

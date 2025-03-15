@@ -1,9 +1,9 @@
-use base64::{engine::general_purpose, Engine as _};
+use base64::{Engine as _, engine::general_purpose};
 use std::collections::HashMap;
 use std::fs::{self};
 use std::io::BufWriter;
 use std::path::Path;
-use tauri::{command, AppHandle, Manager, Runtime};
+use tauri::{AppHandle, Manager, Runtime, command};
 
 #[cfg(target_os = "macos")]
 use tauri_icns::{IconFamily, IconType};
@@ -19,7 +19,7 @@ fn load_icns_file(path: &Path) -> Result<Option<Vec<u8>>, String> {
                 "Failed to read ICNS file: {} for path {}",
                 e,
                 path.display()
-            ))
+            ));
         }
     };
 
@@ -266,13 +266,13 @@ fn get_localized_app_names(app_paths: &[String]) -> HashMap<String, String> {
                 if !line.starts_with(PREFIX) {
                     continue;
                 }
-                
-                let name = &line[PREFIX.len()..line.len()-1];
-                
+
+                let name = &line[PREFIX.len()..line.len() - 1];
+
                 if current_app_index < app_paths.len() {
                     localized_names.insert(app_paths[current_app_index].clone(), name.to_string());
                 }
-    
+
                 current_app_index += 1;
             }
         }
