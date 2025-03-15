@@ -1,9 +1,11 @@
 import { goto } from "$app/navigation";
 import {
+	parseCurrencyConversion,
 	parseFraction,
 	parseMathExpression,
 	parseRelativeTime,
 	parseTextMathExpression,
+	parseUnitConversion,
 } from "$lib/formula-commands";
 import { appMetadataStore } from "$lib/store/app-metadata.svelte";
 import { generateCancellationToken } from "$lib/utils.svelte";
@@ -53,7 +55,6 @@ export const COMMAND_HANDLER = {
 	SYSTEM: "SYSTEM",
 	APP: "APP",
 	CHANGE_MODE: "CHANGE_MODE",
-	FORMULA_RESULT: "FORMULA_RESULT",
 	COPY_TO_CLIPBOARD: "COPY_TO_CLIPBOARD",
 	RUN_SHORTCUT: "RUN_SHORTCUT",
 	OPEN_NOTE: "OPEN_NOTE",
@@ -112,7 +113,9 @@ async function fetchCompletions(query: string) {
 	return json;
 }
 
-function buildFormulaCommands(currentQuery: string): ExecutableCommand[] {
+async function buildFormulaCommands(
+	currentQuery: string,
+): Promise<ExecutableCommand[]> {
 	// Try parsing as a mathematical expression first
 	const mathCommands = parseMathExpression(currentQuery);
 	if (mathCommands.length > 0) {
@@ -125,16 +128,28 @@ function buildFormulaCommands(currentQuery: string): ExecutableCommand[] {
 		return textMathCommands;
 	}
 
-	// Try parsing text fractions like "two thirds"
-	const fractionCommands = parseFraction(currentQuery);
-	if (fractionCommands.length > 0) {
-		return fractionCommands;
+	// Try parsing currency conversions like "10 usd to eur"
+	const currencyCommands = await parseCurrencyConversion(currentQuery);
+	if (currencyCommands.length > 0) {
+		return currencyCommands;
+	}
+
+	// Try parsing unit conversions like "5 inches to cm"
+	const unitConversionCommands = parseUnitConversion(currentQuery);
+	if (unitConversionCommands.length > 0) {
+		return unitConversionCommands;
 	}
 
 	// Try parsing relative time expressions
 	const timeCommands = parseRelativeTime(currentQuery);
 	if (timeCommands.length > 0) {
 		return timeCommands;
+	}
+
+	// Try parsing text fractions like "two thirds"
+	const fractionCommands = parseFraction(currentQuery);
+	if (fractionCommands.length > 0) {
+		return fractionCommands;
 	}
 
 	return [];
@@ -405,39 +420,37 @@ export class CommandsStore extends SecureStore<Commands> {
 		);
 	}
 
-	async buildCommands({
-		query,
-		barMode,
-	}: { query: string; searchMode: SearchMode; barMode: BarMode }) {
+	async buildCommands() {
 		// Skip if we're currently updating from web search to prevent infinite loop
 		if (this.isUpdatingFromWebSearch) {
 			return;
 		}
 
 		this.selectedIndex = 0;
-		const queryIsUrl = HOSTNAME_REGEX.test(query);
+		const queryIsUrl = HOSTNAME_REGEX.test(appStore.query);
 		const newCommandsToken = generateCancellationToken();
 		this.buildCommandsToken = newCommandsToken;
 
 		let commands: ExecutableCommand[] = [];
 
-		commands = await match(barMode)
+		commands = await match(appStore.barMode)
 			.with(BAR_MODE.INITIAL, async () => {
 				let commandHistory = this.commandHistory.slice().reverse();
-				if (query.length === 0) {
+				if (appStore.query.length === 0) {
 					return commandHistory;
 				}
 
 				// Filter out commands of the same url as the current query
 				if (queryIsUrl) {
 					commandHistory = commandHistory.filter(
-						(a) => a.label !== query && a.handler !== COMMAND_HANDLER.URL,
+						(a) =>
+							a.label !== appStore.query && a.handler !== COMMAND_HANDLER.URL,
 					);
 				}
 
 				return [
 					...this.appCommands,
-					...this.buildUrlCommands(queryIsUrl, query),
+					...this.buildUrlCommands(queryIsUrl, appStore.query),
 					...this.webSearchCommands,
 					...commandHistory,
 					...this.shortcutCommands,
@@ -452,11 +465,13 @@ export class CommandsStore extends SecureStore<Commands> {
 			})
 			.with(BAR_MODE.NOTES, async () => {
 				const createNoteCommand =
-					query.length > 0
+					appStore.query.length > 0
 						? [
 								{
-									label: t("commands.actions.createNote", { query }),
-									value: query,
+									label: t("commands.actions.createNote", {
+										query: appStore.query,
+									}),
+									value: appStore.query,
 									handler: COMMAND_HANDLER.CREATE_NOTE,
 									smartMatch: false,
 								},
@@ -469,13 +484,13 @@ export class CommandsStore extends SecureStore<Commands> {
 			.exhaustive();
 
 		const sortedAndFilteredCommands =
-			query.length === 0
+			appStore.query.length === 0
 				? commands
-				: matchSorter(commands, query, {
+				: matchSorter(commands, appStore.query, {
 						keys: ["localizedLabel", "label"],
 					}).sort((a, b) => this.sortCommands({ prev: a, next: b }));
 
-		const formulaCommands = buildFormulaCommands(query);
+		const formulaCommands = await buildFormulaCommands(appStore.query);
 
 		// Prevent overriding commands
 		if (newCommandsToken !== this.buildCommandsToken) {
@@ -484,12 +499,12 @@ export class CommandsStore extends SecureStore<Commands> {
 
 		this.commands = uniq([...formulaCommands, ...sortedAndFilteredCommands]);
 
-		if (query.length > 0 && barMode === "INITIAL") {
+		if (appStore.query.length > 0 && appStore.barMode === BAR_MODE.INITIAL) {
 			setTimeout(() => {
 				this.fetchWebSearchCommands(
-					query,
+					appStore.query,
 					newCommandsToken,
-					queryIsUrl ? query : null,
+					queryIsUrl ? appStore.query : null,
 				);
 			}, 0);
 		}
@@ -521,22 +536,22 @@ export class CommandsStore extends SecureStore<Commands> {
 		);
 	}
 
-	removeHistoryOfType(handler: CommandHandler) {
+	async removeHistoryOfType(handler: CommandHandler) {
 		const filteredHistory = this.commandHistory
 			.slice()
 			.filter((entry) => entry.handler !== handler);
-		this.updateData({ commandHistory: filteredHistory });
+		await this.updateData({ commandHistory: filteredHistory });
 	}
 
-	removeHistoryEntry({ value, handler }: HistoryEntry) {
+	async removeHistoryEntry({ value, handler }: HistoryEntry) {
 		const filteredHistory = this.commandHistory
 			.slice()
 			.filter((entry) => entry.handler !== handler || entry.value !== value);
-		this.updateData({ commandHistory: filteredHistory });
+		await this.updateData({ commandHistory: filteredHistory });
 	}
 
 	async clearHistory() {
-		this.updateData({ commandHistory: [] });
+		await this.updateData({ commandHistory: [] });
 	}
 
 	async openUrl(url: string) {
@@ -566,7 +581,11 @@ export class CommandsStore extends SecureStore<Commands> {
 						pastCommand.handler !== command.handler,
 				);
 			filteredHistory.push(command);
-			this.updateData({ commandHistory: filteredHistory });
+			await this.updateData({ commandHistory: filteredHistory });
+			setTimeout(() => {
+				// Build with timeout, so it's not visible in the UI before user is moved to the app.
+				this.buildCommands();
+			}, 100);
 		}
 		window.scrollTo({ top: 0 });
 		return match(command)
@@ -583,10 +602,7 @@ export class CommandsStore extends SecureStore<Commands> {
 			})
 			.with(
 				{
-					handler: P.union(
-						COMMAND_HANDLER.COPY_TO_CLIPBOARD,
-						COMMAND_HANDLER.FORMULA_RESULT,
-					),
+					handler: P.union(COMMAND_HANDLER.COPY_TO_CLIPBOARD),
 				},
 				async ({ value }) => {
 					await navigator.clipboard.writeText(value);
@@ -697,7 +713,7 @@ export class CommandsStore extends SecureStore<Commands> {
 				keys: ["localizedLabel", "label"],
 			}).sort((a, b) => this.sortCommands({ prev: a, next: b }));
 
-			const formulaCommands = buildFormulaCommands(query);
+			const formulaCommands = await buildFormulaCommands(query);
 
 			// Update the commands list
 			this.commands = uniq([...formulaCommands, ...sortedAndFilteredCommands]);

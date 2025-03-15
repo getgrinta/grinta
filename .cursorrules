@@ -5,6 +5,10 @@ Use /apps/website/src/content/docs as the main documentation directory.
 Use Svelte 5 for the UI.
 The desktop app is developed with Tauri.
 Do not run any server commands if not asked.
+Do not create .bak files.
+DO NOT CREATE NEW DIRECTORIES IF NOT ASKED FOR.
+Add only essential and non-trivial comments in the code.
+Never skip failing tests.
 
 // Code guidelines
 This project uses Bun as the JavaScript and TypeScript runtime.
@@ -12,3 +16,7 @@ Use kebab-case for file names. Example: navigation-bar.svelte.
 Use Biome as linter and formatter with the global "format" and "lint" commands.
 Turborepo is used to run scripts and cache outputs.
 Always make sure you use Svelte 5 (runes) syntax.
+
+// Actions
+Run tests with "bun run test" in the root or specific app directory. Use 'run' as it injects mocks.
+Do not filter tests. Always use "bun run test".

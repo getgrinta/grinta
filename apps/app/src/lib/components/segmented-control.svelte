@@ -9,6 +9,7 @@ type Item = {
 	active?: boolean;
 	hotkey?: string;
 	shortcut?: string;
+	testId?: string;
 	icon?: any;
 };
 
@@ -47,6 +48,7 @@ const containerCss = $derived(
             )}
             data-hotkey={item.hotkey}
             onclick={item.onClick}
+            data-testid={item.testId}
         >
             {#if item.icon}
                 <item.icon size={size === "md" ? 16 : 18} />

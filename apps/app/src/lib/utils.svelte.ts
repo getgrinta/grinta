@@ -132,8 +132,15 @@ export function getIcon(handler: CommandHandler) {
 		.with(COMMAND_HANDLER.APP, () => AppWindowIcon)
 		.with(COMMAND_HANDLER.OPEN_NOTE, () => StickyNoteIcon)
 		.with(COMMAND_HANDLER.CREATE_NOTE, () => StickyNoteIcon)
-		.with(COMMAND_HANDLER.FORMULA_RESULT, () => EqualIcon)
 		.with(COMMAND_HANDLER.RUN_SHORTCUT, () => Layers2Icon)
 		.with(COMMAND_HANDLER.COPY_TO_CLIPBOARD, () => CopyIcon)
 		.otherwise(() => ChevronRightIcon);
+}
+
+export function formatCurrency(amount: number, currency: string) {
+	const locale = window.navigator.language ?? "en";
+	return new Intl.NumberFormat(locale, {
+		style: "currency",
+		currency,
+	}).format(amount);
 }

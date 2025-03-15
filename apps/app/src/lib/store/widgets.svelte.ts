@@ -39,6 +39,24 @@ export class WidgetsStore extends SecureStore<Widgets> {
 			widgets: this.data.widgets.filter((_, i) => i !== index),
 		});
 	}
+
+	moveWidget(currentIndex: number, targetIndex: number) {
+		if (
+			currentIndex < 0 ||
+			currentIndex >= this.data.widgets.length ||
+			targetIndex < 0 ||
+			targetIndex >= this.data.widgets.length ||
+			currentIndex === targetIndex
+		) {
+			return;
+		}
+
+		const widgets = [...this.data.widgets];
+		const [widget] = widgets.splice(currentIndex, 1);
+		widgets.splice(targetIndex, 0, widget);
+
+		this.updateData({ widgets });
+	}
 }
 
 export const widgetsStore = new WidgetsStore({

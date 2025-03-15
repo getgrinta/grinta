@@ -6,7 +6,7 @@ import type { SvelteComponent } from "svelte";
 
 const {
 	children,
-	onclick,
+	onClick,
 	hotkey,
 	class: className,
 } = $props<{
@@ -28,7 +28,7 @@ const css = $derived(
 <button 
     type="button" 
     class={clsx("btn btn-sm shadow-xs", css, className)}
-    onclick={onclick}
+    onclick={onClick}
     data-hotkey={hotkey}
 >
 {@render children?.()}

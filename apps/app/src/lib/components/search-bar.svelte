@@ -14,6 +14,7 @@ import { SystemThemeWatcher } from "$lib/system-theme-watcher.svelte";
 import { clsx } from "clsx";
 import { createForm } from "felte";
 import {
+	ChevronLeftIcon,
 	ClipboardIcon,
 	EyeIcon,
 	EyeOffIcon,
@@ -28,6 +29,7 @@ import { match } from "ts-pattern";
 
 let queryInput: HTMLInputElement;
 const pressedKeys = new PressedKeys();
+const systemThemeWatcher = new SystemThemeWatcher();
 
 const INDICATOR_MODES = [
 	{ value: BAR_MODE.INITIAL, icon: GrintaIcon, shortcut: "⌘1" },
@@ -120,29 +122,26 @@ async function handleNavigation(event: KeyboardEvent) {
 	}
 }
 
+async function buildCommands() {
+	return commandsStore.buildCommands();
+}
+
+async function buildAppCommandsAndAppIcons() {
+	await commandsStore.buildAppCommands();
+	await buildCommands();
+}
+
 watch(
 	() => [appStore.query, appStore.searchMode, appStore.barMode],
 	() => {
-		commandsStore.buildCommands({
-			query: appStore.query,
-			searchMode: appStore.searchMode,
-			barMode: appStore.barMode,
-		});
+		buildCommands();
 	},
 );
 
 watch(
 	() => appMetadataStore.appInfo.length,
 	() => {
-		async function buildCommands() {
-			await commandsStore.buildAppCommands();
-			commandsStore.buildCommands({
-				query: appStore.query,
-				searchMode: appStore.searchMode,
-				barMode: appStore.barMode,
-			});
-		}
-		buildCommands();
+		buildAppCommandsAndAppIcons();
 	},
 );
 
@@ -180,18 +179,34 @@ const inputProps = $derived(
 		.exhaustive(),
 );
 
-const systemThemeWatcher = new SystemThemeWatcher();
+const indicatorButton = $derived(
+	match(appStore.barMode)
+		.with(BAR_MODE.INITIAL, () =>
+			settingsStore.data.incognitoEnabled
+				? {
+						icon: EyeOffIcon,
+						onClick: () => settingsStore.toggleIncognito(),
+						hotkey: "Mod+p",
+					}
+				: {
+						icon: EyeIcon,
+						onClick: () => settingsStore.toggleIncognito(),
+						hotkey: "Mod+p",
+					},
+		)
+		.otherwise(() => ({
+			icon: ChevronLeftIcon,
+			onClick: () => goto("/commands/INITIAL"),
+			hotkey: "Mod+p",
+		})),
+);
 </script>
 
 <form use:form>
 	<TopBar fancyMode={settingsStore.data.incognitoEnabled}>
 		<div slot="indicator">
-			<SearchBarAccessoryButton onclick={() => settingsStore.toggleIncognito()} hotkey="Mod+p">
-				{#if settingsStore.data.incognitoEnabled}
-					<EyeOffIcon size={16} class={clsx(systemThemeWatcher.theme === THEME.LIGHT && "text-neutral-700", "pointer-events-none")} />
-				{:else}
-					<EyeIcon size={16} class={clsx(systemThemeWatcher.theme === THEME.LIGHT && "text-neutral-500", "pointer-events-none")} />
-				{/if}
+			<SearchBarAccessoryButton onClick={indicatorButton.onClick} hotkey={indicatorButton.hotkey}>
+				<indicatorButton.icon size={16} class={clsx(systemThemeWatcher.theme === THEME.LIGHT && "text-neutral-500", "pointer-events-none")} />
 			</SearchBarAccessoryButton>
 		</div>
 			<input
@@ -203,6 +218,7 @@ const systemThemeWatcher = new SystemThemeWatcher();
 				onkeydown={handleNavigation}
 				placeholder={inputProps.placeholder}
 				autocomplete="off"
+				data-testid="search-bar"
 				autofocus
 			/>
 		<div slot="addon">
@@ -212,6 +228,7 @@ const systemThemeWatcher = new SystemThemeWatcher();
 					icon: mode.icon,
 					active: mode.value === appStore.barMode,
 					shortcut: isCmdPressed ? mode.shortcut : undefined,
+					testId: `search-bar-mode-${mode.value.toLowerCase()}`,
 					onClick: () => switchMode(mode.value)
 				}))}
 			/>
