@@ -219,7 +219,11 @@ fn create_spotlight_predicate(query_text: &str) -> id {
         // Define allowed extensions
         let allowed_extensions = [
             "*.txt", "*.pdf", "*.xls", "*.xlsx", "*.doc", "*.docx", 
-            "*.ppt", "*.pptx", "*.zip", "*.rar", "*.7z"
+            "*.ppt", "*.pptx", "*.zip", "*.rar", "*.7z", "*.md",
+            "*.gsheet", "*.gdoc", "*.gslides", "*.drawio", "*.odp",
+
+            // Ebooks
+            "*.epub, *.mobi, *.djvu",
         ];
 
         // Create predicates for each allowed extension

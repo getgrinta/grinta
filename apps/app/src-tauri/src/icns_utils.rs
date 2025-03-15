@@ -111,7 +111,7 @@ pub struct AppInfo {
 
 #[command]
 #[cfg(target_os = "macos")]
-pub fn load_app_icons<R: Runtime>(
+pub fn load_app_info<R: Runtime>(
     _app_handle: AppHandle<R>,
     resources_paths: Vec<String>,
 ) -> Result<HashMap<String, AppInfo>, String> {
@@ -227,25 +227,6 @@ pub fn load_app_icons<R: Runtime>(
     Ok(result)
 }
 
-// Command to get the path to the icons directory
-#[command]
-#[cfg(target_os = "macos")]
-pub fn get_icons_directory<R: Runtime>(app_handle: AppHandle<R>) -> Result<String, String> {
-    // Get app data directory
-    let app_data_dir = get_app_data_dir(app_handle)?;
-    let icons_dir = format!("{}/icons", app_data_dir);
-
-    let icons_dir_path = Path::new(&icons_dir);
-
-    // Create icons directory if it doesn't exist
-    if !icons_dir_path.exists() {
-        fs::create_dir_all(icons_dir_path)
-            .map_err(|e| format!("Failed to create icons directory: {}", e))?;
-    }
-
-    Ok(icons_dir)
-}
-
 // Define a struct to hold app information for non-macOS platforms
 #[derive(serde::Serialize, serde::Deserialize)]
 #[cfg(not(target_os = "macos"))]
@@ -305,17 +286,11 @@ fn get_localized_app_names(app_paths: &[String]) -> HashMap<String, String> {
 // Fallback implementations for non-macOS platforms
 #[command]
 #[cfg(not(target_os = "macos"))]
-pub fn load_app_icons<R: Runtime>(
+pub fn load_app_info<R: Runtime>(
     _app_handle: AppHandle<R>,
     _icns_paths: Vec<String>,
 ) -> Result<HashMap<String, AppInfo>, String> {
     Ok(HashMap::new())
-}
-
-#[command]
-#[cfg(not(target_os = "macos"))]
-pub fn get_icons_directory<R: Runtime>(_app_handle: AppHandle<R>) -> Result<String, String> {
-    Err("Not implemented on this platform".to_string())
 }
 
 #[tauri::command]

@@ -10,6 +10,14 @@ export function setVibrancy(
 	return grintaInvoke("set_vibrancy", { materialName: materialName });
 }
 
+export type AppInfo = { base64Image: string; localizedName: string };
+
+export function loadAppInfo(paths: string[]): Promise<Record<string, AppInfo>> {
+	return grintaInvoke<Record<string, AppInfo>>("load_app_info", {
+		resourcesPaths: paths,
+	});
+}
+
 export function searchSpotlightApps(
 	query: string,
 ): Promise<SpotlightSearchResult[]> {
@@ -24,7 +32,10 @@ type SpotlightSearchResult = {
 	content_type: string;
 };
 
-type GrintaInvokeCommand = "search_spotlight_apps" | "set_vibrancy";
+type GrintaInvokeCommand =
+	| "search_spotlight_apps"
+	| "set_vibrancy"
+	| "load_app_info";
 
 function grintaInvoke<T>(
 	cmd: GrintaInvokeCommand,

@@ -28,8 +28,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             theme_utils::set_vibrancy,
             theme_utils::set_appearance,
-            icns_utils::load_app_icons,
-            icns_utils::get_icons_directory,
+            icns_utils::load_app_info,
             spotlight_utils::search_spotlight_apps,
         ])
         .run(tauri::generate_context!())

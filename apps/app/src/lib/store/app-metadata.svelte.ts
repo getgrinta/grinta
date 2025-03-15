@@ -1,7 +1,6 @@
+import { type AppInfo, loadAppInfo } from "$lib/grinta-invoke";
 import { findApps } from "$lib/utils.svelte";
 import { invoke } from "@tauri-apps/api/core";
-
-type AppInfo = { base64Image: string; localizedName: string };
 
 export class AppMetadataStore {
 	appInfo = $state<Record<string, AppInfo>>({});
@@ -20,8 +19,6 @@ export class AppMetadataStore {
 			const apps = await findApps();
 
 			for (const app of apps) {
-				if (!app.name.endsWith(".app") || !app.isDirectory) continue;
-
 				const appName = app.name.replace(".app", "");
 				const resourcesPath = `${app.path}/Contents/Resources/`;
 
@@ -30,18 +27,12 @@ export class AppMetadataStore {
 			}
 
 			// Load app icons in batches to avoid overloading the system
-			const batchSize = 20;
+			const batchSize = 50;
 			for (let i = 0; i < resourcesPaths.length; i += batchSize) {
 				const batch = resourcesPaths.slice(i, i + batchSize);
 
 				try {
-					const appInfo = await invoke<Record<string, AppInfo>>(
-						"load_app_icons",
-						{
-							resourcesPaths: batch,
-						},
-					);
-
+					const appInfo = await loadAppInfo(batch);
 					this.appInfo = { ...this.appInfo, ...appInfo };
 				} catch (error) {
 					console.error(
