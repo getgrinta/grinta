@@ -55,6 +55,8 @@
 	"commands": {
 		"helperText": {
 			"app": "App",
+			"file": "File",
+			"folder": "Folder",
 			"web": "Web",
 			"barCommand": "Bar Command",
 			"changeMode": "Change Mode",
@@ -64,6 +66,15 @@
 			"createSmartNote": "Create Smart Note",
 			"askAI": "Ask AI",
 			"runShortcut": "Run Shortcut"
+		},
+		"contextMenu": {
+			"pin": "Pin",
+			"open": "Open",
+			"showInFinder": "Show in Finder",
+			"quickLook": "Quick Look",
+			"getInfo": "Get Info",
+			"copyName": "Copy Name",
+			"copyPath": "Copy Path"
 		},
 		"menuItems": {
 			"clearNotes": "Clear notes",

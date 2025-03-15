@@ -2,7 +2,7 @@
 import { SEARCH_MODE, appStore } from "$lib/store/app.svelte";
 import { GlobeIcon, SparklesIcon } from "lucide-svelte";
 import { _ } from "svelte-i18n";
-import SegmentedControl from "./segmented-control.svelte";
+import Toggle from "./toggle.svelte";
 
 const items = $derived([
 	{
@@ -30,4 +30,4 @@ function toggleMode() {
 
 <button type="button" class="hidden" data-hotkey="Mod+j" onclick={toggleMode}>Toggle Search Mode</button>
 
-<SegmentedControl size="md" items={items} />
+<Toggle size="md" items={items} />

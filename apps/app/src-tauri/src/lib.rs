@@ -2,6 +2,7 @@ use tauri_plugin_autostart::MacosLauncher;
 
 mod icns_utils;
 mod theme_utils;
+mod spotlight_utils;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -23,11 +24,12 @@ pub fn run() {
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_opener::init())
+        .manage(spotlight_utils::SpotlightState::new())
         .invoke_handler(tauri::generate_handler![
             theme_utils::set_vibrancy,
             theme_utils::set_appearance,
-            icns_utils::load_app_icons,
-            icns_utils::get_icons_directory
+            icns_utils::load_app_info,
+            spotlight_utils::search_spotlight_apps,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

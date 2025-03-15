@@ -123,12 +123,16 @@ async function handleNavigation(event: KeyboardEvent) {
 }
 
 async function buildCommands() {
-	return commandsStore.buildCommands();
+	return commandsStore.buildCommands({
+		isRefresh: false,
+	});
 }
 
 async function buildAppCommandsAndAppIcons() {
 	await commandsStore.buildAppCommands();
-	await buildCommands();
+	await commandsStore.buildCommands({
+		isRefresh: true,
+	});
 }
 
 watch(

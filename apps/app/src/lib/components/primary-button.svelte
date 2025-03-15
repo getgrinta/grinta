@@ -8,11 +8,13 @@ const {
 	children,
 	class: className,
 	onclick,
+	type = "submit",
 	disabled,
 } = $props<{
 	children: Snippet;
+	type?: string;
 	class?: string;
-	onclick: () => void;
+	onclick?: () => void;
 	disabled?: boolean;
 }>();
 
@@ -20,7 +22,7 @@ const systemThemeWatcher = new SystemThemeWatcher();
 </script>
 
 <button 
-    type="button" 
+    type={type}
     class={clsx(
         `btn border-0`,
         systemThemeWatcher.theme === THEME.LIGHT ? "shadow-neutral-400/30 shadow-xs border-neutral-400/30 bg-neutral-200/50" : "shadow-neutral-800/30 shadow-xs disabled:!bg-neutral-100/20 bg-base-100 base-nonsemantic-dark",

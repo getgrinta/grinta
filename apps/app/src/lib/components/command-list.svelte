@@ -4,11 +4,10 @@ import { appStore } from "$lib/store/app.svelte";
 import {
 	COMMAND_HANDLER,
 	type CommandHandler,
-	type ExecutableCommand,
+	FileMetadataSchema,
 	commandsStore,
 } from "$lib/store/commands.svelte";
 import { THEME } from "$lib/store/settings.svelte";
-import { widgetsStore } from "$lib/store/widgets.svelte";
 import { SystemThemeWatcher } from "$lib/system-theme-watcher.svelte";
 import {
 	clickListener,
@@ -17,41 +16,29 @@ import {
 	highlightText,
 } from "$lib/utils.svelte";
 import { clsx } from "clsx";
-import { ArrowDownLeftIcon, PinIcon, XIcon } from "lucide-svelte";
+import { ArrowDownLeftIcon } from "lucide-svelte";
 import { _ } from "svelte-i18n";
 import { fade } from "svelte/transition";
 import { P, match } from "ts-pattern";
 import { VList } from "virtua/svelte";
-import ContextMenu, { type MenuItem } from "./context-menu.svelte";
-
-const contextMenuItems: MenuItem[] = [
-	{
-		label: "Pin",
-		icon: PinIcon as any,
-		onClick: (context) =>
-			widgetsStore.addWidget({
-				type: "command",
-				data: context as ExecutableCommand,
-			}),
-	},
-	{
-		label: "Remove",
-		icon: XIcon as any,
-		onClick: async (context) => {
-			await commandsStore.removeHistoryEntry(context as ExecutableCommand);
-			await commandsStore.buildCommands();
-		},
-	},
-];
+import { z } from "zod";
+import CommandListContextMenu from "./command-list-context-menu.svelte";
 
 type GetHelperProps = {
 	value: string;
 	handler: CommandHandler;
+	metadata?: z.infer<typeof FileMetadataSchema>;
 };
 
-function getHelperText({ value, handler }: GetHelperProps) {
+function getCommandTypeLabel({ value, handler, metadata }: GetHelperProps) {
 	return match(handler)
 		.with(COMMAND_HANDLER.APP, () => $_("commands.helperText.app"))
+		.with(COMMAND_HANDLER.FS_ITEM, () => {
+			if (metadata?.contentType === "public.folder") {
+				return $_("commands.helperText.folder");
+			}
+			return $_("commands.helperText.file");
+		})
 		.with(COMMAND_HANDLER.URL, () => $_("commands.helperText.web"))
 		.with(COMMAND_HANDLER.SYSTEM, () => $_("commands.helperText.barCommand"))
 		.with(COMMAND_HANDLER.CHANGE_MODE, () =>
@@ -76,7 +63,7 @@ const systemThemeWatcher = new SystemThemeWatcher();
 $effect(clickListener);
 </script>
 
-<ContextMenu name="commandList" items={contextMenuItems} />
+<CommandListContextMenu />
 
 <ul
 	id="commandList"
@@ -132,12 +119,10 @@ $effect(clickListener);
 				)}
 				data-command-index={index}
 				transition:fade={{ duration: 150 }}
-				oncontextmenu={(event) =>
-					handleContextMenu({
-						event,
-						name: "commandList",
-						context: commandsStore.commands[index],
-					})}
+				oncontextmenu={(event) => {
+					contextMenuItems = createContextMenuItems(commandsStore.commands[index]);
+					handleContextMenu({ event, name: "commandList" })
+				}}
 			>
 				<div
 					class={clsx(
@@ -191,7 +176,7 @@ $effect(clickListener);
 					</button>
 					<div class="flex gap-1 items-center">
 						<span class={clsx("badge", badgeCss(active))}>
-							{getHelperText({
+							{getCommandTypeLabel({
 								value: item.value,
 								handler: item.handler,
 							})}

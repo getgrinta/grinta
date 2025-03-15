@@ -55,6 +55,8 @@
 	"commands": {
 		"helperText": {
 			"app": "App",
+			"file": "Datei",
+			"folder": "Ordner",
 			"web": "Netz",
 			"barCommand": "Befehlsleiste",
 			"changeMode": "Modus ändern",
@@ -64,6 +66,15 @@
 			"createSmartNote": "Smart-Notiz erstellen",
 			"askAI": "KI fragen",
 			"runShortcut": "Tastenkürzel ausführen"
+		},
+		"contextMenu": {
+			"pin": "Anheften",
+			"open": "Öffnen",
+			"showInFinder": "Im Finder anzeigen",
+			"quickLook": "Schnellansicht",
+			"getInfo": "Informationen",
+			"copyName": "Name kopieren",
+			"copyPath": "Pfad kopieren"
 		},
 		"menuItems": {
 			"clearNotes": "Notizen löschen",

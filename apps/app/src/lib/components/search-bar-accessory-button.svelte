@@ -21,7 +21,7 @@ const systemThemeWatcher = new SystemThemeWatcher();
 const css = $derived(
 	systemThemeWatcher.theme === THEME.LIGHT
 		? "shadow-neutral-400/30 border-neutral-400/30 bg-neutral-200/50"
-		: "shadow-base-300 !border-base-300 base-nonsemantic-dark bg-neutral-800/50",
+		: "shadow-base-300 !border-base-300 base-nonsemantic-dark bg-neutral-700/50",
 );
 </script>
 

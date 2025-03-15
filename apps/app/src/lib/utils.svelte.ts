@@ -2,6 +2,7 @@ import { env } from "$env/dynamic/public";
 import type { AppType } from "@getgrinta/api";
 import { install } from "@github/hotkey";
 import { type UnlistenFn, emit, listen } from "@tauri-apps/api/event";
+import { readDir } from "@tauri-apps/plugin-fs";
 import { fetch } from "@tauri-apps/plugin-http";
 import { Position, moveWindow } from "@tauri-apps/plugin-positioner";
 // biome-ignore lint/suspicious/noShadowRestrictedNames: nah
@@ -11,14 +12,18 @@ import {
 	AppWindowIcon,
 	ChevronRightIcon,
 	CopyIcon,
-	EqualIcon,
+	FileIcon,
+	FolderIcon,
 	GlobeIcon,
 	Layers2Icon,
 	StickyNoteIcon,
 } from "lucide-svelte";
 import { match } from "ts-pattern";
 import { BAR_MODE, appStore } from "./store/app.svelte";
-import { COMMAND_HANDLER, type CommandHandler } from "./store/commands.svelte";
+import {
+	COMMAND_HANDLER,
+	type ExecutableCommand,
+} from "./store/commands.svelte";
 import { vaultStore } from "./store/vault.svelte";
 
 export async function installHotkeys() {
@@ -97,15 +102,13 @@ export function fail(message: string, cause?: Error) {
 export async function handleContextMenu({
 	event,
 	name,
-	context,
-}: { event: MouseEvent; name: string; context: unknown }) {
+}: { event: MouseEvent; name: string }) {
 	event.preventDefault();
 	event.stopPropagation();
 	await emit("show-context-menu", {
 		x: event.clientX,
 		y: event.clientY,
 		name,
-		context,
 	});
 }
 
@@ -125,15 +128,21 @@ export function clickListener() {
 	};
 }
 
-export function getIcon(handler: CommandHandler) {
+export function getIcon(command: ExecutableCommand) {
 	if (appStore.barMode !== BAR_MODE.INITIAL) return ChevronRightIcon;
-	return match(handler)
+	return match(command.handler)
 		.with(COMMAND_HANDLER.URL, () => GlobeIcon)
 		.with(COMMAND_HANDLER.APP, () => AppWindowIcon)
 		.with(COMMAND_HANDLER.OPEN_NOTE, () => StickyNoteIcon)
 		.with(COMMAND_HANDLER.CREATE_NOTE, () => StickyNoteIcon)
 		.with(COMMAND_HANDLER.RUN_SHORTCUT, () => Layers2Icon)
 		.with(COMMAND_HANDLER.COPY_TO_CLIPBOARD, () => CopyIcon)
+		.with(COMMAND_HANDLER.FS_ITEM, () => {
+			if (command.metadata?.contentType === "public.folder") {
+				return FolderIcon;
+			}
+			return FileIcon;
+		})
 		.otherwise(() => ChevronRightIcon);
 }
 
@@ -143,4 +152,53 @@ export function formatCurrency(amount: number, currency: string) {
 		style: "currency",
 		currency,
 	}).format(amount);
+}
+
+export type FileEntry = {
+	name: string;
+	isDirectory: boolean;
+	isFile: boolean;
+	isSymlink: boolean;
+	path: string;
+};
+
+export async function findApps(): Promise<FileEntry[]> {
+	const apps = [
+		...(
+			await Promise.all([
+				findAppsInDirectory("/Applications"),
+				findAppsInDirectory("/System/Applications"),
+			])
+		).flat(),
+	];
+
+	return apps;
+}
+
+async function findAppsInDirectory(path: string): Promise<FileEntry[]> {
+	const entries = await readDir(path);
+	const apps: FileEntry[] = [];
+
+	for (const entry of entries) {
+		if (entry.isDirectory) {
+			if (entry.name.endsWith(".app")) {
+				apps.push({
+					...entry,
+					path: `${path}/${entry.name}`,
+				});
+			} else {
+				// Don't recurse into .app directories
+				if (!entry.name.includes(".app/")) {
+					try {
+						const subApps = await findAppsInDirectory(`${path}/${entry.name}`);
+						apps.push(...subApps);
+					} catch {
+						// Permission errors
+					}
+				}
+			}
+		}
+	}
+
+	return apps;
 }

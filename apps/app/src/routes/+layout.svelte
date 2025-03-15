@@ -4,6 +4,7 @@ import LocalizedFormat from "dayjs/plugin/localizedFormat";
 import "@fontsource-variable/dm-sans";
 import "../app.css";
 import { afterNavigate, goto } from "$app/navigation";
+import { setVibrancy } from "$lib/grinta-invoke";
 import { locale, setupI18n } from "$lib/i18n";
 import { appMetadataStore } from "$lib/store/app-metadata.svelte";
 import { BAR_MODE, appStore } from "$lib/store/app.svelte";
@@ -15,7 +16,6 @@ import { widgetsStore } from "$lib/store/widgets.svelte";
 import { SystemThemeWatcher } from "$lib/system-theme-watcher.svelte";
 import { installHotkeys } from "$lib/utils.svelte";
 import { defaultWindowIcon } from "@tauri-apps/api/app";
-import { invoke } from "@tauri-apps/api/core";
 import { Menu } from "@tauri-apps/api/menu";
 import { TrayIcon } from "@tauri-apps/api/tray";
 import { readText } from "@tauri-apps/plugin-clipboard-manager";
@@ -150,7 +150,7 @@ async function initializeApp() {
 	initializing = true;
 	await setupI18n();
 	await vaultStore.initialize();
-	await appStore.fetchSession();
+	// await appStore.fetchSession();
 	await commandsStore.initialize();
 	await settingsStore.initialize();
 	await clipboardStore.initialize();
@@ -184,9 +184,7 @@ const bgClass = $derived(
 
 $effect(() => {
 	const isDarkTheme = systemThemeWatcher.theme === "DARK";
-	invoke("set_vibrancy", {
-		materialName: isDarkTheme ? "dark" : "light",
-	});
+	setVibrancy(isDarkTheme ? "dark" : "light");
 });
 
 onMount(() => {

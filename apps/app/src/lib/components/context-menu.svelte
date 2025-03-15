@@ -8,12 +8,11 @@ export interface MenuItem {
 	label: string;
 	href?: string;
 	icon?: typeof SvelteComponent;
-	onClick?: (context: unknown) => void;
+	onClick?: () => void;
 }
 
 let x = $state(0);
 let y = $state(0);
-let context = $state<unknown>(null);
 let menuElement = $state<HTMLElement | null>(null);
 let isVisible = $state(false);
 
@@ -44,12 +43,10 @@ $effect(() => {
 			x: number;
 			y: number;
 			name: string;
-			context: unknown;
 		}>("show-context-menu", (event) => {
 			if (name !== event.payload.name) return;
 			x = event.payload.x;
 			y = event.payload.y;
-			context = event.payload.context;
 			isVisible = true;
 		});
 
@@ -82,7 +79,7 @@ $effect(() => {
         <a 
           href={item.href || '#'} 
           onclick={() => {
-            if (item.onClick) item.onClick(context);
+            if (item.onClick) item.onClick();
             isVisible = false;
           }}
         >

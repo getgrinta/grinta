@@ -7,10 +7,15 @@ import {
 	parseTextMathExpression,
 	parseUnitConversion,
 } from "$lib/formula-commands";
+import { searchSpotlightApps } from "$lib/grinta-invoke";
 import { appMetadataStore } from "$lib/store/app-metadata.svelte";
-import { generateCancellationToken } from "$lib/utils.svelte";
+import {
+	type FileEntry,
+	findApps,
+	generateCancellationToken,
+} from "$lib/utils.svelte";
 import { until } from "@open-draft/until";
-import { type DirEntry, readDir, watch } from "@tauri-apps/plugin-fs";
+import { watch } from "@tauri-apps/plugin-fs";
 import { fetch } from "@tauri-apps/plugin-http";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { exit } from "@tauri-apps/plugin-process";
@@ -32,6 +37,7 @@ import {
 	appStore,
 } from "./app.svelte";
 import { clipboardStore } from "./clipboard.svelte";
+import { featureFlagStore } from "./feature-flag-store";
 import { type Note, notesStore } from "./notes.svelte";
 import { SecureStore } from "./secure.svelte";
 import { settingsStore } from "./settings.svelte";
@@ -61,16 +67,22 @@ export const COMMAND_HANDLER = {
 	CREATE_NOTE: "CREATE_NOTE",
 	URL: "URL",
 	EMBEDDED_URL: "EMBEDDED_URL",
+	FS_ITEM: "FS_ITEM",
 } as const;
 
 export type CommandHandler = keyof typeof COMMAND_HANDLER;
 
 const commandsPriority = Object.keys(COMMAND_HANDLER);
+export const FileMetadataSchema = z.object({
+	contentType: z.string(),
+});
 
 export const ExecutableCommandSchema = z.object({
 	label: z.string(),
 	localizedLabel: z.string().optional(),
 	value: z.string(),
+	path: z.string().nullable().optional(),
+	metadata: FileMetadataSchema.optional().nullable(),
 	handler: z.nativeEnum(COMMAND_HANDLER),
 	smartMatch: z.boolean().optional().default(false),
 });
@@ -156,7 +168,7 @@ async function buildFormulaCommands(
 }
 
 async function buildAppCommands(
-	apps: DirEntry[],
+	apps: FileEntry[],
 ): Promise<ExecutableCommand[]> {
 	return apps.map((app) => {
 		const defaultName = app.name.slice(0, -4);
@@ -166,6 +178,7 @@ async function buildAppCommands(
 			label: defaultName,
 			localizedLabel: localizedName,
 			value: app.name,
+			path: app.path,
 			handler: COMMAND_HANDLER.APP,
 			smartMatch: false,
 		};
@@ -236,15 +249,17 @@ export type Commands = z.infer<typeof CommandsSchema>;
 export class CommandsStore extends SecureStore<Commands> {
 	commands = $state<ExecutableCommand[]>([]);
 	buildCommandsToken = $state<string>("");
+	spotlightSearchToken = $state<string>("");
 	selectedIndex = $state<number>(0);
 	currentCommand = $derived<ExecutableCommand>(
 		this.commands[this.selectedIndex],
 	);
-	installedApps = $state<DirEntry[]>([]);
+	installedApps = $state<FileEntry[]>([]);
 	appCommands = $state<ExecutableCommand[]>([]);
 	shortcutCommands = $state<ExecutableCommand[]>([]);
 	webSearchCommands = $state<ExecutableCommand[]>([]);
-	isUpdatingFromWebSearch = $state<boolean>(false);
+	spotlightCommands = $state<ExecutableCommand[]>([]);
+	isUpdatingExternalSource = $state<boolean>(false);
 
 	// Ensure we have a valid commandHistory even before initialization
 	get commandHistory(): ExecutableCommand[] {
@@ -334,7 +349,7 @@ export class CommandsStore extends SecureStore<Commands> {
 			console.error("Error initializing CommandsStore:", error);
 		}
 
-		await this.watchForApplicationChanges();
+		this.watchForApplicationChanges();
 
 		setInterval(() => {
 			(async () => {
@@ -358,43 +373,8 @@ export class CommandsStore extends SecureStore<Commands> {
         query.predicate = NSPredicate(format: "kMDItemContentType == 'com.apple.application-bundle'")
 		*/
 
-		async function findAppsInDirectory(path: string): Promise<DirEntry[]> {
-			const entries = await readDir(path);
-			const apps: DirEntry[] = [];
-
-			for (const entry of entries) {
-				if (entry.isDirectory) {
-					if (entry.name.endsWith(".app")) {
-						apps.push(entry);
-					} else {
-						// Don't recurse into .app directories
-						if (!entry.name.includes(".app/")) {
-							try {
-								const subApps = await findAppsInDirectory(
-									`${path}/${entry.name}`,
-								);
-								apps.push(...subApps);
-							} catch {
-								// Permission errors
-							}
-						}
-					}
-				}
-			}
-
-			return apps;
-		}
-
-		const [appsFromApplications, appsFromSystemApplications] =
-			await Promise.all([
-				findAppsInDirectory("/Applications"),
-				findAppsInDirectory("/System/Applications"),
-			]);
-
-		this.installedApps = [
-			...appsFromApplications,
-			...appsFromSystemApplications,
-		];
+		const apps = await findApps();
+		this.installedApps = apps;
 		this.appCommands = await buildAppCommands(this.installedApps);
 	}
 
@@ -420,12 +400,11 @@ export class CommandsStore extends SecureStore<Commands> {
 		);
 	}
 
-	async buildCommands() {
-		// Skip if we're currently updating from web search to prevent infinite loop
-		if (this.isUpdatingFromWebSearch) {
-			return;
-		}
-
+	async buildCommands({
+		isRefresh = false,
+	}: {
+		isRefresh: boolean;
+	}) {
 		this.selectedIndex = 0;
 		const queryIsUrl = HOSTNAME_REGEX.test(appStore.query);
 		const newCommandsToken = generateCancellationToken();
@@ -452,6 +431,7 @@ export class CommandsStore extends SecureStore<Commands> {
 					...this.appCommands,
 					...this.buildUrlCommands(queryIsUrl, appStore.query),
 					...this.webSearchCommands,
+					...this.spotlightCommands,
 					...commandHistory,
 					...this.shortcutCommands,
 					...this.getMenuItems(),
@@ -499,31 +479,67 @@ export class CommandsStore extends SecureStore<Commands> {
 
 		this.commands = uniq([...formulaCommands, ...sortedAndFilteredCommands]);
 
-		if (appStore.query.length > 0 && appStore.barMode === BAR_MODE.INITIAL) {
-			setTimeout(() => {
-				this.fetchWebSearchCommands(
-					appStore.query,
-					newCommandsToken,
-					queryIsUrl ? appStore.query : null,
-				);
-			}, 0);
+		if (appStore.barMode === BAR_MODE.INITIAL && !isRefresh && !this.isUpdatingExternalSource) {
+			if (appStore.query.length > 0) {
+				setTimeout(() => {
+					this.fetchWebSearchCommands({
+						query: appStore.query,
+						token: newCommandsToken,
+						excludeResult: queryIsUrl ? appStore.query : null,
+					});
+				}, 0);
+			}
+
+			if (
+				featureFlagStore.isFeatureEnabled("spotlight_search") &&
+				appStore.query.length > 2
+			) {
+				this.startSpotlightSearch();
+			}
 		}
 	}
 
-	private buildUrlCommands(queryIsUrl: boolean, query: string) {
-		return queryIsUrl
-			? [
-					{
-						label: query,
-						value:
-							query.startsWith("http://") || query.startsWith("https://")
-								? query
-								: `https://${query}`,
-						handler: COMMAND_HANDLER.URL,
-						smartMatch: false,
-					},
-				]
-			: [];
+	private startSpotlightSearch() {
+		const spotlightToken = generateCancellationToken();
+		this.spotlightSearchToken = spotlightToken;
+
+		searchSpotlightApps(appStore.query).then((result) => {
+			if (spotlightToken !== this.spotlightSearchToken) {
+				return;
+			}
+
+			this.spotlightCommands = result.map((entry) => ({
+				label: entry.display_name,
+				smartMatch: false,
+				value: entry.path,
+				path: entry.path,
+				metadata: { contentType: entry.content_type },
+				handler: COMMAND_HANDLER.FS_ITEM,
+			}));
+
+			this.isUpdatingExternalSource = true;
+			this.buildCommands({
+				isRefresh: true,
+			});
+			this.isUpdatingExternalSource = false;
+		});
+	}
+
+	private buildUrlCommands(
+		queryIsUrl: boolean,
+		query: string,
+	): ExecutableCommand[] {
+		if (!queryIsUrl) {
+			return [];
+		}
+		const value = query.match(/^https?:\/\//) ? query : `https://${query}`;
+		const command = {
+			label: query,
+			value,
+			handler: COMMAND_HANDLER.URL,
+			smartMatch: false,
+		};
+		return [command];
 	}
 
 	sortCommands({
@@ -584,13 +600,19 @@ export class CommandsStore extends SecureStore<Commands> {
 			await this.updateData({ commandHistory: filteredHistory });
 			setTimeout(() => {
 				// Build with timeout, so it's not visible in the UI before user is moved to the app.
-				this.buildCommands();
+				this.buildCommands({
+					isRefresh: true,
+				});
 			}, 100);
 		}
 		window.scrollTo({ top: 0 });
 		return match(command)
 			.with({ handler: COMMAND_HANDLER.APP }, async ({ value }) => {
 				await Command.create("open", ["-a", value]).execute();
+				return appStore.appWindow?.hide();
+			})
+			.with({ handler: COMMAND_HANDLER.FS_ITEM }, async ({ value }) => {
+				await Command.create("open", [value]).execute();
 				return appStore.appWindow?.hide();
 			})
 			.with({ handler: COMMAND_HANDLER.URL }, async ({ value }) => {
@@ -665,17 +687,15 @@ export class CommandsStore extends SecureStore<Commands> {
 			.exhaustive();
 	}
 
-	async fetchWebSearchCommands(
-		query: string,
-		token: string,
-		excludeResult: string | null = null,
-	) {
-		if (query.length < 1) {
-			return;
-		}
-
-		const queryIsUrl = HOSTNAME_REGEX.test(query);
-
+	async fetchWebSearchCommands({
+		query,
+		token,
+		excludeResult,
+	}: {
+		query: string;
+		token: string;
+		excludeResult: string | null;
+	}) {
 		try {
 			const webSearchCommands = await buildQueryCommands(query, excludeResult);
 
@@ -685,43 +705,17 @@ export class CommandsStore extends SecureStore<Commands> {
 			}
 
 			// Set flag to prevent infinite loop
-			this.isUpdatingFromWebSearch = true;
+			this.isUpdatingExternalSource = true;
 
-			// Update web search commands
 			this.webSearchCommands = webSearchCommands;
-
-			// Rebuild the commands with the new web search results
-			let commandHistory = this.commandHistory.slice().reverse();
-
-			// Filter out commands of the same url as the current query
-			if (queryIsUrl) {
-				commandHistory = commandHistory.filter(
-					(a) => a.label !== query && a.handler !== COMMAND_HANDLER.URL,
-				);
-			}
-
-			const commands = [
-				...this.appCommands,
-				...this.buildUrlCommands(queryIsUrl, query),
-				...this.webSearchCommands,
-				...commandHistory,
-				...this.shortcutCommands,
-				...this.getMenuItems(),
-			];
-
-			const sortedAndFilteredCommands = matchSorter(commands, query, {
-				keys: ["localizedLabel", "label"],
-			}).sort((a, b) => this.sortCommands({ prev: a, next: b }));
-
-			const formulaCommands = await buildFormulaCommands(query);
-
-			// Update the commands list
-			this.commands = uniq([...formulaCommands, ...sortedAndFilteredCommands]);
+			this.buildCommands({
+				isRefresh: true,
+			});
 
 			// Reset the flag after updating
-			this.isUpdatingFromWebSearch = false;
+			this.isUpdatingExternalSource = false;
 		} catch (error) {
-			this.isUpdatingFromWebSearch = false;
+			this.isUpdatingExternalSource = false;
 			console.error("Error fetching web search commands:", error);
 		}
 	}
