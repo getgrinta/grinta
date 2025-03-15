@@ -1,9 +1,9 @@
 <script lang="ts">
-	import ContextMenu from "./context-menu.svelte";
+import ContextMenu from "./context-menu.svelte";
 
-	const contextMenuItems = $state<MenuItem[]>([]);
+const contextMenuItems = $state<MenuItem[]>([]);
 
-    import {
+import {
 	COMMAND_HANDLER,
 	type ExecutableCommand,
 } from "$lib/store/commands.svelte";

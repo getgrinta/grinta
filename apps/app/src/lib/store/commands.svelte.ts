@@ -479,7 +479,11 @@ export class CommandsStore extends SecureStore<Commands> {
 
 		this.commands = uniq([...formulaCommands, ...sortedAndFilteredCommands]);
 
-		if (appStore.barMode === BAR_MODE.INITIAL && !isRefresh && !this.isUpdatingExternalSource) {
+		if (
+			appStore.barMode === BAR_MODE.INITIAL &&
+			!isRefresh &&
+			!this.isUpdatingExternalSource
+		) {
 			if (appStore.query.length > 0) {
 				setTimeout(() => {
 					this.fetchWebSearchCommands({
