@@ -1,12 +1,4 @@
 import { goto } from "$app/navigation";
-import {
-	parseCurrencyConversion,
-	parseFraction,
-	parseMathExpression,
-	parseRelativeTime,
-	parseTextMathExpression,
-	parseUnitConversion,
-} from "$lib/formula-commands";
 import { searchSpotlightApps } from "$lib/grinta-invoke";
 import { appMetadataStore } from "$lib/store/app-metadata.svelte";
 import {
@@ -31,11 +23,14 @@ import { get } from "svelte/store";
 import { P, match } from "ts-pattern";
 import { z } from "zod";
 import {
-	BAR_MODE,
-	type BarMode,
-	type SearchMode,
-	appStore,
-} from "./app.svelte";
+	parseCurrencyConversion,
+	parseFraction,
+	parseMathExpression,
+	parseRelativeTime,
+	parseTextMathExpression,
+	parseUnitConversion,
+} from "../formula-commands";
+import { BAR_MODE, appStore } from "./app.svelte";
 import { clipboardStore } from "./clipboard.svelte";
 import { featureFlagStore } from "./feature-flag-store";
 import { type Note, notesStore } from "./notes.svelte";

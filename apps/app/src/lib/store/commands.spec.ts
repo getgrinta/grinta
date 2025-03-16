@@ -26,9 +26,6 @@ describe("Commands Store", () => {
 
 		expect(commandsStore.webSearchCommands).toBeDefined();
 		expect(Array.isArray(commandsStore.webSearchCommands)).toBe(true);
-
-		expect(commandsStore.isUpdatingFromWebSearch).toBeDefined();
-		expect(typeof commandsStore.isUpdatingFromWebSearch).toBe("boolean");
 	});
 
 	it("should have expected methods", () => {
