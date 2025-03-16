@@ -74,10 +74,10 @@ export const TextSuggestion = Extension.create({
 								// Only reset suggestion if cursor position changed significantly
 								...(tr.selectionSet
 									? {
-											deco: DecorationSet.empty,
-											suggestion: null,
-											query: "",
-										}
+										deco: DecorationSet.empty,
+										suggestion: null,
+										query: "",
+									}
 									: {}),
 							};
 						}

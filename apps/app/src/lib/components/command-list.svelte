@@ -1,68 +1,72 @@
 <script lang="ts">
-import { appMetadataStore } from "$lib/store/app-metadata.svelte";
-import { appStore } from "$lib/store/app.svelte";
-import {
-	COMMAND_HANDLER,
-	type CommandHandler,
-	type ExecutableCommand,
-	FileMetadataSchema,
-	commandsStore,
-} from "$lib/store/commands.svelte";
-import { THEME } from "$lib/store/settings.svelte";
-import { SystemThemeWatcher } from "$lib/system-theme-watcher.svelte";
-import {
-	clickListener,
-	getIcon,
-	handleContextMenu,
-	highlightText,
-} from "$lib/utils.svelte";
-import { clsx } from "clsx";
-import { ArrowDownLeftIcon } from "lucide-svelte";
-import { _ } from "svelte-i18n";
-import { P, match } from "ts-pattern";
-import { VList } from "virtua/svelte";
-import { z } from "zod";
-import CommandListContextMenu from "./command-list-context-menu.svelte";
+	import { appMetadataStore } from "$lib/store/app-metadata.svelte";
+	import { appStore } from "$lib/store/app.svelte";
+	import {
+		COMMAND_HANDLER,
+		type CommandHandler,
+		type ExecutableCommand,
+		FileMetadataSchema,
+		commandsStore,
+	} from "$lib/store/commands.svelte";
+	import { THEME } from "$lib/store/settings.svelte";
+	import { SystemThemeWatcher } from "$lib/system-theme-watcher.svelte";
+	import {
+		clickListener,
+		getIcon,
+		handleContextMenu,
+		highlightText,
+	} from "$lib/utils.svelte";
+	import { clsx } from "clsx";
+	import { ArrowDownLeftIcon } from "lucide-svelte";
+	import { _ } from "svelte-i18n";
+	import { P, match } from "ts-pattern";
+	import { VList } from "virtua/svelte";
+	import { z } from "zod";
+	import CommandListContextMenu from "./command-list-context-menu.svelte";
 
-let contextMenu = $state<CommandListContextMenu>();
+	let contextMenu = $state<CommandListContextMenu>();
 
-type GetHelperProps = {
-	value: string;
-	handler: CommandHandler;
-	metadata?: z.infer<typeof FileMetadataSchema>;
-};
+	type GetHelperProps = {
+		value: string;
+		handler: CommandHandler;
+		metadata?: z.infer<typeof FileMetadataSchema>;
+	};
 
-function getCommandTypeLabel({ value, handler, metadata }: GetHelperProps) {
-	return match(handler)
-		.with(COMMAND_HANDLER.APP, () => $_("commands.helperText.app"))
-		.with(COMMAND_HANDLER.FS_ITEM, () => {
-			if (metadata?.contentType === "public.folder") {
-				return $_("commands.helperText.folder");
-			}
-			return $_("commands.helperText.file");
-		})
-		.with(COMMAND_HANDLER.URL, () => $_("commands.helperText.web"))
-		.with(COMMAND_HANDLER.SYSTEM, () => $_("commands.helperText.barCommand"))
-		.with(COMMAND_HANDLER.CHANGE_MODE, () =>
-			$_("commands.helperText.changeMode"),
-		)
-		.with(P.union(COMMAND_HANDLER.COPY_TO_CLIPBOARD), () =>
-			$_("commands.helperText.copyToClipboard"),
-		)
-		.with(COMMAND_HANDLER.OPEN_NOTE, () => $_("commands.helperText.openNote"))
-		.with(COMMAND_HANDLER.CREATE_NOTE, () =>
-			$_("commands.helperText.createNote"),
-		)
-		.with(COMMAND_HANDLER.RUN_SHORTCUT, () =>
-			$_("commands.helperText.runShortcut"),
-		)
-		.otherwise(() => value);
-}
+	function getCommandTypeLabel({ value, handler, metadata }: GetHelperProps) {
+		return match(handler)
+			.with(COMMAND_HANDLER.APP, () => $_("commands.helperText.app"))
+			.with(COMMAND_HANDLER.FS_ITEM, () => {
+				if (metadata?.contentType === "public.folder") {
+					return $_("commands.helperText.folder");
+				}
+				return $_("commands.helperText.file");
+			})
+			.with(COMMAND_HANDLER.URL, () => $_("commands.helperText.web"))
+			.with(COMMAND_HANDLER.SYSTEM, () =>
+				$_("commands.helperText.barCommand"),
+			)
+			.with(COMMAND_HANDLER.CHANGE_MODE, () =>
+				$_("commands.helperText.changeMode"),
+			)
+			.with(P.union(COMMAND_HANDLER.COPY_TO_CLIPBOARD), () =>
+				$_("commands.helperText.copyToClipboard"),
+			)
+			.with(COMMAND_HANDLER.OPEN_NOTE, () =>
+				$_("commands.helperText.openNote"),
+			)
+			.with(COMMAND_HANDLER.CREATE_NOTE, () =>
+				$_("commands.helperText.createNote"),
+			)
+			.with(COMMAND_HANDLER.RUN_SHORTCUT, () =>
+				$_("commands.helperText.runShortcut"),
+			)
+			.otherwise(() => value);
+	}
 
-const systemThemeWatcher = new SystemThemeWatcher();
+	const systemThemeWatcher = new SystemThemeWatcher();
 
-// Hide context menu when clicking outside
-$effect(clickListener);
+	// Hide context menu when clicking outside
+	$effect(clickListener);
 </script>
 
 <CommandListContextMenu bind:this={contextMenu} />
@@ -122,7 +126,7 @@ $effect(clickListener);
 				data-command-index={index}
 				oncontextmenu={(event) => {
 					contextMenu?.createContextMenuItems(item);
-					handleContextMenu({ event, name: "commandList" })
+					handleContextMenu({ event, name: "commandList" });
 				}}
 			>
 				<div
