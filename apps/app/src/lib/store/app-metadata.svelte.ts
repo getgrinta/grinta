@@ -1,6 +1,5 @@
-import { type AppInfo, loadAppInfo } from "$lib/grinta-invoke";
-import { findApps } from "$lib/utils.svelte";
-import { invoke } from "@tauri-apps/api/core";
+import { type AppInfo, loadAppInfo } from "../grinta-invoke";
+import { findApps } from "../utils.svelte";
 
 export class AppMetadataStore {
 	appInfo = $state<Record<string, AppInfo>>({});

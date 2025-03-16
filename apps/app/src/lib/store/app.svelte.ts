@@ -1,10 +1,10 @@
-import { getAuthClient } from "$lib/auth";
-import { fail, getApiClient } from "$lib/utils.svelte";
 import type { SanitizedSubscription } from "@getgrinta/api";
 import { until } from "@open-draft/until";
 import { type Window, getCurrentWindow } from "@tauri-apps/api/window";
 import type { Session, User } from "better-auth";
 import { z } from "zod";
+import { getAuthClient } from "../auth";
+import { fail, getApiClient } from "../utils.svelte";
 
 export const BAR_MODE = {
 	INITIAL: "INITIAL",
