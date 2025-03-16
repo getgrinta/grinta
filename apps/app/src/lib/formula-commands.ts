@@ -2471,7 +2471,7 @@ export async function parseCurrencyConversion(
 			)
 			// Also normalize any remaining symbols in the target currency position
 			.replace(
-				/(\d+(?:\.\d+)?)\s*([a-z]{3})\s*to\s*([\$€£¥₽₹₩₿฿₴₺₼₾])/i,
+				/(\d+(?:\.\d+)?)\s*([a-z]{3})\s*to\s*([$€£¥₽₹₩₿฿₴₺₼₾])/i,
 				(_, num, source, symbol) => {
 					const code = currencySymbolMap[symbol] || symbol;
 					return `${num} ${source} to ${code}`;

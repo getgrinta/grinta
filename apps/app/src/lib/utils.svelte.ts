@@ -5,7 +5,6 @@ import { type UnlistenFn, emit, listen } from "@tauri-apps/api/event";
 import { readDir } from "@tauri-apps/plugin-fs";
 import { fetch } from "@tauri-apps/plugin-http";
 import { Position, moveWindow } from "@tauri-apps/plugin-positioner";
-// biome-ignore lint/suspicious/noShadowRestrictedNames: nah
 import AggregateError from "aggregate-error";
 import { hc } from "hono/client";
 import {
@@ -163,14 +162,12 @@ export type FileEntry = {
 };
 
 export async function findApps(): Promise<FileEntry[]> {
-	const apps = [
-		...(
+	const apps = (
 			await Promise.all([
 				findAppsInDirectory("/Applications"),
 				findAppsInDirectory("/System/Applications"),
 			])
-		).flat(),
-	];
+		).flat();
 
 	return apps;
 }

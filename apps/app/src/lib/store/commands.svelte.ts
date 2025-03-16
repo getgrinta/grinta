@@ -49,7 +49,7 @@ function t(key: string, params: Record<string, string> = {}) {
 	}
 }
 
-const HOSTNAME_REGEX = /[a-zA-Z0-9\-\.]{1,61}\.[a-zA-Z]{2,}/;
+const HOSTNAME_REGEX = /[a-zA-Z0-9\-.]{1,61}\.[a-zA-Z]{2,}/;
 
 // The order is important for command sorting.
 export const COMMAND_HANDLER = {

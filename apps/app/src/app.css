@@ -4,11 +4,8 @@
 @plugin "tailwindcss-motion";
 
 @plugin "daisyui/theme" {
-	/* biome-ignore lint/correctness/noUnknownProperty: tauri */
 	name: "grinta-dark";
-	/* biome-ignore lint/correctness/noUnknownProperty: tauri */
 	default: false;
-	/* biome-ignore lint/correctness/noUnknownProperty: tauri */
 	prefersdark: true;
 	color-scheme: "dark";
 	--color-base-100: #0a0e17;
@@ -40,11 +37,8 @@
 }
 
 @plugin "daisyui/theme" {
-	/* biome-ignore lint/correctness/noUnknownProperty: tauri */
 	name: "grinta-light";
-	/* biome-ignore lint/correctness/noUnknownProperty: tauri */
 	default: false;
-	/* biome-ignore lint/correctness/noUnknownProperty: tauri */
 	prefersdark: false;
 	color-scheme: "light";
 	--color-base-100: #dedede;

@@ -27,7 +27,6 @@ export function createContextMenuItems(command: ExecutableCommand) {
 	const menuItems: MenuItem[] = [
 		{
 			label: t("commands.contextMenu.pin"),
-			// biome-ignore lint/suspicious/noExplicitAny: fix
 			icon: PinIcon as any,
 			onClick: () =>
 				widgetsStore.addWidget({
@@ -40,7 +39,6 @@ export function createContextMenuItems(command: ExecutableCommand) {
 	if (command.handler === COMMAND_HANDLER.APP) {
 		menuItems.push({
 			label: t("commands.contextMenu.open"),
-			// biome-ignore lint/suspicious/noExplicitAny: fix
 			icon: FolderIcon as any,
 			onClick: () => {
 				const { path } = command;
@@ -69,7 +67,6 @@ export function createContextMenuItems(command: ExecutableCommand) {
 	) {
 		menuItems.push({
 			label: t("commands.contextMenu.showInFinder"),
-			// biome-ignore lint/suspicious/noExplicitAny: fix
 			icon: EyeIcon as any,
 			onClick: () => {
 				const { path } = command;
@@ -93,7 +90,6 @@ export function createContextMenuItems(command: ExecutableCommand) {
 
 		menuItems.push({
 			label: t("commands.contextMenu.quickLook"),
-			// biome-ignore lint/suspicious/noExplicitAny: fix
 			icon: EyeIcon as any,
 			onClick: () => {
 				const { path } = command;
@@ -108,7 +104,6 @@ export function createContextMenuItems(command: ExecutableCommand) {
 
 		menuItems.push({
 			label: t("commands.contextMenu.getInfo"),
-			// biome-ignore lint/suspicious/noExplicitAny: fix
 			icon: TextIcon as any,
 			onClick: () => {
 				const { path } = command;
@@ -127,7 +122,6 @@ export function createContextMenuItems(command: ExecutableCommand) {
 		if (command.localizedLabel || command.label) {
 			menuItems.push({
 				label: t("commands.contextMenu.copyName"),
-				// biome-ignore lint/suspicious/noExplicitAny: fix
 				icon: CopyIcon as any,
 				onClick: () => {
 					const { label, localizedLabel } = command;
@@ -145,7 +139,6 @@ export function createContextMenuItems(command: ExecutableCommand) {
 		if (command.path) {
 			menuItems.push({
 				label: t("commands.contextMenu.copyPath"),
-				// biome-ignore lint/suspicious/noExplicitAny: fix
 				icon: CopyIcon as any,
 				onClick: () => {
 					const { path } = command;

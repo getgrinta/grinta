@@ -112,13 +112,13 @@ export const TextSuggestion = Extension.create({
 				view: (view) => {
 					let debounceTimer: number | Timer | undefined;
 					let lastQuery = "";
-					let inputByMouse = false;
+					let _inputByMouse = false;
 					let navigationByArrow = false;
 					let lastKeyWasBackspace = false;
 					const editorDOM = view.dom;
 
 					const onMouseDown = () => {
-						inputByMouse = true;
+						_inputByMouse = true;
 					};
 
 					// Helper function to accept suggestion
@@ -195,7 +195,7 @@ export const TextSuggestion = Extension.create({
 							lastKeyWasBackspace = false;
 						}
 						// Clear mouse flag on any key press.
-						inputByMouse = false;
+						_inputByMouse = false;
 					};
 
 					editorDOM.addEventListener("mousedown", onMouseDown);
