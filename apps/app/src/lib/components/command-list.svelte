@@ -4,6 +4,7 @@ import { appStore } from "$lib/store/app.svelte";
 import {
 	COMMAND_HANDLER,
 	type CommandHandler,
+	type ExecutableCommand,
 	FileMetadataSchema,
 	commandsStore,
 } from "$lib/store/commands.svelte";
@@ -18,11 +19,12 @@ import {
 import { clsx } from "clsx";
 import { ArrowDownLeftIcon } from "lucide-svelte";
 import { _ } from "svelte-i18n";
-import { fade } from "svelte/transition";
 import { P, match } from "ts-pattern";
 import { VList } from "virtua/svelte";
 import { z } from "zod";
 import CommandListContextMenu from "./command-list-context-menu.svelte";
+
+let contextMenu = $state<CommandListContextMenu>();
 
 type GetHelperProps = {
 	value: string;
@@ -63,7 +65,7 @@ const systemThemeWatcher = new SystemThemeWatcher();
 $effect(clickListener);
 </script>
 
-<CommandListContextMenu />
+<CommandListContextMenu bind:this={contextMenu} />
 
 <ul
 	id="commandList"
@@ -76,7 +78,7 @@ $effect(clickListener);
 	>
 		{#snippet children(item: ExecutableCommand, index)}
 			{@const active = commandsStore.selectedIndex === index}
-			{@const IconComponent = getIcon(item.handler)}
+			{@const IconComponent = getIcon(item)}
 			{@const currentLabel = item.localizedLabel ?? item.label}
 			{@const labelChunks = highlightText(currentLabel, appStore.query)}
 			{@const rowCss =
@@ -112,15 +114,14 @@ $effect(clickListener);
 					: null}
 			<li
 				class={clsx(
-					"!w-[calc(100%-2rem)] mx-4 select-none",
+					"!w-[calc(100%-2rem)] mx-4 select-none motion-preset-slide-up",
 					appStore.query.length > 0 &&
-						commandsStore.commands[index].smartMatch &&
+						item.smartMatch &&
 						"border-gradient",
 				)}
 				data-command-index={index}
-				transition:fade={{ duration: 150 }}
 				oncontextmenu={(event) => {
-					contextMenuItems = createContextMenuItems(commandsStore.commands[index]);
+					contextMenu?.createContextMenuItems(item);
 					handleContextMenu({ event, name: "commandList" })
 				}}
 			>

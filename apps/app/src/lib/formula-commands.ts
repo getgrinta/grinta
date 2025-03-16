@@ -288,8 +288,7 @@ export function parseTextMathExpression(query: string): ExecutableCommand[] {
 						}
 					}
 				}
-			}
-			// Check for square root
+			} // Check for square root
 			else if (part.includes("square root of") || part.includes("sqrt of")) {
 				const sqrtMatch = nlp(part).match(
 					"(square root|sqrt) of [<number>#Value+]",
@@ -325,8 +324,7 @@ export function parseTextMathExpression(query: string): ExecutableCommand[] {
 						}
 					}
 				}
-			}
-			// Check for log
+			} // Check for log
 			else if (part.includes("log")) {
 				const logMatch = nlp(part).match("log [<number>#Value+]");
 				if (logMatch.found) {
@@ -360,8 +358,7 @@ export function parseTextMathExpression(query: string): ExecutableCommand[] {
 						}
 					}
 				}
-			}
-			// Regular number
+			} // Regular number
 			else {
 				const numDoc = nlp(part);
 				if (numDoc.numbers().length > 0) {
@@ -2429,7 +2426,9 @@ export async function parseCurrencyConversion(
 			const toCurrency = directSymbolMatch[3].toLowerCase();
 
 			if (currencySymbolMap[symbol]) {
-				processedQuery = `${currencySymbolMap[symbol]} ${amount} to ${toCurrency}`;
+				processedQuery = `${
+					currencySymbolMap[symbol]
+				} ${amount} to ${toCurrency}`;
 			}
 		}
 

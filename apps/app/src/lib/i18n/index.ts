@@ -23,4 +23,4 @@ export async function setupI18n() {
 }
 
 // Export for convenience
-export { _, locale, dictionary };
+export { _, dictionary, locale };

@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @plugin "daisyui";
 @plugin "@tailwindcss/typography";
+@plugin "tailwindcss-motion";
 
 @plugin "daisyui/theme" {
 	/* biome-ignore lint/correctness/noUnknownProperty: tauri */
@@ -125,7 +126,8 @@
 }
 
 .border-invisible::before {
-	@apply content-[''] absolute inset-0 pointer-events-none rounded-[1.25rem] p-[2px] bg-transparent;
+	@apply content-[""] absolute inset-0 pointer-events-none rounded-[1.25rem]
+    p-[2px] bg-transparent;
 }
 
 .border-gradient {
@@ -135,7 +137,8 @@
 .border-gradient::before {
 	mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
 	mask-composite: exclude;
-	@apply content-[''] absolute inset-0 pointer-events-none rounded-[1.25rem] p-[2px] bg-gradient-to-br from-blue-500 to-indigo-500;
+	@apply content-[""] absolute inset-0 pointer-events-none rounded-[1.25rem]
+    p-[2px] bg-gradient-to-br from-blue-500 to-indigo-500;
 }
 
 body {

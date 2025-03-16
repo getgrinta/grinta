@@ -1,20 +1,18 @@
 <script lang="ts">
-import ContextMenu from "./context-menu.svelte";
-
-const contextMenuItems = $state<MenuItem[]>([]);
-
 import {
 	COMMAND_HANDLER,
 	type ExecutableCommand,
 } from "$lib/store/commands.svelte";
-import { CopyIcon, PinIcon } from "lucide-svelte";
-import type { MenuItem } from "./context-menu.svelte";
-
 import { widgetsStore } from "$lib/store/widgets.svelte";
 import { Command } from "@tauri-apps/plugin-shell";
+import { CopyIcon, PinIcon } from "lucide-svelte";
 import { EyeIcon, FolderIcon, TextIcon } from "lucide-svelte";
 import { _ } from "svelte-i18n";
 import { get } from "svelte/store";
+import ContextMenu from "./context-menu.svelte";
+import type { MenuItem } from "./context-menu.svelte";
+
+let contextMenuItems = $state<MenuItem[]>([]);
 
 function t(key: string, params: Record<string, string> = {}) {
 	try {
@@ -25,7 +23,7 @@ function t(key: string, params: Record<string, string> = {}) {
 	}
 }
 
-export function createContextMenuItems(command: ExecutableCommand): MenuItem[] {
+export function createContextMenuItems(command: ExecutableCommand) {
 	const menuItems: MenuItem[] = [
 		{
 			label: t("commands.contextMenu.pin"),
@@ -161,8 +159,7 @@ export function createContextMenuItems(command: ExecutableCommand): MenuItem[] {
 			});
 		}
 	}
-
-	return menuItems;
+	contextMenuItems = menuItems;
 }
 </script>
 
