@@ -1,11 +1,4 @@
 import { goto } from "$app/navigation";
-import { searchSpotlightApps } from "$lib/grinta-invoke";
-import { appMetadataStore } from "$lib/store/app-metadata.svelte";
-import {
-	type FileEntry,
-	findApps,
-	generateCancellationToken,
-} from "$lib/utils.svelte";
 import { until } from "@open-draft/until";
 import { watch } from "@tauri-apps/plugin-fs";
 import { fetch } from "@tauri-apps/plugin-http";
@@ -30,6 +23,13 @@ import {
 	parseTextMathExpression,
 	parseUnitConversion,
 } from "../formula-commands";
+import { searchSpotlightApps } from "../grinta-invoke";
+import { appMetadataStore } from "../store/app-metadata.svelte";
+import {
+	type FileEntry,
+	findApps,
+	generateCancellationToken,
+} from "../utils.svelte";
 import { BAR_MODE, appStore } from "./app.svelte";
 import { clipboardStore } from "./clipboard.svelte";
 import { featureFlagStore } from "./feature-flag-store";
