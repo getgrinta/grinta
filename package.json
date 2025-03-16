@@ -6,7 +6,7 @@
 		"dev": "turbo dev",
 		"test": "turbo test",
 		"lint": "oxlint",
-		"format": "oxlint --fix --fix-suggestions --fix-dangerously",
+		"format": "oxlint --fix --fix-suggestions",
 		"cleanup": "turbo cleanup && rimraf node_modules bun.lock",
 		"prepare": "husky"
 	},
@@ -23,7 +23,10 @@
 		"node": ">=22"
 	},
 	"packageManager": "bun@1.2.5",
-	"workspaces": ["apps/*", "packages/*"],
+	"workspaces": [
+		"apps/*",
+		"packages/*"
+	],
 	"lint-staged": {
 		"**/*.{js,mjs,cjs,ts,astro,svelte}": "oxlint"
 	}
