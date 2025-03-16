@@ -17,12 +17,8 @@ header.header {
 	display: none;
 }
 
-starlight-theme-select {
-	display: none;
-}
-
 [data-open-modal] {
-	@apply !rounded-full !border-2 hover:!border-primary;
+	@apply !rounded-full !border-2 hover !border-primary;
 }
 
 .blueprint {

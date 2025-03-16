@@ -21,11 +21,59 @@ export default defineConfig({
 			sidebar: [
 				{
 					label: "Guides",
-					items: [{ label: "Getting Started", slug: "guides" }],
+					items: [
+						{ label: "Getting Started", slug: "guides" },
+						{ label: "Replace system Spotlight", slug: "guides/replace-spotlight" },
+						{ label: "Core Concepts", slug: "" },
+					],
 				},
+				{
+					label: "Core Features",
+					items: [
+						{ label: "Web and AI Search", slug: "" },
+						{ label: "Notes", slug: "" },
+						{ label: "File System Search", slug: "" },
+						{ label: "Calculator", slug: "" },
+						{ label: "NLP", slug: "" },
+						{ label: "Shortcuts", slug: "" },
+					]
+				},
+				{
+					label: "Grinta Pro",
+					items: [
+						{ label: "Notes AI", slug: "" },
+					]
+				},
+				{
+					label: "Recipes",
+					items: [
+						{ label: "Notes in Obsidian", slug: "" },
+						{ label: "Running Shell Commands", slug: "" },
+					]
+				}
 			],
 			customCss: ["./src/tailwind.css"],
 			head: [
+				{
+					tag: "script",
+					content: `
+						window.op = window.op||function(...args){(window.op.q=window.op.q||[]).push(args);};
+						window.op('init', {
+							clientId: '11152ed2-ba79-480c-a020-028c574cb89f',
+							trackScreenViews: true,
+							trackOutgoingLinks: true,
+							trackAttributes: true,
+						});
+					`
+				},
+				{
+					tag: "script",
+					attrs: {
+						defer: true,
+						async: true,
+						src: "https://openpanel.dev/op1.js",
+					},
+				},
 				{
 					tag: "script",
 					attrs: {
@@ -36,6 +84,7 @@ export default defineConfig({
 			],
 			components: {
 				ThemeProvider: "./src/components/theme.astro",
+				ThemeSelect: "./src/components/theme-select.astro",
 			},
 			plugins: [starlightBlog({ title: "Changelog" })],
 		}),
