@@ -11,8 +11,11 @@ export function setVibrancy(
 }
 
 export type AppInfo = { base64Image: string; localizedName: string };
+export type ExtInfo = { base64Image: string; extension: string };
 
-export function loadAppInfo(paths: string[]): Promise<Record<string, AppInfo>> {
+export async function loadAppInfo(
+	paths: string[],
+): Promise<Record<string, AppInfo>> {
 	return grintaInvoke<Record<string, AppInfo>>("load_app_info", {
 		resourcesPaths: paths,
 	});

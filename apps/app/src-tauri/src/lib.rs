@@ -29,6 +29,7 @@ pub fn run() {
             theme_utils::set_vibrancy,
             theme_utils::set_appearance,
             icns_utils::load_app_info,
+            icns_utils::load_extension_icons,
             spotlight_utils::search_spotlight_apps,
         ])
         .run(tauri::generate_context!())

@@ -1,9 +1,11 @@
-import { type AppInfo, loadAppInfo } from "$lib/grinta-invoke";
+import { type AppInfo, type ExtInfo, loadAppInfo } from "$lib/grinta-invoke";
 import { findApps } from "$lib/utils.svelte";
 import { invoke } from "@tauri-apps/api/core";
+import { COMMAND_HANDLER, type ExecutableCommand } from "./commands.svelte";
 
 export class AppMetadataStore {
 	appInfo = $state<Record<string, AppInfo>>({});
+	extInfo = $state<Record<string, ExtInfo>>({});
 	loading = $state<boolean>(false);
 	initialized = $state<boolean>(false);
 
@@ -47,10 +49,61 @@ export class AppMetadataStore {
 			this.loading = false;
 			this.initialized = true;
 		}
+
+		invoke("load_extension_icons", {
+			extensions: [
+				"pdf",
+				"jpg",
+				"xlsx",
+				"xls",
+				"gdoc",
+				"docx",
+				"png",
+				"md",
+				"txt",
+				"doc",
+				"ppt",
+				"pptx",
+				"zip",
+				"rar",
+				"7z",
+				"gsheet",
+				"gslides",
+				"drawio",
+				"odp",
+				"epub",
+				"mobi",
+				"djvu",
+				"folder",
+			],
+		}).then((_icons) => {
+			const icons = _icons as Record<string, string>;
+			const data: Record<string, ExtInfo> = {};
+
+			for (const [extension, base64Image] of Object.entries(icons)) {
+				data[extension] = { base64Image, extension };
+			}
+
+			this.extInfo = { ...this.extInfo, ...data };
+		});
 	}
 
-	getIcon(appName: string): string | undefined {
-		return this.appInfo[appName]?.base64Image;
+	getIcon(command: ExecutableCommand): string | null {
+		if (command.handler === COMMAND_HANDLER.APP) {
+			return this.appInfo[command.label]?.base64Image;
+		}
+		if (command.handler === COMMAND_HANDLER.FS_ITEM) {
+			if (command.metadata?.contentType === "public.folder") {
+				return this.extInfo["folder" as string]?.base64Image;
+			}
+			const extension = command.value.split(".").pop();
+			return this.extInfo[extension as string]?.base64Image;
+		}
+		return null;
+	}
+
+	getExtensionIcon(extension: string): string | undefined {
+		return this.extInfo[extension]?.base64Image;
 	}
 
 	getLocalizedName(appName: string): string | undefined {
