@@ -28,16 +28,15 @@ export default defineConfig({
 			head: [
 				{
 					tag: "script",
-					content: "document.documentElement.dataset.theme = 'dark'",
-				},
-				{
-					tag: "script",
 					attrs: {
 						defer: true,
 						src: "https://unpkg.com/tailwindcss-intersect@2.x.x/dist/observer.min.js",
 					},
 				},
 			],
+			components: {
+				ThemeProvider: "./src/components/theme.astro",
+			},
 			plugins: [starlightBlog({ title: "Changelog" })],
 		}),
 		tailwind({ applyBaseStyles: false }),

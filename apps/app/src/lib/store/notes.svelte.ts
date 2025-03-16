@@ -1,6 +1,6 @@
-import { createFsStorage } from "$lib/storage";
 import * as PathApi from "@tauri-apps/api/path";
 import dayjs from "dayjs";
+import { createFsStorage } from "../storage";
 import { COMMAND_HANDLER, commandsStore } from "./commands.svelte";
 import { settingsStore } from "./settings.svelte";
 

@@ -1,69 +1,75 @@
 <script lang="ts">
-import { appMetadataStore } from "$lib/store/app-metadata.svelte";
-import { appStore } from "$lib/store/app.svelte";
-import {
-	COMMAND_HANDLER,
-	type CommandHandler,
-	FileMetadataSchema,
-	commandsStore,
-} from "$lib/store/commands.svelte";
-import { THEME } from "$lib/store/settings.svelte";
-import { SystemThemeWatcher } from "$lib/system-theme-watcher.svelte";
-import {
-	clickListener,
-	getIcon,
-	handleContextMenu,
-	highlightText,
-} from "$lib/utils.svelte";
-import { clsx } from "clsx";
-import { ArrowDownLeftIcon } from "lucide-svelte";
-import { _ } from "svelte-i18n";
-import { fade } from "svelte/transition";
-import { P, match } from "ts-pattern";
-import { VList } from "virtua/svelte";
-import { z } from "zod";
-import CommandListContextMenu from "./command-list-context-menu.svelte";
+	import { appMetadataStore } from "$lib/store/app-metadata.svelte";
+	import { appStore } from "$lib/store/app.svelte";
+	import {
+		COMMAND_HANDLER,
+		type CommandHandler,
+		type ExecutableCommand,
+		FileMetadataSchema,
+		commandsStore,
+	} from "$lib/store/commands.svelte";
+	import { THEME } from "$lib/store/settings.svelte";
+	import { SystemThemeWatcher } from "$lib/system-theme-watcher.svelte";
+	import {
+		clickListener,
+		getIcon,
+		handleContextMenu,
+		highlightText,
+	} from "$lib/utils.svelte";
+	import { clsx } from "clsx";
+	import { ArrowDownLeftIcon } from "lucide-svelte";
+	import { _ } from "svelte-i18n";
+	import { P, match } from "ts-pattern";
+	import { VList } from "virtua/svelte";
+	import { z } from "zod";
+	import CommandListContextMenu from "./command-list-context-menu.svelte";
 
-type GetHelperProps = {
-	value: string;
-	handler: CommandHandler;
-	metadata?: z.infer<typeof FileMetadataSchema>;
-};
+	let contextMenu = $state<CommandListContextMenu>();
 
-function getCommandTypeLabel({ value, handler, metadata }: GetHelperProps) {
-	return match(handler)
-		.with(COMMAND_HANDLER.APP, () => $_("commands.helperText.app"))
-		.with(COMMAND_HANDLER.FS_ITEM, () => {
-			if (metadata?.contentType === "public.folder") {
-				return $_("commands.helperText.folder");
-			}
-			return $_("commands.helperText.file");
-		})
-		.with(COMMAND_HANDLER.URL, () => $_("commands.helperText.web"))
-		.with(COMMAND_HANDLER.SYSTEM, () => $_("commands.helperText.barCommand"))
-		.with(COMMAND_HANDLER.CHANGE_MODE, () =>
-			$_("commands.helperText.changeMode"),
-		)
-		.with(P.union(COMMAND_HANDLER.COPY_TO_CLIPBOARD), () =>
-			$_("commands.helperText.copyToClipboard"),
-		)
-		.with(COMMAND_HANDLER.OPEN_NOTE, () => $_("commands.helperText.openNote"))
-		.with(COMMAND_HANDLER.CREATE_NOTE, () =>
-			$_("commands.helperText.createNote"),
-		)
-		.with(COMMAND_HANDLER.RUN_SHORTCUT, () =>
-			$_("commands.helperText.runShortcut"),
-		)
-		.otherwise(() => value);
-}
+	type GetHelperProps = {
+		value: string;
+		handler: CommandHandler;
+		metadata?: z.infer<typeof FileMetadataSchema>;
+	};
 
-const systemThemeWatcher = new SystemThemeWatcher();
+	function getCommandTypeLabel({ value, handler, metadata }: GetHelperProps) {
+		return match(handler)
+			.with(COMMAND_HANDLER.APP, () => $_("commands.helperText.app"))
+			.with(COMMAND_HANDLER.FS_ITEM, () => {
+				if (metadata?.contentType === "public.folder") {
+					return $_("commands.helperText.folder");
+				}
+				return $_("commands.helperText.file");
+			})
+			.with(COMMAND_HANDLER.URL, () => $_("commands.helperText.web"))
+			.with(COMMAND_HANDLER.SYSTEM, () =>
+				$_("commands.helperText.barCommand"),
+			)
+			.with(COMMAND_HANDLER.CHANGE_MODE, () =>
+				$_("commands.helperText.changeMode"),
+			)
+			.with(P.union(COMMAND_HANDLER.COPY_TO_CLIPBOARD), () =>
+				$_("commands.helperText.copyToClipboard"),
+			)
+			.with(COMMAND_HANDLER.OPEN_NOTE, () =>
+				$_("commands.helperText.openNote"),
+			)
+			.with(COMMAND_HANDLER.CREATE_NOTE, () =>
+				$_("commands.helperText.createNote"),
+			)
+			.with(COMMAND_HANDLER.RUN_SHORTCUT, () =>
+				$_("commands.helperText.runShortcut"),
+			)
+			.otherwise(() => value);
+	}
 
-// Hide context menu when clicking outside
-$effect(clickListener);
+	const systemThemeWatcher = new SystemThemeWatcher();
+
+	// Hide context menu when clicking outside
+	$effect(clickListener);
 </script>
 
-<CommandListContextMenu />
+<CommandListContextMenu bind:this={contextMenu} />
 
 <ul
 	id="commandList"
@@ -71,12 +77,12 @@ $effect(clickListener);
 >
 	<VList
 		data={commandsStore.commands}
-		style="height: 99vh;padding-top: var(--commands-padding);"
+		style="height: 99vh;padding-top: var(--commands-padding);padding-bottom:1rem;"
 		getKey={(_, i) => i}
 	>
 		{#snippet children(item: ExecutableCommand, index)}
 			{@const active = commandsStore.selectedIndex === index}
-			{@const IconComponent = getIcon(item.handler)}
+			{@const IconComponent = getIcon(item)}
 			{@const currentLabel = item.localizedLabel ?? item.label}
 			{@const labelChunks = highlightText(currentLabel, appStore.query)}
 			{@const rowCss =
@@ -109,16 +115,15 @@ $effect(clickListener);
 			{@const icon = appMetadataStore.getIcon(item)}
 			<li
 				class={clsx(
-					"!w-[calc(100%-2rem)] mx-4 select-none",
+					"!w-[calc(100%-2rem)] mx-4 select-none motion-preset-slide-up",
 					appStore.query.length > 0 &&
-						commandsStore.commands[index].smartMatch &&
+						item.smartMatch &&
 						"border-gradient",
 				)}
 				data-command-index={index}
-				transition:fade={{ duration: 150 }}
 				oncontextmenu={(event) => {
-					contextMenuItems = createContextMenuItems(commandsStore.commands[index]);
-					handleContextMenu({ event, name: "commandList" })
+					contextMenu?.createContextMenuItems(item);
+					handleContextMenu({ event, name: "commandList" });
 				}}
 			>
 				<div

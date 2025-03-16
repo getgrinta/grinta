@@ -1,19 +1,4 @@
 import { goto } from "$app/navigation";
-import {
-	parseCurrencyConversion,
-	parseFraction,
-	parseMathExpression,
-	parseRelativeTime,
-	parseTextMathExpression,
-	parseUnitConversion,
-} from "$lib/formula-commands";
-import { searchSpotlightApps } from "$lib/grinta-invoke";
-import { appMetadataStore } from "$lib/store/app-metadata.svelte";
-import {
-	type FileEntry,
-	findApps,
-	generateCancellationToken,
-} from "$lib/utils.svelte";
 import { until } from "@open-draft/until";
 import { watch } from "@tauri-apps/plugin-fs";
 import { fetch } from "@tauri-apps/plugin-http";
@@ -31,11 +16,21 @@ import { get } from "svelte/store";
 import { P, match } from "ts-pattern";
 import { z } from "zod";
 import {
-	BAR_MODE,
-	type BarMode,
-	type SearchMode,
-	appStore,
-} from "./app.svelte";
+	parseCurrencyConversion,
+	parseFraction,
+	parseMathExpression,
+	parseRelativeTime,
+	parseTextMathExpression,
+	parseUnitConversion,
+} from "../formula-commands";
+import { searchSpotlightApps } from "../grinta-invoke";
+import { appMetadataStore } from "../store/app-metadata.svelte";
+import {
+	type FileEntry,
+	findApps,
+	generateCancellationToken,
+} from "../utils.svelte";
+import { BAR_MODE, appStore } from "./app.svelte";
 import { clipboardStore } from "./clipboard.svelte";
 import { featureFlagStore } from "./feature-flag-store";
 import { type Note, notesStore } from "./notes.svelte";
@@ -54,7 +49,7 @@ function t(key: string, params: Record<string, string> = {}) {
 	}
 }
 
-const HOSTNAME_REGEX = /[a-zA-Z0-9\-\.]{1,61}\.[a-zA-Z]{2,}/;
+const HOSTNAME_REGEX = /[a-zA-Z0-9\-.]{1,61}\.[a-zA-Z]{2,}/;
 
 // The order is important for command sorting.
 export const COMMAND_HANDLER = {
@@ -494,10 +489,7 @@ export class CommandsStore extends SecureStore<Commands> {
 				}, 0);
 			}
 
-			if (
-				featureFlagStore.isFeatureEnabled("spotlight_search") &&
-				appStore.query.length > 2
-			) {
+			if (appStore.query.length > 2) {
 				this.startSpotlightSearch();
 			}
 		}

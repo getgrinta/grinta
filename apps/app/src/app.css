@@ -1,13 +1,11 @@
 @import "tailwindcss";
 @plugin "daisyui";
 @plugin "@tailwindcss/typography";
+@plugin "tailwindcss-motion";
 
 @plugin "daisyui/theme" {
-	/* biome-ignore lint/correctness/noUnknownProperty: tauri */
 	name: "grinta-dark";
-	/* biome-ignore lint/correctness/noUnknownProperty: tauri */
 	default: false;
-	/* biome-ignore lint/correctness/noUnknownProperty: tauri */
 	prefersdark: true;
 	color-scheme: "dark";
 	--color-base-100: #0a0e17;
@@ -39,11 +37,8 @@
 }
 
 @plugin "daisyui/theme" {
-	/* biome-ignore lint/correctness/noUnknownProperty: tauri */
 	name: "grinta-light";
-	/* biome-ignore lint/correctness/noUnknownProperty: tauri */
 	default: false;
-	/* biome-ignore lint/correctness/noUnknownProperty: tauri */
 	prefersdark: false;
 	color-scheme: "light";
 	--color-base-100: #dedede;
@@ -125,7 +120,7 @@
 }
 
 .border-invisible::before {
-	@apply content-[''] absolute inset-0 pointer-events-none rounded-[1.25rem] p-[2px] bg-transparent;
+	@apply content-[""] absolute inset-0 pointer-events-none rounded-[1.25rem] p-[2px] bg-transparent;
 }
 
 .border-gradient {
@@ -135,7 +130,7 @@
 .border-gradient::before {
 	mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
 	mask-composite: exclude;
-	@apply content-[''] absolute inset-0 pointer-events-none rounded-[1.25rem] p-[2px] bg-gradient-to-br from-blue-500 to-indigo-500;
+	@apply content-[""] absolute inset-0 pointer-events-none rounded-[1.25rem] p-[2px] bg-gradient-to-br from-blue-500 to-indigo-500;
 }
 
 body {
@@ -153,13 +148,16 @@ body {
 }
 
 @layer utilities {
+
 	/* Chrome, Safari and Opera */
 	.no-scrollbar::-webkit-scrollbar {
 		display: none;
 	}
 
 	.no-scrollbar {
-		-ms-overflow-style: none; /* IE and Edge */
-		scrollbar-width: none; /* Firefox */
+		-ms-overflow-style: none;
+		/* IE and Edge */
+		scrollbar-width: none;
+		/* Firefox */
 	}
 }

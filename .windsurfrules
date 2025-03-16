@@ -6,6 +6,6 @@ Use /apps/website/src/content/docs as the main documentation directory.
 // Code guidelines
 This project uses Bun as the JavaScript and TypeScript runtime.
 Use kebab-case for file names. Example: navigation-bar.svelte.
-Use Biome as linter and formatter with the global "format" and "lint" commands.
+Use oxlint as linter and formatter with the global "format" and "lint" commands.
 Turborepo is used to run scripts and cache outputs.
 Always make sure you use Svelte 5 (runes) syntax.

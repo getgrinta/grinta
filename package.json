@@ -4,17 +4,17 @@
 	"scripts": {
 		"build": "turbo build",
 		"dev": "turbo dev",
-		"lint": "bunx --bun biome check .",
-		"lint:staged": "biome check --no-errors-on-unmatched --staged ./{apps,packages}/**/*.{ts}",
 		"test": "turbo test",
-		"format": "bunx --bun biome check --write --unsafe .",
+		"lint": "oxlint",
+		"format": "oxlint --fix --fix-suggestions",
 		"cleanup": "turbo cleanup && rimraf node_modules bun.lock",
 		"prepare": "husky"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "1.9.4",
 		"@types/bun": "1.2.5",
 		"husky": "9.1.7",
+		"lint-staged": "^15.5.0",
+		"oxlint": "^0.16.0",
 		"rimraf": "6.0.1",
 		"turbo": "2.4.4",
 		"typescript": "5.8.2"
@@ -23,5 +23,11 @@
 		"node": ">=22"
 	},
 	"packageManager": "bun@1.2.5",
-	"workspaces": ["apps/*", "packages/*"]
+	"workspaces": [
+		"apps/*",
+		"packages/*"
+	],
+	"lint-staged": {
+		"**/*.{js,mjs,cjs,ts,astro,svelte}": "oxlint"
+	}
 }

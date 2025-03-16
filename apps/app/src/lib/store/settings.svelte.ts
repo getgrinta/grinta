@@ -1,5 +1,4 @@
 import { browser } from "$app/environment";
-import { activateWindow } from "$lib/utils.svelte";
 import {
 	type ShortcutEvent,
 	register,
@@ -7,6 +6,7 @@ import {
 } from "@tauri-apps/plugin-global-shortcut";
 import { match } from "ts-pattern";
 import { z } from "zod";
+import { activateWindow } from "../utils.svelte";
 import { SEARCH_MODE, appStore } from "./app.svelte";
 import { commandsStore } from "./commands.svelte";
 import { notesStore } from "./notes.svelte";

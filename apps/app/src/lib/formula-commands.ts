@@ -288,8 +288,7 @@ export function parseTextMathExpression(query: string): ExecutableCommand[] {
 						}
 					}
 				}
-			}
-			// Check for square root
+			} // Check for square root
 			else if (part.includes("square root of") || part.includes("sqrt of")) {
 				const sqrtMatch = nlp(part).match(
 					"(square root|sqrt) of [<number>#Value+]",
@@ -325,8 +324,7 @@ export function parseTextMathExpression(query: string): ExecutableCommand[] {
 						}
 					}
 				}
-			}
-			// Check for log
+			} // Check for log
 			else if (part.includes("log")) {
 				const logMatch = nlp(part).match("log [<number>#Value+]");
 				if (logMatch.found) {
@@ -360,8 +358,7 @@ export function parseTextMathExpression(query: string): ExecutableCommand[] {
 						}
 					}
 				}
-			}
-			// Regular number
+			} // Regular number
 			else {
 				const numDoc = nlp(part);
 				if (numDoc.numbers().length > 0) {
@@ -2048,7 +2045,7 @@ export function parseUnitConversion(query: string): ExecutableCommand[] {
 					} else {
 						value = Number(valueText);
 					}
-				} catch (error) {
+				} catch {
 					value = Number(valueText);
 				}
 
@@ -2125,7 +2122,7 @@ export function parseUnitConversion(query: string): ExecutableCommand[] {
 					} else {
 						value = Number(valueText);
 					}
-				} catch (error) {
+				} catch {
 					value = Number(valueText);
 				}
 
@@ -2266,7 +2263,7 @@ export function parseUnitConversion(query: string): ExecutableCommand[] {
 					smartMatch: true,
 				},
 			];
-		} catch (error) {
+		} catch {
 			// For volume conversions, handle special cases
 			if (
 				(fromUnit === "milliliters" || fromUnit === "milliliter") &&
@@ -2338,7 +2335,7 @@ export function parseUnitConversion(query: string): ExecutableCommand[] {
 						recursionDepth + 1,
 					);
 				}
-			} catch (nestedError) {
+			} catch {
 				// Return empty results after exhausting all conversion attempts
 				return [];
 			}
@@ -2429,7 +2426,9 @@ export async function parseCurrencyConversion(
 			const toCurrency = directSymbolMatch[3].toLowerCase();
 
 			if (currencySymbolMap[symbol]) {
-				processedQuery = `${currencySymbolMap[symbol]} ${amount} to ${toCurrency}`;
+				processedQuery = `${
+					currencySymbolMap[symbol]
+				} ${amount} to ${toCurrency}`;
 			}
 		}
 
@@ -2472,7 +2471,7 @@ export async function parseCurrencyConversion(
 			)
 			// Also normalize any remaining symbols in the target currency position
 			.replace(
-				/(\d+(?:\.\d+)?)\s*([a-z]{3})\s*to\s*([\$€£¥₽₹₩₿฿₴₺₼₾])/i,
+				/(\d+(?:\.\d+)?)\s*([a-z]{3})\s*to\s*([$€£¥₽₹₩₿฿₴₺₼₾])/i,
 				(_, num, source, symbol) => {
 					const code = currencySymbolMap[symbol] || symbol;
 					return `${num} ${source} to ${code}`;

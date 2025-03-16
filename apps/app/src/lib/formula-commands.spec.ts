@@ -9,7 +9,6 @@ import {
 	parseUnitConversion,
 } from "./formula-commands";
 import { COMMAND_HANDLER } from "./store/commands.svelte";
-import { settingsStore } from "./store/settings.svelte";
 
 describe("parseTextMathExpression", () => {
 	// Basic operations
