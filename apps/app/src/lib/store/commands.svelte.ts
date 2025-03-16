@@ -489,10 +489,7 @@ export class CommandsStore extends SecureStore<Commands> {
 				}, 0);
 			}
 
-			if (
-				featureFlagStore.isFeatureEnabled("spotlight_search") &&
-				appStore.query.length > 2
-			) {
+			if (appStore.query.length > 2) {
 				this.startSpotlightSearch();
 			}
 		}

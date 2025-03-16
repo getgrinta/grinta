@@ -112,10 +112,7 @@
 			{@const arrowDownLeftCss =
 				systemThemeWatcher.theme === THEME.LIGHT &&
 				"text-neutral-600 hover:!bg-neutral-300/50"}
-			{@const icon =
-				item.handler === COMMAND_HANDLER.APP
-					? appMetadataStore.getIcon(item.label)
-					: null}
+			{@const icon = appMetadataStore.getIcon(item)}
 			<li
 				class={clsx(
 					"!w-[calc(100%-2rem)] mx-4 select-none motion-preset-slide-up",

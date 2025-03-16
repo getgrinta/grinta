@@ -4,6 +4,9 @@ use std::fs::{self};
 use std::io::BufWriter;
 use std::path::Path;
 use tauri::{AppHandle, Manager, Runtime, command};
+use cocoa::base::{NO, YES, id, nil, selector};
+use cocoa::foundation::{NSArray, NSString, NSDictionary, NSString as CocoaNSString};
+use objc::{class, msg_send, sel, sel_impl};
 
 #[cfg(target_os = "macos")]
 use tauri_icns::{IconFamily, IconType};
@@ -300,4 +303,68 @@ fn get_app_data_dir<R: Runtime>(app_handle: tauri::AppHandle<R>) -> Result<Strin
         .app_config_dir()
         .map(|path| path.to_string_lossy().to_string())
         .map_err(|err| format!("App data directory not configured: {}", err))
+}
+
+#[tauri::command]
+pub fn load_extension_icons(extensions: Vec<String>) -> Result<HashMap<String, String>, String> {
+    let mut icon_map = HashMap::new();
+
+    for ext in extensions {
+        let icon = unsafe {
+            // Special case for folder icon
+            if ext == "folder" {
+                let ns_image_class = class!(NSImage);
+                // NSImage.folderName in Swift is "NSFolder" in Objective-C
+                let folder_name = NSString::alloc(nil).init_str("NSFolder");
+                msg_send![ns_image_class, imageNamed:folder_name]
+            } else {
+                // Regular file extension icon
+                let workspace = class!(NSWorkspace);
+                let shared_workspace: id = msg_send![workspace, sharedWorkspace];
+                let ns_string = CocoaNSString::alloc(nil).init_str(&ext);
+                let icon: id = msg_send![shared_workspace, iconForFileType:ns_string];
+                icon
+            }
+        };
+
+        if icon.is_null() {
+            continue;
+        }
+
+        let tiff_data: id = unsafe { msg_send![icon, TIFFRepresentation] };
+        if tiff_data.is_null() {
+            continue;
+        }
+
+        let bitmap_rep: id = unsafe {
+            let bitmap_rep_class = class!(NSBitmapImageRep);
+            let bitmap_rep: id = msg_send![bitmap_rep_class, alloc];
+            let bitmap_rep: id = msg_send![bitmap_rep, initWithData:tiff_data];
+            bitmap_rep
+        };
+
+        if bitmap_rep.is_null() {
+            continue;
+        }
+
+        let png_data: id = unsafe {
+            let properties: id = msg_send![class!(NSDictionary), dictionary];
+            msg_send![bitmap_rep, representationUsingType:4 properties:properties]
+        };
+
+        if png_data.is_null() {
+            continue;
+        }
+
+        let png_bytes = unsafe {
+            let length = msg_send![png_data, length];
+            std::slice::from_raw_parts(msg_send![png_data, bytes], length)
+        };
+
+        let base64_icon = general_purpose::STANDARD.encode(png_bytes);
+        let data_url = format!("data:image/png;base64,{}", base64_icon);
+        icon_map.insert(ext, data_url);
+    }
+
+    Ok(icon_map)
 }
