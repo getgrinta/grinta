@@ -58,7 +58,7 @@ plugin({
 		builder.module("$app/navigation", () => {
 			return {
 				exports: {
-					goto: mock((path: string) => {}),
+					goto: mock((_path: string) => {}),
 				},
 				loader: "object",
 			};

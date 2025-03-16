@@ -2045,7 +2045,7 @@ export function parseUnitConversion(query: string): ExecutableCommand[] {
 					} else {
 						value = Number(valueText);
 					}
-				} catch (error) {
+				} catch {
 					value = Number(valueText);
 				}
 
@@ -2122,7 +2122,7 @@ export function parseUnitConversion(query: string): ExecutableCommand[] {
 					} else {
 						value = Number(valueText);
 					}
-				} catch (error) {
+				} catch {
 					value = Number(valueText);
 				}
 
@@ -2263,7 +2263,7 @@ export function parseUnitConversion(query: string): ExecutableCommand[] {
 					smartMatch: true,
 				},
 			];
-		} catch (error) {
+		} catch {
 			// For volume conversions, handle special cases
 			if (
 				(fromUnit === "milliliters" || fromUnit === "milliliter") &&
@@ -2335,7 +2335,7 @@ export function parseUnitConversion(query: string): ExecutableCommand[] {
 						recursionDepth + 1,
 					);
 				}
-			} catch (nestedError) {
+			} catch {
 				// Return empty results after exhausting all conversion attempts
 				return [];
 			}

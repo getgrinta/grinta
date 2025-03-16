@@ -150,6 +150,7 @@ function buildEditor(initialContent: string) {
 			// Force re-render so editor.isActive works as expected
 			// but avoid self-referencing in the callback
 			if (editor) {
+				// eslint-disable-next-line no-self-assign
 				editor = editor;
 			}
 			setContentAwareWindowHeight();
