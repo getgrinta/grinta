@@ -73,7 +73,7 @@ $effect(clickListener);
 >
 	<VList
 		data={commandsStore.commands}
-		style="height: 99vh;padding-top: var(--commands-padding);"
+		style="height: 99vh;padding-top: var(--commands-padding);padding-bottom:1rem;"
 		getKey={(_, i) => i}
 	>
 		{#snippet children(item: ExecutableCommand, index)}

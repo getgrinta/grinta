@@ -12,7 +12,7 @@ import { SparklesIcon, Layers2Icon, CommandIcon } from "lucide-svelte"
   <h1 class="!text-4xl lg:!text-7xl !leading-[3rem] lg:!leading-[6rem] text-center max-w-[44rem] !font-semibold">Everything you need, in <span class="bg-gradient-to-r from-blue-500 to-indigo-400 inline-block text-transparent bg-clip-text">one shortcut</span>.</h1>
   <p class="text-2xl text-center">A next generation of MacOS search bar packed with AI and notes.</p>
   <div class="flex gap-4 items-center justify-center">
-    <a href="#" class="btn lg:btn-lg bg-neutral-800 border-2 !text-white rounded-full hover:border-primary shadow-2xl hover:shadow-primary/40">
+    <a href="#" class="btn lg:btn-lg !bg-neutral-800 border-2 !text-white rounded-full hover:border-primary shadow-2xl hover:shadow-primary/40" disabled>
       <img src="/mac.svg" width={40} height={40} class="text-white" />
       <span>Download for Mac</span>
     </a>
@@ -29,7 +29,7 @@ import { SparklesIcon, Layers2Icon, CommandIcon } from "lucide-svelte"
   <div class="card bg-gradient-to-bl rounded-[1.5rem] from-neutral-900 to-indigo-500/20 relative border-gradient col-span-1 lg:col-span-2 row-span-1 lg:row-span-2 !mt-0 shadow-lg transition-shadow hover:shadow-indigo-700/20 intersect:motion-preset-slide-up">
     <div class="card-body">
       <h2 class="card-title !text-2xl">Grinta is always with you.</h2>
-      <p class="!m-0">All your favorite applications and shortcuts in one place. Easily <span class="text-secondary">switch between search, note-taking, and prompt modes</span>.</p>
+      <p class="!m-0">All your favorite applications and shortcuts in one place. Easily <span class="text-secondary">switch between search and note-taking modes</span>.</p>
       <div class="flex items-center justify-between">
         <div class="flex gap-1 items-center">
           <kbd class="kbd kbd-lg !m-0 text-secondary rounded-[1rem]">
@@ -42,8 +42,8 @@ import { SparklesIcon, Layers2Icon, CommandIcon } from "lucide-svelte"
   </div>
   <div class="card bg-neutral-900 rounded-[1.5rem] relative border-gradient col-span-1 lg:col-span-2 col-start-auto lg:col-start-3 !mt-0 shadow-lg transition-shadow hover:shadow-indigo-700/20 intersect:motion-preset-slide-up">
     <div class="card-body">
-      <h2 class="card-title !text-2xl">Protecting your privacy</h2>
-      <p class="!m-0">We respect your privacy and <span class="text-secondary">collect only anonymous information</span>.</p>
+      <h2 class="card-title !text-2xl">Zero Telemetry</h2>
+      <p class="!m-0">We respect your privacy and <span class="text-secondary">collect zero user related data</span>.</p>
     </div>
   </div>
   <div class="card blueprint border-gradient-special col-span-1 lg:col-span-2 col-start-auto lg:col-start-3 row-start-auto lg:row-start-2 !mt-0 shadow-lg transition-shadow hover:shadow-indigo-700/20 intersect:motion-preset-slide-up">
@@ -54,8 +54,8 @@ import { SparklesIcon, Layers2Icon, CommandIcon } from "lucide-svelte"
   </div>
   <div class="card bg-gradient-to-br rounded-[1.5rem] from-neutral-900 via-neutral-900 to-indigo-500/20 relative border-gradient-special col-span-1 lg:col-span-2 row-span-1 lg:row-span-3 col-start-1 lg:col-start-5 row-start-auto lg:row-start-1 !mt-0 shadow-lg transition-shadow hover:shadow-indigo-700/20 intersect:motion-preset-slide-up">
     <div class="card-body">
-      <h2 class="card-title !text-2xl">AI the way you prefer</h2>
-      <p class="!m-0">In Grinta you have several ways to use AI. You can buy <span class="text-secondary">access to AI services with a subscription, provide an OpenAI compatible API token, or point the application to your locally running LLM</span>.</p>
+      <h2 class="card-title !text-2xl">Intelligence Inside</h2>
+      <p class="!m-0">Grinta is packed with natural language processing and AI. We want the app to fully understand you with natural language and <span class="text-secondary">give you the best results based on that</span>.</p>
       <div class="flex input input-bordered input-lg items-center gap-4 rounded-[1rem]">
         <SparklesIcon class="!m-0 text-secondary" size={40} />
         <p class="!m-0 !text-sm lg:!text-xl font-semibold">Lasagna recipe</p>
@@ -84,13 +84,12 @@ import { SparklesIcon, Layers2Icon, CommandIcon } from "lucide-svelte"
   <div class="flex flex-1 flex-col justify-center items-start !m-0 px-4 lg:px-16 py-8 lg:py-24">
     <div class="flex gap-2">
       <h2>Grinta Pro</h2>
-      <div class="badge badge-secondary badge-outline">coming soon</div>
     </div>
     <p>For your convenience, we've prepared a turbo-charged version of Grinta with extra features such as:</p>
     <ul>
       <li><span class="text-secondary">Zero config, fast AI</span>, out-of-box.</li>
       <li><span class="text-secondary">Note writing AI based copilot</span> that will autocomplete your thoughts as you write.</li>
-      <li><span class="text-secondary">GrintaFi</span> - AI based stock and crypto data quick access.</li>
+      <li><span class="text-secondary">GrintaFi (coming soon)</span> - AI based stock and crypto data quick access.</li>
     </ul>
   </div>
   <div class="hidden lg:flex grinta-pro flex-1 !m-0"></div>
