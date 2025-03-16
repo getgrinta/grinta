@@ -4,12 +4,7 @@ import { SystemThemeWatcher } from "$lib/system-theme-watcher.svelte";
 import clsx from "clsx";
 import type { SvelteComponent } from "svelte";
 
-const {
-	children,
-	onClick,
-	hotkey,
-	class: className,
-} = $props<{
+const { children, onClick, hotkey, className } = $props<{
 	onClick: () => void;
 	className?: string;
 	hotkey?: string;
