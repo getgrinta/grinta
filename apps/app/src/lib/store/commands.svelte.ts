@@ -32,7 +32,6 @@ import {
 } from "../utils.svelte";
 import { BAR_MODE, appStore } from "./app.svelte";
 import { clipboardStore } from "./clipboard.svelte";
-import { featureFlagStore } from "./feature-flag-store";
 import { type Note, notesStore } from "./notes.svelte";
 import { SecureStore } from "./secure.svelte";
 import { settingsStore } from "./settings.svelte";

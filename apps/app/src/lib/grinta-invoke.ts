@@ -29,7 +29,7 @@ export function searchSpotlightApps(
 	});
 }
 
-export function requestAccessToUserFolders(): Promise<SpotlightSearchResult[]> {
+export async function requestAccessToUserFolders(): Promise<SpotlightSearchResult[]> {
 	return grintaInvoke<SpotlightSearchResult[]>("search_spotlight_apps", {
 		query: "random_request_access_handler",
 	});

@@ -3,6 +3,42 @@
 @plugin "@tailwindcss/typography";
 @plugin "tailwindcss-motion";
 
+@theme {
+	--color-mare-50: oklch(93.739% 0.02582 278.73);
+	--color-mare-100: oklch(89.109% 0.04578 277.29);
+	--color-mare-200: oklch(79.936% 0.08583 276.94);
+	--color-mare-300: oklch(71.044% 0.12811 275.23);
+	--color-mare-400: oklch(62.054% 0.17159 272.93);
+	--color-mare-500: oklch(53.788% 0.21484 270.06);
+	--color-mare-600: oklch(44.864% 0.2427 266.27);
+	--color-mare-700: oklch(37.225% 0.19718 266.65);
+	--color-mare-800: oklch(29.368% 0.14759 267.24);
+	--color-mare-900: oklch(20.846% 0.09413 268.87);
+	--color-mare-950: oklch(16.421% 0.0636 269.55);
+	--color-iris-50: oklch(93.276% 0.03573 307.2);
+	--color-iris-100: oklch(88.663% 0.0616 305.19);
+	--color-iris-200: oklch(79.79% 0.11098 304.5);
+	--color-iris-300: oklch(71.19% 0.16162 303.09);
+	--color-iris-400: oklch(62.9% 0.20906 301.42);
+	--color-iris-500: oklch(55.827% 0.24676 298.27);
+	--color-iris-600: oklch(48.164% 0.25606 293.56);
+	--color-iris-700: oklch(39.706% 0.20829 294.17);
+	--color-iris-800: oklch(30.976% 0.15769 294.78);
+	--color-iris-900: oklch(21.682% 0.10295 297.31);
+	--color-iris-950: oklch(16.595% 0.07146 299.78);
+	--color-foam-50: oklch(87.818% 0.06344 209.89);
+	--color-foam-100: oklch(85.677% 0.07423 208.84);
+	--color-foam-200: oklch(81.419% 0.09372 210.32);
+	--color-foam-300: oklch(77.399% 0.10894 211.2);
+	--color-foam-400: oklch(73.697% 0.1189 212.7);
+	--color-foam-500: oklch(65.708% 0.10714 212.78);
+	--color-foam-600: oklch(53.161% 0.08537 212.11);
+	--color-foam-700: oklch(39.545% 0.06178 212.56);
+	--color-foam-800: oklch(24.913% 0.03591 210.48);
+	--color-foam-900: oklch(0% 0 none);
+	--color-foam-950: oklch(0% 0 none);
+}
+
 @plugin "daisyui/theme" {
 	name: "grinta-dark";
 	default: false;

@@ -26,6 +26,12 @@ export const SEARCH_ENGINE = {
 	DUCKDUCKGO: "DUCKDUCKGO",
 } as const;
 
+export const SEARCH_ENGINE_STYLED = {
+	[SEARCH_ENGINE.STARTPAGE]: "Startpage",
+	[SEARCH_ENGINE.GOOGLE]: "Google",
+	[SEARCH_ENGINE.DUCKDUCKGO]: "DuckDuckGo",
+} as const
+
 export const ACCENT_COLOR = {
 	MARE: "MARE",
 	IRIS: "IRIS",
@@ -51,6 +57,12 @@ const LANGUAGE_CODE_TO_ENUM = Object.entries(LANGUAGE).reduce(
 
 export type Language = (typeof LANGUAGE)[keyof typeof LANGUAGE];
 
+export const LANGUAGE_NATIVE_NAME = {
+	[LANGUAGE.EN]: "English",
+	[LANGUAGE.PL]: "Polski",
+	[LANGUAGE.DE]: "Deutsch",
+} as const
+
 export const BASE_CURRENCY = {
 	EUR: "EUR",
 	PLN: "PLN",
@@ -74,6 +86,7 @@ const getBrowserLanguage = (): Language => {
 };
 
 export const SettingsSchema = z.object({
+	onboardingCompleted: z.boolean().default(false),
 	toggleShortcut: z.string().default("CommandOrControl+Space"),
 	theme: z.nativeEnum(THEME).default(THEME.SYSTEM),
 	accentColor: z.nativeEnum(ACCENT_COLOR).default(ACCENT_COLOR.MARE),
@@ -115,6 +128,10 @@ export class SettingsStore extends SecureStore<Settings> {
 
 	toggleIncognito() {
 		this.updateData({ incognitoEnabled: !this.data.incognitoEnabled });
+	}
+
+	finishOnboarding() {
+		this.updateData({ onboardingCompleted: true });
 	}
 
 	async setToggleShortcut(toggleShortcut: string) {
