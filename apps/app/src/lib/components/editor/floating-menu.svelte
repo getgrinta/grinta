@@ -5,6 +5,9 @@
 	import { SparklesIcon } from "lucide-svelte";
 	import { _ } from "svelte-i18n";
 	import PrimaryButton from "../primary-button.svelte";
+  import { appStore } from "$lib/store/app.svelte";
+
+	const hasPro = appStore.subscriptions.length > 0;
 
 	const { form } = createForm<{ prompt: string }>({
 		async onSubmit(values) {
@@ -43,26 +46,28 @@
 	}
 </script>
 
-<form use:form class="join">
-	{#if menuState === "idle"}
-		<PrimaryButton
-			class="btn-sm rounded-full text-primary"
-			onclick={toggleState}
-		>
-			<span>⌘I</span>
-			<span>{$_("notes.askAi")}</span>
-		</PrimaryButton>
-	{:else}
-		<label class="input rounded-full !outline-none">
-			<SparklesIcon size={16} />
-			<input
-				bind:this={promptInput}
-				name="prompt"
-				type="text"
-				placeholder={$_("notes.askAi")}
-				onblur={toggleState}
-				onkeydown={handlePromptKeyDown}
-			/>
-		</label>
-	{/if}
-</form>
+{#if hasPro}
+	<form use:form class="join">
+		{#if menuState === "idle"}
+			<PrimaryButton
+				class="btn-sm rounded-full text-primary"
+				onclick={toggleState}
+			>
+				<span>⌘I</span>
+				<span>{$_("notes.askAi")}</span>
+			</PrimaryButton>
+		{:else}
+			<label class="input rounded-full !outline-none">
+				<SparklesIcon size={16} />
+				<input
+					bind:this={promptInput}
+					name="prompt"
+					type="text"
+					placeholder={$_("notes.askAi")}
+					onblur={toggleState}
+					onkeydown={handlePromptKeyDown}
+				/>
+			</label>
+		{/if}
+	</form>
+{/if}

@@ -1,4 +1,11 @@
 {
+	"common": {
+		"next": "Next"
+	},
+	"welcome": {
+		"title": "Welcome to Grinta",
+		"subtitle": "Before you start, you may want to adjust these settings."
+	},
 	"searchMode": {
 		"web": "Web",
 		"ai": "AI"

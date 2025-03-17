@@ -6,8 +6,9 @@
 	import { appStore } from "$lib/store/app.svelte";
 	import {
 		ACCENT_COLOR,
-		LANGUAGE,
+		LANGUAGE_NATIVE_NAME,
 		SEARCH_ENGINE,
+		SEARCH_ENGINE_STYLED,
 		THEME,
 		baseCurrencies,
 		settingsStore,
@@ -37,13 +38,7 @@
 	let recordingShortcut = $state(false);
 	let currentTab = $state("general");
 	const themes = Object.keys(THEME);
-	const searchEngines = Object.keys(SEARCH_ENGINE);
 	const accentColors = Object.keys(ACCENT_COLOR);
-	const languages = [
-		{ code: LANGUAGE.EN, name: "English" },
-		{ code: LANGUAGE.PL, name: "Polski" },
-		{ code: LANGUAGE.DE, name: "Deutsch" },
-	];
 
 	function changeTab(tab: string) {
 		currentTab = tab;
@@ -205,8 +200,8 @@
 					bind:value={settingsStore.data.language}
 					class="select select-bordered w-full"
 				>
-					{#each languages as language}
-						<option value={language.code}>{language.name}</option>
+					{#each Object.entries(LANGUAGE_NATIVE_NAME) as [code, name]}
+						<option value={code}>{name}</option>
 					{/each}
 				</select>
 				<label class="text-sm" for="notesDirInput"
@@ -241,9 +236,9 @@
 					bind:value={settingsStore.data.defaultSearchEngine}
 					class="select select-bordered w-full"
 				>
-					{#each searchEngines as searchEngine}
+					{#each Object.values(SEARCH_ENGINE) as searchEngine}
 						<option value={searchEngine}
-							>{humanizeString(searchEngine)}</option
+							>{SEARCH_ENGINE_STYLED[searchEngine]}</option
 						>
 					{/each}
 				</select>

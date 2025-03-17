@@ -1,4 +1,11 @@
 {
+	"common": {
+		"next": "Dalej"
+	},
+	"welcome": {
+		"title": "Witaj w Grincie",
+		"subtitle": "Przed rozpoczęciem, możesz dostosować te ustawienia."
+	},
 	"searchMode": {
 		"web": "Sieć",
 		"ai": "AI"

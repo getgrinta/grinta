@@ -1,4 +1,11 @@
 {
+	"common": {
+		"next": "Weiter"
+	},
+	"welcome": {
+		"title": "Willkommen bei Grinta",
+		"subtitle": "Bevor du losmachst, möchtest du vielleicht diese Einstellungen anpassen?"
+	},
 	"searchMode": {
 		"web": "Netz",
 		"ai": "KI"

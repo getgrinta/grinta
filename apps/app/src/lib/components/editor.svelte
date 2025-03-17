@@ -17,6 +17,8 @@
 	import BubbleMenu from "./editor/bubble-menu.svelte";
 	import FloatingMenu from "./editor/floating-menu.svelte";
 
+	const hasPro = appStore.subscriptions.length > 0;
+
 	const turndownService = new TurndownService({ headingStyle: "atx" });
 
 	// Markdown to HTML conversion helper
@@ -124,7 +126,7 @@
 			}),
 		];
 
-		if (settingsStore.data.proAutocompleteEnabled) {
+		if (hasPro && settingsStore.data.proAutocompleteEnabled) {
 			extensions.push(
 				TextSuggestion.configure({
 					async fetchAutocompletion({
