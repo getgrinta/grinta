@@ -23,10 +23,11 @@
 	import { VList } from "virtua/svelte";
 	import { z } from "zod";
 	import CommandListContextMenu from "./command-list-context-menu.svelte";
+	import { watch } from "runed";
 
 	let contextMenu = $state<CommandListContextMenu>();
-	let loadedIcons = $state<Map<string, string>>(new Map());
-	let loadingIcons = $state<Map<string, boolean>>(new Map());
+	let loadedIcons = $state<Record<string, string>>({});
+	let loadingIcons = $state<Record<string, boolean>>({});
 
 	type GetHelperProps = {
 		value: string;
@@ -69,18 +70,16 @@
 		if (!command.path) return;
 
 		const _cacheKey = cacheKey(command);
-
 		if (!_cacheKey) return;
 
-		if (loadedIcons.get(_cacheKey)) return;
-		if (loadingIcons.get(_cacheKey)) return;
+		if (loadedIcons[_cacheKey]) return;
+		if (loadingIcons[_cacheKey]) return;
 
-		loadingIcons.set(_cacheKey, true);
+		loadingIcons[_cacheKey] = true;
 
 		appMetadataStore.getIconAsync(command).then((icon) => {
 			if (!command.path || !icon) return;
-
-			loadedIcons.set(_cacheKey, icon);
+			loadedIcons[_cacheKey] = icon;
 		});
 	}
 
@@ -115,7 +114,7 @@
 
 				return {
 					...command,
-					icon: _cacheKey ? (icons.get(_cacheKey) ?? null) : null,
+					icon: _cacheKey ? (icons[_cacheKey] ?? null) : null,
 				};
 			},
 		);

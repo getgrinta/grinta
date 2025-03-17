@@ -130,14 +130,18 @@ pub async fn search_spotlight_apps<R: Runtime>(
             let desktop_directory: NSUInteger = 12; // NSDesktopDirectory
             let desktop_urls: id = msg_send![file_manager, URLsForDirectory:desktop_directory inDomains:user_domain_mask];
             let desktop_url: id = msg_send![desktop_urls, firstObject];
+
+            let downloads_path: id = msg_send![downloads_url, relativePath];
+            let documents_path: id = msg_send![documents_url, relativePath];
+            let desktop_path: id = msg_send![desktop_url, relativePath];
       
             // Update the search scopes to include user directories
             let scope_array: id = unsafe {
                 // Add the user directories to the existing scope array
                 let array: id = msg_send![class!(NSMutableArray), arrayWithObject:computer_scope];
-                let _: () = msg_send![array, addObject:downloads_url];
-                let _: () = msg_send![array, addObject:documents_url];
-                let _: () = msg_send![array, addObject:desktop_url];
+                let _: () = msg_send![array, addObject:desktop_path];
+                let _: () = msg_send![array, addObject:documents_path];
+                let _: () = msg_send![array, addObject:downloads_path];
                 array
             };
 

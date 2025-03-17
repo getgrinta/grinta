@@ -198,8 +198,6 @@ pub fn load_app_info<R: Runtime>(
                         base64Image: data_url,
                         localizedName: localized_name,
                     };
-
-                    println!("Found icon for {}", app_name.clone());
                     result.insert(app_name, app_info);
                 }
                 Ok(None) => {
@@ -208,8 +206,6 @@ pub fn load_app_info<R: Runtime>(
                         base64Image: String::new(),
                         localizedName: localized_name.clone(),
                     };
-
-                    println!("Empty icon for {}", app_name.clone());
                     result.insert(app_name, app_info);
                 }
                 Err(_) => {
@@ -217,7 +213,6 @@ pub fn load_app_info<R: Runtime>(
                         base64Image: String::new(),
                         localizedName: localized_name.clone(),
                     };
-                    println!("Failed to load icon for {}", app_name.clone());
                     result.insert(app_name, app_info);
                 }
             }
