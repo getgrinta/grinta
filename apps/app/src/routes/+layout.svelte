@@ -155,7 +155,7 @@
 		await settingsStore.initialize();
 		await clipboardStore.initialize();
 		await widgetsStore.initialize();
-		appMetadataStore.initializeIcons();
+		appMetadataStore.initialize();
 		initTrayIcon();
 
 		moveWindow(Position.TopCenter).then(() => {

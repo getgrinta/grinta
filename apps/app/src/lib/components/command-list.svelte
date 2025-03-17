@@ -25,6 +25,9 @@
 	import CommandListContextMenu from "./command-list-context-menu.svelte";
 
 	let contextMenu = $state<CommandListContextMenu>();
+	let loadedIcons = $state<Map<string, string | null>>(new Map());
+	let loadingIcons = $state<Map<string, boolean>>(new Map());
+	let forceUpdate = $state(0); // Counter to force re-renders
 
 	type GetHelperProps = {
 		value: string;
@@ -61,6 +64,51 @@
 				$_("commands.helperText.runShortcut"),
 			)
 			.otherwise(() => value);
+	}
+
+	function getIconFromCache(command: ExecutableCommand): string | null {
+		if (!command.path) return null;
+
+		const _cacheKey = cacheKey(command);
+		if (!_cacheKey) return null;
+
+		return loadedIcons.get(_cacheKey) || null;
+	}
+
+	function loadIcon(_node: any, command: ExecutableCommand) {
+		if (!command.path) return;
+
+		const _cacheKey = cacheKey(command);
+
+		if (!_cacheKey) return;
+
+		if (loadedIcons.get(_cacheKey)) return;
+		if (loadingIcons.get(_cacheKey)) return;
+
+		loadingIcons.set(_cacheKey, true);
+
+		console.log('Load icon for', command.path);
+
+		appMetadataStore.getIconAsync(command).then((icon) => {
+			if (!command.path) return;
+
+			loadedIcons.set(_cacheKey, icon);
+			forceUpdate++;
+		});
+	}
+
+	function cacheKey(command: ExecutableCommand): string | null {
+		if (command.metadata?.contentType === "public.folder") {
+			return "folder"
+		}
+		if (command.handler === 'FS_ITEM') {
+			const extension = command.value.split(".").pop();
+			if (extension) {
+				return extension;
+			}
+		}
+
+		return command.path ?? null;
 	}
 
 	const systemThemeWatcher = new SystemThemeWatcher();
@@ -112,7 +160,7 @@
 			{@const arrowDownLeftCss =
 				systemThemeWatcher.theme === THEME.LIGHT &&
 				"text-neutral-600 hover:!bg-neutral-300/50"}
-			{@const icon = appMetadataStore.getIcon(item)}
+			{@const icon = getIconFromCache(item)}
 			<li
 				class={clsx(
 					"!w-[calc(100%-2rem)] mx-4 select-none motion-preset-slide-up",
@@ -121,6 +169,7 @@
 						"border-gradient",
 				)}
 				data-command-index={index}
+				use:loadIcon={item}
 				oncontextmenu={(event) => {
 					contextMenu?.createContextMenuItems(item);
 					handleContextMenu({ event, name: "commandList" });
