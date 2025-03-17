@@ -14,6 +14,7 @@
 		"@astrojs/starlight": "0.32.2",
 		"@astrojs/starlight-tailwind": "3.0.0",
 		"@astrojs/tailwind": "6.0.0",
+		"@openpanel/web": "^1.0.1",
 		"astro": "5.5.2",
 		"lucide-svelte": "0.482.0",
 		"sharp": "0.33.5",
