@@ -1,8 +1,11 @@
 <script lang="ts">
+  import { appStore } from "$lib/store/app.svelte";
 	import { getApiClient } from "$lib/utils.svelte";
 	import type { Editor } from "@tiptap/core";
 	import { ChevronLeftIcon, QuoteIcon, SparklesIcon } from "lucide-svelte";
 	import { _ } from "svelte-i18n";
+
+	const hasPro = appStore.subscriptions.length > 0;
 
 	export const MENU_MODE = {
 		IDLE: "IDLE",
@@ -122,14 +125,16 @@
 			class="btn btn-sm join-item items-center text-primary"
 			onclick={() => toggleHeader(3)}>H3</button
 		>
-		<button
-			type="button"
-			class="btn btn-sm join-item items-center text-primary"
-			onclick={() => setMenuMode(MENU_MODE.REPHRASE_CHOICE)}
-		>
-			<SparklesIcon size={16} />
-			<span>{$_("notes.rephrase")}</span>
-		</button>
+		{#if hasPro}
+			<button
+				type="button"
+				class="btn btn-sm join-item items-center text-primary"
+				onclick={() => setMenuMode(MENU_MODE.REPHRASE_CHOICE)}
+			>
+				<SparklesIcon size={16} />
+				<span>{$_("notes.rephrase")}</span>
+			</button>
+		{/if}
 	{:else}
 		<button
 			type="button"
