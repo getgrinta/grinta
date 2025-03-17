@@ -263,21 +263,21 @@ export class CommandsStore extends SecureStore<Commands> {
 	getMenuItems(): ExecutableCommand[] {
 		const userCommands = appStore?.user
 			? [
-					{
-						label: t("commands.menuItems.profile"),
-						value: SYSTEM_COMMAND.PROFILE,
-						handler: COMMAND_HANDLER.SYSTEM,
-						smartMatch: false,
-					},
-				]
+				{
+					label: t("commands.menuItems.profile"),
+					value: SYSTEM_COMMAND.PROFILE,
+					handler: COMMAND_HANDLER.SYSTEM,
+					smartMatch: false,
+				},
+			]
 			: [
-					{
-						label: t("commands.menuItems.signIn"),
-						value: SYSTEM_COMMAND.SIGN_IN,
-						handler: COMMAND_HANDLER.SYSTEM,
-						smartMatch: false,
-					},
-				];
+				{
+					label: t("commands.menuItems.signIn"),
+					value: SYSTEM_COMMAND.SIGN_IN,
+					handler: COMMAND_HANDLER.SYSTEM,
+					smartMatch: false,
+				},
+			];
 		return [
 			...userCommands,
 			{
@@ -362,9 +362,9 @@ export class CommandsStore extends SecureStore<Commands> {
 	async buildAppCommands() {
 		// Use spotlight query through rust in the future
 		/*
-        let query = NSMetadataQuery()
-        query.searchScopes = [NSMetadataQueryLocalComputerScope]
-        query.predicate = NSPredicate(format: "kMDItemContentType == 'com.apple.application-bundle'")
+		let query = NSMetadataQuery()
+		query.searchScopes = [NSMetadataQueryLocalComputerScope]
+		query.predicate = NSPredicate(format: "kMDItemContentType == 'com.apple.application-bundle'")
 		*/
 
 		const apps = await findApps();
@@ -441,15 +441,15 @@ export class CommandsStore extends SecureStore<Commands> {
 				const createNoteCommand =
 					appStore.query.length > 0
 						? [
-								{
-									label: t("commands.actions.createNote", {
-										query: appStore.query,
-									}),
-									value: appStore.query,
-									handler: COMMAND_HANDLER.CREATE_NOTE,
-									smartMatch: false,
-								},
-							]
+							{
+								label: t("commands.actions.createNote", {
+									query: appStore.query,
+								}),
+								value: appStore.query,
+								handler: COMMAND_HANDLER.CREATE_NOTE,
+								smartMatch: false,
+							},
+						]
 						: [];
 
 				await notesStore.fetchNotes();
@@ -461,8 +461,8 @@ export class CommandsStore extends SecureStore<Commands> {
 			appStore.query.length === 0
 				? commands
 				: matchSorter(commands, appStore.query, {
-						keys: ["localizedLabel", "label"],
-					}).sort((a, b) => this.sortCommands({ prev: a, next: b }));
+					keys: ["localizedLabel", "label"],
+				}).sort((a, b) => this.sortCommands({ prev: a, next: b }));
 
 		const formulaCommands = await buildFormulaCommands(appStore.query);
 
