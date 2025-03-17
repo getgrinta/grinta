@@ -25,9 +25,8 @@
 	import CommandListContextMenu from "./command-list-context-menu.svelte";
 
 	let contextMenu = $state<CommandListContextMenu>();
-	let loadedIcons = $state<Map<string, string | null>>(new Map());
+	let loadedIcons = $state<Map<string, string>>(new Map());
 	let loadingIcons = $state<Map<string, boolean>>(new Map());
-	let forceUpdate = $state(0); // Counter to force re-renders
 
 	type GetHelperProps = {
 		value: string;
@@ -66,15 +65,6 @@
 			.otherwise(() => value);
 	}
 
-	function getIconFromCache(command: ExecutableCommand): string | null {
-		if (!command.path) return null;
-
-		const _cacheKey = cacheKey(command);
-		if (!_cacheKey) return null;
-
-		return loadedIcons.get(_cacheKey) || null;
-	}
-
 	function loadIcon(_node: any, command: ExecutableCommand) {
 		if (!command.path) return;
 
@@ -87,21 +77,18 @@
 
 		loadingIcons.set(_cacheKey, true);
 
-		console.log('Load icon for', command.path);
-
 		appMetadataStore.getIconAsync(command).then((icon) => {
-			if (!command.path) return;
+			if (!command.path || !icon) return;
 
 			loadedIcons.set(_cacheKey, icon);
-			forceUpdate++;
 		});
 	}
 
 	function cacheKey(command: ExecutableCommand): string | null {
 		if (command.metadata?.contentType === "public.folder") {
-			return "folder"
+			return "folder";
 		}
-		if (command.handler === 'FS_ITEM') {
+		if (command.handler === "FS_ITEM") {
 			const extension = command.value.split(".").pop();
 			if (extension) {
 				return extension;
@@ -115,6 +102,26 @@
 
 	// Hide context menu when clicking outside
 	$effect(clickListener);
+
+	type CommandWithIcon = ExecutableCommand & {
+		icon: string | null;
+	};
+
+	const commandsWithIcons: CommandWithIcon[] = $derived.by(() => {
+		const icons = loadedIcons;
+		const commandWithIcons: CommandWithIcon[] = commandsStore.commands.map(
+			(command) => {
+				const _cacheKey = cacheKey(command);
+
+				return {
+					...command,
+					icon: _cacheKey ? (icons.get(_cacheKey) ?? null) : null,
+				};
+			},
+		);
+
+		return commandWithIcons;
+	});
 </script>
 
 <CommandListContextMenu bind:this={contextMenu} />
@@ -124,11 +131,11 @@
 	class="menu menu-lg flex-1 menu-vertical flex-nowrap overflow-hidden w-full p-0"
 >
 	<VList
-		data={commandsStore.commands}
+		data={commandsWithIcons}
 		style="height: 99vh;padding-top: var(--commands-padding);padding-bottom:1rem;"
 		getKey={(_, i) => i}
 	>
-		{#snippet children(item: ExecutableCommand, index)}
+		{#snippet children(item: CommandWithIcon, index)}
 			{@const active = commandsStore.selectedIndex === index}
 			{@const IconComponent = getIcon(item)}
 			{@const currentLabel = item.localizedLabel ?? item.label}
@@ -160,7 +167,7 @@
 			{@const arrowDownLeftCss =
 				systemThemeWatcher.theme === THEME.LIGHT &&
 				"text-neutral-600 hover:!bg-neutral-300/50"}
-			{@const icon = getIconFromCache(item)}
+
 			<li
 				class={clsx(
 					"!w-[calc(100%-2rem)] mx-4 select-none motion-preset-slide-up",
@@ -188,9 +195,9 @@
 						data-testid={`command-list-item.${index}`}
 						class="flex flex-1 h-full gap-4 py-[0.75rem] items-center overflow-hidden cursor-pointer"
 					>
-						{#if icon}
+						{#if item.icon}
 							<img
-								src={icon}
+								src={item.icon}
 								alt={currentLabel}
 								width="32"
 								height="32"

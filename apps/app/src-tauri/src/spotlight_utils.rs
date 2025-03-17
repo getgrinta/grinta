@@ -33,7 +33,7 @@ pub async fn search_spotlight_apps<R: Runtime>(
     query: Option<String>,
 ) -> Result<Vec<SpotlightAppInfo>, String> {
     use cocoa::base::{NO, YES, id, nil, selector};
-    use cocoa::foundation::{NSArray, NSString as CocoaNSString};
+    use cocoa::foundation::{NSArray, NSUInteger, NSString as CocoaNSString};
     use objc::runtime::{Class, Object, Sel};
     use objc::{class, msg_send, sel, sel_impl};
 
@@ -112,28 +112,33 @@ pub async fn search_spotlight_apps<R: Runtime>(
             // Set the predicate on the query object
             let _: () = msg_send![query_obj, setPredicate: predicate];
 
-            // Get the user's home directory using NSFileManager instead
+            // Get standard directories using FileManager instead of manually appending paths
             let file_manager: id = msg_send![class!(NSFileManager), defaultManager];
-            let home_dir_url: id = msg_send![file_manager, homeDirectoryForCurrentUser];
-            let home_dir: id = msg_send![home_dir_url, relativePath];
-
-            // Create URLs for Downloads, Documents, and Desktop directories
-            let downloads_url: id = msg_send![class!(NSURL), fileURLWithPath:home_dir];
-            let downloads_url: id = msg_send![downloads_url, URLByAppendingPathComponent: CocoaNSString::alloc(nil).init_str("Downloads")];
-
-            let documents_url: id = msg_send![class!(NSURL), fileURLWithPath:home_dir];
-            let documents_url: id = msg_send![documents_url, URLByAppendingPathComponent: CocoaNSString::alloc(nil).init_str("Documents")];
-
-            let desktop_url: id = msg_send![class!(NSURL), fileURLWithPath:home_dir];
-            let desktop_url: id = msg_send![desktop_url, URLByAppendingPathComponent: CocoaNSString::alloc(nil).init_str("Desktop")];
-
+            
+            // Get Downloads directory
+            let downloads_directory: NSUInteger = 15; // NSDownloadsDirectory
+            let user_domain_mask: NSUInteger = 1; // NSUserDomainMask
+            let downloads_urls: id = msg_send![file_manager, URLsForDirectory:downloads_directory inDomains:user_domain_mask];
+            let downloads_url: id = msg_send![downloads_urls, firstObject];
+            
+            // Get Documents directory
+            let documents_directory: NSUInteger = 9; // NSDocumentDirectory
+            let documents_urls: id = msg_send![file_manager, URLsForDirectory:documents_directory inDomains:user_domain_mask];
+            let documents_url: id = msg_send![documents_urls, firstObject];
+            
+            // Get Desktop directory
+            let desktop_directory: NSUInteger = 12; // NSDesktopDirectory
+            let desktop_urls: id = msg_send![file_manager, URLsForDirectory:desktop_directory inDomains:user_domain_mask];
+            let desktop_url: id = msg_send![desktop_urls, firstObject];
+      
             // Update the search scopes to include user directories
             let scope_array: id = unsafe {
                 // Add the user directories to the existing scope array
-                let _: () = msg_send![scope_array, addObject:downloads_url];
-                let _: () = msg_send![scope_array, addObject:documents_url];
-                let _: () = msg_send![scope_array, addObject:desktop_url];
-                scope_array
+                let array: id = msg_send![class!(NSMutableArray), arrayWithObject:computer_scope];
+                let _: () = msg_send![array, addObject:downloads_url];
+                let _: () = msg_send![array, addObject:documents_url];
+                let _: () = msg_send![array, addObject:desktop_url];
+                array
             };
 
             // Set the search scopes for the query

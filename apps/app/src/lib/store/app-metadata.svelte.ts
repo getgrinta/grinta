@@ -44,22 +44,16 @@ export class AppMetadataStore {
 	}
 
 	// Load an app icon on demand
-	async loadAppIcon(appName: string): Promise<string | null> {
+	async loadAppIcon(appName: string, resourcePath: string): Promise<string | null> {
 		// Return cached icon if available
 		if (this.appInfo[appName]?.base64Image) {
 			return this.appInfo[appName].base64Image;
 		}
 
-		// Skip if already loading or if app path not found
-		if (this.loadingApps.has(appName) || !this.appResourcePaths[appName]) {
-			return null;
-		}
-
 		this.loadingApps.add(appName);
 
 		try {
-			const resourcePath = this.appResourcePaths[appName];
-			const appInfo = await loadAppInfo([resourcePath]);
+			const appInfo = await loadAppInfo([`${resourcePath}/Contents/Resources/`]);
 			
 			// Update the store with the new icon
 			this.appInfo = { ...this.appInfo, ...appInfo };
@@ -110,15 +104,16 @@ export class AppMetadataStore {
 	// Get an icon, loading it if necessary
 	async getIconAsync(command: ExecutableCommand): Promise<string | null> {
 		if (command.handler === COMMAND_HANDLER.APP) {
-			return this.loadAppIcon(command.label);
+			if (!command.path) return null;
+			return await this.loadAppIcon(command.label, command.path);
 		}
 		if (command.handler === COMMAND_HANDLER.FS_ITEM) {
 			if (command.metadata?.contentType === "public.folder") {
-				return this.loadExtensionIcon("folder");
+				return await this.loadExtensionIcon("folder");
 			}
 			const extension = command.value.split(".").pop();
 			if (extension) {
-				return this.loadExtensionIcon(extension);
+				return await this.loadExtensionIcon(extension);
 			}
 		}
 		return null;
@@ -128,9 +123,9 @@ export class AppMetadataStore {
 	getIcon(command: ExecutableCommand): string | null {
 		if (command.handler === COMMAND_HANDLER.APP) {
 			const icon = this.appInfo[command.label]?.base64Image;
-			if (!icon) {
+			if (!icon && command.path) {
 				// Trigger async load but don't wait for it
-				this.loadAppIcon(command.label);
+				this.loadAppIcon(command.label, command.path);
 			}
 			return icon || null;
 		}

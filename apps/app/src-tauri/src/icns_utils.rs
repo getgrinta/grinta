@@ -34,15 +34,14 @@ fn load_icns_file(path: &Path) -> Result<Option<Vec<u8>>, String> {
 
     // Try to get the largest icon (preferably 256x256 or 128x128)
     let icon_types = [
-        IconType::RGBA32_64x64,
-        IconType::RGB24_128x128,
-        IconType::RGBA32_128x128,
-
-        IconType::RGBA32_128x128_2x,
-        IconType::RGBA32_256x256,
-        IconType::RGBA32_256x256_2x,
         IconType::RGBA32_512x512,
+        IconType::RGBA32_256x256,
+        IconType::RGBA32_128x128,
+        IconType::RGB24_128x128,
         IconType::RGBA32_512x512_2x,
+        IconType::RGBA32_256x256_2x,
+        IconType::RGBA32_128x128_2x,
+        IconType::RGBA32_64x64,
         IconType::RGBA32_32x32,
     ];
 
@@ -200,6 +199,7 @@ pub fn load_app_info<R: Runtime>(
                         localizedName: localized_name,
                     };
 
+                    println!("Found icon for {}", app_name.clone());
                     result.insert(app_name, app_info);
                 }
                 Ok(None) => {
@@ -208,6 +208,8 @@ pub fn load_app_info<R: Runtime>(
                         base64Image: String::new(),
                         localizedName: localized_name.clone(),
                     };
+
+                    println!("Empty icon for {}", app_name.clone());
                     result.insert(app_name, app_info);
                 }
                 Err(_) => {
@@ -215,6 +217,7 @@ pub fn load_app_info<R: Runtime>(
                         base64Image: String::new(),
                         localizedName: localized_name.clone(),
                     };
+                    println!("Failed to load icon for {}", app_name.clone());
                     result.insert(app_name, app_info);
                 }
             }
@@ -224,6 +227,7 @@ pub fn load_app_info<R: Runtime>(
                 base64Image: String::new(),
                 localizedName: localized_name,
             };
+            println!("No icon path found for {}", app_name.clone());
             result.insert(app_name, app_info);
         }
     }
