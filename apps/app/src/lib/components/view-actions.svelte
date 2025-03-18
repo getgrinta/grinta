@@ -14,11 +14,13 @@
 	const isCmdPressed = $derived(pressedKeys.has("Meta"));
 </script>
 
-{#each actions as action}
-	<FlatButton
-		text={action.label}
-		onClick={action.onclick}
-		showShortcut={isCmdPressed}
-		shortcut={action.shortcut}
-	/>
-{/each}
+<div class="flex pointer-events-auto">
+	{#each actions as action}
+		<FlatButton
+			text={action.label}
+			onClick={action.onclick}
+			showShortcut={isCmdPressed}
+			shortcut={action.shortcut}
+		/>
+	{/each}
+</div>
