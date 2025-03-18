@@ -173,7 +173,7 @@
 
 			<li
 				class={clsx(
-					"!w-[calc(100%-2rem)] mx-4 select-none intersect:motion-preset-fade",
+					"!w-[calc(100%-2rem)] mx-4 select-none",
 					appStore.query.length > 0 &&
 						item.smartMatch &&
 						"border-gradient",
