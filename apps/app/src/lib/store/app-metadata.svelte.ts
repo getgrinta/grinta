@@ -105,15 +105,15 @@ export class AppMetadataStore {
 	async getIconAsync(command: ExecutableCommand): Promise<string | null> {
 		if (command.handler === COMMAND_HANDLER.APP) {
 			if (!command.path) return null;
-			return await this.loadAppIcon(command.label, command.path);
+			return this.loadAppIcon(command.label, command.path);
 		}
 		if (command.handler === COMMAND_HANDLER.FS_ITEM) {
 			if (command.metadata?.contentType === "public.folder") {
-				return await this.loadExtensionIcon("folder");
+				return this.loadExtensionIcon("folder");
 			}
 			const extension = command.value.split(".").pop();
 			if (extension) {
-				return await this.loadExtensionIcon(extension);
+				return this.loadExtensionIcon(extension);
 			}
 		}
 		return null;
