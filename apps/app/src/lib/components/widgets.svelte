@@ -12,14 +12,15 @@
 
     let widgetsContextMenu = $state<WidgetsContextMenu>();
     const widgets = $derived(widgetsStore.data.widgets ?? []);
+    const showWidgets = $derived(widgetsStore.showWidgets && commandsStore.scrollTop < 8);
 
     $effect(clickListener);
 </script>
 
 <WidgetsContextMenu bind:this={widgetsContextMenu} />
 
-{#if widgetsStore.showWidgets}
-    <div class="absolute left-0 right-0 top-20 carousel gap-2 z-10">
+{#if showWidgets}
+    <div class="absolute left-0 right-0 top-20 carousel gap-2 z-10 motion-opacity-in">
         {#each widgets as widget, i}
             {@const IconComponent = getIcon(widget.data)}
             {@const icon = appMetadataStore.getIcon(widget.data)}

@@ -23,11 +23,14 @@
 	import { VList } from "virtua/svelte";
 	import { z } from "zod";
 	import CommandListContextMenu from "./command-list-context-menu.svelte";
-	import { watch } from "runed";
 
 	let contextMenu = $state<CommandListContextMenu>();
 	let loadedIcons = $state<Record<string, string>>({});
 	let loadingIcons = $state<Record<string, boolean>>({});
+
+	function handleListScroll(offset: number) {
+		commandsStore.scrollTop = offset;
+	}
 
 	type GetHelperProps = {
 		value: string;
@@ -133,6 +136,7 @@
 		data={commandsWithIcons}
 		style="height: 99vh;padding-top: var(--commands-padding);padding-bottom:1rem;"
 		getKey={(_, i) => i}
+		onscroll={handleListScroll}
 	>
 		{#snippet children(item: CommandWithIcon, index)}
 			{@const active = commandsStore.selectedIndex === index}
@@ -169,7 +173,7 @@
 
 			<li
 				class={clsx(
-					"!w-[calc(100%-2rem)] mx-4 select-none motion-preset-slide-up",
+					"!w-[calc(100%-2rem)] mx-4 select-none intersect:motion-preset-fade",
 					appStore.query.length > 0 &&
 						item.smartMatch &&
 						"border-gradient",
