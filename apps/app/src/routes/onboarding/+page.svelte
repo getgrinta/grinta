@@ -6,6 +6,7 @@
   import humanizeString from "humanize-string";
   import { onMount } from "svelte";
   import { t } from "svelte-i18n";
+  import { enable } from '@tauri-apps/plugin-autostart';
 
   let audio = $state<HTMLAudioElement>();
 
@@ -16,6 +17,7 @@
 
   async function finishOnboarding() {
     await requestAccessToUserFolders();
+    await enable();
     settingsStore.finishOnboarding();
     return goto("/commands/INITIAL");
   }
