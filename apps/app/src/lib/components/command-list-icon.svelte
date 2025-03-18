@@ -45,7 +45,7 @@
 
 {#if props.item.metadata?.contentType === "public.folder"}
     <img
-        src={props.appMetadataStore.extInfo["folder"].base64Image}
+        src={props.appMetadataStore.extInfo["folder"]?.base64Image}
         alt={props.label}
         width="32"
         height="32"
@@ -53,7 +53,7 @@
     />
 {:else if props.appMetadataStore.appInfo[props.item.label]}
     <img
-        src={props.appMetadataStore.appInfo[props.item.label].base64Image}
+        src={props.appMetadataStore.appInfo[props.item.label]?.base64Image}
         alt={props.label}
         width="32"
         height="32"
@@ -61,7 +61,7 @@
     />
 {:else if props.appMetadataStore.extInfo[ext]}
     <img
-        src={props.appMetadataStore.extInfo[ext].base64Image}
+        src={props.appMetadataStore.extInfo[ext]?.base64Image}
         alt={props.label}
         width="32"
         height="32"
