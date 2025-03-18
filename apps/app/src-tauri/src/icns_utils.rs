@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use std::fs::{self};
 use std::io::BufWriter;
 use std::path::Path;
-use tauri::{AppHandle, Manager, Runtime, command};
+use tauri::{AppHandle, Runtime, command};
 use cocoa::base::{NO, YES, id, nil, selector};
 use cocoa::foundation::{NSArray, NSString, NSDictionary, NSString as CocoaNSString};
 use objc::{class, msg_send, sel, sel_impl};
@@ -107,6 +107,7 @@ fn load_icns_file(path: &Path) -> Result<Option<Vec<u8>>, String> {
 // Define a struct to hold app information
 #[derive(serde::Serialize, serde::Deserialize)]
 #[cfg(target_os = "macos")]
+#[allow(non_snake_case)]
 pub struct AppInfo {
     pub base64Image: String,
     pub localizedName: String,
@@ -294,15 +295,6 @@ pub fn load_app_info<R: Runtime>(
     _icns_paths: Vec<String>,
 ) -> Result<HashMap<String, AppInfo>, String> {
     Ok(HashMap::new())
-}
-
-#[tauri::command]
-fn get_app_data_dir<R: Runtime>(app_handle: tauri::AppHandle<R>) -> Result<String, String> {
-    app_handle
-        .path()
-        .app_config_dir()
-        .map(|path| path.to_string_lossy().to_string())
-        .map_err(|err| format!("App data directory not configured: {}", err))
 }
 
 #[tauri::command]

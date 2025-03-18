@@ -4,6 +4,7 @@ use window_vibrancy::*;
 
 #[command]
 #[cfg(target_os = "macos")]
+#[allow(deprecated)]
 pub fn set_vibrancy(app_handle: tauri::AppHandle, material_name: String) -> Result<String, String> {
     let window = app_handle
         .get_webview_window("main")

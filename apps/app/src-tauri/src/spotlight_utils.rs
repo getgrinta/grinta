@@ -1,10 +1,10 @@
 use std::collections::HashMap;
-use std::os::raw::c_void;
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
-use tauri::{Emitter, Listener, Manager, Runtime, State, Window, command};
+use tauri::{command, Emitter, Listener, Runtime, State, Window};
 use tokio::sync::oneshot;
 
+#[allow(non_snake_case)]
 #[derive(serde::Serialize, serde::Deserialize, Clone)]
 pub struct SpotlightAppInfo {
     pub path: String,
@@ -13,10 +13,12 @@ pub struct SpotlightAppInfo {
 }
 
 // State to store ongoing queries
+#[allow(dead_code)]
 pub struct SpotlightState {
     queries: Mutex<HashMap<String, Arc<Mutex<Vec<SpotlightAppInfo>>>>>,
 }
 
+#[allow(dead_code)]
 impl SpotlightState {
     pub fn new() -> Self {
         Self {
@@ -27,14 +29,14 @@ impl SpotlightState {
 
 #[cfg(target_os = "macos")]
 #[command]
+#[allow(dead_code)]
 pub async fn search_spotlight_apps<R: Runtime>(
     window: Window<R>,
     state: State<'_, SpotlightState>,
     query: Option<String>,
 ) -> Result<Vec<SpotlightAppInfo>, String> {
-    use cocoa::base::{NO, YES, id, nil, selector};
-    use cocoa::foundation::{NSArray, NSUInteger, NSString as CocoaNSString};
-    use objc::runtime::{Class, Object, Sel};
+    use cocoa::base::{id, nil, YES};
+    use cocoa::foundation::{NSString as CocoaNSString, NSUInteger};
     use objc::{class, msg_send, sel, sel_impl};
 
     // Generate a unique ID for this query
@@ -93,18 +95,13 @@ pub async fn search_spotlight_apps<R: Runtime>(
 
             // Set the search scope to the computer
             let computer_scope = CocoaNSString::alloc(nil).init_str("kMDQueryScopeComputer");
-            let scope_array: id = unsafe {
-                let array: id = msg_send![class!(NSMutableArray), array];
-                let _: () = msg_send![array, addObject:computer_scope];
-                array
-            };
+            let scope_array: id = msg_send![class!(NSMutableArray), array];
+            let _: () = msg_send![scope_array, addObject:computer_scope];
+
             let _: () = msg_send![query_obj, setSearchScopes: scope_array];
 
             // Set up the predicate
             let search_term = query.as_deref().unwrap_or("");
-
-            // Create a pool for this operation
-            let pool: id = msg_send![class!(NSAutoreleasePool), new];
 
             // Create the predicate
             let predicate: id = create_spotlight_predicate(search_term);
@@ -114,18 +111,18 @@ pub async fn search_spotlight_apps<R: Runtime>(
 
             // Get standard directories using FileManager instead of manually appending paths
             let file_manager: id = msg_send![class!(NSFileManager), defaultManager];
-            
+
             // Get Downloads directory
             let downloads_directory: NSUInteger = 15; // NSDownloadsDirectory
             let user_domain_mask: NSUInteger = 1; // NSUserDomainMask
             let downloads_urls: id = msg_send![file_manager, URLsForDirectory:downloads_directory inDomains:user_domain_mask];
             let downloads_url: id = msg_send![downloads_urls, firstObject];
-            
+
             // Get Documents directory
             let documents_directory: NSUInteger = 9; // NSDocumentDirectory
             let documents_urls: id = msg_send![file_manager, URLsForDirectory:documents_directory inDomains:user_domain_mask];
             let documents_url: id = msg_send![documents_urls, firstObject];
-            
+
             // Get Desktop directory
             let desktop_directory: NSUInteger = 12; // NSDesktopDirectory
             let desktop_urls: id = msg_send![file_manager, URLsForDirectory:desktop_directory inDomains:user_domain_mask];
@@ -134,16 +131,12 @@ pub async fn search_spotlight_apps<R: Runtime>(
             let downloads_path: id = msg_send![downloads_url, relativePath];
             let documents_path: id = msg_send![documents_url, relativePath];
             let desktop_path: id = msg_send![desktop_url, relativePath];
-      
+
             // Update the search scopes to include user directories
-            let scope_array: id = unsafe {
-                // Add the user directories to the existing scope array
-                let array: id = msg_send![class!(NSMutableArray), arrayWithObject:computer_scope];
-                let _: () = msg_send![array, addObject:desktop_path];
-                let _: () = msg_send![array, addObject:documents_path];
-                let _: () = msg_send![array, addObject:downloads_path];
-                array
-            };
+            let scope_array: id = msg_send![class!(NSMutableArray), arrayWithObject:computer_scope];
+            let _: () = msg_send![scope_array, addObject:desktop_path];
+            let _: () = msg_send![scope_array, addObject:documents_path];
+            let _: () = msg_send![scope_array, addObject:downloads_path];
 
             // Set the search scopes for the query
             let _: () = msg_send![query_obj, setSearchScopes: scope_array];
@@ -155,14 +148,11 @@ pub async fn search_spotlight_apps<R: Runtime>(
             let _: () = msg_send![query_obj, setSortDescriptors:sort_descriptors_array];
 
             // Set value list attributes
-            let value_list_attributes: id = unsafe {
-                let array: id = msg_send![class!(NSMutableArray), array];
-                let _: () = msg_send![array, addObject:CocoaNSString::alloc(nil).init_str("kMDItemDisplayName")];
-                let _: () =
-                    msg_send![array, addObject:CocoaNSString::alloc(nil).init_str("kMDItemPath")];
-                let _: () = msg_send![array, addObject:CocoaNSString::alloc(nil).init_str("kMDItemContentType")];
-                array
-            };
+            let value_list_attributes: id = msg_send![class!(NSMutableArray), array];
+            let _: () = msg_send![value_list_attributes, addObject:CocoaNSString::alloc(nil).init_str("kMDItemDisplayName")];
+            let _: () = msg_send![value_list_attributes, addObject:CocoaNSString::alloc(nil).init_str("kMDItemPath")];
+            let _: () = msg_send![value_list_attributes, addObject:CocoaNSString::alloc(nil).init_str("kMDItemContentType")];
+
             let _: () = msg_send![query_obj, setValueListAttributes:value_list_attributes];
 
             // Release the pool
@@ -274,7 +264,7 @@ pub async fn search_spotlight_apps<R: Runtime>(
 use cocoa::base::{id, nil};
 #[cfg(target_os = "macos")]
 fn create_spotlight_predicate(query_text: &str) -> id {
-    use cocoa::foundation::{NSArray, NSString as CocoaNSString};
+    use cocoa::foundation::NSString as CocoaNSString;
     use objc::{class, msg_send, sel, sel_impl};
 
     unsafe {
@@ -306,7 +296,7 @@ fn create_spotlight_predicate(query_text: &str) -> id {
 
         // Create predicates for each allowed extension
         let mut allow_predicates: Vec<id> = Vec::with_capacity(allowed_extensions.len());
-        for (i, ext) in allowed_extensions.iter().enumerate() {
+        for (_i, ext) in allowed_extensions.iter().enumerate() {
             // Use a simpler predicate format without parameters first
             let format_str = format!("kMDItemDisplayName LIKE[c] '{}'", ext);
             let predicate_str = CocoaNSString::alloc(nil).init_str(&format_str);
@@ -353,14 +343,6 @@ fn create_spotlight_predicate(query_text: &str) -> id {
         let exclude_system_file_predicate: id =
             msg_send![class!(NSPredicate), predicateWithFormat:exclude_system_predicate_str];
 
-        // Create AND compound predicate for excluding directories
-        let exclude_directories_array: id =
-            msg_send![class!(NSArray), arrayWithObject:exclude_system_file_predicate];
-        let exclude_directories_predicate: id = msg_send![
-            class!(NSCompoundPredicate),
-            andPredicateWithSubpredicates:exclude_directories_array
-        ];
-
         // Create final AND compound predicate
         let final_predicates = [
             search_predicate,
@@ -379,9 +361,6 @@ fn create_spotlight_predicate(query_text: &str) -> id {
 
         // Try to retain the predicate to prevent it from being released too early
         let _: () = msg_send![final_predicate, retain];
-
-        // Make a copy of the predicate to ensure it's not released
-        let copied_predicate: id = msg_send![final_predicate, copy];
 
         // Release the autorelease pool
         let _: () = msg_send![pool, drain];
