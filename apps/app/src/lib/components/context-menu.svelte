@@ -1,6 +1,9 @@
 <script lang="ts">
+	import { THEME } from "$lib/store/settings.svelte";
+	import { SystemThemeWatcher } from "$lib/system-theme-watcher.svelte";
 	import { emit, listen } from "@tauri-apps/api/event";
 	import type { UnlistenFn } from "@tauri-apps/api/event";
+	import clsx from "clsx";
 	import type { SvelteComponent } from "svelte";
 
 	// Types for menu items
@@ -64,13 +67,20 @@
 			if (unlistenHide) unlistenHide();
 		};
 	});
+
+	const systemThemeWatcher = new SystemThemeWatcher();
 </script>
 
 <svelte:body on:click={onPageClick} />
 
 {#if isVisible}
 	<ul
-		class="menu bg-base-200 rounded-box shadow-lg absolute z-50"
+		class={clsx(
+			"menu rounded-box shadow-lg absolute z-50",
+			systemThemeWatcher.theme === THEME.LIGHT
+				? "bg-base-200"
+				: "base-nonsemantic-dark bg-base-200",
+		)}
 		style="left: {x}px; top: {y}px;"
 		bind:this={menuElement}
 	>
