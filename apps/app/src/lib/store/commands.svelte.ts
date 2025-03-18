@@ -14,8 +14,6 @@ import { _ } from "svelte-i18n";
 import { toast } from "svelte-sonner";
 import { get } from "svelte/store";
 import { P, match } from "ts-pattern";
-import debounce from 'lodash/debounce'
-
 import { z } from "zod";
 import {
 	parseCurrencyConversion,
@@ -37,6 +35,7 @@ import { clipboardStore } from "./clipboard.svelte";
 import { type Note, notesStore } from "./notes.svelte";
 import { SecureStore } from "./secure.svelte";
 import { settingsStore } from "./settings.svelte";
+import debounce from 'debounce'
 
 nlp.extend(dates);
 nlp.extend(numbers);

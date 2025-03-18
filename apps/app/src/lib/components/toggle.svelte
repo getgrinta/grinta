@@ -17,7 +17,7 @@
 
 <div
     class={clsx(
-        "join shadow-sm rounded-full overflow-hidden border-0 ring-0",
+        "join shadow-sm rounded-full overflow-hidden border-0 ring-0 pointer-events-auto",
         containerCss,
     )}
 >

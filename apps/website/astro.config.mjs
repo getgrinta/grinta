@@ -32,9 +32,9 @@ export default defineConfig({
 					items: [
 						{ label: "Web and AI Search", slug: "features/search" },
 						{ label: "Notes", slug: "features/notes" },
-						{ label: "File System Search", slug: "features/fs-search" },
-						{ label: "Calculator", slug: "" },
-						{ label: "NLP", slug: "" },
+						{ label: "File System Search", slug: "features/file-system" },
+						{ label: "Calculator", slug: "features/calculator" },
+						{ label: "NLP", slug: "features/nlp" },
 						{ label: "Shortcuts", slug: "" },
 						{ label: "Clipboard History", slug: "" },
 						{ label: "Widgets", slug: "" },

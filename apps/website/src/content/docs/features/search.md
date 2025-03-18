@@ -22,3 +22,7 @@ Grinta will open scira.ai to answer your query.
 
 ![AI Search](/docs/search-ai.png "AI Search")
 
+## Incognito Mode
+
+You can use Incognito Mode to search the web without saving your search history.
+Simply click the eye button or press `Command+P` shortcut.

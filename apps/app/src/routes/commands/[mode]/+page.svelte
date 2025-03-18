@@ -35,7 +35,7 @@
 		<CommandList />
 	</div>
 	{#if appStore.barMode !== BAR_MODE.MENU}
-		<div class="flex fixed bottom-4 right-4 left-4 justify-end">
+		<div class="flex fixed bottom-4 right-4 left-4 justify-end pointer-events-none">
 			{#if appStore.barMode === BAR_MODE.INITIAL}
 				<SearchModeToggle />
 			{:else if appStore.barMode === BAR_MODE.NOTES}
