@@ -24,18 +24,20 @@ export default defineConfig({
 					items: [
 						{ label: "Getting Started", slug: "guides" },
 						{ label: "Replace system Spotlight", slug: "guides/replace-spotlight" },
-						{ label: "Core Concepts", slug: "" },
+						{ label: "Core Concepts", slug: "guides/core-concepts" },
 					],
 				},
 				{
 					label: "Core Features",
 					items: [
-						{ label: "Web and AI Search", slug: "" },
-						{ label: "Notes", slug: "" },
+						{ label: "Web and AI Search", slug: "features/search" },
+						{ label: "Notes", slug: "features/notes" },
 						{ label: "File System Search", slug: "" },
 						{ label: "Calculator", slug: "" },
 						{ label: "NLP", slug: "" },
 						{ label: "Shortcuts", slug: "" },
+						{ label: "Clipboard History", slug: "" },
+						{ label: "Widgets", slug: "" },
 					]
 				},
 				{

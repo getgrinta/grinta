@@ -10,6 +10,11 @@
     	
 	let contextMenu = $state<CommandListContextMenu>();
 
+	function handleListScroll(offset: number) {
+		commandsStore.scrollTop = offset;
+	}
+
+
 	// Hide context menu when clicking outside
 	$effect(clickListener);
 
@@ -24,7 +29,8 @@
 	<VList
 		data={commandsStore.commands}
 		style="height: 99vh;padding-top: var(--commands-padding);padding-bottom:1rem;"
-		getKey={(item, i) => i}
+		getKey={(_, i) => i}
+		onscroll={handleListScroll}
 	>
 		{#snippet children(item, index)}
 			{@const active = commandsStore.selectedIndex === index}

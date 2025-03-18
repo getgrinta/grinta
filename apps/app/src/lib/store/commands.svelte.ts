@@ -254,6 +254,7 @@ export class CommandsStore extends SecureStore<Commands> {
 	webSearchCommands = $state<ExecutableCommand[]>([]);
 	spotlightCommands = $state<ExecutableCommand[]>([]);
 	isUpdatingExternalSource = $state<boolean>(false);
+	scrollTop = $state<number>(0);
 
 	// Ensure we have a valid commandHistory even before initialization
 	get commandHistory(): ExecutableCommand[] {
