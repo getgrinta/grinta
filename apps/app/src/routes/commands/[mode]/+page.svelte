@@ -7,6 +7,7 @@
 	import ViewActions from "$lib/components/view-actions.svelte";
 	import Widgets from "$lib/components/widgets.svelte";
 	import { BAR_MODE, appStore } from "$lib/store/app.svelte";
+	import { commandsStore } from "$lib/store/commands.svelte";
 	import { notesStore } from "$lib/store/notes.svelte";
 	import { _ } from "svelte-i18n";
 
@@ -23,6 +24,7 @@
 
 	$effect(() => {
 		appStore.switchMode(page.params.mode);
+		commandsStore.scrollTop = 0;
 	});
 </script>
 
