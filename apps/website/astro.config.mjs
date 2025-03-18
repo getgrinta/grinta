@@ -30,13 +30,14 @@ export default defineConfig({
 				{
 					label: "Core Features",
 					items: [
-						{ label: "Web and AI Search", slug: "" },
-						{ label: "Notes", slug: "" },
+						{ label: "Web and AI Search", slug: "features/search" },
+						{ label: "Notes", slug: "features/notes" },
 						{ label: "File System Search", slug: "" },
 						{ label: "Calculator", slug: "" },
 						{ label: "NLP", slug: "" },
 						{ label: "Shortcuts", slug: "" },
 						{ label: "Clipboard History", slug: "" },
+						{ label: "Widgets", slug: "" },
 					]
 				},
 				{

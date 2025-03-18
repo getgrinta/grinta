@@ -22,6 +22,6 @@ The application has two main modes: search and notes. You can switch between the
 
 ## Menu
 
-The menu is accessible via the `Command+k` shortcut. This shortcut works on pretty much every screen of the application.
+The menu is accessible via the `Command+K` shortcut. This shortcut works on pretty much every screen of the application.
 
 ![Menu](/docs/menu.png "Menu")
