@@ -24,7 +24,7 @@ export default defineConfig({
 					items: [
 						{ label: "Getting Started", slug: "guides" },
 						{ label: "Replace system Spotlight", slug: "guides/replace-spotlight" },
-						{ label: "Core Concepts", slug: "" },
+						{ label: "Core Concepts", slug: "guides/core-concepts" },
 					],
 				},
 				{
@@ -36,6 +36,7 @@ export default defineConfig({
 						{ label: "Calculator", slug: "" },
 						{ label: "NLP", slug: "" },
 						{ label: "Shortcuts", slug: "" },
+						{ label: "Clipboard History", slug: "" },
 					]
 				},
 				{
