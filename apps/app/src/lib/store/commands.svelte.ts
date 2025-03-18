@@ -14,6 +14,8 @@ import { _ } from "svelte-i18n";
 import { toast } from "svelte-sonner";
 import { get } from "svelte/store";
 import { P, match } from "ts-pattern";
+import debounce from 'lodash/debounce'
+
 import { z } from "zod";
 import {
 	parseCurrencyConversion,
@@ -256,6 +258,10 @@ export class CommandsStore extends SecureStore<Commands> {
 	isUpdatingExternalSource = $state<boolean>(false);
 	scrollTop = $state<number>(0);
 
+	private debouncedSpotlightSearch = debounce(() => {
+		this.startSpotlightSearch();
+	}, 400);
+
 	// Ensure we have a valid commandHistory even before initialization
 	get commandHistory(): ExecutableCommand[] {
 		return this.data?.commandHistory || [];
@@ -489,8 +495,8 @@ export class CommandsStore extends SecureStore<Commands> {
 				}, 0);
 			}
 
-			if (appStore.query.length > 2) {
-				this.startSpotlightSearch();
+			if (appStore.query.length >= 3) {
+				this.debouncedSpotlightSearch();
 			}
 		}
 	}

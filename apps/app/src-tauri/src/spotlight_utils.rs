@@ -184,7 +184,7 @@ pub async fn search_spotlight_apps<R: Runtime>(
 
                 // Store the results
                 if let Ok(mut results_vec) = results_for_block.lock() {
-                    for i in 0..count {
+                    for i in 0..std::cmp::min(count, 100) {
                         let item: id = msg_send![query_results, objectAtIndex: i];
 
                         let path_attr = CocoaNSString::alloc(nil).init_str("kMDItemPath");
