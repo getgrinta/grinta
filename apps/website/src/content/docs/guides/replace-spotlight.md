@@ -14,4 +14,4 @@ To replace the system Spotlight search bar with Grinta, you can follow these ste
 5. Make sure `Show Spotlight search` is **NOT** checked.
 6. Click `Done`.
 
-![Disable Spotlight](/docs/spotlight.png "Disable Spotlight")
+![Disable Spotlight](/docs/spotlight.jpeg "Disable Spotlight")

@@ -13,14 +13,14 @@ You can toggle between searching the web and asking AI using the `Command+J` sho
 
 You can search the web by typing your query into the search bar.
 
-![Web Search](/docs/search-web.png "Web Search")
+![Web Search](/docs/search-web.jpeg "Web Search")
 
 ## AI Search powered by scira.ai
 
 You can ask AI by typing your query into the search bar in the `AI` mode. Instead of being taken to the search engine,
 Grinta will open scira.ai to answer your query.
 
-![AI Search](/docs/search-ai.png "AI Search")
+![AI Search](/docs/search-ai.jpeg "AI Search")
 
 ## Incognito Mode
 

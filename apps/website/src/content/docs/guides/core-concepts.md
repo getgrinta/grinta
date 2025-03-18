@@ -10,7 +10,7 @@ In this guide you'll learn how to make the most out of Grinta.
 We have designed the navigation to be intuitive. Each screen of the application has keyboard shortcuts
 so you'll barely have to use mouse. Take this for example:
 
-![Home](/docs/home.png "Home")
+![Home](/docs/home.jpeg "Home")
 
 If you are feeling lost on any screen, simply hold `Command` key. It will reveal shortcut labels.
 
@@ -18,10 +18,10 @@ If you are feeling lost on any screen, simply hold `Command` key. It will reveal
 
 The application has two main modes: search and notes. You can switch between them using the `Command+1` and `Command+2` shortcuts.
 
-![Notes](/docs/notes.png "Notes")
+![Notes](/docs/notes.jpeg "Notes")
 
 ## Menu
 
 The menu is accessible via the `Command+K` shortcut. This shortcut works on pretty much every screen of the application.
 
-![Menu](/docs/menu.png "Menu")
+![Menu](/docs/menu.jpeg "Menu")
