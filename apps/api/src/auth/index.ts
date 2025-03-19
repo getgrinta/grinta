@@ -15,6 +15,9 @@ export const auth = betterAuth({
 	database: drizzleAdapter(db, {
 		provider: "pg",
 	}),
+	session: {
+		freshAge: 0,
+	},
 	plugins: [
 		emailOTP({
 			async sendVerificationOTP({ email, otp }) {

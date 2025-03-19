@@ -34,7 +34,7 @@ export default defineConfig({
 						{ label: "Notes", slug: "features/notes" },
 						{ label: "File System Search", slug: "features/file-system" },
 						{ label: "Calculator", slug: "features/calculator" },
-						{ label: "NLP", slug: "features/nlp" },
+						{ label: "Natural Language Processing", slug: "features/nlp" },
 						{ label: "Shortcuts", slug: "features/shortcuts" },
 						{ label: "Clipboard History", slug: "features/clipboard" },
 						{ label: "Widgets", slug: "features/widgets" },
@@ -51,6 +51,7 @@ export default defineConfig({
 					items: [
 						{ label: "Notes in Obsidian", slug: "recipes/obsidian" },
 						{ label: "Running Shell Commands", slug: "recipes/shell-commands" },
+						{ label: "Speech to Text", slug: "recipes/speech-to-text" },
 					]
 				}
 			],

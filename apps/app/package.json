@@ -15,7 +15,7 @@
 	},
 	"dependencies": {
 		"@ai-sdk/openai-compatible": "0.1.13",
-		"@better-auth/stripe": "1.2.4-beta.8",
+		"@better-auth/stripe": "1.2.4",
 		"@felte/validator-zod": "1.0.18",
 		"@fontsource-variable/dm-sans": "5.2.5",
 		"@github/hotkey": "3.1.1",
@@ -45,7 +45,7 @@
 		"@tiptap/suggestion": "2.11.5",
 		"aggregate-error": "^5.0.0",
 		"ai": "4.1.54",
-		"better-auth": "1.2.4-beta.8",
+		"better-auth": "1.2.4",
 		"buffer": "^6.0.3",
 		"clsx": "2.1.1",
 		"compromise": "14.14.4",

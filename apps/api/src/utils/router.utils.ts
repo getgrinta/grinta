@@ -1,12 +1,14 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { createMiddleware } from "hono/factory";
 import { auth } from "../auth/index.js";
+import { db } from "../db/index.js";
 
 export function createRouter() {
 	return new OpenAPIHono<{
 		Variables: {
 			user: typeof auth.$Infer.Session.user | null;
 			session: typeof auth.$Infer.Session.session | null;
+			db: typeof db;
 		};
 	}>();
 }
@@ -26,5 +28,10 @@ export const authSession = createMiddleware(async (c, next) => {
 	}
 	c.set("user", session.user);
 	c.set("session", session.session);
+	return next();
+});
+
+export const databaseContext = createMiddleware(async (c, next) => {
+	c.set("db", db);
 	return next();
 });

@@ -1,30 +1,66 @@
 <section
-    class="flex flex-col lg:grid grid-cols-2 bg-neutral-900 rounded-[1.5rem] !mt-40 relative border-gradient intersect:motion-preset-slide-up"
+    class="flex flex-col lg:grid grid-cols-2 bg-gradient-to-br from-neutral-900 to-indigo-900/30 rounded-[1.5rem] !mt-40 relative border-gradient intersect:motion-preset-slide-up"
 >
     <div
         class="flex flex-1 flex-col justify-center items-start !m-0 px-4 lg:px-16 py-8 lg:py-24"
     >
-        <div class="flex gap-2">
-            <h2>Grinta Pro</h2>
-        </div>
-        <p>
-            For your convenience, we've prepared a turbo-charged version of
-            Grinta with extra features such as:
+        <h2 class="!text-3xl lg:!text-5xl !mb-4">Grinta Pro</h2>
+        <p class="!text-lg lg:!text-xl !mb-6">
+            Unlock the full potential of Grinta with our premium offering –
+            designed for power users who demand more.
         </p>
-        <ul>
-            <li>
-                <span class="text-secondary">Zero config, fast AI</span>,
-                out-of-box.
-            </li>
-            <li>
-                <span class="text-secondary">Note writing AI based copilot</span
-                > that will autocomplete your thoughts as you write.
-            </li>
-            <li>
-                <span class="text-secondary">GrintaFi (coming soon)</span> - AI based
-                stock and crypto data quick access.
-            </li>
-        </ul>
+        <div>
+            <h3 class="!text-xl lg:!text-2xl !mb-4">Premium Features</h3>
+            <ul class="space-y-4 ml-0 pl-0">
+                <li class="flex items-start gap-3">
+                    <span class="text-secondary text-xl lg:text-2xl">✓</span>
+                    <div>
+                        <span class="text-secondary font-semibold"
+                            >Zero config, fast AI</span
+                        >
+                        <p class="!m-0 text-gray-300 text-sm lg:text-base">
+                            Advanced AI capabilities ready to use
+                            out-of-the-box, no setup required.
+                        </p>
+                    </div>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="text-secondary text-xl lg:text-2xl">✓</span>
+                    <div>
+                        <span class="text-secondary font-semibold"
+                            >AI-powered writing assistant</span
+                        >
+                        <p class="!m-0 text-gray-300 text-sm lg:text-base">
+                            Smart copilot that autocompletes your thoughts as
+                            you write, helping you express ideas more clearly.
+                        </p>
+                    </div>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="text-secondary text-xl lg:text-2xl">✓</span>
+                    <div>
+                        <span class="text-secondary font-semibold"
+                            >GrintaFi (coming soon)</span
+                        >
+                        <p class="!m-0 text-gray-300 text-sm lg:text-base">
+                            AI-driven insights for quick access to stock and
+                            cryptocurrency data, right at your fingertips.
+                        </p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="mt-8">
+            <h3 class="!text-xl lg:!text-2xl !mb-4">Special Offer</h3>
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="text-2xl font-bold line-through text-gray-400">$10</span>
+                    <span class="text-3xl font-bold text-secondary">$5</span>
+                    <span class="bg-secondary/20 text-secondary px-2 py-1 rounded-md text-sm">50% OFF</span>
+                </div>
+                <p class="!m-0 text-gray-300 text-sm lg:text-base mb-4">
+                    Limited time offer - Get Grinta Pro at half price!
+                </p>
+        </div>
     </div>
     <div class="hidden lg:flex grinta-pro flex-1 !m-0"></div>
 </section>
