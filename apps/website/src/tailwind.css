@@ -59,5 +59,7 @@ header.header {
 
 .grinta-pro {
 	background-image: url("/pro.svg");
+	background-repeat: no-repeat;
+	background-position: center;
 	background-size: cover;
 }
