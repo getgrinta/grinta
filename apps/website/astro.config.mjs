@@ -51,6 +51,7 @@ export default defineConfig({
 					items: [
 						{ label: "Notes in Obsidian", slug: "recipes/obsidian" },
 						{ label: "Running Shell Commands", slug: "recipes/shell-commands" },
+						{ label: "Speech to Text", slug: "recipes/speech-to-text" },
 					]
 				}
 			],
