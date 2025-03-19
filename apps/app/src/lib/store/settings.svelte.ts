@@ -91,6 +91,7 @@ export const SettingsSchema = z.object({
 	theme: z.nativeEnum(THEME).default(THEME.SYSTEM),
 	accentColor: z.nativeEnum(ACCENT_COLOR).default(ACCENT_COLOR.MARE),
 	language: z.nativeEnum(LANGUAGE).default(getBrowserLanguage()),
+	clipboardRecordingEnabled: z.boolean().default(true),
 	defaultSearchEngine: z
 		.nativeEnum(SEARCH_ENGINE)
 		.default(SEARCH_ENGINE.STARTPAGE),

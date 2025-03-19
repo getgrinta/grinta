@@ -286,12 +286,12 @@ export class CommandsStore extends SecureStore<Commands> {
 			];
 		return [
 			...userCommands,
-			{
+			...(settingsStore.data?.clipboardRecordingEnabled ? [{
 				label: t("commands.menuItems.clipboardHistory"),
 				value: SYSTEM_COMMAND.CLIPBOARD,
 				handler: COMMAND_HANDLER.SYSTEM,
 				smartMatch: false,
-			},
+			}] : []),
 			{
 				label: t("commands.menuItems.clearNotes"),
 				value: SYSTEM_COMMAND.CLEAR_NOTES,
