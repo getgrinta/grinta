@@ -35,15 +35,18 @@
 						data: command,
 					}),
 			},
-			{
+		];
+
+		if (command.isHistory) {
+			menuItems.push({
 				label: t("commands.contextMenu.remove"),
 				icon: XIcon as any,
 				onClick: async () => {
 					await commandsStore.removeHistoryEntry(command);
 					commandsStore.buildCommands({ isRefresh: false });
 				},
-			},
-		];
+			});
+		}
 
 		if (command.handler === COMMAND_HANDLER.APP) {
 			menuItems.push({

@@ -82,7 +82,7 @@ export const ExecutableCommandSchema = z.object({
 	smartMatch: z.boolean().optional().default(false),
 });
 
-export type ExecutableCommand = z.infer<typeof ExecutableCommandSchema>;
+export type ExecutableCommand = z.infer<typeof ExecutableCommandSchema> & { isHistory?: boolean };
 
 export const SYSTEM_COMMAND = {
 	SIGN_IN: "SIGN_IN",
@@ -414,7 +414,11 @@ export class CommandsStore extends SecureStore<Commands> {
 
 		commands = await match(appStore.barMode)
 			.with(BAR_MODE.INITIAL, async () => {
-				let commandHistory = this.commandHistory.slice().reverse();
+				let commandHistory = this.commandHistory
+					.slice()
+					.reverse()
+					.map((command) => ({ ...command, isHistory: true }));
+
 				if (appStore.query.length === 0) {
 					return commandHistory;
 				}

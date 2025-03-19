@@ -4,8 +4,8 @@ use std::fs::{self};
 use std::io::BufWriter;
 use std::path::Path;
 use tauri::{AppHandle, Runtime, command};
-use cocoa::base::{NO, YES, id, nil, selector};
-use cocoa::foundation::{NSArray, NSString, NSDictionary, NSString as CocoaNSString};
+use cocoa::base::{id, nil};
+use cocoa::foundation::{NSString, NSString as CocoaNSString};
 use objc::{class, msg_send, sel, sel_impl};
 
 #[cfg(target_os = "macos")]
