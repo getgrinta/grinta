@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1741000235111,
-      "tag": "0000_clear_the_captain",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1742408192894,
-      "tag": "0001_fancy_ben_urich",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1742416715004,
-      "tag": "0002_spicy_earthquake",
+      "when": 1742417038336,
+      "tag": "0000_blue_centennial",
       "breakpoints": true
     }
   ]
