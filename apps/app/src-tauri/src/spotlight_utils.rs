@@ -291,7 +291,36 @@ fn create_spotlight_predicate(query_text: &str) -> id {
             "*.drawio",
             "*.odp",
             // Ebooks
-            "*.epub, *.mobi, *.djvu",
+            "*.epub",
+            "*.mobi",
+            "*.djvu",
+            // Media
+            "*.mp3",
+            "*.wav",
+            "*.aac",
+            "*.ogg",
+            "*.flac",
+            "*.m4a",
+            "*.webm",
+            "*.mp4",
+            "*.avi",
+            "*.mov",
+            "*.wmv",
+            "*.mkv",
+            "*.gif",
+            "*.jpg",
+            "*.jpeg",
+            "*.png",
+            "*.webp",
+            "*.bmp",
+            "*.tiff",
+            "*.svg",
+            // Config
+            "*.json",
+            "*.yml",
+            "*.yaml",
+            "*.toml",
+            "*.ini",
         ];
 
         // Create predicates for each allowed extension

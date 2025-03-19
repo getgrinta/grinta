@@ -76,6 +76,7 @@
 		},
 		"contextMenu": {
 			"pin": "Anheften",
+			"remove": "Löschen",
 			"open": "Öffnen",
 			"showInFinder": "Im Finder anzeigen",
 			"quickLook": "Schnellansicht",
