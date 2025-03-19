@@ -5,6 +5,7 @@ import {
 	pgTable,
 	text,
 	timestamp,
+	uuid,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -74,7 +75,7 @@ export const subscription = pgTable("subscription", {
 });
 
 export const aiUsage = pgTable("ai_usage", {
-	id: text("id").primaryKey().$defaultFn(crypto.randomUUID),
+	id: uuid("id").primaryKey().defaultRandom(),
 	userId: text("user_id")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade" }),
