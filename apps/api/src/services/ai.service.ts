@@ -1,5 +1,5 @@
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
-import { generateText, streamText } from "ai";
+import { generateText } from "ai";
 import dedent from "dedent";
 import { match } from "ts-pattern";
 import { z } from "zod";
@@ -109,26 +109,5 @@ export class AiService {
 			model,
 		});
 		return text.match(RESPONSE_REGEX)?.[1] ?? "";
-	}
-
-	streamResponse(params: {
-		prompt: string;
-		context: string;
-		provider: AiProvider;
-		model: string;
-	}) {
-		const model = this.createModel({
-			provider: params.provider,
-			model: params.model,
-		});
-		const prompt = `<request>${params.prompt}</request>`;
-		const system = this.getGenerateNoteSystemPrompt({
-			context: params.context,
-		});
-		return streamText({
-			prompt,
-			system,
-			model,
-		});
 	}
 }

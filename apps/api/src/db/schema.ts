@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm";
 import {
 	boolean,
 	integer,
@@ -72,10 +73,37 @@ export const subscription = pgTable("subscription", {
 	trialEnd: timestamp("trial_end"),
 });
 
+export const aiUsage = pgTable("ai_usage", {
+	id: text("id").primaryKey().$defaultFn(crypto.randomUUID),
+	userId: text("user_id")
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade" }),
+	model: text("model").notNull(),
+	state: text("state", { enum: ["pending", "success", "error"] }).notNull().default("pending"),
+	createdAt: timestamp("created_at").notNull().defaultNow(),
+	updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// Relations
+
+export const userRelations = relations(user, ({ many }) => ({
+	aiUsages: many(aiUsage),
+}))
+
+export const aiUsageRelations = relations(aiUsage, ({ one }) => ({
+	user: one(user, {
+		fields: [aiUsage.userId],
+		references: [user.id],
+	}),
+}))
+
+// Schema
+
 export const schema = {
 	user,
 	session,
 	account,
 	verification,
 	subscription,
+	aiUsage,
 };

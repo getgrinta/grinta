@@ -19,6 +19,7 @@
         "@ai-sdk/openai-compatible": "0.1.13",
         "@better-auth/stripe": "1.2.4",
         "@hono/zod-openapi": "0.19.2",
+        "@open-draft/until": "^2.1.0",
         "@scalar/hono-api-reference": "0.5.184",
         "ai": "4.1.54",
         "better-auth": "1.2.4",

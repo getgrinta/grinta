@@ -8,6 +8,7 @@ import {
 	authSession,
 	authenticatedGuard,
 	createRouter,
+	databaseContext,
 } from "./utils/router.utils.js";
 
 const app = createRouter()
@@ -19,7 +20,8 @@ const app = createRouter()
 		},
 	})
 	.use(logger())
-	.use("*", authSession)
+	.use(databaseContext)
+	.use(authSession)
 	.use("/api/ai/*", authenticatedGuard)
 	.use("/api/users/*", authenticatedGuard)
 	.on(["POST", "GET"], "/api/auth/*", (c) => {
