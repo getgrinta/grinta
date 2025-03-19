@@ -35,22 +35,22 @@ export default defineConfig({
 						{ label: "File System Search", slug: "features/file-system" },
 						{ label: "Calculator", slug: "features/calculator" },
 						{ label: "NLP", slug: "features/nlp" },
-						{ label: "Shortcuts", slug: "" },
-						{ label: "Clipboard History", slug: "" },
-						{ label: "Widgets", slug: "" },
+						{ label: "Shortcuts", slug: "features/shortcuts" },
+						{ label: "Clipboard History", slug: "features/clipboard" },
+						{ label: "Widgets", slug: "features/widgets" },
 					]
 				},
 				{
 					label: "Grinta Pro",
 					items: [
-						{ label: "Notes AI", slug: "" },
+						{ label: "Notes AI", slug: "pro/notes" },
 					]
 				},
 				{
 					label: "Recipes",
 					items: [
-						{ label: "Notes in Obsidian", slug: "" },
-						{ label: "Running Shell Commands", slug: "" },
+						{ label: "Notes in Obsidian", slug: "recipes/obsidian" },
+						{ label: "Running Shell Commands", slug: "recipes/shell-commands" },
 					]
 				}
 			],

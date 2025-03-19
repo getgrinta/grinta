@@ -12,5 +12,5 @@ You can also use any set of consecutive letters contained within the name of the
 
 For example, if there's a file named "alphabet", you could search for "phab".
 
-![File System Search](/docs/fs-search.png "File System Search")
+![File System Search](/docs/fs-search.jpeg "File System Search")
 
