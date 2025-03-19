@@ -48,8 +48,14 @@
 				name: string;
 			}>("show-context-menu", (event) => {
 				if (name !== event.payload.name) return;
-				x = event.payload.x;
-				y = event.payload.y;
+
+				const approxHeight = Math.min(4, items.length) * 33 + (9 * 2);
+
+				const pixelsBelowWindow = window.innerHeight - (event.payload.y + approxHeight);
+				const pixelsPastWindow = window.innerWidth - (event.payload.x + 200);
+
+				x = event.payload.x + Math.min(0, pixelsPastWindow);
+				y = event.payload.y + Math.min(0, pixelsBelowWindow);
 				isVisible = true;
 			});
 
@@ -74,39 +80,37 @@
 <svelte:body on:click={onPageClick} />
 
 {#if isVisible}
-	<ul
-		class={clsx(
-			"menu rounded-box shadow-lg absolute z-50",
-			systemThemeWatcher.theme === THEME.LIGHT
-				? "bg-base-200"
-				: "base-nonsemantic-dark bg-base-200",
-		)}
+	<div 
+		class="max-h-[150px] overflow-y-scroll rounded-box shadow-lg absolute z-50"
 		style="left: {x}px; top: {y}px;"
 		bind:this={menuElement}
 	>
-		{#each items as item}
-			<li>
-				<a
-					href={item.href || "#"}
-					onclick={() => {
-						if (item.onClick) item.onClick();
-						isVisible = false;
-					}}
-				>
-					{#if item.icon}
-						<span class="mr-2">
-							<svelte:component this={item.icon} size={16} />
-						</span>
-					{/if}
-					{item.label}
-				</a>
-			</li>
-		{/each}
-	</ul>
+		<ul
+			class={clsx(
+				"menu menu-vertical w-[200px] bg-base-200",
+				systemThemeWatcher.theme === THEME.LIGHT
+					? "bg-base-200"
+					: "base-nonsemantic-dark bg-base-200",
+			)}
+		>
+			{#each items as item}
+				<li>
+					<a
+						href={item.href || "#"}
+						onclick={() => {
+							if (item.onClick) item.onClick();
+							isVisible = false;
+						}}
+					>
+						{#if item.icon}
+							<span class="mr-2">
+								<svelte:component this={item.icon} size={16} />
+							</span>
+						{/if}
+						{item.label}
+					</a>
+				</li>
+			{/each}
+		</ul>
+	</div>
 {/if}
-
-<style>
-	.menu {
-		min-width: 200px;
-	}
-</style>
