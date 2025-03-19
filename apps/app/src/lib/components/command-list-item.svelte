@@ -17,6 +17,7 @@
 	import { _ } from "svelte-i18n";
 	import { z } from "zod";
     import CommandListIcon from "./command-list-icon.svelte";
+    import { widgetsStore } from "$lib/store/widgets.svelte";
 
 	const props = $props();
 
@@ -101,7 +102,8 @@
 	)}
 	data-command-index={props.index}
 	oncontextmenu={(event) => {
-		props.contextMenu?.createContextMenuItems(props.item);
+		const isWidget = widgetsStore.data.widgets?.some(widget => widget.data.value === props.item.value);
+		props.contextMenu?.createContextMenuItems(props.item, isWidget);
 		handleContextMenu({ event, name: "commandList" });
 	}}
 >

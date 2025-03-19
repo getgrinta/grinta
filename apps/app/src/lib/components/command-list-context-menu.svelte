@@ -24,9 +24,14 @@
 		}
 	}
 
-	export function createContextMenuItems(command: ExecutableCommand) {
-		const menuItems: MenuItem[] = [
-			{
+	export function createContextMenuItems(
+		command: ExecutableCommand,
+		isWidget: boolean,
+	) {
+		const menuItems: MenuItem[] = [];
+
+		if (!isWidget) {
+			menuItems.push({
 				label: t("commands.contextMenu.pin"),
 				icon: PinIcon as any,
 				onClick: () =>
@@ -34,8 +39,8 @@
 						type: "command",
 						data: command,
 					}),
-			},
-		];
+			});
+		}
 
 		if (command.isHistory) {
 			menuItems.push({
