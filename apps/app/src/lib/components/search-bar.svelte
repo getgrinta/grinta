@@ -231,6 +231,7 @@
 		</div>
 		<input
 			bind:this={queryInput}
+			id="search-bar"
 			slot="input"
 			class="grow font-semibold text-lg !outline-none"
 			name="query"

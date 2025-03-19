@@ -107,7 +107,9 @@ async function toggleShortcutHandler(event: ShortcutEvent) {
 	if (event.state !== "Pressed") return;
 	const visible = await appStore.appWindow.isVisible();
 	if (!visible) {
-		return activateWindow();
+		await activateWindow();
+		const searchBar = document.getElementById("search-bar");
+		return searchBar?.focus();
 	}
 	return appStore.appWindow.hide();
 }

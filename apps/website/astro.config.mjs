@@ -34,7 +34,7 @@ export default defineConfig({
 						{ label: "Notes", slug: "features/notes" },
 						{ label: "File System Search", slug: "features/file-system" },
 						{ label: "Calculator", slug: "features/calculator" },
-						{ label: "NLP", slug: "features/nlp" },
+						{ label: "Natural Language Processing", slug: "features/nlp" },
 						{ label: "Shortcuts", slug: "features/shortcuts" },
 						{ label: "Clipboard History", slug: "features/clipboard" },
 						{ label: "Widgets", slug: "features/widgets" },
