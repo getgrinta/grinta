@@ -16,8 +16,10 @@
 	import { match, P } from "ts-pattern";
 	import { _ } from "svelte-i18n";
 	import { z } from "zod";
-    import CommandListIcon from "./command-list-icon.svelte";
-    import { widgetsStore } from "$lib/store/widgets.svelte";
+	import CommandListIcon from "./command-list-icon.svelte";
+	import { widgetsStore } from "$lib/store/widgets.svelte";
+	import { itemFromKind } from "@tauri-apps/api/menu";
+	import { PressedKeys } from "runed";
 
 	const props = $props();
 
@@ -60,7 +62,12 @@
 			.otherwise(() => value);
 	}
 
-	const currentLabel = $derived(props.item.localizedLabel ?? props.item.label);
+	const pressedKeys = new PressedKeys();
+	const isCmdPressed = $derived(pressedKeys.has("Meta"));
+
+	const currentLabel = $derived(
+		props.item.localizedLabel ?? props.item.label,
+	);
 
 	const rowCss =
 		systemThemeWatcher.theme === THEME.LIGHT
@@ -93,6 +100,11 @@
 	const arrowDownLeftCss =
 		systemThemeWatcher.theme === THEME.LIGHT &&
 		"text-neutral-600 hover:!bg-neutral-300/50";
+
+	const pathCss =
+		systemThemeWatcher.theme === THEME.LIGHT
+			? "text-neutral-600"
+			: "text-neutral-100";
 </script>
 
 <li
@@ -102,7 +114,9 @@
 	)}
 	data-command-index={props.index}
 	oncontextmenu={(event) => {
-		const isWidget = widgetsStore.data.widgets?.some(widget => widget.data.value === props.item.value);
+		const isWidget = widgetsStore.data.widgets?.some(
+			(widget) => widget.data.value === props.item.value,
+		);
 		props.contextMenu?.createContextMenuItems(props.item, isWidget);
 		handleContextMenu({ event, name: "commandList" });
 	}}
@@ -120,8 +134,12 @@
 			data-testid={`command-list-item.${props.index}`}
 			class="flex flex-1 h-full gap-4 py-[0.75rem] items-center overflow-hidden cursor-pointer"
 		>
-			<CommandListIcon label={currentLabel} appMetadataStore={appMetadataStore} item={props.item} />
-			<div class="flex flex-col">
+			<CommandListIcon
+				label={currentLabel}
+				{appMetadataStore}
+				item={props.item}
+			/>
+			<div class="flex flex-col align-left">
 				<h2
 					class={clsx("flex-1 flex text-left truncate max-w-[34rem]")}
 				>
@@ -135,6 +153,12 @@
 						<span class="flex-1 truncate">{currentLabel}</span>
 					{/if}
 				</h2>
+
+				<div class={clsx("text-xs text-left", pathCss, "text-xs")}>
+					{#if isCmdPressed && props.item.path}
+						{props.item.path}
+					{/if}
+				</div>
 			</div>
 		</button>
 		<div class="flex gap-1 items-center">
