@@ -15,13 +15,15 @@ export const auth = betterAuth({
 	database: drizzleAdapter(db, {
 		provider: "pg",
 	}),
+	session: {
+		freshAge: 0,
+	},
 	plugins: [
 		emailOTP({
 			async sendVerificationOTP({ email, otp }) {
 				await sendOtp({ to: email, code: otp });
 			},
 		}),
-		// @ts-expect-error
 		stripe({
 			stripeClient,
 			stripeWebhookSecret: env.STRIPE_WEBHOOK_SECRET,
