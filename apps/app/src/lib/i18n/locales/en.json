@@ -101,6 +101,13 @@
 			"createNote": "Create \"{query}\" note"
 		}
 	},
+	"widgets": {
+		"contextMenu": {
+			"moveLeft": "Move Left",
+			"moveRight": "Move Right",
+			"remove": "Remove"
+		}
+	},
 	"searchBar": {
 		"placeholder": {
 			"initial": "Search web or apps",

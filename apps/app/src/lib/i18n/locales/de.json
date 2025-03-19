@@ -119,5 +119,12 @@
 			"askAI": "KI fragen"
 		}
 	},
+	"widgets": {
+		"contextMenu": {
+			"moveLeft": "Nach links verschieben",
+			"moveRight": "Nach rechts verschieben",
+			"remove": "Entfernen"
+		}
+	},
 	"additionalContextPlaceholder": "Zusätzlicher Kontext für die Notizgenerierung.\r\nz.B. \"Antworte im professionellen Stil. Sei präzise\"."
 }

@@ -124,5 +124,12 @@
 			"askAI": "Zapytaj AI"
 		}
 	},
+	"widgets": {
+		"contextMenu": {
+			"moveLeft": "Przesuń w lewo",
+			"moveRight": "Przesuń w prawo",
+			"remove": "Usuń"
+		}
+	},
 	"additionalContextPlaceholder": "Dodatkowy kontekst dla generowania notatek.\r\nnp. \"Odpowiadaj w profesjonalnym stylu. Bądź zwięzły\"."
 }
