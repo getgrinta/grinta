@@ -24,6 +24,7 @@ export const auth = betterAuth({
 				await sendOtp({ to: email, code: otp });
 			},
 		}),
+		// @ts-expect-error
 		stripe({
 			stripeClient,
 			stripeWebhookSecret: env.STRIPE_WEBHOOK_SECRET,
