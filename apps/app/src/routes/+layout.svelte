@@ -125,7 +125,10 @@
 	async function clipboardSnapshot() {
 		try {
 			const clipboardText = await readText();
-			await clipboardStore.addSnapshot(clipboardText);
+
+			if (settingsStore.data?.clipboardRecordingEnabled) {
+				await clipboardStore.addSnapshot(clipboardText);
+			}
 		} catch {
 			console.log("Unreadable clipboard");
 		}

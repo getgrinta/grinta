@@ -37,6 +37,7 @@
 			"recordShortcut": "Naciśnij, aby zapisać",
 			"baseCurrency": "Waluta bazowa"
 		},
+		"clipboardRecordingEnabled": "Rejestruj historię schowka",
 		"language": "Język",
 		"languages": {
 			"en": "Angielski",

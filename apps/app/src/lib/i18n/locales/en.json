@@ -37,6 +37,7 @@
 			"checkForUpdate": "Check for update",
 			"baseCurrency": "Base Currency"
 		},
+		"clipboardRecordingEnabled": "Record Clipboard History",
 		"language": "Language"
 	},
 	"notes": {

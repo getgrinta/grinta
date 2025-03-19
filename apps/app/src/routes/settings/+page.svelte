@@ -204,6 +204,16 @@
 						<option value={code}>{name}</option>
 					{/each}
 				</select>
+				<label class="text-sm" for="clipboardChoice"
+					>{$_("settings.clipboardRecordingEnabled")}</label
+				>
+				<input
+					class="toggle"
+					id="clipboardChoice"
+					name="clipboardRecordingEnabled"
+					type="checkbox"
+					bind:checked={settingsStore.data.clipboardRecordingEnabled}
+				/>
 				<label class="text-sm" for="notesDirInput"
 					>{$_("settings.fields.notesDirectory")}</label
 				>
