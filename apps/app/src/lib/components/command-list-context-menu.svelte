@@ -1,11 +1,12 @@
 <script lang="ts">
 	import {
 		COMMAND_HANDLER,
+		commandsStore,
 		type ExecutableCommand,
 	} from "$lib/store/commands.svelte";
 	import { widgetsStore } from "$lib/store/widgets.svelte";
 	import { Command } from "@tauri-apps/plugin-shell";
-	import { CopyIcon, PinIcon } from "lucide-svelte";
+	import { CopyIcon, PinIcon, XIcon } from "lucide-svelte";
 	import { EyeIcon, FolderIcon, TextIcon } from "lucide-svelte";
 	import { _ } from "svelte-i18n";
 	import { get } from "svelte/store";
@@ -33,6 +34,14 @@
 						type: "command",
 						data: command,
 					}),
+			},
+			{
+				label: t("commands.contextMenu.remove"),
+				icon: XIcon as any,
+				onClick: async () => {
+					await commandsStore.removeHistoryEntry(command);
+					commandsStore.buildCommands({ isRefresh: false });
+				},
 			},
 		];
 

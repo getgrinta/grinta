@@ -81,6 +81,7 @@
 		},
 		"contextMenu": {
 			"pin": "Przypnij",
+			"remove": "Usuń",
 			"open": "Otwórz",
 			"showInFinder": "Pokaż w Finderze",
 			"quickLook": "Szybki podgląd",
