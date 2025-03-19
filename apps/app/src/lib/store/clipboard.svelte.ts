@@ -16,8 +16,12 @@ export class ClipboardStore extends SecureStore<Clipboard> {
 		const lastSnapshot =
 			this.data.clipboardHistory[this.data.clipboardHistory.length - 1];
 		if (snapshot === lastSnapshot) return;
+
+		const maxClipboardSize = 50
+		const newClipboardHistory = [...this.data.clipboardHistory.slice(0, maxClipboardSize - 1), snapshot];
+
 		this.updateData({
-			clipboardHistory: [...this.data.clipboardHistory, snapshot],
+			clipboardHistory: newClipboardHistory,
 		});
 	}
 
