@@ -35,6 +35,7 @@ pub async fn search_spotlight_apps<R: Runtime>(
     state: State<'_, SpotlightState>,
     query: Option<String>,
     extensions: Vec<String>,
+    search_only_in_home: bool,
 ) -> Result<Vec<SpotlightAppInfo>, String> {
     use cocoa::base::{id, nil, YES};
     use cocoa::foundation::{NSString as CocoaNSString, NSUInteger};
@@ -113,31 +114,43 @@ pub async fn search_spotlight_apps<R: Runtime>(
             // Get standard directories using FileManager instead of manually appending paths
             let file_manager: id = msg_send![class!(NSFileManager), defaultManager];
 
-            // Get Downloads directory
-            let downloads_directory: NSUInteger = 15; // NSDownloadsDirectory
-            let user_domain_mask: NSUInteger = 1; // NSUserDomainMask
-            let downloads_urls: id = msg_send![file_manager, URLsForDirectory:downloads_directory inDomains:user_domain_mask];
-            let downloads_url: id = msg_send![downloads_urls, firstObject];
+            let user_domain_mask: NSUInteger = 1;
 
-            // Get Documents directory
-            let documents_directory: NSUInteger = 9; // NSDocumentDirectory
-            let documents_urls: id = msg_send![file_manager, URLsForDirectory:documents_directory inDomains:user_domain_mask];
-            let documents_url: id = msg_send![documents_urls, firstObject];
+            // Get home directory using homeDirectoryForCurrentUser
+            let home_url: id = msg_send![file_manager, homeDirectoryForCurrentUser];
+            let home_path: id = msg_send![home_url, path];
 
-            // Get Desktop directory
-            let desktop_directory: NSUInteger = 12; // NSDesktopDirectory
-            let desktop_urls: id = msg_send![file_manager, URLsForDirectory:desktop_directory inDomains:user_domain_mask];
-            let desktop_url: id = msg_send![desktop_urls, firstObject];
+            // Create scope array based on search_only_in_home flag
+            let scope_array: id = if search_only_in_home {
+                let array: id = msg_send![class!(NSMutableArray), arrayWithObject:home_path];
+                array
+            } else {
+                // Get Downloads directory
+                let downloads_directory: NSUInteger = 15; // NSDownloadsDirectory
+                let downloads_urls: id = msg_send![file_manager, URLsForDirectory:downloads_directory inDomains:user_domain_mask]; // NSUserDomainMask
+                let downloads_url: id = msg_send![downloads_urls, firstObject];
 
-            let downloads_path: id = msg_send![downloads_url, relativePath];
-            let documents_path: id = msg_send![documents_url, relativePath];
-            let desktop_path: id = msg_send![desktop_url, relativePath];
+                // Get Documents directory
+                let documents_directory: NSUInteger = 9; // NSDocumentDirectory
+                let documents_urls: id = msg_send![file_manager, URLsForDirectory:documents_directory inDomains:user_domain_mask]; // NSUserDomainMask
+                let documents_url: id = msg_send![documents_urls, firstObject];
 
-            // Update the search scopes to include user directories
-            let scope_array: id = msg_send![class!(NSMutableArray), arrayWithObject:computer_scope];
-            let _: () = msg_send![scope_array, addObject:desktop_path];
-            let _: () = msg_send![scope_array, addObject:documents_path];
-            let _: () = msg_send![scope_array, addObject:downloads_path];
+                // Get Desktop directory
+                let desktop_directory: NSUInteger = 12; // NSDesktopDirectory
+                let desktop_urls: id = msg_send![file_manager, URLsForDirectory:desktop_directory inDomains:user_domain_mask]; // NSUserDomainMask
+                let desktop_url: id = msg_send![desktop_urls, firstObject];
+
+                let downloads_path: id = msg_send![downloads_url, relativePath];
+                let documents_path: id = msg_send![documents_url, relativePath];
+                let desktop_path: id = msg_send![desktop_url, relativePath];
+
+                // Update the search scopes to include user directories
+                let array: id = msg_send![class!(NSMutableArray), arrayWithObject:computer_scope];
+                let _: () = msg_send![array, addObject:desktop_path];
+                let _: () = msg_send![array, addObject:documents_path];
+                let _: () = msg_send![array, addObject:downloads_path];
+                array
+            };
 
             // Set the search scopes for the query
             let _: () = msg_send![query_obj, setSearchScopes: scope_array];

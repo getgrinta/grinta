@@ -78,11 +78,13 @@ export async function loadAppInfo(
 
 export async function searchSpotlightApps(
 	query: string,
-	additionalExtensions: string[] = []
+	additionalExtensions: string[] = [],
+	searchOnlyInHome: boolean = false
 ) {
 	return await invoke<SpotlightAppInfo[]>("search_spotlight_apps", {
 		query,
 		extensions: uniq([...SUPPORTED_FILE_INDEXING_FILE_EXTENSIONS, ...additionalExtensions]),
+		searchOnlyInHome: searchOnlyInHome,
 	});
 }
 

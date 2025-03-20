@@ -163,11 +163,11 @@ export type FileEntry = {
 
 export async function findApps(): Promise<FileEntry[]> {
 	const apps = (
-			await Promise.all([
-				findAppsInDirectory("/Applications"),
-				findAppsInDirectory("/System/Applications"),
-			])
-		).flat();
+		await Promise.all([
+			findAppsInDirectory("/Applications"),
+			findAppsInDirectory("/System/Applications"),
+		])
+	).flat();
 
 	return apps;
 }
