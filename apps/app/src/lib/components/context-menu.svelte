@@ -81,16 +81,19 @@
 
 {#if isVisible}
 	<div 
-		class="max-h-[150px] overflow-y-scroll rounded-box shadow-lg absolute z-50"
+		class={clsx(
+			"psps overflow-hidden rounded-box p-2 w-[200px] shadow-lg absolute z-50",
+			systemThemeWatcher.theme === THEME.LIGHT
+				? "bg-base-200"
+				: "base-nonsemantic-dark bg-base-200"
+		)}
 		style="left: {x}px; top: {y}px;"
 		bind:this={menuElement}
 	>
+	<div class="overflow-y-auto -ml-1 w-[210px] max-h-[150px]">
 		<ul
 			class={clsx(
-				"menu menu-vertical w-[200px] bg-base-200",
-				systemThemeWatcher.theme === THEME.LIGHT
-					? "bg-base-200"
-					: "base-nonsemantic-dark bg-base-200",
+				"menu menu-vertical "
 			)}
 		>
 			{#each items as item}
@@ -112,5 +115,6 @@
 				</li>
 			{/each}
 		</ul>
+	</div>
 	</div>
 {/if}
