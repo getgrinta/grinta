@@ -19,7 +19,7 @@
 	import packageJson from "../../../package.json" with { type: "json" };
 	import { SUPPORTED_FILE_INDEXING_FILE_EXTENSIONS } from "$lib/grinta-invoke";
 	import { toast } from "svelte-sonner";
-    import { clipboardStore } from "$lib/store/clipboard.svelte";
+	import { clipboardStore } from "$lib/store/clipboard.svelte";
 
 	const pressedKeys = new PressedKeys();
 
@@ -110,18 +110,18 @@
 		toggleShortcutRecording();
 	});
 
-	$effect(() => {
-		const isClipboardRecorded = settingsStore.data.clipboardRecordingEnabled;
-
-		if (!isClipboardRecorded) {
-			clipboardStore.clearClipboardHistory();
-		}
-	});
-
 	watch(
 		() => $state.snapshot(settingsStore.data),
-		() => {
+		(before, after) => {
 			settingsStore.persist();
+
+			// Clear clipboard history when clipboard recording is disabled
+			if (
+				before?.clipboardRecordingEnabled &&
+				!after?.clipboardRecordingEnabled
+			) {
+				clipboardStore.clearClipboardHistory();
+			}
 		},
 	);
 
@@ -283,7 +283,8 @@
 
 							<PrimaryButton
 								class="flex-1/3"
-								onclick={addExtension}>{$_("settings.fields.add")}</PrimaryButton
+								onclick={addExtension}
+								>{$_("settings.fields.add")}</PrimaryButton
 							>
 						</div>
 					</div>
