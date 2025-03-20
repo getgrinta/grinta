@@ -139,6 +139,15 @@ export class SettingsStore extends SecureStore<Settings> {
 		this.updateData({ onboardingCompleted: true });
 	}
 
+    setFsSearchAdditionalExtensions(fsSearchAdditionalExtensions: string[]) {
+        this.updateData({ fsSearchAdditionalExtensions });
+    }
+
+    removeFsSearchExtension(extension: string) {
+        const updatedExtensions = this.data.fsSearchAdditionalExtensions.filter(ext => ext !== extension);
+        this.updateData({ fsSearchAdditionalExtensions: updatedExtensions });
+    }
+
 	async setToggleShortcut(toggleShortcut: string) {
 		await this.unregisterShortcuts();
 		this.updateData({ toggleShortcut });

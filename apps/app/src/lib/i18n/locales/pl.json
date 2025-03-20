@@ -24,6 +24,7 @@
 		},
 		"fields": {
 			"shortcut": "Skrót",
+			"add": "Dodaj",
 			"version": "Wersja",
 			"theme": "Motyw",
 			"accentColor": "Akcent",
@@ -35,8 +36,12 @@
 			"wipeAllLocalData": "Wyczyść wszystkie dane lokalne",
 			"changeShortcut": "Naciśnij, aby zmienić",
 			"recordShortcut": "Naciśnij, aby zapisać",
-			"baseCurrency": "Waluta bazowa"
+			"baseCurrency": "Waluta bazowa",
+			"fsSearchOnlyInHome": "Szukaj tylko w katalogu domowym",
+			"additional_extensions": "Dodatkowe rozszerzenia"
 		},
+		"extension_already_added": "To rozszerzenie jest już dodane.",
+		"extension_supported_by_default": "To rozszerzenie jest obsługiwane domyślnie.",
 		"clipboardRecordingEnabled": "Rejestruj historię schowka",
 		"language": "Język",
 		"languages": {

@@ -217,7 +217,7 @@
 	});
 </script>
 
-<Toaster theme="dark" position="bottom-center" richColors />
+<Toaster richColors position="bottom-center" theme={systemThemeWatcher.theme === THEME.DARK ? "dark" : "light"} />
 
 <main
 	id="mainLayout"

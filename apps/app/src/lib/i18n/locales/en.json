@@ -24,6 +24,7 @@
 		},
 		"fields": {
 			"shortcut": "Shortcut",
+			"add": "Add",
 			"version": "Version",
 			"theme": "Theme",
 			"accentColor": "Accent Color",
@@ -35,8 +36,12 @@
 			"proAutocompleteEnabled": "Pro Autocomplete Enabled",
 			"notesDirectory": "Notes Directory",
 			"checkForUpdate": "Check for update",
-			"baseCurrency": "Base Currency"
+			"baseCurrency": "Base Currency",
+			"fsSearchOnlyInHome": "Search only in home directory",
+			"additional_extensions": "Additional searchable extensions"
 		},
+		"extension_already_added": "This extension is already added.",
+		"extension_supported_by_default": "This extension is already supported by default.",
 		"clipboardRecordingEnabled": "Record Clipboard History",
 		"language": "Language"
 	},

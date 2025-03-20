@@ -24,6 +24,7 @@
 		},
 		"fields": {
 			"shortcut": "Tastenkürzel",
+			"add": "Hinzufügen",
 			"version": "Version",
 			"theme": "Thema",
 			"accentColor": "Akzentfarbe",
@@ -35,8 +36,12 @@
 			"proAutocompleteEnabled": "Pro Autocomplete aktiviert",
 			"recordShortcut": "Drücken zum Speichern",
 			"changeShortcut": "Drücken zum Ändern",
-			"baseCurrency": "Basis-Währung"
+			"baseCurrency": "Basis-Währung",
+			"fsSearchOnlyInHome": "Nur im Home-Verzeichnis suchen",
+			"additional_extensions": "Zusätzliche Erweiterungen"
 		},
+		"extension_already_added": "Diese Erweiterung wurde bereits hinzugefügt.",
+		"extension_supported_by_default": "Diese Erweiterung wird bereits unterstützt.",
 		"clipboardRecordingEnabled": "Zwischenablage-Verlauf aufzeichnen",
 		"language": "Sprache"
 	},
