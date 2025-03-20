@@ -99,6 +99,8 @@ export const SettingsSchema = z.object({
 	proAutocompleteEnabled: z.boolean().default(true),
 	incognitoEnabled: z.boolean().default(false),
 	baseCurrency: z.nativeEnum(BASE_CURRENCY).default(BASE_CURRENCY.USD),
+	fsSearchOnlyInHome: z.boolean().default(false),
+	fsSearchAdditionalExtensions: z.array(z.string()).default([]),
 });
 
 export type Settings = z.infer<typeof SettingsSchema>;

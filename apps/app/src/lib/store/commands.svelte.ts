@@ -508,7 +508,10 @@ export class CommandsStore extends SecureStore<Commands> {
 		const spotlightToken = generateCancellationToken();
 		this.spotlightSearchToken = spotlightToken;
 
-		searchSpotlightApps(appStore.query).then((result) => {
+		const additionalExtensions = settingsStore.data.fsSearchAdditionalExtensions;
+		const searchOnlyInHome = settingsStore.data.fsSearchOnlyInHome;
+
+		searchSpotlightApps(appStore.query, additionalExtensions, searchOnlyInHome).then((result) => {
 			if (spotlightToken !== this.spotlightSearchToken) {
 				return;
 			}
