@@ -19,6 +19,7 @@
 	import packageJson from "../../../package.json" with { type: "json" };
 	import { SUPPORTED_FILE_INDEXING_FILE_EXTENSIONS } from "$lib/grinta-invoke";
 	import { toast } from "svelte-sonner";
+    import { clipboardStore } from "$lib/store/clipboard.svelte";
 
 	const pressedKeys = new PressedKeys();
 
@@ -107,6 +108,14 @@
 		settingsStore.setToggleShortcut(processedShortcut);
 		settingsStore.persist();
 		toggleShortcutRecording();
+	});
+
+	$effect(() => {
+		const isClipboardRecorded = settingsStore.data.clipboardRecordingEnabled;
+
+		if (!isClipboardRecorded) {
+			clipboardStore.clearClipboardHistory();
+		}
 	});
 
 	watch(
