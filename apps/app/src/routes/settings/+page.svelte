@@ -146,6 +146,13 @@
 			extension = "." + extension;
 		}
 
+		const extensionRegex = new RegExp(`^\\.[a-zA-Z0-9]+$`);
+
+		if (!extensionRegex.test(extension)) {
+			toast.error($_("settings.extension_invalid_format"));
+			return;
+		}
+
 		if (
 			settingsStore.data.fsSearchAdditionalExtensions.includes(extension)
 		) {
@@ -248,21 +255,21 @@
 						>{$_("settings.fields.additional_extensions")}</label
 					>
 					<div>
-						<div class="flex gap-2 mb-2">
+						<div class="mb-2 inline-block">
 							{#each settingsStore.data.fsSearchAdditionalExtensions as extension}
 								<div
-									class="badge badge-outline badge-neutral-200"
+								class="badge badge-outline mr-2 mb-2"
 								>
-									{extension}
-									<button
-										class="btn-ghost cursor-pointer"
-										onclick={(e) => {
-											e.preventDefault();
-											settingsStore.removeFsSearchExtension(
-												extension,
-											);
-										}}>x</button
-									>
+								{extension}
+								<button
+									class="btn-ghost cursor-pointer"
+									onclick={(e) => {
+										e.preventDefault();
+										settingsStore.removeFsSearchExtension(
+											extension,
+										);
+									}}>x</button
+								>
 								</div>
 							{/each}
 						</div>

@@ -42,6 +42,7 @@
 		},
 		"extension_already_added": "To rozszerzenie jest już dodane.",
 		"extension_supported_by_default": "To rozszerzenie jest obsługiwane domyślnie.",
+		"extension_invalid_format": "Rozszerzenie może zawierać tylko litery i cyfry.",
 		"clipboardRecordingEnabled": "Rejestruj historię schowka",
 		"language": "Język",
 		"languages": {

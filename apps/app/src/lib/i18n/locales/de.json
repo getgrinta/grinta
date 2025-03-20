@@ -42,6 +42,7 @@
 		},
 		"extension_already_added": "Diese Erweiterung wurde bereits hinzugefügt.",
 		"extension_supported_by_default": "Diese Erweiterung wird bereits unterstützt.",
+		"extension_invalid_format": "Die Erweiterung darf nur Buchstaben und Zahlen enthalten.",
 		"clipboardRecordingEnabled": "Zwischenablage-Verlauf aufzeichnen",
 		"language": "Sprache"
 	},
