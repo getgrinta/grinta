@@ -34,6 +34,7 @@ pub async fn search_spotlight_apps<R: Runtime>(
     window: Window<R>,
     state: State<'_, SpotlightState>,
     query: Option<String>,
+    extensions: Vec<String>,
 ) -> Result<Vec<SpotlightAppInfo>, String> {
     use cocoa::base::{id, nil, YES};
     use cocoa::foundation::{NSString as CocoaNSString, NSUInteger};
@@ -104,7 +105,7 @@ pub async fn search_spotlight_apps<R: Runtime>(
             let search_term = query.as_deref().unwrap_or("");
 
             // Create the predicate
-            let predicate: id = create_spotlight_predicate(search_term);
+            let predicate: id = create_spotlight_predicate(search_term, extensions);
 
             // Set the predicate on the query object
             let _: () = msg_send![query_obj, setPredicate: predicate];
@@ -263,65 +264,13 @@ pub async fn search_spotlight_apps<R: Runtime>(
 
 use cocoa::base::{id, nil};
 #[cfg(target_os = "macos")]
-fn create_spotlight_predicate(query_text: &str) -> id {
+fn create_spotlight_predicate(query_text: &str, allowed_extensions: Vec<std::string::String>) -> id {
     use cocoa::foundation::NSString as CocoaNSString;
     use objc::{class, msg_send, sel, sel_impl};
 
     unsafe {
         // Create an autorelease pool to manage memory
         let pool: id = msg_send![class!(NSAutoreleasePool), new];
-
-        // Define allowed extensions
-        let allowed_extensions = [
-            "*.txt",
-            "*.pdf",
-            "*.xls",
-            "*.xlsx",
-            "*.doc",
-            "*.docx",
-            "*.ppt",
-            "*.pptx",
-            "*.zip",
-            "*.rar",
-            "*.7z",
-            "*.md",
-            "*.gsheet",
-            "*.gdoc",
-            "*.gslides",
-            "*.drawio",
-            "*.odp",
-            // Ebooks
-            "*.epub",
-            "*.mobi",
-            "*.djvu",
-            // Media
-            "*.mp3",
-            "*.wav",
-            "*.aac",
-            "*.ogg",
-            "*.flac",
-            "*.m4a",
-            "*.webm",
-            "*.mp4",
-            "*.avi",
-            "*.mov",
-            "*.wmv",
-            "*.mkv",
-            "*.gif",
-            "*.jpg",
-            "*.jpeg",
-            "*.png",
-            "*.webp",
-            "*.bmp",
-            "*.tiff",
-            "*.svg",
-            // Config
-            "*.json",
-            "*.yml",
-            "*.yaml",
-            "*.toml",
-            "*.ini",
-        ];
 
         // Create predicates for each allowed extension
         let mut allow_predicates: Vec<id> = Vec::with_capacity(allowed_extensions.len());
@@ -404,6 +353,7 @@ pub async fn search_spotlight_apps<R: Runtime>(
     _window: Window<R>,
     _state: State<'_, SpotlightState>,
     _query: Option<String>,
+    _extensions: Vec<String>,
 ) -> Result<Vec<SpotlightAppInfo>, String> {
     Err("Spotlight search is only available on macOS".to_string())
 }

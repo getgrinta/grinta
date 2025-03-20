@@ -3,6 +3,61 @@ import {
 	type InvokeOptions,
 	invoke,
 } from "@tauri-apps/api/core";
+import { uniq } from "rambda";
+
+export const SUPPORTED_FILE_INDEXING_FILE_EXTENSIONS = [
+	// Documents
+	"*.txt",
+	"*.pdf",
+	"*.xls",
+	"*.xlsx",
+	"*.doc",
+	"*.docx",
+	"*.ppt",
+	"*.pptx",
+	"*.zip",
+	"*.rar",
+	"*.7z",
+	"*.md",
+	"*.gsheet",
+	"*.gdoc",
+	"*.gslides",
+	"*.drawio",
+	"*.odp",
+	// Ebooks
+	"*.epub",
+	"*.mobi",
+	"*.djvu",
+	// Media
+	"*.mp3",
+	"*.wav",
+	"*.aac",
+	"*.ogg",
+	"*.flac",
+	"*.m4a",
+	"*.webm",
+	"*.mp4",
+	"*.avi",
+	"*.mov",
+	"*.wmv",
+	"*.mkv",
+	"*.gif",
+	"*.jpg",
+	"*.jpeg",
+	"*.png",
+	"*.webp",
+	"*.bmp",
+	"*.tiff",
+	"*.svg",
+	// Config
+	"*.json",
+	"*.yml",
+	"*.yaml",
+	"*.toml",
+	"*.ini",
+] as const;
+
+export type SupportedFileExtension = (typeof SUPPORTED_FILE_INDEXING_FILE_EXTENSIONS)[number];
 
 export function setVibrancy(
 	materialName: "dark" | "light",
@@ -21,11 +76,13 @@ export async function loadAppInfo(
 	});
 }
 
-export function searchSpotlightApps(
+export async function searchSpotlightApps(
 	query: string,
-): Promise<SpotlightSearchResult[]> {
-	return grintaInvoke<SpotlightSearchResult[]>("search_spotlight_apps", {
+	additionalExtensions: string[] = []
+) {
+	return await invoke<SpotlightAppInfo[]>("search_spotlight_apps", {
 		query,
+		extensions: uniq([...SUPPORTED_FILE_INDEXING_FILE_EXTENSIONS, ...additionalExtensions]),
 	});
 }
 
@@ -36,6 +93,12 @@ export async function requestAccessToUserFolders(): Promise<SpotlightSearchResul
 }
 
 type SpotlightSearchResult = {
+	display_name: string;
+	path: string;
+	content_type: string;
+};
+
+type SpotlightAppInfo = {
 	display_name: string;
 	path: string;
 	content_type: string;
