@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
 	import { getAuthClient } from "$lib/auth";
+	import PrimaryButton from "$lib/components/primary-button.svelte";
 	import TopBar from "$lib/components/top-bar.svelte";
 	import { appStore } from "$lib/store/app.svelte";
 	import { fail } from "$lib/utils.svelte";
 	import { openUrl } from "@tauri-apps/plugin-opener";
 	import { onMount } from "svelte";
+	import { _ } from "$lib/i18n";
 
 	type ViewState = "idle" | "subscribing";
 
@@ -80,14 +82,14 @@
 
 <dialog id="subscribingModal" class="modal" bind:this={subscribingModalRef}>
 	<div class="modal-box">
-		<h3 class="text-lg font-bold">Continue in the browser</h3>
-		<p class="py-4">Continue the subscription process in the browser.</p>
+		<h3 class="text-lg font-bold">{$_("profile.subscriptionModal.title")}</h3>
+		<p class="py-4">{$_("profile.subscriptionModal.description")}</p>
 		<div class="modal-action">
 			<form method="dialog">
 				<button
 					type="button"
 					onclick={stopSubscriptionCheck}
-					class="btn">Cancel</button
+					class="btn">{$_("profile.subscriptionModal.cancel")}</button
 				>
 			</form>
 		</div>
@@ -96,13 +98,13 @@
 
 <div class="flex flex-1 flex-col">
 	<TopBar {goBack}>
-		<h1 slot="input" class="text-lg font-semibold w-full">Profile</h1>
-		<button slot="addon" class="btn">Sign out</button>
+		<h1 slot="input" class="text-lg font-semibold w-full">{$_("profile.title")}</h1>
+		<PrimaryButton slot="addon" class="btn">{$_("profile.signOut")}</PrimaryButton>
 	</TopBar>
 	<div class="flex flex-1 flex-col mt-24 px-8 gap-4">
-		<h2 class="text-xl font-semibold">Account</h2>
+		<h2 class="text-xl font-semibold">{$_("profile.account")}</h2>
 		<div class="grid grid-cols-2 gap-4">
-			<label for="emailField" class="label">Email Address</label>
+			<label for="emailField" class="label">{$_("profile.emailAddress")}</label>
 			<input
 				id="emailField"
 				type="email"
@@ -111,16 +113,16 @@
 				disabled
 			/>
 		</div>
-		<h2 class="text-xl font-semibold">Subscription</h2>
+		<h2 class="text-xl font-semibold">{$_("profile.subscription")}</h2>
 		<div class="grid grid-cols-2 gap-4">
-			<label for="emailField" class="label">Grinta Pro</label>
+			<label for="emailField" class="label">{$_("profile.grintaPro")}</label>
 			{#if appStore.subscriptions?.length ?? 0 > 0}
-				<button type="button" class="btn" onclick={cancelSubscription}
-					>Cancel</button
+				<PrimaryButton type="button" class="btn" onclick={cancelSubscription}
+					>{$_("profile.cancel")}</PrimaryButton
 				>
 			{:else}
-				<button type="button" class="btn" onclick={upgradeToPro}
-					>Upgrade to Pro</button
+				<PrimaryButton type="button" class="btn" onclick={upgradeToPro}
+					>{$_("profile.upgradeButton")}</PrimaryButton
 				>
 			{/if}
 		</div>

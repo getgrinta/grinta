@@ -13,6 +13,21 @@
 		"invalidCode": "Ungültiger Code. Bitte überprüfen Sie den an Ihre E-Mail gesendeten Code.",
 		"invalidEmail": "Ungültige E-Mail-Adresse"
 	},
+	"profile": {
+		"title": "Profil",
+		"account": "Konto",
+		"emailAddress": "E-Mail-Adresse",
+		"subscription": "Abonnement",
+		"grintaPro": "Grinta Pro",
+		"upgrade": "Auf Pro upgraden",
+		"cancel": "Abbrechen",
+		"signOut": "Abmelden",
+		"subscriptionModal": {
+			"title": "Im Browser fortfahren",
+			"description": "Fahren Sie mit dem Abonnementprozess im Browser fort.",
+			"cancel": "Abbrechen"
+		}
+	},
 	"welcome": {
 		"title": "Willkommen bei Grinta",
 		"subtitle": "Bevor du losmachst, möchtest du vielleicht diese Einstellungen anpassen?"

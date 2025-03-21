@@ -149,5 +149,20 @@
 			"remove": "Usuń"
 		}
 	},
-	"additionalContextPlaceholder": "Dodatkowy kontekst dla generowania notatek.\r\nnp. \"Odpowiadaj w profesjonalnym stylu. Bądź zwięzły\"."
+	"additionalContextPlaceholder": "Dodatkowy kontekst dla generowania notatek.\r\nnp. \"Odpowiadaj w profesjonalnym stylu. Bądź zwięzły\".",
+	"profile": {
+		"title": "Profil",
+		"account": "Konto",
+		"emailAddress": "Adres e-mail",
+		"subscription": "Subskrypcja",
+		"grintaPro": "Grinta Pro",
+		"upgrade": "Przejdź na Pro",
+		"cancel": "Anuluj",
+		"signOut": "Wyloguj się",
+		"subscriptionModal": {
+			"title": "Kontynuuj w przeglądarce",
+			"description": "Kontynuuj proces subskrypcji w przeglądarce.",
+			"cancel": "Anuluj"
+		}
+	}
 }

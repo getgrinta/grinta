@@ -13,6 +13,21 @@
 		"invalidCode": "Invalid code. Please verify the code sent to your e-mail.",
 		"invalidEmail": "Invalid email address"
 	},
+	"profile": {
+		"title": "Profile",
+		"account": "Account",
+		"emailAddress": "Email Address",
+		"subscription": "Subscription",
+		"grintaPro": "Grinta Pro",
+		"upgrade": "Upgrade to Pro",
+		"cancel": "Cancel",
+		"signOut": "Sign out",
+		"subscriptionModal": {
+			"title": "Continue in the browser",
+			"description": "Continue the subscription process in the browser.",
+			"cancel": "Cancel"
+		}
+	},
 	"welcome": {
 		"title": "Welcome to Grinta",
 		"subtitle": "Before you start, you may want to adjust these settings."

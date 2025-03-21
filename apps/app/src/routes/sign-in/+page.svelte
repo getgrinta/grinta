@@ -159,7 +159,7 @@
 				/>
 				<div class="flex items-center">
 					<progress
-						class="m-auto progress progress-primary w-[95%] mt-2"
+						class="m-auto progress accent progress-primary w-[95%] mt-2"
 						value={progress}
 						max="100"
 					></progress>
