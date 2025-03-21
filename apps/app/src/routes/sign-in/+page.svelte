@@ -21,6 +21,39 @@
 
 	let otpField = $state<HTMLInputElement | null>(null);
 	let mode = $state<Mode>("sendCode");
+	let otpCodeExpiryTime = $state<number | null>(null);
+	let progress = $state(0);
+
+	// Update progress every second when expiryTime is set
+	$effect(() => {
+		if (!otpCodeExpiryTime) {
+			progress = 0;
+			return;
+		}
+
+		const updateProgress = () => {
+			const now = Date.now();
+			if (otpCodeExpiryTime === null) {
+				progress = 0;
+				return;
+			}
+
+			const timeLeft = Math.max(0, otpCodeExpiryTime - now);
+			const totalDuration = 5 * 60 * 1000;
+			progress = (timeLeft / totalDuration) * 100;
+
+			if (timeLeft === 0) {
+				otpCodeExpiryTime = null;
+				progress = 0;
+			}
+		};
+
+		updateProgress();
+
+		const interval = setInterval(updateProgress, 50);
+		return () => clearInterval(interval);
+	});
+
 	const header = $derived(
 		mode === "sendCode" ? $_("auth.signIn") : $_("auth.verifyCode"),
 	);
@@ -54,6 +87,7 @@
 
 				toast.success($_("auth.checkEmailForCode"));
 
+				otpCodeExpiryTime = Date.now() + 5 * 60 * 1000;
 				setMode("verifyOtp");
 
 				setTimeout(() => {
@@ -83,7 +117,7 @@
 		onError: (error) => {
 			if (error instanceof ZodError) {
 				const validationObject = JSON.parse(error?.message)[0];
-				
+
 				let errorMessage = validationObject.message;
 				if (validationObject.path[0] === "email") {
 					errorMessage = $_("auth.invalidEmail");
@@ -122,6 +156,13 @@
 					name="otp"
 					class="input input-lg w-full"
 				/>
+				<div class="flex items-center">
+					<progress
+						class="m-auto progress progress-primary w-[95%] mt-2"
+						value={progress}
+						max="100"
+					></progress>
+				</div>
 			{/if}
 			<button type="submit" class="btn btn-lg">{buttonLabel}</button>
 		</form>
