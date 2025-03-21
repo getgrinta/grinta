@@ -8,6 +8,7 @@
 	import { toast } from "svelte-sonner";
 	import { ZodError, z } from "zod";
 	import { _ } from "$lib/i18n";
+    import PrimaryButton from "$lib/components/primary-button.svelte";
 
 	const SignInSchema = z.object({
 		email: z.string().email(),
@@ -164,7 +165,7 @@
 					></progress>
 				</div>
 			{/if}
-			<button type="submit" class="btn btn-lg">{buttonLabel}</button>
+			<PrimaryButton type="submit" class="btn btn-lg">{buttonLabel}</PrimaryButton>
 		</form>
 	</div>
 </div>
