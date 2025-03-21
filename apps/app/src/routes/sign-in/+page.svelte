@@ -8,7 +8,7 @@
 	import { toast } from "svelte-sonner";
 	import { ZodError, z } from "zod";
 	import { _ } from "$lib/i18n";
-    import PrimaryButton from "$lib/components/primary-button.svelte";
+	import PrimaryButton from "$lib/components/primary-button.svelte";
 
 	const SignInSchema = z.object({
 		email: z.string().email(),
@@ -24,6 +24,7 @@
 	let mode = $state<Mode>("sendCode");
 	let otpCodeExpiryTime = $state<number | null>(null);
 	let progress = $state(0);
+	let interactionDisabled = $state(false);
 
 	// Update progress every second when expiryTime is set
 	$effect(() => {
@@ -71,6 +72,8 @@
 	const { form } = createForm({
 		onSubmit: async (values) => {
 			const authClient = getAuthClient();
+			interactionDisabled = true;
+
 			if (mode === "sendCode") {
 				const data = SignInSchema.parse(values);
 				const { error } = await authClient.emailOtp.sendVerificationOtp(
@@ -79,6 +82,8 @@
 						type: "sign-in",
 					},
 				);
+
+				interactionDisabled = false;
 				if (error) {
 					if (error.message) {
 						toast.error(error.message);
@@ -109,6 +114,8 @@
 					return goto("/profile");
 				},
 			});
+
+			interactionDisabled = false;
 
 			if (error) {
 				toast.error($_("auth.invalidCode"));
@@ -142,7 +149,7 @@
 			>
 			<input
 				id="emailField"
-				disabled={mode === "verifyOtp"}
+				disabled={mode === "verifyOtp" || interactionDisabled}
 				placeholder={$_("auth.emailPlaceholder")}
 				name="email"
 				class="input input-lg w-full"
@@ -165,7 +172,11 @@
 					></progress>
 				</div>
 			{/if}
-			<PrimaryButton type="submit" class="btn btn-lg">{buttonLabel}</PrimaryButton>
+			<PrimaryButton
+				type="submit"
+				disabled={interactionDisabled}
+				class="btn btn-lg">{buttonLabel}</PrimaryButton
+			>
 		</form>
 	</div>
 </div>
