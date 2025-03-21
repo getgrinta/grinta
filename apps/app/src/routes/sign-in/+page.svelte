@@ -7,6 +7,7 @@
 	import { createForm } from "felte";
 	import { toast } from "svelte-sonner";
 	import { ZodError, z } from "zod";
+	import { _ } from "$lib/i18n";
 
 	const SignInSchema = z.object({
 		email: z.string().email(),
@@ -18,10 +19,15 @@
 
 	type Mode = "sendCode" | "verifyOtp";
 
+	let otpField = $state<HTMLInputElement | null>(null);
 	let mode = $state<Mode>("sendCode");
-	const header = $derived(mode === "sendCode" ? "Send Code" : "Verify Code");
+	const header = $derived(
+		mode === "sendCode" ? $_("auth.signIn") : $_("auth.verifyCode"),
+	);
 	const buttonLabel = $derived(
-		mode === "sendCode" ? "Sign In" : "Verify Code",
+		mode === "sendCode"
+			? $_("auth.sendOneTimeCode")
+			: $_("auth.verifyCode"),
 	);
 
 	function setMode(newMode: Mode) {
@@ -40,9 +46,20 @@
 					},
 				);
 				if (error) {
+					if (error.message) {
+						toast.error(error.message);
+					}
 					throw error;
 				}
-				return setMode("verifyOtp");
+
+				toast.success($_("auth.checkEmailForCode"));
+
+				setMode("verifyOtp");
+
+				setTimeout(() => {
+					otpField?.focus();
+				}, 100);
+				return;
 			}
 			const data = VerifyOtpSchema.parse(values);
 			const { error } = await authClient.signIn.emailOtp(data, {
@@ -57,13 +74,20 @@
 					return goto("/profile");
 				},
 			});
+
 			if (error) {
+				toast.error($_("auth.invalidCode"));
 				throw error;
 			}
 		},
 		onError: (error) => {
 			if (error instanceof ZodError) {
-				const errorMessage = JSON.parse(error?.message)[0].message;
+				const validationObject = JSON.parse(error?.message)[0];
+				
+				let errorMessage = validationObject.message;
+				if (validationObject.path[0] === "email") {
+					errorMessage = $_("auth.invalidEmail");
+				}
 				return toast.error(errorMessage);
 			}
 			if (error instanceof Error) {
@@ -78,11 +102,26 @@
 	<div class="flex flex-col flex-1 mt-12 gap-4 items-center justify-center">
 		<form use:form class="flex flex-col w-full max-w-[28rem] gap-2">
 			<h1 class="col-span-2 text-2xl font-semibold">{header}</h1>
-			<label for="emailField" class="label">Email Address</label>
-			<input id="emailField" name="email" class="input input-lg w-full" />
+			<label for="email" class="label"
+				>{$_("auth.oneTimePasswordInfo")}</label
+			>
+			<input
+				id="emailField"
+				disabled={mode === "verifyOtp"}
+				placeholder={$_("auth.emailPlaceholder")}
+				name="email"
+				class="input input-lg w-full"
+			/>
 			{#if mode === "verifyOtp"}
-				<label for="otpField" class="label">OTP</label>
-				<input id="otpField" name="otp" class="input input-lg w-full" />
+				<label for="otpField" class="label"
+					>{$_("auth.oneTimeCode")}</label
+				>
+				<input
+					bind:this={otpField}
+					id="otpField"
+					name="otp"
+					class="input input-lg w-full"
+				/>
 			{/if}
 			<button type="submit" class="btn btn-lg">{buttonLabel}</button>
 		</form>

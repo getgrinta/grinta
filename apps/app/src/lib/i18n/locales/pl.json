@@ -51,6 +51,17 @@
 			"de": "Niemiecki"
 		}
 	},
+	"auth": {
+		"signIn": "Zaloguj się",
+		"verifyCode": "Zweryfikuj kod",
+		"sendOneTimeCode": "Wyślij kod jednorazowy",
+		"oneTimePasswordInfo": "Kod jednorazowy zostanie wysłany na Twój adres e-mail",
+		"oneTimeCode": "Kod jednorazowy",
+		"emailPlaceholder": "E-mail",
+		"checkEmailForCode": "Sprawdź swoją skrzynkę e-mail, aby znaleźć kod jednorazowy.",
+		"invalidCode": "Nieprawidłowy kod. Sprawdź kod wysłany na Twój adres e-mail.",
+		"invalidEmail": "Nieprawidłowy adres e-mail"
+	},
 	"notes": {
 		"placeholder": "Nazwa notatki",
 		"regenerateWithAI": "Wygeneruj ponownie z AI",

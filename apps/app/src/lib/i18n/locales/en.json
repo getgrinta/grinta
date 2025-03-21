@@ -2,6 +2,17 @@
 	"common": {
 		"next": "Next"
 	},
+	"auth": {
+		"signIn": "Sign In",
+		"verifyCode": "Verify Code",
+		"sendOneTimeCode": "Send One-Time Code",
+		"oneTimePasswordInfo": "A one-time password will be sent to your email address",
+		"oneTimeCode": "One-time code",
+		"emailPlaceholder": "E-mail",
+		"checkEmailForCode": "Please check your email inbox for the one-time code.",
+		"invalidCode": "Invalid code. Please verify the code sent to your e-mail.",
+		"invalidEmail": "Invalid email address"
+	},
 	"welcome": {
 		"title": "Welcome to Grinta",
 		"subtitle": "Before you start, you may want to adjust these settings."
@@ -133,5 +144,9 @@
 			"askAI": "Ask AI"
 		}
 	},
-	"additionalContextPlaceholder": "Additional context for note generation.\r\ne.g. \"Respond in professional style. Be concise\"."
+	"additionalContextPlaceholder": "Additional context for note generation.\r\ne.g. \"Respond in professional style. Be concise\".",
+	"toast": {
+		"checkEmailForCode": "Please check your email inbox for the one-time code.",
+		"invalidCode": "Invalid code. Please verify the code sent to your e-mail."
+	}
 }

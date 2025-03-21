@@ -2,6 +2,17 @@
 	"common": {
 		"next": "Weiter"
 	},
+	"auth": {
+		"signIn": "Anmelden",
+		"verifyCode": "Code bestätigen",
+		"sendOneTimeCode": "Einmalcode senden",
+		"oneTimePasswordInfo": "Ein Einmalpasswort wird an Ihre E-Mail-Adresse gesendet",
+		"oneTimeCode": "Einmalcode",
+		"emailPlaceholder": "E-Mail",
+		"checkEmailForCode": "Bitte überprüfen Sie Ihren E-Mail-Posteingang für den Einmalcode.",
+		"invalidCode": "Ungültiger Code. Bitte überprüfen Sie den an Ihre E-Mail gesendeten Code.",
+		"invalidEmail": "Ungültige E-Mail-Adresse"
+	},
 	"welcome": {
 		"title": "Willkommen bei Grinta",
 		"subtitle": "Bevor du losmachst, möchtest du vielleicht diese Einstellungen anpassen?"
@@ -133,5 +144,15 @@
 			"remove": "Entfernen"
 		}
 	},
-	"additionalContextPlaceholder": "Zusätzlicher Kontext für die Notizgenerierung.\r\nz.B. \"Antworte im professionellen Stil. Sei präzise\"."
+	"additionalContextPlaceholder": "Zusätzlicher Kontext für die Notizgenerierung.\r\nz.B. \"Antworte im professionellen Stil. Sei präzise\".",
+	"toast": {
+		"copiedToClipboard": "In die Zwischenablage kopiert",
+		"noteCreated": "Notiz erstellt",
+		"noteDeleted": "Notiz gelöscht",
+		"noteUpdated": "Notiz aktualisiert",
+		"searchResults": "Suchergebnisse",
+		"noResults": "Keine Ergebnisse gefunden",
+		"error": "Fehler",
+		"success": "Erfolg"
+	}
 }
