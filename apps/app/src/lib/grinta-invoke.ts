@@ -80,6 +80,10 @@ export async function loadAppInfo(
 	});
 }
 
+export async function toggleVisibility(): Promise<string> {
+	return grintaInvoke("toggle_visibility");
+}
+
 export async function searchSpotlightApps(
 	query: string,
 	additionalExtensions: string[] = [],
@@ -114,6 +118,7 @@ type GrintaInvokeCommand =
 	| "search_spotlight_apps"
 	| "set_vibrancy"
 	| "load_app_info"
+	| "toggle_visibility"
 	| "bring_to_front";
 
 function grintaInvoke<T>(

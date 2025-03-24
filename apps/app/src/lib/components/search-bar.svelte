@@ -5,12 +5,15 @@
 	import SearchBarAccessoryButton from "$lib/components/search-bar-accessory-button.svelte";
 	import SegmentedControl from "$lib/components/segmented-control.svelte";
 	import TopBar from "$lib/components/top-bar.svelte";
+    import { toggleVisibility } from "$lib/grinta-invoke";
 	import { appMetadataStore } from "$lib/store/app-metadata.svelte";
 	import { BAR_MODE, type BarMode, appStore } from "$lib/store/app.svelte";
 	import { commandsStore } from "$lib/store/commands.svelte";
 	import { notesStore } from "$lib/store/notes.svelte";
 	import { THEME, settingsStore } from "$lib/store/settings.svelte";
 	import { SystemThemeWatcher } from "$lib/system-theme-watcher.svelte";
+    import { invoke } from "@tauri-apps/api/core";
+    import { listen } from "@tauri-apps/api/event";
 	import { clsx } from "clsx";
 	import { createForm } from "felte";
 	import {
@@ -57,6 +60,13 @@
 		});
 	}
 
+	listen('focus', () => {
+		setTimeout(() => {
+			const searchBar = document.getElementById("search-bar");
+			return searchBar?.focus();
+		}, 50);
+	});
+
 	function switchMode(mode: BarMode) {
 		return goto(`/commands/${mode}`);
 	}
@@ -99,7 +109,7 @@
 			if (appStore.barMode !== BAR_MODE.INITIAL) {
 				return switchMode(BAR_MODE.INITIAL);
 			}
-			//return appStore.appWindow?.hide();
+			toggleVisibility();
 		}
 		if (event.key === "Backspace" && appStore.query.length === 0) {
 			appStore.barMode = BAR_MODE.INITIAL;
