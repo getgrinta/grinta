@@ -52,7 +52,7 @@
 		});
 		if (error) {
 			throw fail("Subscription Error", error);
-		}
+		}	
 		if (!data?.url) return;
 		startSubscriptionCheck();
 		await openUrl(data.url);

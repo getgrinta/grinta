@@ -36,6 +36,7 @@ rust-argon2 = "2.1.0"
 tauri-plugin-deep-link = "2"
 block = "0.1.6"
 block2 = "0.3"
+thiserror = "1.0.63"
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-autostart = "2"
@@ -48,6 +49,10 @@ window-vibrancy = "0.6.0"
 [target.'cfg(target_os = "macos")'.dependencies]
 cocoa = "0.26.0"
 objc = { version = "0.2.7", features = ["exception"] }
+tauri-nspanel = { git = "https://github.com/ahkohd/tauri-nspanel", branch = "v2" }
 
 # Added for Spotlight search async functionality
 tokio = { version = "1", features = ["sync"] }
+
+[features]
+cargo-clippy = []

@@ -106,6 +106,7 @@ export const SettingsSchema = z.object({
 export type Settings = z.infer<typeof SettingsSchema>;
 
 async function toggleShortcutHandler(event: ShortcutEvent) {
+	return;
 	if (!appStore.appWindow) return;
 	if (event.state !== "Pressed") return;
 	const visible = await appStore.appWindow.isVisible();
@@ -124,6 +125,8 @@ export class SettingsStore extends SecureStore<Settings> {
 	}
 
 	async registerShortcuts() {
+		return;
+		
 		await register(this.data.toggleShortcut, toggleShortcutHandler);
 	}
 

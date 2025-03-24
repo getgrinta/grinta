@@ -22,9 +22,10 @@
 				"maxHeight": 400,
 				"transparent": true,
 				"center": true,
+				"decorations": false,
 				"maximizable": false,
-				"minimizable": false,
-				"resizable": false,
+				"minimizable": false,"alwaysOnTop": true,
+				"resizable": false,"visibleOnAllWorkspaces": true,
 				"closable": false,
 				"visible": false,
 				"windowEffects": {

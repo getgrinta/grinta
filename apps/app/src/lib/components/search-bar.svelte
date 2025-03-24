@@ -99,7 +99,7 @@
 			if (appStore.barMode !== BAR_MODE.INITIAL) {
 				return switchMode(BAR_MODE.INITIAL);
 			}
-			return appStore.appWindow?.hide();
+			//return appStore.appWindow?.hide();
 		}
 		if (event.key === "Backspace" && appStore.query.length === 0) {
 			appStore.barMode = BAR_MODE.INITIAL;

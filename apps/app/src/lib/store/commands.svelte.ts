@@ -617,15 +617,15 @@ export class CommandsStore extends SecureStore<Commands> {
 		return match(command)
 			.with({ handler: COMMAND_HANDLER.APP }, async ({ value }) => {
 				await Command.create("open", ["-a", value]).execute();
-				return appStore.appWindow?.hide();
+				//return appStore.appWindow?.hide();
 			})
 			.with({ handler: COMMAND_HANDLER.FS_ITEM }, async ({ value }) => {
 				await Command.create("open", [value]).execute();
-				return appStore.appWindow?.hide();
+				//return appStore.appWindow?.hide();
 			})
 			.with({ handler: COMMAND_HANDLER.URL }, async ({ value }) => {
 				await this.openUrl(value);
-				return appStore.appWindow?.hide();
+				//return appStore.appWindow?.hide();
 			})
 			.with({ handler: COMMAND_HANDLER.CHANGE_MODE }, async ({ value }) => {
 				return goto(`/commands/${value}`);
@@ -636,7 +636,7 @@ export class CommandsStore extends SecureStore<Commands> {
 				},
 				async ({ value }) => {
 					await navigator.clipboard.writeText(value);
-					return appStore.appWindow?.hide();
+					//return appStore.appWindow?.hide();
 				},
 			)
 			.with({ handler: COMMAND_HANDLER.SYSTEM }, async ({ value }) => {

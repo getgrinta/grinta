@@ -142,7 +142,7 @@
 		if (appStore.barMode === BAR_MODE.NOTES) {
 			appStore.switchMode(BAR_MODE.INITIAL);
 		}
-		return appStore.appWindow?.hide();
+		//return appStore.appWindow?.hide();
 	}
 
 	async function openMenu() {
