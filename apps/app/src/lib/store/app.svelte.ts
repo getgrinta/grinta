@@ -5,6 +5,7 @@ import type { Session, User } from "better-auth";
 import { z } from "zod";
 import { getAuthClient } from "../auth";
 import { fail, getApiClient } from "../utils.svelte";
+import { getCurrentWebview } from "@tauri-apps/api/webview";
 
 export const BAR_MODE = {
 	INITIAL: "INITIAL",

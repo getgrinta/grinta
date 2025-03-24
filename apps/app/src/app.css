@@ -199,3 +199,8 @@ body {
 		/* Firefox */
 	}
 }
+
+:root {
+	border-radius: 12px !important;
+	background-color: transparent;
+}
