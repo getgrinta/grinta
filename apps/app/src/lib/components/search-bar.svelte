@@ -61,10 +61,11 @@
 	}
 
 	listen('focus', () => {
-		setTimeout(() => {
-			const searchBar = document.getElementById("search-bar");
-			return searchBar?.focus();
-		}, 50);
+		queryInput?.focus();
+
+		if (appStore.barMode !== BAR_MODE.INITIAL) {
+			switchMode(BAR_MODE.INITIAL);
+		}
 	});
 
 	function switchMode(mode: BarMode) {
