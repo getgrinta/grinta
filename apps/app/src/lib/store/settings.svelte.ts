@@ -6,11 +6,11 @@ import {
 } from "@tauri-apps/plugin-global-shortcut";
 import { match } from "ts-pattern";
 import { z } from "zod";
+import { activateWindow } from "../utils.svelte";
 import { SEARCH_MODE, appStore } from "./app.svelte";
 import { commandsStore } from "./commands.svelte";
 import { notesStore } from "./notes.svelte";
 import { SecureStore } from "./secure.svelte";
-import { invoke } from "@tauri-apps/api/core";
 
 export const THEME = {
 	SYSTEM: "SYSTEM",
@@ -108,15 +108,13 @@ export type Settings = z.infer<typeof SettingsSchema>;
 async function toggleShortcutHandler(event: ShortcutEvent) {
 	if (!appStore.appWindow) return;
 	if (event.state !== "Pressed") return;
-	// const visible = await appStore.appWindow.isVisible();
-	// if (!visible) {
-	// 	//await activateWindow();
-	// 	const searchBar = document.getElementById("search-bar");
-	// 	//return searchBar?.focus();
-	// }
-	// return appStore.appWindow.hide();
-
-	invoke("toggle_visibility");
+	const visible = await appStore.appWindow.isVisible();
+	if (!visible) {
+		await activateWindow();
+		const searchBar = document.getElementById("search-bar");
+		return searchBar?.focus();
+	}
+	return appStore.appWindow.hide();
 }
 
 export class SettingsStore extends SecureStore<Settings> {
@@ -126,8 +124,7 @@ export class SettingsStore extends SecureStore<Settings> {
 	}
 
 	async registerShortcuts() {
-	
-		await register("Command+Space", toggleShortcutHandler);
+		await register(this.data.toggleShortcut, toggleShortcutHandler);
 	}
 
 	async unregisterShortcuts() {
