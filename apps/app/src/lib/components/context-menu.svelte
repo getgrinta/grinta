@@ -49,10 +49,18 @@
 			}>("show-context-menu", (event) => {
 				if (name !== event.payload.name) return;
 
-				const approxHeight = Math.min(4, items.length) * 33 + (9 * 2);
+				const verticalPadding = 34;
+				const windowVerticalBias = 4;
 
-				const pixelsBelowWindow = window.innerHeight - (event.payload.y + approxHeight);
-				const pixelsPastWindow = window.innerWidth - (event.payload.x + 200);
+				const padding = 3;
+
+				const approxHeight =
+					Math.min(4, items.length) * 33 +
+					(windowVerticalBias + verticalPadding + padding);
+				const pixelsBelowWindow =
+					window.innerHeight - (event.payload.y + approxHeight);
+				const pixelsPastWindow =
+					window.innerWidth - (event.payload.x + 200 + padding);
 
 				x = event.payload.x + Math.min(0, pixelsPastWindow);
 				y = event.payload.y + Math.min(0, pixelsBelowWindow);
@@ -80,41 +88,41 @@
 <svelte:body on:click={onPageClick} />
 
 {#if isVisible}
-	<div 
+	<div
 		class={clsx(
 			"psps overflow-hidden rounded-box p-2 w-[200px] shadow-lg absolute z-50",
 			systemThemeWatcher.theme === THEME.LIGHT
 				? "bg-base-200"
-				: "base-nonsemantic-dark bg-base-200"
+				: "base-nonsemantic-dark bg-base-200",
 		)}
 		style="left: {x}px; top: {y}px;"
 		bind:this={menuElement}
 	>
-	<div class="overflow-y-auto -ml-1 w-[210px] max-h-[150px]">
-		<ul
-			class={clsx(
-				"menu menu-vertical "
-			)}
-		>
-			{#each items as item}
-				<li>
-					<a
-						href={item.href || "#"}
-						onclick={() => {
-							if (item.onClick) item.onClick();
-							isVisible = false;
-						}}
-					>
-						{#if item.icon}
-							<span class="mr-2">
-								<svelte:component this={item.icon} size={16} />
-							</span>
-						{/if}
-						{item.label}
-					</a>
-				</li>
-			{/each}
-		</ul>
-	</div>
+		<div class={clsx("overflow-y-auto w-[200px] max-h-[150px]", "-ml-2")}>
+			<ul class={clsx("menu menu-vertical w-full")}>
+				{#each items as item}
+					<li class="w-full">
+						<a
+							href={item.href || "#"}
+							class="w-full flex items-center"
+							onclick={() => {
+								if (item.onClick) item.onClick();
+								isVisible = false;
+							}}
+						>
+							{#if item.icon}
+								<span class="mr-2">
+									<svelte:component
+										this={item.icon}
+										size={16}
+									/>
+								</span>
+							{/if}
+							{item.label}
+						</a>
+					</li>
+				{/each}
+			</ul>
+		</div>
 	</div>
 {/if}
