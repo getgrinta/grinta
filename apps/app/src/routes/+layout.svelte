@@ -58,72 +58,91 @@
 		}
 	});
 
-	async function initTrayIcon() {
-		const menu = await Menu.new({
-			items: [
-				{
-					id: "search",
-					text: "Search",
-					action() {
-						appStore.appWindow?.show();
-						appStore.appWindow?.setFocus();
-						return goto("/");
+	async function initTrayIcon(didFinishOnboarding: boolean) {
+		let menuItems = [
+			{
+				id: "help",
+				text: "Help",
+				action() {
+					return open("https://getgrinta.com/docs");
+				},
+			},
+			{
+				item: "Separator",
+			},
+			{
+				id: "exit",
+				text: "Exit Grinta",
+				action() {
+					return exit();
+				},
+			},
+		];
+
+		if (didFinishOnboarding) {
+			menuItems = [
+				...[
+					{
+						id: "search",
+						text: "Search",
+						action() {
+							appStore.appWindow?.show();
+							appStore.appWindow?.setFocus();
+							return goto("/");
+						},
 					},
-				},
-				{
-					id: "notes",
-					text: "Notes",
-					action() {
-						appStore.appWindow?.show();
-						appStore.appWindow?.setFocus();
-						return goto(`/commands/${BAR_MODE.NOTES}`);
+					{
+						id: "notes",
+						text: "Notes",
+						action() {
+							appStore.appWindow?.show();
+							appStore.appWindow?.setFocus();
+							return goto(`/commands/${BAR_MODE.NOTES}`);
+						},
 					},
-				},
-				{
-					id: "clipboard",
-					text: "Clipboard",
-					action() {
-						appStore.appWindow?.show();
-						appStore.appWindow?.setFocus();
-						return goto(`/commands/${BAR_MODE.CLIPBOARD}`);
+					{
+						id: "clipboard",
+						text: "Clipboard",
+						action() {
+							appStore.appWindow?.show();
+							appStore.appWindow?.setFocus();
+							return goto(`/commands/${BAR_MODE.CLIPBOARD}`);
+						},
 					},
-				},
-				{
-					item: "Separator",
-				},
-				{
-					id: "settings",
-					text: "Settings",
-					action() {
-						appStore.appWindow?.show();
-						appStore.appWindow?.setFocus();
-						return goto("/settings");
+					{
+						item: "Separator",
 					},
-				},
-				{
-					id: "help",
-					text: "Help",
-					action() {
-						return open("https://getgrinta.com/docs");
+					{
+						id: "settings",
+						text: "Settings",
+						action() {
+							appStore.appWindow?.show();
+							appStore.appWindow?.setFocus();
+							return goto("/settings");
+						},
 					},
-				},
-				{
-					item: "Separator",
-				},
-				{
-					id: "exit",
-					text: "Exit Grinta",
-					action() {
-						return exit();
-					},
-				},
-			],
+				],
+				...menuItems,
+			];
+		}
+
+		const TRAY_ID = "grinta";
+		TrayIcon.getById(TRAY_ID).then(async (trayIcon) => {
+			const menu = await Menu.new({
+				items: menuItems as any,
+			});
+
+			if (trayIcon) {
+				trayIcon.setMenu(menu);
+			} else {
+				const options = {
+					id: TRAY_ID,
+					menu,
+					icon: (await defaultWindowIcon()) ?? undefined,
+				};
+				TrayIcon.new(options);
+			}
 		});
-		const options = {
-			menu,
-			icon: (await defaultWindowIcon()) ?? undefined,
-		};
-		await TrayIcon.new(options);
 	}
 
 	async function clipboardSnapshot() {
@@ -174,7 +193,7 @@
 		await clipboardStore.initialize();
 		await widgetsStore.initialize();
 		appMetadataStore.initialize();
-		initTrayIcon();
+		initTrayIcon(settingsStore.data.onboardingCompleted);
 
 		monitor = await currentMonitor();
 		lastMonitorScreenSize = monitor?.size ?? null;
@@ -185,6 +204,10 @@
 
 		initializing = false;
 	}
+
+	$effect(() => {
+		initTrayIcon(settingsStore.data.onboardingCompleted);
+	});
 
 	const accentLower = $derived(
 		settingsStore?.data?.accentColor?.toLowerCase() ?? "mare",
