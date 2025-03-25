@@ -25,11 +25,18 @@
 	import { clsx } from "clsx";
 	import { onMount } from "svelte";
 	import { Toaster } from "svelte-sonner";
+	import {
+		currentMonitor,
+		PhysicalSize,
+		type Monitor,
+	} from "@tauri-apps/api/window";
 	const { children } = $props();
 
 	dayjs.extend(LocalizedFormat);
 
 	let initializing = $state<boolean>(true);
+	let monitor = $state<Monitor | null>(null);
+	let lastMonitorScreenSize = $state<PhysicalSize | null>(null);
 
 	if (process.env.NODE_ENV === "development") {
 		window.onerror = (_event, _source, _lineno, _colno, err) => {
@@ -131,6 +138,20 @@
 		}
 	}
 
+	function centerWindow() {
+		currentMonitor().then((monitor) => {
+			if (
+				monitor?.size &&
+				lastMonitorScreenSize &&
+				(monitor.size.width !== lastMonitorScreenSize.width ||
+					monitor.size.height !== lastMonitorScreenSize.height)
+			) {
+				lastMonitorScreenSize = monitor.size;
+				moveWindow(Position.TopCenter);
+			}
+		});
+	}
+
 	async function hideWindow() {
 		if (appStore.barMode === BAR_MODE.NOTES) {
 			appStore.switchMode(BAR_MODE.INITIAL);
@@ -154,6 +175,9 @@
 		await widgetsStore.initialize();
 		appMetadataStore.initialize();
 		initTrayIcon();
+
+		monitor = await currentMonitor();
+		lastMonitorScreenSize = monitor?.size ?? null;
 
 		moveWindow(Position.TopCenter).then(() => {
 			appStore.appWindow?.show();
@@ -192,10 +216,13 @@
 		console.info("[Grinta] Layout Mount");
 		initializeApp();
 		// Initialize i18n
-		const intervalId = setInterval(clipboardSnapshot, 5000);
+		const clipboardIntervalId = setInterval(clipboardSnapshot, 5000);
+		const centerWindowIntervalId = setInterval(centerWindow, 1000);
+
 		return () => {
 			settingsStore.unregisterShortcuts();
-			clearInterval(intervalId);
+			clearInterval(clipboardIntervalId);
+			clearInterval(centerWindowIntervalId);
 		};
 	});
 
@@ -205,7 +232,11 @@
 	});
 </script>
 
-<Toaster richColors position="bottom-center" theme={systemThemeWatcher.theme === THEME.DARK ? "dark" : "light"} />
+<Toaster
+	richColors
+	position="bottom-center"
+	theme={systemThemeWatcher.theme === THEME.DARK ? "dark" : "light"}
+/>
 
 <main
 	id="mainLayout"
