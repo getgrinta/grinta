@@ -5,7 +5,7 @@
 	import "../app.css";
 	import { afterNavigate, goto } from "$app/navigation";
 	import { setVibrancy, toggleVisibility } from "$lib/grinta-invoke";
-	import { locale, setupI18n } from "$lib/i18n";
+	import { locale, setupI18n, _ } from "$lib/i18n";
 	import { appMetadataStore } from "$lib/store/app-metadata.svelte";
 	import { BAR_MODE, appStore } from "$lib/store/app.svelte";
 	import { clipboardStore } from "$lib/store/clipboard.svelte";
@@ -62,7 +62,7 @@
 		let menuItems = [
 			{
 				id: "help",
-				text: "Help",
+				text: $_("commands.menuItems.help"),
 				action() {
 					return open("https://getgrinta.com/docs");
 				},
@@ -72,7 +72,7 @@
 			},
 			{
 				id: "exit",
-				text: "Exit Grinta",
+				text: $_("commands.menuItems.exit"),
 				action() {
 					return exit();
 				},
@@ -84,7 +84,7 @@
 				...[
 					{
 						id: "search",
-						text: "Search",
+						text: $_("barMode.initial"),
 						action() {
 							appStore.appWindow?.show();
 							appStore.appWindow?.setFocus();
@@ -93,7 +93,7 @@
 					},
 					{
 						id: "notes",
-						text: "Notes",
+						text: $_("barMode.notes"),
 						action() {
 							appStore.appWindow?.show();
 							appStore.appWindow?.setFocus();
@@ -102,7 +102,7 @@
 					},
 					{
 						id: "clipboard",
-						text: "Clipboard",
+						text: $_("commands.menuItems.clipboardHistory"),
 						action() {
 							appStore.appWindow?.show();
 							appStore.appWindow?.setFocus();
@@ -114,7 +114,7 @@
 					},
 					{
 						id: "settings",
-						text: "Settings",
+						text: $_("commands.menuItems.settings"),
 						action() {
 							appStore.appWindow?.show();
 							appStore.appWindow?.setFocus();
