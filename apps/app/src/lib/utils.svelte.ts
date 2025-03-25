@@ -105,6 +105,7 @@ export async function handleContextMenu({
 }: { event: MouseEvent; name: string }) {
   event.preventDefault();
   event.stopPropagation();
+  await emit("hide-context-menu");
   await emit("show-context-menu", {
     x: event.clientX,
     y: event.clientY,
