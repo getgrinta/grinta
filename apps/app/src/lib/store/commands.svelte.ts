@@ -623,6 +623,7 @@ export class CommandsStore extends SecureStore<Commands> {
 			})
 			.with({ handler: COMMAND_HANDLER.URL }, async ({ value }) => {
 				await this.openUrl(value);
+				toggleVisibility();
 			})
 			.with({ handler: COMMAND_HANDLER.CHANGE_MODE }, async ({ value }) => {
 				return goto(`/commands/${value}`);
