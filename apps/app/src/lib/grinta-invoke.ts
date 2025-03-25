@@ -98,7 +98,9 @@ export async function searchSpotlightApps(
 
 export async function requestAccessToUserFolders(): Promise<SpotlightSearchResult[]> {
 	return grintaInvoke<SpotlightSearchResult[]>("search_spotlight_apps", {
-		query: "random_request_access_handler",
+		query: "random_request_access_handler",  
+		extensions: SUPPORTED_FILE_INDEXING_FILE_EXTENSIONS,
+		searchOnlyInHome: false,
 	});
 }
 

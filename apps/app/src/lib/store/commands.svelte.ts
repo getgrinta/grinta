@@ -23,7 +23,7 @@ import {
 	parseTextMathExpression,
 	parseUnitConversion,
 } from "../formula-commands";
-import { searchSpotlightApps } from "../grinta-invoke";
+import { searchSpotlightApps, toggleVisibility } from "../grinta-invoke";
 import { appMetadataStore } from "../store/app-metadata.svelte";
 import {
 	type FileEntry,
@@ -633,7 +633,8 @@ export class CommandsStore extends SecureStore<Commands> {
 				},
 				async ({ value }) => {
 					await navigator.clipboard.writeText(value);
-					//return appStore.appWindow?.hide();
+
+					toggleVisibility();
 				},
 			)
 			.with({ handler: COMMAND_HANDLER.SYSTEM }, async ({ value }) => {

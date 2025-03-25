@@ -4,7 +4,7 @@
 	import "@fontsource-variable/dm-sans";
 	import "../app.css";
 	import { afterNavigate, goto } from "$app/navigation";
-	import { setVibrancy } from "$lib/grinta-invoke";
+	import { setVibrancy, toggleVisibility } from "$lib/grinta-invoke";
 	import { locale, setupI18n } from "$lib/i18n";
 	import { appMetadataStore } from "$lib/store/app-metadata.svelte";
 	import { BAR_MODE, appStore } from "$lib/store/app.svelte";
@@ -23,7 +23,6 @@
 	import { exit } from "@tauri-apps/plugin-process";
 	import { open } from "@tauri-apps/plugin-shell";
 	import { clsx } from "clsx";
-	import * as focusTrap from "focus-trap";
 	import { onMount } from "svelte";
 	import { Toaster } from "svelte-sonner";
 	const { children } = $props();
@@ -51,8 +50,6 @@
 			locale.set(settingsStore.data.language);
 		}
 	});
-
-	let trap = $state<focusTrap.FocusTrap>();
 
 	async function initTrayIcon() {
 		const menu = await Menu.new({
@@ -134,15 +131,12 @@
 		}
 	}
 
-	function activateFocusTrap() {
-		return trap?.activate();
-	}
-
 	async function hideWindow() {
 		if (appStore.barMode === BAR_MODE.NOTES) {
 			appStore.switchMode(BAR_MODE.INITIAL);
 		}
-		//return appStore.appWindow?.hide();
+
+		toggleVisibility();
 	}
 
 	async function openMenu() {
@@ -198,13 +192,9 @@
 		console.info("[Grinta] Layout Mount");
 		initializeApp();
 		// Initialize i18n
-		window.addEventListener("blur", hideWindow);
-		window.addEventListener("focus", activateFocusTrap);
 		const intervalId = setInterval(clipboardSnapshot, 5000);
 		return () => {
 			settingsStore.unregisterShortcuts();
-			window.removeEventListener("blur", hideWindow);
-			window.removeEventListener("focus", activateFocusTrap);
 			clearInterval(intervalId);
 		};
 	});
@@ -212,8 +202,6 @@
 	afterNavigate(({ to }) => {
 		installHotkeys();
 		if (to?.url?.pathname === "/") return;
-		trap = focusTrap.createFocusTrap("body");
-		trap?.activate();
 	});
 </script>
 

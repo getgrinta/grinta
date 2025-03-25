@@ -1,10 +1,6 @@
 use tauri::{Emitter, Manager, Runtime, WebviewWindow};
 use tauri_nspanel::{
-    cocoa::{
-        appkit::{NSMainMenuWindowLevel, NSView, NSWindowCollectionBehavior},
-        base::{id, YES},
-        foundation::{NSPoint, NSRect},
-    },
+    cocoa::appkit::{NSMainMenuWindowLevel, NSWindowCollectionBehavior},
     objc::{msg_send, sel, sel_impl},
     panel_delegate, Panel, WebviewWindowExt as PanelWebviewWindowExt,
 };

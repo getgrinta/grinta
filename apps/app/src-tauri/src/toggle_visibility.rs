@@ -1,7 +1,6 @@
 
 
-use tauri::{command, Emitter, Listener, Runtime, State, Window};
-use window::WebviewWindowExt as _;
+use tauri::{command, Emitter};
 use tauri_nspanel::ManagerExt;
 
 use crate::window;

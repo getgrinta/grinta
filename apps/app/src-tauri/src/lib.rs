@@ -1,10 +1,9 @@
 use cocoa::base::{id, YES};
 use objc::{class, msg_send, sel, sel_impl};
-use tauri::{Emitter, Manager as _, Runtime, Window};
+use tauri::{Listener as _, Manager as _};
 use tauri_nspanel::ManagerExt as _;
 use tauri_plugin_autostart::MacosLauncher;
 
-use tauri_plugin_global_shortcut::{Code, Modifiers, Shortcut, ShortcutState};
 use window::WebviewWindowExt as _;
 mod command;
 mod icns_utils;
@@ -15,7 +14,6 @@ mod toggle_visibility;
 
 pub const SPOTLIGHT_LABEL: &str = "main";
 
-use tauri::command;
 
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -64,7 +62,7 @@ pub fn run() {
                     let view = panel.content_view();
 
                     // Create a block to execute our UI updates
-                    use block2::{Block, ConcreteBlock};
+                    use block2::ConcreteBlock;
 
                     let update_block = ConcreteBlock::new(move || -> () {
                         unsafe {
@@ -87,14 +85,14 @@ pub fn run() {
                     let _: () = msg_send![main_queue, addOperationWithBlock:update_block];
                 }
 
-                use tauri::Listener;
+                
 
-                // handle.listen(
-                //     format!("{}_panel_did_resign_key", SPOTLIGHT_LABEL),
-                //     move |_| {
-                //         panel.order_out(None);
-                //     },
-                // );
+                handle.listen(
+                    format!("{}_panel_did_resign_key", SPOTLIGHT_LABEL),
+                    move |_| {
+                        panel.order_out(None);
+                    },
+                );
             }
 
             Ok({})
