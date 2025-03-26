@@ -24,11 +24,11 @@
 
 	type RephraseAction = keyof typeof REPHRASE_ACTION;
 
-	export const REPHRASE_PROMPT = {
-		[REPHRASE_ACTION.LONGER]: "Make the text longer",
-		[REPHRASE_ACTION.SHORTER]: "Make the text shorter",
-		[REPHRASE_ACTION.GRAMMAR]: "Correct the grammar",
-		[REPHRASE_ACTION.PROFESSIONAL]: "Make the text more professional",
+	export const REPHRASE_SYSTEM_PROMPT = {
+		[REPHRASE_ACTION.LONGER]: "Make the text longer. Keep the current language.",
+		[REPHRASE_ACTION.SHORTER]: "Make the text shorter. Keep the current language.",
+		[REPHRASE_ACTION.GRAMMAR]: "Correct the grammar. Keep the current language.",
+		[REPHRASE_ACTION.PROFESSIONAL]: "Make the text more professional. Keep the current language.",
 	} as const;
 
 	export const rephraseAction = Object.keys(
@@ -64,7 +64,7 @@
 
 	async function rephrase(rephraseAction: RephraseAction) {
 		const apiClient = getApiClient();
-		const prompt = REPHRASE_PROMPT[rephraseAction];
+		const prompt = REPHRASE_SYSTEM_PROMPT[rephraseAction];
 		const selectedText = editor?.state.doc.textBetween(
 			editor.state.selection.from,
 			editor.state.selection.to,
