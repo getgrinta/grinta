@@ -11,6 +11,7 @@
     import { appMetadataStore } from "$lib/store/app-metadata.svelte";
     import { SystemThemeWatcher } from "$lib/system-theme-watcher.svelte";
     import { THEME } from "$lib/store/settings.svelte";
+    import CommandListIcon from "./command-list-icon.svelte";
 
     let widgetsContextMenu = $state<WidgetsContextMenu>();
     const widgets = $derived(widgetsStore.data.widgets ?? []);
@@ -51,17 +52,11 @@
                     )}
                     onclick={() => commandsStore.handleCommand(widget.data)}
                 >
-                    {#if icon}
-                        <img
-                            src={icon}
-                            alt={""}
-                            width="32"
-                            height="32"
-                            class="w-6 h-6 object-contain"
-                        />
-                    {:else}
-                        <IconComponent size={20} />
-                    {/if}
+                    <CommandListIcon
+                        {appMetadataStore}
+                        item={widget.data}
+                        label={widget.data.label}
+                    />
 
                     <span
                         >{widget.data.localizedLabel ?? widget.data.label}</span

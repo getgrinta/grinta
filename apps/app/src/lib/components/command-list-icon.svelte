@@ -51,7 +51,7 @@
         height="32"
         class="w-8 h-8 object-contain"
     />
-{:else if props.appMetadataStore.appInfo[props.item.label]}
+{:else if props.appMetadataStore.appInfo[props.item.label]?.base64Image}
     <img
         src={props.appMetadataStore.appInfo[props.item.label]?.base64Image}
         alt={props.label}
@@ -59,7 +59,7 @@
         height="32"
         class="w-8 h-8 object-contain"
     />
-{:else if props.appMetadataStore.extInfo[ext]}
+{:else if props.appMetadataStore.extInfo[ext]?.base64Image}
     <img
         src={props.appMetadataStore.extInfo[ext]?.base64Image}
         alt={props.label}

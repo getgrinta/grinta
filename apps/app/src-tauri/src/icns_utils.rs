@@ -223,7 +223,6 @@ pub fn load_app_info<R: Runtime>(
                 base64Image: String::new(),
                 localizedName: localized_name,
             };
-            println!("No icon path found for {}", app_name.clone());
             result.insert(app_name, app_info);
         }
     }
