@@ -64,7 +64,7 @@
 				id: "help",
 				text: $_("commands.menuItems.help"),
 				action() {
-					return open("https://getgrinta.com/docs");
+					return open("https://getgrinta.com/guides");
 				},
 			},
 			{
