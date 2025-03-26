@@ -30,11 +30,20 @@
 	let generatingNote = $state<boolean>(false);
 	let unsubWatcher = $state<UnwatchFn>();
 	let sidebarOpened = $state(false);
+	let generatingContent = $state<boolean>(false);
 	let editorContent = $state<string>(""); // Track editor's raw markdown content
 
 	function toggleSidebar() {
 		sidebarOpened = !sidebarOpened;
 		deleteConfirmationMode = false;
+	}
+
+	function onStartGenerating() {
+		generatingContent = true;
+	}
+
+	function onStopGenerating() {
+		generatingContent = false;
 	}
 
 	async function fetchNote() {
@@ -180,9 +189,16 @@
 						editable={!generatingNote}
 						onUpdate={onContentUpdate}
 						{toggleSidebar}
+						{onStartGenerating}
+						{onStopGenerating}
 					/>
 				{/if}
 			</div>
+			{#if generatingContent}
+				<div class="fixed bottom-4 right-4">
+					<span class="loading loading-spinner loading-md text-primary"></span>
+				</div>
+			{/if}
 		</div>
 	</div>
 	<div id="sidebarContent" class="drawer-side z-20">

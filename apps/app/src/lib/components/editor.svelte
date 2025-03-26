@@ -32,7 +32,7 @@
 		}
 	}
 
-	const { content, onUpdate, editable = true, toggleSidebar } = $props();
+	const { content, onUpdate, editable = true, toggleSidebar, onStartGenerating, onStopGenerating } = $props();
 
 	let element = $state<HTMLElement>();
 	let floatingMenuTooltip = $state<HTMLElement>();
@@ -318,7 +318,7 @@
 </script>
 
 <div bind:this={floatingMenuTooltip}>
-	<FloatingMenu bind:this={floatingMenu} {editor} />
+	<FloatingMenu bind:this={floatingMenu} {editor} {onStartGenerating} {onStopGenerating} />
 </div>
 <div bind:this={bubbleMenuTooltip}>
 	<BubbleMenu {editor} />
