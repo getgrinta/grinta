@@ -46,6 +46,8 @@
 
 			if (timeLeft === 0) {
 				otpCodeExpiryTime = null;
+				mode = 'sendCode';
+				interactionDisabled = false;
 				progress = 0;
 			}
 		};
