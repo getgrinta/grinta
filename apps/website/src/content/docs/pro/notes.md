@@ -56,7 +56,7 @@ Inline AI allows you to generate comprehensive content by asking questions or pr
 ### How to Use
 
 1. Type a question or prompt in your note
-2. Select the text and press `Command+I` or click the AI icon in the toolbar
+2. Select the text and press `Command+L` or click the AI icon in the toolbar
 3. Choose the type of response you want (paragraph, list, explanation, etc.)
 4. The AI generates content that directly addresses your query
 
@@ -83,4 +83,4 @@ All AI features in Grinta Pro are designed with privacy in mind:
 |---------|----------|
 | Accept Copilot suggestion | `Tab` |
 | Dismiss Copilot suggestion | `Escape` |
-| Use Inline AI | `Command+I` |
+| Use Inline AI | `Command+L` |

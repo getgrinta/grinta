@@ -9,6 +9,7 @@
 	import { ZodError, z } from "zod";
 	import { _ } from "$lib/i18n";
 	import PrimaryButton from "$lib/components/primary-button.svelte";
+    import { onMount } from "svelte";
 
 	const SignInSchema = z.object({
 		email: z.string().email(),
@@ -20,6 +21,7 @@
 
 	type Mode = "sendCode" | "verifyOtp";
 
+	let emailField = $state<HTMLInputElement | null>(null);
 	let otpField = $state<HTMLInputElement | null>(null);
 	let mode = $state<Mode>("sendCode");
 	let otpCodeExpiryTime = $state<number | null>(null);
@@ -56,6 +58,10 @@
 
 		const interval = setInterval(updateProgress, 50);
 		return () => clearInterval(interval);
+	});
+
+	onMount(() => {
+		emailField?.focus();
 	});
 
 	const header = $derived(
@@ -150,6 +156,7 @@
 				>{$_("auth.oneTimePasswordInfo")}</label
 			>
 			<input
+				bind:this={emailField}
 				id="emailField"
 				disabled={mode === "verifyOtp" || interactionDisabled}
 				placeholder={$_("auth.emailPlaceholder")}
