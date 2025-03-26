@@ -57,7 +57,8 @@ export const SUPPORTED_FILE_INDEXING_FILE_EXTENSIONS = [
 	"*.ini",
 ] as const;
 
-export type SupportedFileExtension = (typeof SUPPORTED_FILE_INDEXING_FILE_EXTENSIONS)[number];
+export type SupportedFileExtension =
+	(typeof SUPPORTED_FILE_INDEXING_FILE_EXTENSIONS)[number];
 
 export function setVibrancy(
 	materialName: "dark" | "light",
@@ -87,18 +88,23 @@ export async function toggleVisibility(): Promise<string> {
 export async function searchSpotlightApps(
 	query: string,
 	additionalExtensions: string[] = [],
-	searchOnlyInHome: boolean = false
+	searchOnlyInHome = false,
 ) {
 	return await invoke<SpotlightAppInfo[]>("search_spotlight_apps", {
 		query,
-		extensions: uniq([...SUPPORTED_FILE_INDEXING_FILE_EXTENSIONS, ...additionalExtensions]),
+		extensions: uniq([
+			...SUPPORTED_FILE_INDEXING_FILE_EXTENSIONS,
+			...additionalExtensions,
+		]),
 		searchOnlyInHome: searchOnlyInHome,
 	});
 }
 
-export async function requestAccessToUserFolders(): Promise<SpotlightSearchResult[]> {
+export async function requestAccessToUserFolders(): Promise<
+	SpotlightSearchResult[]
+> {
 	return grintaInvoke<SpotlightSearchResult[]>("search_spotlight_apps", {
-		query: "random_request_access_handler",  
+		query: "random_request_access_handler",
 		extensions: SUPPORTED_FILE_INDEXING_FILE_EXTENSIONS,
 		searchOnlyInHome: false,
 	});

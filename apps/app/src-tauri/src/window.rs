@@ -12,8 +12,6 @@ type TauriError = tauri::Error;
 enum Error {
     #[error("Unable to convert window to panel")]
     Panel,
-    #[error("Monitor with cursor not found")]
-    MonitorNotFound,
 }
 
 pub trait WebviewWindowExt {

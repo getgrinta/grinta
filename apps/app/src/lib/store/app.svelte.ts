@@ -1,11 +1,15 @@
 import type { SanitizedSubscription } from "@getgrinta/api";
 import { until } from "@open-draft/until";
-import { type Window, getCurrentWindow } from "@tauri-apps/api/window";
+import {
+	LogicalPosition,
+	type Window,
+	getCurrentWindow,
+	currentMonitor,
+} from "@tauri-apps/api/window";
 import type { Session, User } from "better-auth";
 import { z } from "zod";
 import { getAuthClient } from "../auth";
 import { fail, getApiClient } from "../utils.svelte";
-import { getCurrentWebview } from "@tauri-apps/api/webview";
 
 export const BAR_MODE = {
 	INITIAL: "INITIAL",
@@ -87,6 +91,15 @@ export class AppStore {
 
 	clearQuery() {
 		return this.setQuery("");
+	}
+
+	async positionWindow() {
+		const monitor = await currentMonitor();
+		if (!monitor) return;
+		const size = monitor.size.toLogical(monitor.scaleFactor);
+		return this.appWindow?.setPosition(
+			new LogicalPosition(size.width / 2 - 400, 44),
+		);
 	}
 }
 

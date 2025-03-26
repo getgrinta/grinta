@@ -63,17 +63,14 @@ pub fn run() {
                     use block2::ConcreteBlock;
 
                     let update_block = ConcreteBlock::new(move || -> () {
-                        unsafe {
-                            let layer: id = msg_send![view as id, layer];
-                            let _: () = msg_send![layer, setCornerRadius: 20.0];
-                            let _: () = msg_send![layer, setMasksToBounds: YES];
+                        let layer: id = msg_send![view as id, layer];
+                        let _: () = msg_send![layer, setCornerRadius: 20.0];
+                        let _: () = msg_send![layer, setMasksToBounds: YES];
+                        // Force layout update - using NSView methods
+                        let _: () = msg_send![view as id, setNeedsDisplay: YES];
 
-                            // Force layout update - using NSView methods
-                            let _: () = msg_send![view as id, setNeedsDisplay: YES];
-
-                            // Update the layer
-                            let _: () = msg_send![layer, setNeedsDisplay];
-                        }
+                        // Update the layer
+                        let _: () = msg_send![layer, setNeedsDisplay];
                     });
 
                     let update_block = update_block.copy();

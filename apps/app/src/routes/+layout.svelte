@@ -1,258 +1,251 @@
 <script lang="ts">
-	import dayjs from "dayjs";
-	import LocalizedFormat from "dayjs/plugin/localizedFormat";
-	import "@fontsource-variable/dm-sans";
-	import "../app.css";
-	import { afterNavigate, goto } from "$app/navigation";
-	import { setVibrancy, toggleVisibility } from "$lib/grinta-invoke";
-	import { locale, setupI18n, _ } from "$lib/i18n";
-	import { appMetadataStore } from "$lib/store/app-metadata.svelte";
-	import { BAR_MODE, appStore } from "$lib/store/app.svelte";
-	import { clipboardStore } from "$lib/store/clipboard.svelte";
-	import { commandsStore } from "$lib/store/commands.svelte";
-	import { THEME, settingsStore } from "$lib/store/settings.svelte";
-	import { vaultStore } from "$lib/store/vault.svelte";
-	import { widgetsStore } from "$lib/store/widgets.svelte";
-	import { SystemThemeWatcher } from "$lib/system-theme-watcher.svelte";
-	import { installHotkeys } from "$lib/utils.svelte";
-	import { defaultWindowIcon } from "@tauri-apps/api/app";
-	import { Menu } from "@tauri-apps/api/menu";
-	import { TrayIcon } from "@tauri-apps/api/tray";
-	import { readText } from "@tauri-apps/plugin-clipboard-manager";
-	import { Position, moveWindow } from "@tauri-apps/plugin-positioner";
-	import { exit } from "@tauri-apps/plugin-process";
-	import { open } from "@tauri-apps/plugin-shell";
-	import { clsx } from "clsx";
-	import { onMount } from "svelte";
-	import { Toaster } from "svelte-sonner";
-	import {
-		currentMonitor,
-		PhysicalSize,
-		type Monitor,
-	} from "@tauri-apps/api/window";
-	const { children } = $props();
+import dayjs from "dayjs";
+import LocalizedFormat from "dayjs/plugin/localizedFormat";
+import "@fontsource-variable/dm-sans";
+import "../app.css";
+import { afterNavigate, goto } from "$app/navigation";
+import { setVibrancy, toggleVisibility } from "$lib/grinta-invoke";
+import { locale, setupI18n, _ } from "$lib/i18n";
+import { appMetadataStore } from "$lib/store/app-metadata.svelte";
+import { BAR_MODE, appStore } from "$lib/store/app.svelte";
+import { clipboardStore } from "$lib/store/clipboard.svelte";
+import { commandsStore } from "$lib/store/commands.svelte";
+import { THEME, settingsStore } from "$lib/store/settings.svelte";
+import { vaultStore } from "$lib/store/vault.svelte";
+import { widgetsStore } from "$lib/store/widgets.svelte";
+import { SystemThemeWatcher } from "$lib/system-theme-watcher.svelte";
+import { installHotkeys } from "$lib/utils.svelte";
+import { defaultWindowIcon } from "@tauri-apps/api/app";
+import { Menu } from "@tauri-apps/api/menu";
+import { TrayIcon } from "@tauri-apps/api/tray";
+import { readText } from "@tauri-apps/plugin-clipboard-manager";
+import { Position } from "@tauri-apps/plugin-positioner";
+import { exit } from "@tauri-apps/plugin-process";
+import { open } from "@tauri-apps/plugin-shell";
+import { clsx } from "clsx";
+import { onMount } from "svelte";
+import { Toaster } from "svelte-sonner";
+import {
+	currentMonitor,
+	type PhysicalSize,
+	type Monitor,
+} from "@tauri-apps/api/window";
+const { children } = $props();
 
-	dayjs.extend(LocalizedFormat);
+dayjs.extend(LocalizedFormat);
 
-	let initializing = $state<boolean>(true);
-	let monitor = $state<Monitor | null>(null);
-	let lastMonitorScreenSize = $state<PhysicalSize | null>(null);
+let initializing = $state<boolean>(true);
+let monitor = $state<Monitor | null>(null);
+let lastMonitorScreenSize = $state<PhysicalSize | null>(null);
 
-	if (process.env.NODE_ENV === "development") {
-		window.onerror = (_event, _source, _lineno, _colno, err) => {
-			const ErrorOverlay = customElements.get("vite-error-overlay");
-			if (!ErrorOverlay) {
-				return;
-			}
-			const overlay = new ErrorOverlay(err);
-			document.body.appendChild(overlay);
-		};
-	}
-
-	const systemThemeWatcher = new SystemThemeWatcher();
-
-	// Sync language with settings
-	$effect(() => {
-		if (settingsStore.data.language) {
-			locale.set(settingsStore.data.language);
+if (process.env.NODE_ENV === "development") {
+	window.onerror = (_event, _source, _lineno, _colno, err) => {
+		const ErrorOverlay = customElements.get("vite-error-overlay");
+		if (!ErrorOverlay) {
+			return;
 		}
-	});
+		const overlay = new ErrorOverlay(err);
+		document.body.appendChild(overlay);
+	};
+}
 
-	async function initTrayIcon(didFinishOnboarding: boolean) {
-		let menuItems = [
+const systemThemeWatcher = new SystemThemeWatcher();
+
+// Sync language with settings
+$effect(() => {
+	if (settingsStore.data.language) {
+		locale.set(settingsStore.data.language);
+	}
+});
+
+async function initTrayIcon(didFinishOnboarding: boolean) {
+	let menuItems = [
+		{
+			id: "help",
+			text: $_("commands.menuItems.help"),
+			action() {
+				return open("https://getgrinta.com/docs");
+			},
+		},
+		{
+			item: "Separator",
+		},
+		{
+			id: "exit",
+			text: $_("commands.menuItems.exit"),
+			action() {
+				return exit();
+			},
+		},
+	];
+
+	if (didFinishOnboarding) {
+		menuItems = [
 			{
-				id: "help",
-				text: $_("commands.menuItems.help"),
+				id: "search",
+				text: $_("barMode.initial"),
 				action() {
-					return open("https://getgrinta.com/docs");
+					appStore.appWindow?.show();
+					appStore.appWindow?.setFocus();
+					return goto("/");
+				},
+			},
+			{
+				id: "notes",
+				text: $_("barMode.notes"),
+				action() {
+					appStore.appWindow?.show();
+					appStore.appWindow?.setFocus();
+					return goto(`/commands/${BAR_MODE.NOTES}`);
+				},
+			},
+			{
+				id: "clipboard",
+				text: $_("commands.menuItems.clipboardHistory"),
+				action() {
+					appStore.appWindow?.show();
+					appStore.appWindow?.setFocus();
+					return goto(`/commands/${BAR_MODE.CLIPBOARD}`);
 				},
 			},
 			{
 				item: "Separator",
 			},
 			{
-				id: "exit",
-				text: $_("commands.menuItems.exit"),
+				id: "settings",
+				text: $_("commands.menuItems.settings"),
 				action() {
-					return exit();
+					appStore.appWindow?.show();
+					appStore.appWindow?.setFocus();
+					return goto("/settings");
 				},
 			},
+			...menuItems,
 		];
-
-		if (didFinishOnboarding) {
-			menuItems = [
-				...[
-					{
-						id: "search",
-						text: $_("barMode.initial"),
-						action() {
-							appStore.appWindow?.show();
-							appStore.appWindow?.setFocus();
-							return goto("/");
-						},
-					},
-					{
-						id: "notes",
-						text: $_("barMode.notes"),
-						action() {
-							appStore.appWindow?.show();
-							appStore.appWindow?.setFocus();
-							return goto(`/commands/${BAR_MODE.NOTES}`);
-						},
-					},
-					{
-						id: "clipboard",
-						text: $_("commands.menuItems.clipboardHistory"),
-						action() {
-							appStore.appWindow?.show();
-							appStore.appWindow?.setFocus();
-							return goto(`/commands/${BAR_MODE.CLIPBOARD}`);
-						},
-					},
-					{
-						item: "Separator",
-					},
-					{
-						id: "settings",
-						text: $_("commands.menuItems.settings"),
-						action() {
-							appStore.appWindow?.show();
-							appStore.appWindow?.setFocus();
-							return goto("/settings");
-						},
-					},
-				],
-				...menuItems,
-			];
-		}
-
-		const TRAY_ID = "grinta";
-		TrayIcon.getById(TRAY_ID).then(async (trayIcon) => {
-			const menu = await Menu.new({
-				items: menuItems as any,
-			});
-
-			if (trayIcon) {
-				trayIcon.setMenu(menu);
-			} else {
-				const options = {
-					id: TRAY_ID,
-					menu,
-					icon: (await defaultWindowIcon()) ?? undefined,
-				};
-				TrayIcon.new(options);
-			}
-		});
 	}
 
-	async function clipboardSnapshot() {
-		try {
-			const clipboardText = await readText();
-
-			if (settingsStore.data?.clipboardRecordingEnabled) {
-				await clipboardStore.addSnapshot(clipboardText);
-			}
-		} catch {
-			console.log("Unreadable clipboard");
-		}
-	}
-
-	function centerWindow() {
-		currentMonitor().then((monitor) => {
-			if (
-				monitor?.size &&
-				lastMonitorScreenSize &&
-				(monitor.size.width !== lastMonitorScreenSize.width ||
-					monitor.size.height !== lastMonitorScreenSize.height)
-			) {
-				lastMonitorScreenSize = monitor.size;
-				moveWindow(Position.TopCenter);
-			}
-		});
-	}
-
-	async function hideWindow() {
-		if (appStore.barMode === BAR_MODE.NOTES) {
-			appStore.switchMode(BAR_MODE.INITIAL);
-		}
-
-		toggleVisibility();
-	}
-
-	async function openMenu() {
-		return goto(`/commands/${BAR_MODE.MENU}`);
-	}
-
-	async function initializeApp() {
-		initializing = true;
-		await setupI18n();
-		await vaultStore.initialize();
-		// await appStore.fetchSession();
-		await commandsStore.initialize();
-		await settingsStore.initialize();
-		await clipboardStore.initialize();
-		await widgetsStore.initialize();
-		appMetadataStore.initialize();
-		initTrayIcon(settingsStore.data.onboardingCompleted);
-
-		monitor = await currentMonitor();
-		lastMonitorScreenSize = monitor?.size ?? null;
-
-		moveWindow(Position.TopCenter).then(() => {
-			appStore.appWindow?.show();
+	const TRAY_ID = "grinta";
+	TrayIcon.getById(TRAY_ID).then(async (trayIcon) => {
+		const menu = await Menu.new({
+			items: menuItems as any,
 		});
 
-		initializing = false;
+		if (trayIcon) {
+			trayIcon.setMenu(menu);
+		} else {
+			const options = {
+				id: TRAY_ID,
+				menu,
+				icon: (await defaultWindowIcon()) ?? undefined,
+			};
+			TrayIcon.new(options);
+		}
+	});
+}
+
+async function clipboardSnapshot() {
+	try {
+		const clipboardText = await readText();
+
+		if (settingsStore.data?.clipboardRecordingEnabled) {
+			await clipboardStore.addSnapshot(clipboardText);
+		}
+	} catch {
+		console.log("Unreadable clipboard");
+	}
+}
+
+function centerWindow() {
+	currentMonitor().then((monitor) => {
+		if (
+			monitor?.size &&
+			lastMonitorScreenSize &&
+			(monitor.size.width !== lastMonitorScreenSize.width ||
+				monitor.size.height !== lastMonitorScreenSize.height)
+		) {
+			lastMonitorScreenSize = monitor.size;
+			appStore.positionWindow();
+		}
+	});
+}
+
+async function hideWindow() {
+	if (appStore.barMode === BAR_MODE.NOTES) {
+		appStore.switchMode(BAR_MODE.INITIAL);
 	}
 
-	$effect(() => {
-		initTrayIcon(settingsStore.data.onboardingCompleted);
-	});
+	toggleVisibility();
+}
 
-	const accentLower = $derived(
-		settingsStore?.data?.accentColor?.toLowerCase() ?? "mare",
-	);
-	const themeLower = $derived(
-		systemThemeWatcher?.theme?.toLowerCase() ?? "light",
-	);
+async function openMenu() {
+	return goto(`/commands/${BAR_MODE.MENU}`);
+}
 
-	const accentColorClass = $derived(`accent-${accentLower}-${themeLower}`);
+async function initializeApp() {
+	initializing = true;
+	await setupI18n();
+	await vaultStore.initialize();
+	// await appStore.fetchSession();
+	await commandsStore.initialize();
+	await settingsStore.initialize();
+	await clipboardStore.initialize();
+	await widgetsStore.initialize();
+	appMetadataStore.initialize();
+	initTrayIcon(settingsStore.data.onboardingCompleted);
 
-	const themeName = $derived(
-		systemThemeWatcher.theme === THEME.DARK
-			? "grinta-dark"
-			: "grinta-light",
-	);
+	monitor = await currentMonitor();
+	lastMonitorScreenSize = monitor?.size ?? null;
 
-	const bgClass = $derived(
-		systemThemeWatcher.theme === THEME.DARK
-			? "bg-base-200/20"
-			: "bg-white/20",
-	);
+	await appStore.positionWindow();
+	await appStore.appWindow?.show();
 
-	$effect(() => {
-		const isDarkTheme = systemThemeWatcher.theme === "DARK";
-		setVibrancy(isDarkTheme ? "dark" : "light");
-	});
+	initializing = false;
+}
 
-	onMount(() => {
-		console.info("[Grinta] Layout Mount");
-		initializeApp();
-		// Initialize i18n
-		const clipboardIntervalId = setInterval(clipboardSnapshot, 5000);
-		const centerWindowIntervalId = setInterval(centerWindow, 1000);
+$effect(() => {
+	initTrayIcon(settingsStore.data.onboardingCompleted);
+});
 
-		return () => {
-			settingsStore.unregisterShortcuts();
-			clearInterval(clipboardIntervalId);
-			clearInterval(centerWindowIntervalId);
-		};
-	});
+const accentLower = $derived(
+	settingsStore?.data?.accentColor?.toLowerCase() ?? "mare",
+);
+const themeLower = $derived(
+	systemThemeWatcher?.theme?.toLowerCase() ?? "light",
+);
 
-	afterNavigate(({ to }) => {
-		installHotkeys();
-		if (to?.url?.pathname === "/") return;
-	});
+const accentColorClass = $derived(`accent-${accentLower}-${themeLower}`);
+
+const themeName = $derived(
+	systemThemeWatcher.theme === THEME.DARK ? "grinta-dark" : "grinta-light",
+);
+
+const bgClass = $derived(
+	systemThemeWatcher.theme === THEME.DARK ? "bg-base-200/20" : "bg-white/20",
+);
+
+$effect(() => {
+	const isDarkTheme = systemThemeWatcher.theme === "DARK";
+	setVibrancy(isDarkTheme ? "dark" : "light");
+});
+
+onMount(() => {
+	console.info("[Grinta] Layout Mount");
+	initializeApp();
+	// Initialize i18n
+	const clipboardIntervalId = setInterval(clipboardSnapshot, 5000);
+	const centerWindowIntervalId = setInterval(centerWindow, 1000);
+
+	return () => {
+		settingsStore.unregisterShortcuts();
+		clearInterval(clipboardIntervalId);
+		clearInterval(centerWindowIntervalId);
+	};
+});
+
+afterNavigate(({ to }) => {
+	installHotkeys();
+	if (to?.url?.pathname === "/") return;
+});
 </script>
 
 <Toaster
