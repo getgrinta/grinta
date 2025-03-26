@@ -10,16 +10,14 @@ import { appMetadataStore } from "$lib/store/app-metadata.svelte";
 import { BAR_MODE, appStore } from "$lib/store/app.svelte";
 import { clipboardStore } from "$lib/store/clipboard.svelte";
 import { commandsStore } from "$lib/store/commands.svelte";
-import { THEME, settingsStore } from "$lib/store/settings.svelte";
+import { settingsStore } from "$lib/store/settings.svelte";
 import { vaultStore } from "$lib/store/vault.svelte";
 import { widgetsStore } from "$lib/store/widgets.svelte";
-import { SystemThemeWatcher } from "$lib/system-theme-watcher.svelte";
-import { installHotkeys } from "$lib/utils.svelte";
-import { defaultWindowIcon } from "@tauri-apps/api/app";
+import { systemThemeWatcher } from "$lib/system-theme-watcher.svelte";
+import { installHotkeys, ColorModeValue } from "$lib/utils.svelte";
 import { Menu } from "@tauri-apps/api/menu";
 import { TrayIcon } from "@tauri-apps/api/tray";
 import { readText } from "@tauri-apps/plugin-clipboard-manager";
-import { Position } from "@tauri-apps/plugin-positioner";
 import { exit } from "@tauri-apps/plugin-process";
 import { open } from "@tauri-apps/plugin-shell";
 import { clsx } from "clsx";
@@ -30,6 +28,7 @@ import {
 	type PhysicalSize,
 	type Monitor,
 } from "@tauri-apps/api/window";
+import PngIconUrl from "$lib/assets/tray.png?arraybuffer";
 const { children } = $props();
 
 dayjs.extend(LocalizedFormat);
@@ -48,8 +47,6 @@ if (process.env.NODE_ENV === "development") {
 		document.body.appendChild(overlay);
 	};
 }
-
-const systemThemeWatcher = new SystemThemeWatcher();
 
 // Sync language with settings
 $effect(() => {
@@ -133,12 +130,12 @@ async function initTrayIcon(didFinishOnboarding: boolean) {
 		if (trayIcon) {
 			trayIcon.setMenu(menu);
 		} else {
-			const options = {
+			TrayIcon.new({
 				id: TRAY_ID,
 				menu,
-				icon: (await defaultWindowIcon()) ?? undefined,
-			};
-			TrayIcon.new(options);
+				icon: PngIconUrl,
+				iconAsTemplate: true,
+			});
 		}
 	});
 }
@@ -169,14 +166,6 @@ function centerWindow() {
 	});
 }
 
-async function hideWindow() {
-	if (appStore.barMode === BAR_MODE.NOTES) {
-		appStore.switchMode(BAR_MODE.INITIAL);
-	}
-
-	toggleVisibility();
-}
-
 async function openMenu() {
 	return goto(`/commands/${BAR_MODE.MENU}`);
 }
@@ -191,7 +180,6 @@ async function initializeApp() {
 	await clipboardStore.initialize();
 	await widgetsStore.initialize();
 	appMetadataStore.initialize();
-	initTrayIcon(settingsStore.data.onboardingCompleted);
 
 	monitor = await currentMonitor();
 	lastMonitorScreenSize = monitor?.size ?? null;
@@ -203,7 +191,9 @@ async function initializeApp() {
 }
 
 $effect(() => {
-	initTrayIcon(settingsStore.data.onboardingCompleted);
+	setTimeout(() => {
+		initTrayIcon(settingsStore.data.onboardingCompleted);
+	}, 1000);
 });
 
 const accentLower = $derived(
@@ -215,28 +205,25 @@ const themeLower = $derived(
 
 const accentColorClass = $derived(`accent-${accentLower}-${themeLower}`);
 
-const themeName = $derived(
-	systemThemeWatcher.theme === THEME.DARK ? "grinta-dark" : "grinta-light",
-);
-
-const bgClass = $derived(
-	systemThemeWatcher.theme === THEME.DARK ? "bg-base-200/20" : "bg-white/20",
-);
+const themeName = new ColorModeValue("grinta-light", "grinta-dark");
+const bgClass = new ColorModeValue("bg-zinc-50/60", "bg-base-200/80");
+const vibrancyValue = new ColorModeValue<"light" | "dark">("light", "dark");
 
 $effect(() => {
-	const isDarkTheme = systemThemeWatcher.theme === "DARK";
-	setVibrancy(isDarkTheme ? "dark" : "light");
+	setVibrancy(vibrancyValue.value);
 });
 
 onMount(() => {
+	console.log(">>>IC", PngIconUrl);
 	console.info("[Grinta] Layout Mount");
 	initializeApp();
-	// Initialize i18n
+	systemThemeWatcher.addEventListner();
 	const clipboardIntervalId = setInterval(clipboardSnapshot, 5000);
 	const centerWindowIntervalId = setInterval(centerWindow, 1000);
 
 	return () => {
 		settingsStore.unregisterShortcuts();
+		systemThemeWatcher.removeEventListner();
 		clearInterval(clipboardIntervalId);
 		clearInterval(centerWindowIntervalId);
 	};
@@ -246,12 +233,14 @@ afterNavigate(({ to }) => {
 	installHotkeys();
 	if (to?.url?.pathname === "/") return;
 });
+
+const toasterTheme = new ColorModeValue<"light" | "dark">("light", "dark");
 </script>
 
 <Toaster
 	richColors
 	position="bottom-center"
-	theme={systemThemeWatcher.theme === THEME.DARK ? "dark" : "light"}
+	theme={toasterTheme.value}
 />
 
 <main
@@ -259,10 +248,10 @@ afterNavigate(({ to }) => {
 	class={clsx(
 		"flex-1 flex flex-col",
 		accentColorClass,
-		bgClass,
+		bgClass.value,
 		widgetsStore.showWidgets && "widgets-visible",
 	)}
-	data-theme={themeName}
+	data-theme={themeName.value}
 >
 	<button type="button" class="hidden" onclick={openMenu} data-hotkey="Mod+k"
 		>Open Settings</button

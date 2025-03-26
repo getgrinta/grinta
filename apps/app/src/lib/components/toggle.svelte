@@ -1,31 +1,28 @@
 <script lang="ts">
-    import { THEME } from "$lib/store/settings.svelte";
-    import { SystemThemeWatcher } from "$lib/system-theme-watcher.svelte";
-    import clsx from "clsx";
-    import { match } from "ts-pattern";
+import { THEME } from "$lib/store/settings.svelte";
+import { systemThemeWatcher } from "$lib/system-theme-watcher.svelte";
+import { ColorModeValue } from "$lib/utils.svelte";
+import clsx from "clsx";
+import { match } from "ts-pattern";
 
-    const { items, size = "md" } = $props();
+const { items, size = "md" } = $props();
 
-    const systemThemeWatcher = new SystemThemeWatcher();
+const containerClass = new ColorModeValue(
+	"ring-zinc-300/20",
+	"ring-zinc-900/20",
+);
 
-    const containerCss = $derived(
-        systemThemeWatcher.theme === THEME.LIGHT
-            ? "ring-neutral-300/20"
-            : "ring-neutral-900/20",
-    );
+const buttonClass = new ColorModeValue("border-0", "border-zinc-800");
+const deactivatedClass = new ColorModeValue("text-zinc-500", "text-zinc-100");
 </script>
 
 <div
     class={clsx(
         "join shadow-sm rounded-full overflow-hidden border-0 ring-0 pointer-events-auto",
-        containerCss,
+        containerClass.value,
     )}
 >
     {#each items as item}
-        {@const buttonClass =
-            systemThemeWatcher.theme === THEME.LIGHT
-                ? "border-0"
-                : "border-neutral-800"}
         {@const buttonActiveClass = (isActive: boolean) => {
             const background =
                 size === "lg"
@@ -37,12 +34,10 @@
                 size === "lg"
                     ? isActive
                         ? "text-primary"
-                        : systemThemeWatcher.theme === THEME.DARK
-                          ? "text-neutral-100"
-                          : "text-neutral-500"
+                        : deactivatedClass.value
                     : isActive
                       ? "text-primary"
-                      : "text-neutral-500";
+                      : "text-zinc-500";
             return match(systemThemeWatcher.theme)
                 .with(THEME.LIGHT, () => (isActive ? foreground : foreground))
                 .with(THEME.DARK, () =>
@@ -57,7 +52,7 @@
             type="button"
             class={clsx(
                 `btn ${size === "lg" ? "btn-md" : "btn-sm"} join-item border-1 !border-base-300/30 bg-base-100`,
-                buttonClass,
+                buttonClass.value,
                 buttonActiveClass(item.active),
             )}
             data-hotkey={item.hotkey}

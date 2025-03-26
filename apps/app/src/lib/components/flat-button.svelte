@@ -1,23 +1,22 @@
 <script lang="ts">
-    import { THEME } from "$lib/store/settings.svelte";
-    import { SystemThemeWatcher } from "$lib/system-theme-watcher.svelte";
-    import clsx from "clsx";
+import { ColorModeValue } from "$lib/utils.svelte";
+import clsx from "clsx";
 
-    const { text, onClick, shortcut, showShortcut } = $props<{
-        text: string;
-        onClick: () => void;
-        shortcut?: string;
-        showShortcut?: boolean;
-    }>();
+const { text, onClick, shortcut, showShortcut } = $props<{
+	text: string;
+	onClick: () => void;
+	shortcut?: string;
+	showShortcut?: boolean;
+}>();
 
-    const systemThemeWatcher = new SystemThemeWatcher();
+const buttonClass = new ColorModeValue("text-zinc-700", "");
 </script>
 
 <button
     type="button"
     class={clsx(
         `btn btn-md border-0 bg-base-100`,
-        systemThemeWatcher.theme === THEME.LIGHT && "text-neutral-700",
+        buttonClass.value,
     )}
     onclick={onClick}
 >

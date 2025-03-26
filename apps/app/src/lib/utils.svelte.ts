@@ -23,7 +23,8 @@ import {
 	type ExecutableCommand,
 } from "./store/commands.svelte";
 import { vaultStore } from "./store/vault.svelte";
-import { bringWindowToFront } from "./grinta-invoke";
+import { systemThemeWatcher } from "./system-theme-watcher.svelte";
+import { THEME } from "./store/settings.svelte";
 
 export async function installHotkeys() {
 	for (const el of document.querySelectorAll("[data-hotkey]")) {
@@ -72,7 +73,6 @@ export function highlightText(
 export async function activateWindow() {
 	await appStore.appWindow?.show();
 	await appStore.appWindow?.setFocus();
-	await bringWindowToFront();
 	const queryInput = document.querySelector("#queryInput") as HTMLInputElement;
 	return queryInput?.focus();
 }
@@ -199,4 +199,19 @@ async function findAppsInDirectory(path: string): Promise<FileEntry[]> {
 	}
 
 	return apps;
+}
+
+export class ColorModeValue<T = string> {
+	lightModeValue = $state<T>("" as T);
+	darkModeValue = $state<T>("" as T);
+	value = $derived(
+		systemThemeWatcher.theme === THEME.DARK
+			? this.darkModeValue
+			: this.lightModeValue,
+	);
+
+	constructor(lightModeValue: T, darkModeValue: T) {
+		this.lightModeValue = lightModeValue;
+		this.darkModeValue = darkModeValue;
+	}
 }

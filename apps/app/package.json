@@ -98,6 +98,7 @@
 		"svelte": "5.22.6",
 		"svelte-check": "4.1.5",
 		"tailwindcss": "4.0.12",
-		"tailwindcss-motion": "1.1.0"
+		"tailwindcss-motion": "1.1.0",
+		"vite-plugin-arraybuffer": "^0.1.0"
 	}
 }

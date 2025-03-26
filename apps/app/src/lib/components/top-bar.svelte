@@ -1,33 +1,30 @@
 <script lang="ts">
-	import { THEME } from "$lib/store/settings.svelte";
-	import { SystemThemeWatcher } from "$lib/system-theme-watcher.svelte";
-	import clsx from "clsx";
-	import { ChevronLeftIcon } from "lucide-svelte";
-	import SearchBarAccessoryButton from "./search-bar-accessory-button.svelte";
+import clsx from "clsx";
+import { ChevronLeftIcon } from "lucide-svelte";
+import SearchBarAccessoryButton from "./search-bar-accessory-button.svelte";
+import { ColorModeValue } from "$lib/utils.svelte";
 
-	const { goBack, fancyMode = false } = $props<{
-		goBack?: () => void;
-		fancyMode?: boolean;
-	}>();
+const { goBack, fancyMode = false } = $props<{
+	goBack?: () => void;
+	fancyMode?: boolean;
+}>();
 
-	function defaultGoBack() {
-		return window.history.back();
-	}
+function defaultGoBack() {
+	return window.history.back();
+}
 
-	function scrollUp() {
-		return window.scrollBy(0, -160);
-	}
+function scrollUp() {
+	return window.scrollBy(0, -160);
+}
 
-	function scrollDown() {
-		return window.scrollBy(0, 160);
-	}
+function scrollDown() {
+	return window.scrollBy(0, 160);
+}
 
-	const systemThemeWatcher = new SystemThemeWatcher();
-	const topBarCss = $derived(
-		systemThemeWatcher.theme === THEME.DARK
-			? "backdrop-blur-lg bg-base-100 base-nonsemantic-dark border-neutral-800 !outline-none px-6 h-14"
-			: "bg-neutral-300/50 border-neutral-400/30 !shadow-neutral-300/30 !shadow-xs !outline-none px-6 h-14",
-	);
+const topBarCss = new ColorModeValue(
+	"border-zinc-400/30 !shadow-zinc-300/30 !shadow-xs !outline-none px-6 h-14",
+	"backdrop-blur-lg base-nonsemantic-dark border-zinc-800 !outline-none px-6 h-14",
+);
 </script>
 
 <button type="button" onclick={scrollUp} class="hidden" data-hotkey="k"
@@ -40,8 +37,8 @@
 <div class="fixed flex flex-row left-4 top-4 right-4 z-10 items-center gap-2">
 	<label
 		class={clsx(
-			"input flex-1 flex items-center gap-4 w-full",
-			topBarCss,
+			"input flex-1 !bg-base-200 flex items-center gap-4 w-full",
+			topBarCss.value,
 			fancyMode ? "border-gradient" : "border-invisible",
 		)}
 	>

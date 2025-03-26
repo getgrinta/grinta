@@ -4,5 +4,6 @@
 mod spotlight_utils;
 
 fn main() {
+    let _ = fix_path_env::fix();
     grinta_lib::run();
 }

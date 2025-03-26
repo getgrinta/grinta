@@ -66,10 +66,6 @@ export function setVibrancy(
 	return grintaInvoke("set_vibrancy", { materialName: materialName });
 }
 
-export function bringWindowToFront(): Promise<string> {
-	return grintaInvoke("bring_to_front");
-}
-
 export type AppInfo = { base64Image: string; localizedName: string };
 export type ExtInfo = { base64Image: string; extension: string };
 
@@ -126,8 +122,7 @@ type GrintaInvokeCommand =
 	| "search_spotlight_apps"
 	| "set_vibrancy"
 	| "load_app_info"
-	| "toggle_visibility"
-	| "bring_to_front";
+	| "toggle_visibility";
 
 function grintaInvoke<T>(
 	cmd: GrintaInvokeCommand,

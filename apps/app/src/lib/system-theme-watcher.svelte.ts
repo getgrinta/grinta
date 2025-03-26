@@ -1,4 +1,3 @@
-import { useEventListener } from "runed";
 import { settingsStore } from "./store/settings.svelte";
 
 const THEME_QUERY = "(prefers-color-scheme: dark)";
@@ -12,6 +11,9 @@ type Theme = keyof typeof THEME;
 
 export class SystemThemeWatcher {
 	systemTheme = $state<Theme>();
+	themeChangeInterval = $state<number | NodeJS.Timeout>();
+	media = $derived(window.matchMedia(THEME_QUERY));
+
 	theme = $derived(
 		settingsStore.data.theme === "SYSTEM"
 			? (this.systemTheme ?? "DARK")
@@ -19,21 +21,22 @@ export class SystemThemeWatcher {
 	);
 
 	constructor() {
-		this.setInitialSystemTheme();
-		useEventListener(
-			() => window.matchMedia(THEME_QUERY),
-			"change",
-			this.handleSystemThemeChange,
-		);
+		this.getSystemTheme();
 	}
 
-	setInitialSystemTheme() {
-		this.systemTheme = window?.matchMedia?.(THEME_QUERY)?.matches
-			? THEME.DARK
-			: THEME.LIGHT;
+	getSystemTheme() {
+		this.systemTheme = this.media.matches ? THEME.DARK : THEME.LIGHT;
 	}
 
-	handleSystemThemeChange(event: MediaQueryListEvent) {
-		this.systemTheme = event.matches ? THEME.DARK : THEME.LIGHT;
+	addEventListner() {
+		this.themeChangeInterval = setInterval(() => {
+			this.getSystemTheme();
+		}, 1000);
+	}
+
+	removeEventListner() {
+		clearInterval(this.themeChangeInterval);
 	}
 }
+
+export const systemThemeWatcher = new SystemThemeWatcher();
