@@ -53,7 +53,7 @@
 				class="btn-sm rounded-full text-primary"
 				onclick={toggleState}
 			>
-				<span>⌘I</span>
+				<span>⌘L</span>
 				<span>{$_("notes.askAi")}</span>
 			</PrimaryButton>
 		{:else}

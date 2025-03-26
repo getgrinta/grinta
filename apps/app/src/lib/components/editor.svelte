@@ -71,7 +71,7 @@
 					"Mod-k"() {
 						return goto(`/commands/${BAR_MODE.MENU}`);
 					},
-					"Mod-i"() {
+					"Mod-l"() {
 						// Safely access editor
 						const currentEditor = editor;
 						if (!currentEditor) return false;
