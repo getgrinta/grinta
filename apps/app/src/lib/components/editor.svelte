@@ -321,7 +321,7 @@
 	<FloatingMenu bind:this={floatingMenu} {editor} {onStartGenerating} {onStopGenerating} />
 </div>
 <div bind:this={bubbleMenuTooltip}>
-	<BubbleMenu {editor} />
+	<BubbleMenu {editor} {onStartGenerating} {onStopGenerating} />
 </div>
 <div class="prose" bind:this={element}></div>
 
