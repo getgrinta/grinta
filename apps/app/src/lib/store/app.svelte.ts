@@ -5,11 +5,13 @@ import {
 	type Window,
 	getCurrentWindow,
 	currentMonitor,
+	PhysicalSize,
 } from "@tauri-apps/api/window";
 import type { Session, User } from "better-auth";
 import { z } from "zod";
 import { getAuthClient } from "../auth";
 import { fail, getApiClient } from "../utils.svelte";
+import monitor from "lucide-svelte/icons/monitor";
 
 export const BAR_MODE = {
 	INITIAL: "INITIAL",
@@ -96,9 +98,11 @@ export class AppStore {
 	async positionWindow() {
 		const monitor = await currentMonitor();
 		if (!monitor) return;
+		
 		const size = monitor.size.toLogical(monitor.scaleFactor);
+		let physicalSize = new PhysicalSize(0, 44);
 		return this.appWindow?.setPosition(
-			new LogicalPosition(size.width / 2 - 400, 44),
+			new LogicalPosition(size.width / 2 - 400, physicalSize.toLogical(monitor.scaleFactor).height),
 		);
 	}
 }
