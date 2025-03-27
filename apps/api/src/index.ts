@@ -37,4 +37,7 @@ export type AppType = typeof app;
 export type { ContentType } from "./routers/ai.router.js";
 export type { SanitizedSubscription } from "./utils/schema.utils.js";
 
-export default app;
+export default {
+	port: 3000,
+	fetch: app.fetch
+}
