@@ -65,6 +65,9 @@
 				},
 				{
 					"url": "https://*.getgrinta.com"
+				},
+				{
+					"url": "http://localhost:3000"
 				}
 			]
 		},

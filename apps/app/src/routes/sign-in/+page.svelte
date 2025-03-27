@@ -9,7 +9,7 @@
 	import { ZodError, z } from "zod";
 	import { _ } from "$lib/i18n";
 	import PrimaryButton from "$lib/components/primary-button.svelte";
-    import { onMount } from "svelte";
+	import { onMount } from "svelte";
 
 	const SignInSchema = z.object({
 		email: z.string().email(),
@@ -48,7 +48,7 @@
 
 			if (timeLeft === 0) {
 				otpCodeExpiryTime = null;
-				mode = 'sendCode';
+				mode = "sendCode";
 				interactionDisabled = false;
 				progress = 0;
 			}
@@ -84,12 +84,11 @@
 
 			if (mode === "sendCode") {
 				const data = SignInSchema.parse(values);
-				const { error } = await authClient.emailOtp.sendVerificationOtp(
-					{
+				const { error, data: response } =
+					await authClient.emailOtp.sendVerificationOtp({
 						email: data.email,
 						type: "sign-in",
-					},
-				);
+					});
 
 				interactionDisabled = false;
 				if (error) {

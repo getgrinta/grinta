@@ -40,4 +40,4 @@ export type { SanitizedSubscription } from "./utils/schema.utils.js";
 export default {
 	port: 3000,
 	fetch: app.fetch
-}
+};
