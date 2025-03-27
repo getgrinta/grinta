@@ -31,6 +31,14 @@ export const auth = betterAuth({
 					}));
 				}
 
+				// Check if the email contains a plus sign in the username part
+				if (/^[^+]*\+/.test(email.split('@')[0])) {
+					return Promise.reject(new APIError('FORBIDDEN', {
+						message: "Plus signs are not allowed in the username part of the email address",
+						code: "PLUS_SIGN_NOT_ALLOWED",
+					}));
+				}
+
 				// Proceed with normal flow
 				await sendOtp({ to: email, code: otp });
 			},
