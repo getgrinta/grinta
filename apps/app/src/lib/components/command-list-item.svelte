@@ -19,6 +19,9 @@ import { PressedKeys } from "runed";
 
 const props = $props();
 
+const pressedKeys = new PressedKeys();
+const isCmdPressed = pressedKeys.has("Meta");
+
 type GetHelperProps = {
 	value: string;
 	handler: CommandHandler;
@@ -51,9 +54,6 @@ function getCommandTypeLabel({ value, handler, metadata }: GetHelperProps) {
 		)
 		.otherwise(() => value);
 }
-
-const pressedKeys = new PressedKeys();
-const isCmdPressed = $derived(pressedKeys.has("Meta"));
 
 const currentLabel = $derived(props.item.localizedLabel ?? props.item.label);
 

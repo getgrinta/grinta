@@ -10,7 +10,7 @@ type Action = {
 const { actions } = $props<{ actions: Action[] }>();
 
 const pressedKeys = new PressedKeys();
-const isCmdPressed = $derived(pressedKeys.has("Meta"));
+const isCmdPressed = pressedKeys.has("Meta");
 </script>
 
 <div class="flex pointer-events-auto">

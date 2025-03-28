@@ -22,7 +22,7 @@ const { items } = $props<{ items: Item[] }>();
         <button
             type="button"
             class={clsx(
-                "btn join-item border-1 !border-base-300/30 bg-base-100",
+                "btn btn-sm join-item",
                 item.active && "btn-primary"
             )}
             data-hotkey={item.hotkey}

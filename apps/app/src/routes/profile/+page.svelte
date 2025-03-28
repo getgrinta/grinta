@@ -1,7 +1,6 @@
 <script lang="ts">
 import { goto } from "$app/navigation";
 import { getAuthClient } from "$lib/auth";
-import PrimaryButton from "$lib/components/primary-button.svelte";
 import TopBar from "$lib/components/top-bar.svelte";
 import { appStore } from "$lib/store/app.svelte";
 import { fail } from "$lib/utils.svelte";
@@ -11,9 +10,8 @@ import { _ } from "$lib/i18n";
 
 type ViewState = "idle" | "subscribing";
 
-let viewState = $state<ViewState>("idle");
 let subscribingModalRef = $state<HTMLDialogElement>();
-let subscriptionCheckInterval = $state<number | Timer>();
+let subscriptionCheckInterval = $state<number | NodeJS.Timer>();
 const authClient = getAuthClient();
 
 function setViewState(newViewState: ViewState) {

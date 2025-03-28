@@ -8,15 +8,15 @@ import { type ExtendedNote, notesStore } from "$lib/store/notes.svelte";
 import { BaseDirectory, type UnwatchFn, watch } from "@tauri-apps/plugin-fs";
 import clsx from "clsx";
 import { MoreVerticalIcon } from "lucide-svelte";
-import { marked } from "marked";
 import { PressedKeys } from "runed";
 import { onMount } from "svelte";
 import { _ } from "svelte-i18n";
 import { toast } from "svelte-sonner";
 
-// Initialize state
-
 const pressedKeys = new PressedKeys();
+const isCmdPressed = pressedKeys.has("Meta");
+
+// Initialize state
 
 const filename = $derived(decodeURIComponent(page.params.name));
 let deleteConfirmationMode = $state(false);
@@ -127,8 +127,6 @@ async function deleteNote() {
 	toast.success($_("notes.noteDeleted"));
 	return goto(`/commands/${BAR_MODE.NOTES}`);
 }
-
-const isCmdPressed = $derived(pressedKeys.has("Meta"));
 
 async function setupNoteWatcher() {
 	await fetchNote();

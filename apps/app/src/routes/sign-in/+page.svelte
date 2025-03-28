@@ -81,10 +81,11 @@ const { form } = createForm({
 
 		if (mode === "sendCode") {
 			const data = SignInSchema.parse(values);
-			const { error } = await authClient.emailOtp.sendVerificationOtp({
-				email: data.email,
-				type: "sign-in",
-			});
+			const { error, data: response } =
+				await authClient.emailOtp.sendVerificationOtp({
+					email: data.email,
+					type: "sign-in",
+				});
 
 			interactionDisabled = false;
 			if (error) {
@@ -140,51 +141,52 @@ const { form } = createForm({
 	},
 });
 </script>
-
-<div class="flex flex-1 flex-col">
-	<TopBar>
-		<h1 slot="input" class="text-lg font-semibold flex-1">{header}</h1>
-		<a href="https://getgrinta.com/guides" slot="addon" target="_blank" rel="noopener noreferrer" class="btn btn-sm">{$_("auth.guides")}</a>
-	</TopBar>
-	<div class="flex flex-col flex-1 mt-12 gap-4 items-center justify-center">
-		<form use:form class="flex flex-col w-full max-w-[28rem] gap-2">
-			<p
-				>{$_("auth.oneTimePasswordInfo")}</p
-			>
-			<label for="email" class="label"
-				>{$_("auth.email")}</label
-			>
-			<input
-				bind:this={emailField}
-				id="emailField"
-				disabled={mode === "verifyOtp" || interactionDisabled}
-				placeholder={$_("auth.emailPlaceholder")}
-				name="email"
-				class="input w-full"
-			/>
-			{#if mode === "verifyOtp"}
-				<label for="otpField" class="label"
-					>{$_("auth.oneTimeCode")}</label
+	
+	<div class="flex flex-1 flex-col">
+		<TopBar>
+			<h1 slot="input" class="text-lg font-semibold flex-1">{header}</h1>
+			<a href="https://getgrinta.com/guides" slot="addon" target="_blank" rel="noopener noreferrer" class="btn btn-sm">{$_("auth.help")}</a>
+		</TopBar>
+		<div class="flex flex-col flex-1 mt-12 gap-4 items-center justify-center">
+			<form use:form class="flex flex-col w-full max-w-[28rem] gap-2">
+				<p
+					>{$_("auth.oneTimePasswordInfo")}</p
+				>
+				<label for="email" class="label"
+					>{$_("auth.email")}</label
 				>
 				<input
-					bind:this={otpField}
-					id="otpField"
-					name="otp"
-					class="input input-lg w-full"
+					bind:this={emailField}
+					id="emailField"
+					disabled={mode === "verifyOtp" || interactionDisabled}
+					placeholder={$_("auth.emailPlaceholder")}
+					name="email"
+					class="input w-full"
 				/>
-				<div class="flex items-center">
-					<progress
-						class="m-auto progress accent progress-primary w-[95%] mt-2"
-						value={progress}
-						max="100"
-					></progress>
-				</div>
-			{/if}
-			<button
-				type="submit"
-				disabled={interactionDisabled}
-				class="btn">{buttonLabel}</button
-			>
-		</form>
+				{#if mode === "verifyOtp"}
+					<label for="otpField" class="label"
+						>{$_("auth.oneTimeCode")}</label
+					>
+					<input
+						bind:this={otpField}
+						id="otpField"
+						name="otp"
+						class="input input-lg w-full"
+					/>
+					<div class="flex items-center">
+						<progress
+							class="m-auto progress accent progress-primary w-[95%] mt-2"
+							value={progress}
+							max="100"
+						></progress>
+					</div>
+				{/if}
+				<button
+					type="submit"
+					disabled={interactionDisabled}
+					class="btn">{buttonLabel}</button
+				>
+			</form>
+		</div>
 	</div>
-</div>
+	

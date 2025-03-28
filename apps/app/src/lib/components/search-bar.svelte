@@ -10,7 +10,6 @@ import { BAR_MODE, type BarMode, appStore } from "$lib/store/app.svelte";
 import { commandsStore } from "$lib/store/commands.svelte";
 import { notesStore } from "$lib/store/notes.svelte";
 import { settingsStore } from "$lib/store/settings.svelte";
-import { ColorModeValue } from "$lib/utils.svelte";
 import { listen } from "@tauri-apps/api/event";
 import { clsx } from "clsx";
 import { createForm } from "felte";
@@ -23,21 +22,21 @@ import {
 	SearchIcon,
 	StickyNoteIcon,
 } from "lucide-svelte";
-import { PressedKeys } from "runed";
 import { watch } from "runed";
 import { _ } from "svelte-i18n";
 import { match } from "ts-pattern";
+import { PressedKeys } from "runed";
+
+const pressedKeys = new PressedKeys();
+const isCmdPressed = pressedKeys.has("Meta");
 
 let queryInput: HTMLInputElement;
-const pressedKeys = new PressedKeys();
 
 const INDICATOR_MODES = [
 	{ value: BAR_MODE.INITIAL, icon: GrintaIcon, shortcut: "⌘1" },
 	{ value: BAR_MODE.NOTES, icon: AiNoteIcon, shortcut: "⌘2" },
 	{ value: BAR_MODE.MENU, icon: MenuIcon, shortcut: "⌘K" },
 ];
-
-const isCmdPressed = $derived(pressedKeys.has("Meta"));
 
 const { form } = createForm({
 	async onSubmit() {

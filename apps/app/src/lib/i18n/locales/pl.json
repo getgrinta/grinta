@@ -58,7 +58,8 @@
 		"emailPlaceholder": "Adres E-Mail",
 		"checkEmailForCode": "Sprawdź swoją skrzynkę e-mail, aby znaleźć kod jednorazowy.",
 		"invalidCode": "Nieprawidłowy kod. Sprawdź kod wysłany na Twój adres e-mail.",
-		"invalidEmail": "Nieprawidłowy adres e-mail"
+		"invalidEmail": "Nieprawidłowy adres e-mail",
+		"help": "Pomoc"
 	},
 	"notes": {
 		"placeholder": "Nazwa notatki",

@@ -12,7 +12,8 @@
 		"emailPlaceholder": "E-Mail-Adresse",
 		"checkEmailForCode": "Bitte überprüfen Sie Ihren E-Mail-Posteingang für den Einmalcode.",
 		"invalidCode": "Ungültiger Code. Bitte überprüfen Sie den an Ihre E-Mail gesendeten Code.",
-		"invalidEmail": "Ungültige E-Mail-Adresse"
+		"invalidEmail": "Ungültige E-Mail-Adresse",
+		"help": "Hilfe"
 	},
 	"profile": {
 		"title": "Profil",

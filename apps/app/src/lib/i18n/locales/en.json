@@ -12,7 +12,8 @@
 		"emailPlaceholder": "E-mail Address",
 		"checkEmailForCode": "Please check your email inbox for the one-time code.",
 		"invalidCode": "Invalid code. Please verify the code sent to your e-mail.",
-		"invalidEmail": "Invalid email address"
+		"invalidEmail": "Invalid email address",
+		"help": "Help"
 	},
 	"profile": {
 		"title": "Profile",
