@@ -1,26 +1,29 @@
 <script lang="ts">
-	import { PressedKeys } from "runed";
-	import FlatButton from "./flat-button.svelte";
+import { PressedKeys } from "runed";
 
-	type Action = {
-		label: string;
-		onclick: () => void;
-		shortcut?: string;
-	};
+type Action = {
+	label: string;
+	onclick: () => void;
+	shortcut?: string;
+};
 
-	const { actions } = $props<{ actions: Action[] }>();
+const { actions } = $props<{ actions: Action[] }>();
 
-	const pressedKeys = new PressedKeys();
-	const isCmdPressed = $derived(pressedKeys.has("Meta"));
+const pressedKeys = new PressedKeys();
+const isCmdPressed = $derived(pressedKeys.has("Meta"));
 </script>
 
 <div class="flex pointer-events-auto">
 	{#each actions as action}
-		<FlatButton
-			text={action.label}
-			onClick={action.onclick}
-			showShortcut={isCmdPressed}
-			shortcut={action.shortcut}
-		/>
+		<button
+			type="button"
+			class="btn"
+			onclick={action.onclick}
+		>
+			<span>{action.label}</span>
+			{#if action.shortcut && isCmdPressed}
+				<span class="text-sm">{action.shortcut}</span>
+			{/if}
+		</button>
 	{/each}
 </div>

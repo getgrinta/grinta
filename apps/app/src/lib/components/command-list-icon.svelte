@@ -1,75 +1,74 @@
 <script lang="ts">
-    import { type AppMetadataStore } from "$lib/store/app-metadata.svelte";
-    import type { ExecutableCommand } from "$lib/store/commands.svelte";
-    import { getIcon } from "$lib/utils.svelte";
-    import { watch } from "runed";
+import { appMetadataStore } from "$lib/store/app-metadata.svelte";
+import type { ExecutableCommand } from "$lib/store/commands.svelte";
+import { getIcon } from "$lib/utils.svelte";
+import clsx from "clsx";
+import { watch } from "runed";
 
-    const props: {
-        item: ExecutableCommand;
-        appMetadataStore: AppMetadataStore;
-        label: string;
-    } = $props();
+const {
+	item,
+	label,
+	size = 32,
+} = $props<{
+	item: ExecutableCommand;
+	label: string;
+	size?: number;
+}>();
 
-    const ext = $derived(props.item.label.split(".").pop() ?? "");
-    function loadCommandIcon(command: ExecutableCommand) {
-        if (!command.path) return;
+const ext = $derived(item.label.split(".").pop() ?? "");
+function loadCommandIcon(command: ExecutableCommand) {
+	if (!command.path) return;
 
-        props.appMetadataStore.getIconAsync(command);
-    }
+	appMetadataStore.getIconAsync(command);
+}
 
-    watch(
-        () => [props.item.path],
-        () => {
-            let needsLoading = false;
+watch(
+	() => [item.path],
+	() => {
+		let needsLoading = false;
 
-            if (
-                props.item.handler === "APP" &&
-                !props.appMetadataStore.appInfo[props.item.label]
-            ) {
-                needsLoading = true;
-            }
+		if (item.handler === "APP" && !appMetadataStore.appInfo[item.label]) {
+			needsLoading = true;
+		}
 
-            if (
-                props.item.handler === "FS_ITEM" &&
-                !props.appMetadataStore.extInfo[props.item.label]
-            ) {
-                needsLoading = true;
-            }
+		if (item.handler === "FS_ITEM" && !appMetadataStore.extInfo[ext]) {
+			needsLoading = true;
+		}
 
-            if (needsLoading) {
-                loadCommandIcon(props.item);
-            }
-        },
-    );
+		if (needsLoading) {
+			loadCommandIcon(item);
+		}
+	},
+);
 </script>
 
-{#if props.item.metadata?.contentType === "public.folder"}
+{#if item.metadata?.contentType === "public.folder"}
     <img
-        src={props.appMetadataStore.extInfo["folder"]?.base64Image}
-        alt={props.label}
-        width="32"
-        height="32"
-        class="w-8 h-8 object-contain"
+        src={appMetadataStore.extInfo["folder"]?.base64Image}
+        alt={label}
+        width={size}
+        height={size}
+        class={clsx("object-contain")}
     />
-{:else if props.appMetadataStore.appInfo[props.item.label]}
+{:else if appMetadataStore.appInfo[item.label]?.base64Image}
     <img
-        src={props.appMetadataStore.appInfo[props.item.label]?.base64Image}
-        alt={props.label}
-        width="32"
-        height="32"
-        class="w-8 h-8 object-contain"
+        src={appMetadataStore.appInfo[item.label]?.base64Image}
+        alt={label}
+        width={size}
+        height={size}
+        class={clsx("object-contain")}
     />
-{:else if props.appMetadataStore.extInfo[ext]}
+{:else if appMetadataStore.extInfo[ext]?.base64Image}
     <img
-        src={props.appMetadataStore.extInfo[ext]?.base64Image}
-        alt={props.label}
-        width="32"
-        height="32"
-        class="w-8 h-8 object-contain"
+        src={appMetadataStore.extInfo[ext]?.base64Image}
+        alt={label}
+        width={size}
+        height={size}
+        class={clsx("object-contain")}
     />
 {:else}
-    {@const IconComponent = getIcon(props.item)}
-    <div class="flex items-center justify-center w-8 h-8">
-        <IconComponent size={24} />
+    {@const IconComponent = getIcon(item)}
+    <div class={clsx("flex items-center justify-center")}>
+        <IconComponent size={size - 4} />
     </div>
 {/if}

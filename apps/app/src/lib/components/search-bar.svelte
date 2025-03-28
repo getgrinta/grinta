@@ -2,7 +2,6 @@
 import { goto } from "$app/navigation";
 import AiNoteIcon from "$lib/assets/ai-note.svelte";
 import GrintaIcon from "$lib/assets/grinta.svelte";
-import SearchBarAccessoryButton from "$lib/components/search-bar-accessory-button.svelte";
 import SegmentedControl from "$lib/components/segmented-control.svelte";
 import TopBar from "$lib/components/top-bar.svelte";
 import { toggleVisibility } from "$lib/grinta-invoke";
@@ -202,39 +201,40 @@ const indicatorButton = $derived(
 				? {
 						icon: EyeOffIcon,
 						onClick: () => settingsStore.toggleIncognito(),
+						active: true,
 						hotkey: "Mod+p",
 					}
 				: {
 						icon: EyeIcon,
 						onClick: () => settingsStore.toggleIncognito(),
+						active: false,
 						hotkey: "Mod+p",
 					},
 		)
 		.otherwise(() => ({
 			icon: ChevronLeftIcon,
 			onClick: () => goto("/commands/INITIAL"),
+			active: false,
 			hotkey: "Mod+p",
 		})),
 );
-
-const indicatorIconClass = new ColorModeValue("text-zinc-500", "");
 </script>
 
 <form use:form>
-	<TopBar fancyMode={settingsStore.data.incognitoEnabled}>
+	<TopBar>
 		<div slot="indicator">
-			<SearchBarAccessoryButton
-				onClick={indicatorButton.onClick}
-				hotkey={indicatorButton.hotkey}
+			<button 
+				type="button"
+				class={clsx("btn btn-sm", indicatorButton.active && "btn-primary")}
+				onclick={indicatorButton.onClick}
 			>
 				<indicatorButton.icon
 					size={16}
 					class={clsx(
-						indicatorIconClass.value,
 						"pointer-events-none",
 					)}
 				/>
-			</SearchBarAccessoryButton>
+			</button>
 		</div>
 		<input
 			bind:this={queryInput}
@@ -259,6 +259,7 @@ const indicatorIconClass = new ColorModeValue("text-zinc-500", "");
 					testId: `search-bar-mode-${mode.value.toLowerCase()}`,
 					onClick: () => switchMode(mode.value),
 				}))}
+				hidingLabels
 			/>
 		</div>
 	</TopBar>

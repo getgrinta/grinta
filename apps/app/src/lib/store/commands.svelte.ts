@@ -35,7 +35,7 @@ import { clipboardStore } from "./clipboard.svelte";
 import { type Note, notesStore } from "./notes.svelte";
 import { SecureStore } from "./secure.svelte";
 import { settingsStore } from "./settings.svelte";
-import debounce from 'debounce'
+import debounce from "debounce";
 
 nlp.extend(dates);
 nlp.extend(numbers);
@@ -82,7 +82,9 @@ export const ExecutableCommandSchema = z.object({
 	smartMatch: z.boolean().optional().default(false),
 });
 
-export type ExecutableCommand = z.infer<typeof ExecutableCommandSchema> & { isHistory?: boolean };
+export type ExecutableCommand = z.infer<typeof ExecutableCommandSchema> & {
+	isHistory?: boolean;
+};
 
 export const SYSTEM_COMMAND = {
 	SIGN_IN: "SIGN_IN",
@@ -269,29 +271,33 @@ export class CommandsStore extends SecureStore<Commands> {
 	getMenuItems(): ExecutableCommand[] {
 		const userCommands = appStore?.user
 			? [
-				{
-					label: t("commands.menuItems.profile"),
-					value: SYSTEM_COMMAND.PROFILE,
-					handler: COMMAND_HANDLER.SYSTEM,
-					smartMatch: false,
-				},
-			]
+					{
+						label: t("commands.menuItems.profile"),
+						value: SYSTEM_COMMAND.PROFILE,
+						handler: COMMAND_HANDLER.SYSTEM,
+						smartMatch: false,
+					},
+				]
 			: [
-				{
-					label: t("commands.menuItems.signIn"),
-					value: SYSTEM_COMMAND.SIGN_IN,
-					handler: COMMAND_HANDLER.SYSTEM,
-					smartMatch: false,
-				},
-			];
+					{
+						label: t("commands.menuItems.signIn"),
+						value: SYSTEM_COMMAND.SIGN_IN,
+						handler: COMMAND_HANDLER.SYSTEM,
+						smartMatch: false,
+					},
+				];
 		return [
 			...userCommands,
-			...(settingsStore.data?.clipboardRecordingEnabled ? [{
-				label: t("commands.menuItems.clipboardHistory"),
-				value: SYSTEM_COMMAND.CLIPBOARD,
-				handler: COMMAND_HANDLER.SYSTEM,
-				smartMatch: false,
-			}] : []),
+			...(settingsStore.data?.clipboardRecordingEnabled
+				? [
+						{
+							label: t("commands.menuItems.clipboardHistory"),
+							value: SYSTEM_COMMAND.CLIPBOARD,
+							handler: COMMAND_HANDLER.SYSTEM,
+							smartMatch: false,
+						},
+					]
+				: []),
 			{
 				label: t("commands.menuItems.clearNotes"),
 				value: SYSTEM_COMMAND.CLEAR_NOTES,
@@ -451,15 +457,15 @@ export class CommandsStore extends SecureStore<Commands> {
 				const createNoteCommand =
 					appStore.query.length > 0
 						? [
-							{
-								label: t("commands.actions.createNote", {
-									query: appStore.query,
-								}),
-								value: appStore.query,
-								handler: COMMAND_HANDLER.CREATE_NOTE,
-								smartMatch: false,
-							},
-						]
+								{
+									label: t("commands.actions.createNote", {
+										query: appStore.query,
+									}),
+									value: appStore.query,
+									handler: COMMAND_HANDLER.CREATE_NOTE,
+									smartMatch: false,
+								},
+							]
 						: [];
 
 				await notesStore.fetchNotes();
@@ -471,8 +477,8 @@ export class CommandsStore extends SecureStore<Commands> {
 			appStore.query.length === 0
 				? commands
 				: matchSorter(commands, appStore.query, {
-					keys: ["localizedLabel", "label"],
-				}).sort((a, b) => this.sortCommands({ prev: a, next: b }));
+						keys: ["localizedLabel", "label"],
+					}).sort((a, b) => this.sortCommands({ prev: a, next: b }));
 
 		const formulaCommands = await buildFormulaCommands(appStore.query);
 
@@ -508,10 +514,15 @@ export class CommandsStore extends SecureStore<Commands> {
 		const spotlightToken = generateCancellationToken();
 		this.spotlightSearchToken = spotlightToken;
 
-		const additionalExtensions = settingsStore.data.fsSearchAdditionalExtensions;
+		const additionalExtensions =
+			settingsStore.data.fsSearchAdditionalExtensions;
 		const searchOnlyInHome = settingsStore.data.fsSearchOnlyInHome;
 
-		searchSpotlightApps(appStore.query, additionalExtensions, searchOnlyInHome).then((result) => {
+		searchSpotlightApps(
+			appStore.query,
+			additionalExtensions,
+			searchOnlyInHome,
+		).then((result) => {
 			if (spotlightToken !== this.spotlightSearchToken) {
 				return;
 			}
@@ -647,7 +658,7 @@ export class CommandsStore extends SecureStore<Commands> {
 						return goto("/");
 					})
 					.with(SYSTEM_COMMAND.HELP, async () => {
-						return this.openUrl("https://getgrinta.com/docs");
+						return this.openUrl("https://getgrinta.com/guides");
 					})
 					.with(SYSTEM_COMMAND.SETTINGS, async () => {
 						return goto("/settings");

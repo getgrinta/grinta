@@ -32,7 +32,7 @@
 		}
 	}
 
-	const { content, onUpdate, editable = true, toggleSidebar } = $props();
+	const { content, onUpdate, editable = true, toggleSidebar, onStartGenerating, onStopGenerating } = $props();
 
 	let element = $state<HTMLElement>();
 	let floatingMenuTooltip = $state<HTMLElement>();
@@ -71,7 +71,7 @@
 					"Mod-k"() {
 						return goto(`/commands/${BAR_MODE.MENU}`);
 					},
-					"Mod-i"() {
+					"Mod-l"() {
 						// Safely access editor
 						const currentEditor = editor;
 						if (!currentEditor) return false;
@@ -318,10 +318,10 @@
 </script>
 
 <div bind:this={floatingMenuTooltip}>
-	<FloatingMenu bind:this={floatingMenu} {editor} />
+	<FloatingMenu bind:this={floatingMenu} {editor} {onStartGenerating} {onStopGenerating} />
 </div>
 <div bind:this={bubbleMenuTooltip}>
-	<BubbleMenu {editor} />
+	<BubbleMenu {editor} {onStartGenerating} {onStopGenerating} />
 </div>
 <div class="prose" bind:this={element}></div>
 

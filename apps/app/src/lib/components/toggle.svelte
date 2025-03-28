@@ -1,59 +1,29 @@
 <script lang="ts">
-import { THEME } from "$lib/store/settings.svelte";
-import { systemThemeWatcher } from "$lib/system-theme-watcher.svelte";
-import { ColorModeValue } from "$lib/utils.svelte";
 import clsx from "clsx";
-import { match } from "ts-pattern";
 
-const { items, size = "md" } = $props();
+type Item = {
+	icon?: any;
+	text?: string;
+	shortcut?: string;
+	onClick: () => void;
+	active: boolean;
+	hotkey?: string;
+};
 
-const containerClass = new ColorModeValue(
-	"ring-zinc-300/20",
-	"ring-zinc-900/20",
-);
-
-const buttonClass = new ColorModeValue("border-0", "border-zinc-800");
-const deactivatedClass = new ColorModeValue("text-zinc-500", "text-zinc-100");
+const { items } = $props<{ items: Item[] }>();
 </script>
 
 <div
     class={clsx(
         "join shadow-sm rounded-full overflow-hidden border-0 ring-0 pointer-events-auto",
-        containerClass.value,
     )}
 >
     {#each items as item}
-        {@const buttonActiveClass = (isActive: boolean) => {
-            const background =
-                size === "lg"
-                    ? "bg-base-100"
-                    : isActive
-                      ? "bg-base-300"
-                      : "bg-base-100";
-            const foreground =
-                size === "lg"
-                    ? isActive
-                        ? "text-primary"
-                        : deactivatedClass.value
-                    : isActive
-                      ? "text-primary"
-                      : "text-zinc-500";
-            return match(systemThemeWatcher.theme)
-                .with(THEME.LIGHT, () => (isActive ? foreground : foreground))
-                .with(THEME.DARK, () =>
-                    isActive
-                        ? `border-0 ${background} ${foreground}`
-                        : `${foreground} border-base-800 ${background}`,
-                )
-                .exhaustive();
-        }}
-
         <button
             type="button"
             class={clsx(
-                `btn ${size === "lg" ? "btn-md" : "btn-sm"} join-item border-1 !border-base-300/30 bg-base-100`,
-                buttonClass.value,
-                buttonActiveClass(item.active),
+                "btn join-item border-1 !border-base-300/30 bg-base-100",
+                item.active && "btn-primary"
             )}
             data-hotkey={item.hotkey}
             onclick={() => {
@@ -63,16 +33,16 @@ const deactivatedClass = new ColorModeValue("text-zinc-500", "text-zinc-100");
                 }
 
                 // When active item is clicked, activate the other item (there are only 2 items)
-                const otherItem = items.find((i: any) => i !== item);
+                const otherItem = items.find((i: Item) => i !== item);
                 if (otherItem) {
                     otherItem.onClick();
                 }
             }}
         >
             {#if item.icon}
-                <item.icon size={size === "md" ? 16 : 18} />
+                <item.icon size={16} />
             {/if}
-            {#if item.text && (size === "lg" || item.active || !item.icon)}
+            {#if item.text && (item.active || !item.icon)}
                 <span>{item.text}</span>
             {/if}
             {#if item.shortcut}

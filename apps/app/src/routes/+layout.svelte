@@ -4,7 +4,7 @@ import LocalizedFormat from "dayjs/plugin/localizedFormat";
 import "@fontsource-variable/dm-sans";
 import "../app.css";
 import { afterNavigate, goto } from "$app/navigation";
-import { setVibrancy, toggleVisibility } from "$lib/grinta-invoke";
+import { setVibrancy } from "$lib/grinta-invoke";
 import { locale, setupI18n, _ } from "$lib/i18n";
 import { appMetadataStore } from "$lib/store/app-metadata.svelte";
 import { BAR_MODE, appStore } from "$lib/store/app.svelte";
@@ -199,14 +199,9 @@ $effect(() => {
 const accentLower = $derived(
 	settingsStore?.data?.accentColor?.toLowerCase() ?? "mare",
 );
-const themeLower = $derived(
-	systemThemeWatcher?.theme?.toLowerCase() ?? "light",
-);
-
-const accentColorClass = $derived(`accent-${accentLower}-${themeLower}`);
 
 const themeName = new ColorModeValue("grinta-light", "grinta-dark");
-const bgClass = new ColorModeValue("bg-zinc-50/60", "bg-base-200/80");
+const bgClass = new ColorModeValue("bg-base-100/60", "bg-base-100/80");
 const vibrancyValue = new ColorModeValue<"light" | "dark">("light", "dark");
 
 $effect(() => {
@@ -214,7 +209,6 @@ $effect(() => {
 });
 
 onMount(() => {
-	console.log(">>>IC", PngIconUrl);
 	console.info("[Grinta] Layout Mount");
 	initializeApp();
 	systemThemeWatcher.addEventListner();
@@ -246,18 +240,18 @@ const toasterTheme = new ColorModeValue<"light" | "dark">("light", "dark");
 <main
 	id="mainLayout"
 	class={clsx(
-		"flex-1 flex flex-col",
-		accentColorClass,
+		"flex-1 flex flex-col accent-mare",
 		bgClass.value,
 		widgetsStore.showWidgets && "widgets-visible",
 	)}
 	data-theme={themeName.value}
+	data-accent={accentLower}
 >
 	<button type="button" class="hidden" onclick={openMenu} data-hotkey="Mod+k"
 		>Open Settings</button
 	>
 	{#if initializing}
-		<div class="skeleton w-full h-10"></div>
+		<div class="skeleton w-full h-10 rounded-none"></div>
 	{:else}
 		{@render children?.()}
 	{/if}

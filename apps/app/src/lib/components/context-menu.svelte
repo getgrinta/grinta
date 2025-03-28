@@ -1,5 +1,4 @@
 <script lang="ts">
-import { ColorModeValue } from "$lib/utils.svelte";
 import { listen } from "@tauri-apps/api/event";
 import type { UnlistenFn } from "@tauri-apps/api/event";
 import clsx from "clsx";
@@ -80,11 +79,6 @@ $effect(() => {
 		if (unlistenHide) unlistenHide();
 	};
 });
-
-const contextMenuClass = new ColorModeValue(
-	"bg-base-200",
-	"base-nonsemantic-dark bg-base-200",
-);
 </script>
 
 <svelte:body on:click={onPageClick} />
@@ -92,14 +86,13 @@ const contextMenuClass = new ColorModeValue(
 {#if isVisible}
 	<div
 		class={clsx(
-			"psps overflow-hidden rounded-box p-2 w-[200px] shadow-lg absolute z-50",
-			contextMenuClass.value,
+			"overflow-hidden bg-base-300 rounded-box p-0 w-[200px] shadow-lg absolute z-50",
 		)}
 		style="left: {x}px; top: {y}px;"
 		bind:this={menuElement}
 	>
-		<div class={clsx("overflow-y-auto w-[200px] max-h-[150px]", "-ml-2")}>
-			<ul class={clsx("menu menu-vertical w-full")}>
+		<div class="overflow-y-auto w-[200px] max-h-[150px]">
+			<ul class="menu menu-vertical w-full">
 				{#each items as item}
 					<li class="w-full">
 						<a

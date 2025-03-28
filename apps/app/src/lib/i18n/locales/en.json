@@ -8,7 +8,8 @@
 		"sendOneTimeCode": "Send One-Time Code",
 		"oneTimePasswordInfo": "A one-time password will be sent to your email address",
 		"oneTimeCode": "One-time code",
-		"emailPlaceholder": "E-mail",
+		"email": "E-mail",
+		"emailPlaceholder": "E-mail Address",
 		"checkEmailForCode": "Please check your email inbox for the one-time code.",
 		"invalidCode": "Invalid code. Please verify the code sent to your e-mail.",
 		"invalidEmail": "Invalid email address"
@@ -70,7 +71,9 @@
 		"extension_supported_by_default": "This extension is already supported by default.",
 		"extension_invalid_format": "Extension must contain only letters and numbers.",
 		"clipboardRecordingEnabled": "Record Clipboard History",
-		"language": "Language"
+		"language": "Language",
+		"web": "Web",
+		"file": "File"
 	},
 	"notes": {
 		"placeholder": "Note name",

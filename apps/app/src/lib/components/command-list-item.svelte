@@ -8,9 +8,7 @@ import {
 	type FileMetadataSchema,
 	type CommandHandler,
 } from "$lib/store/commands.svelte";
-import { appMetadataStore } from "$lib/store/app-metadata.svelte";
-import { systemThemeWatcher } from "$lib/system-theme-watcher.svelte";
-import { ColorModeValue, handleContextMenu } from "$lib/utils.svelte";
+import { handleContextMenu } from "$lib/utils.svelte";
 import { highlightText } from "$lib/utils.svelte";
 import { match, P } from "ts-pattern";
 import { _ } from "svelte-i18n";
@@ -59,45 +57,18 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
 
 const currentLabel = $derived(props.item.localizedLabel ?? props.item.label);
 
-const rowClass = new ColorModeValue(
-	"border-1 border-transparent hover:bg-zinc-300/30 color-base-100",
-	"border-1 border-transparent color-base-100",
+const highlightedText = $derived(
+	highlightText(
+		isCmdPressed ? (props.item.path ?? currentLabel) : currentLabel,
+		appStore.query,
+	),
 );
-
-const rowActiveCss = new ColorModeValue(
-	"menu-active !bg-zinc-300/30 color-base-10 border-1 !border-zinc-400/30",
-	"menu-active !bg-base-100/40 !text-primary !border-zinc-600",
-);
-const labelChunkClass = (isHiglighted: boolean) =>
-	new ColorModeValue(
-		isHiglighted
-			? "color-base-100 text-zinc-800"
-			: "color-base-100 text-zinc-800 font-semibold",
-		isHiglighted ? "text-zinc-300" : "text-primary font-semibold",
-	);
-
-const badgeClass = (isHiglighted: boolean) =>
-	new ColorModeValue(
-		isHiglighted
-			? "badge-outline !text-primary !border-primary"
-			: "!bg-zinc-300/50 border-0 badge-soft text-zinc-300",
-		isHiglighted
-			? "badge-outline !text-primary !border-primary"
-			: "badge-soft text-zinc-300",
-	);
-
-const arrowDownLeftClass = new ColorModeValue(
-	"text-zinc-600 hover:!bg-zinc-300/50",
-	"text-zinc-100",
-);
-
-const pathClass = new ColorModeValue("text-zinc-600", "text-zinc-100");
 </script>
 
 <li
 	class={clsx(
-		"!w-[calc(100%-2rem)] mx-4 select-none motion-preset-slide-up",
-		appStore.query.length > 0 && props.item.smartMatch && "border-gradient",
+		"!w-[calc(100%-2rem)] mx-4 select-none",
+		appStore.query.length > 0 && commandsStore.selectedIndex === 0 && props.item.smartMatch && "border-gradient",
 	)}
 	data-command-index={props.index}
 	oncontextmenu={(event) => {
@@ -110,46 +81,35 @@ const pathClass = new ColorModeValue("text-zinc-600", "text-zinc-100");
 >
 	<div
 		class={clsx(
-			"flex justify-between gap-4",
-			rowClass.value,
-			props.active && rowActiveCss,
+			"flex justify-between gap-4 border-2 border-transparent hover:bg-primary/40",
+			props.active && 'menu-active !bg-primary/20 text-primary-content !border-primary-content/50 shadow-none',
 		)}
 	>
 		<button
 			type="button"
 			onclick={() => commandsStore.handleCommand(props.item)}
 			data-testid={`command-list-item.${props.index}`}
-			class="flex flex-1 h-full gap-4 py-[0.75rem] items-center overflow-hidden cursor-pointer"
+			class="flex flex-1 h-full gap-4 py-[0.5rem] items-center cursor-pointer"
 		>
 			<CommandListIcon
 				label={currentLabel}
-				{appMetadataStore}
 				item={props.item}
 			/>
 			<div class="flex flex-col align-left">
 				<h2
-					class={clsx("flex-1 flex text-left truncate max-w-[34rem]")}
+					class={clsx("flex-1 flex text-left font-semibold truncate max-w-[34rem]")}
 				>
-					{#if appStore.query.length > 0}
-						{#each highlightText(currentLabel, appStore.query) as chunk}
-							<span class={clsx(labelChunkClass(chunk.highlight).value)}>
-								{chunk.text}
-							</span>
-						{/each}
-					{:else}
-						<span class="flex-1 truncate">{currentLabel}</span>
-					{/if}
+					{#each highlightedText as chunk}
+						{@const last = chunk === highlightedText[highlightedText.length - 1]}
+						<span class={clsx(chunk.highlight ? "text-base-content" : "text-primary-content", last && "truncate", props.active && "!text-primary-content")}>
+							{chunk.text}
+						</span>
+					{/each}
 				</h2>
-
-				<div class={clsx("text-xs text-left", pathClass.value, "text-xs")}>
-					{#if isCmdPressed && props.item.path}
-						{props.item.path}
-					{/if}
-				</div>
 			</div>
 		</button>
 		<div class="flex gap-1 items-center">
-			<span class={clsx("badge", badgeClass(props.active).value)}>
+			<span class={clsx("badge badge-lg border-none bg-transparent border-primary-content/50 font-semibold", props.active && "badge-primary !text-primary-content !border-primary-content/50")}>
 				{getCommandTypeLabel({
 					value: props.item.value,
 					handler: props.item.handler,
@@ -160,7 +120,6 @@ const pathClass = new ColorModeValue("text-zinc-600", "text-zinc-100");
 				type="button"
 				class={clsx(
 					"btn btn-square btn-ghost btn-sm !border-0 p-[1px]",
-					arrowDownLeftClass.value,
 				)}
 				onclick={() => appStore.setQuery(currentLabel)}
 			>

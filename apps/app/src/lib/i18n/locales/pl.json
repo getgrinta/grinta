@@ -45,19 +45,17 @@
 		"extension_invalid_format": "Rozszerzenie może zawierać tylko litery i cyfry.",
 		"clipboardRecordingEnabled": "Rejestruj historię schowka",
 		"language": "Język",
-		"languages": {
-			"en": "Angielski",
-			"pl": "Polski",
-			"de": "Niemiecki"
-		}
+		"web": "Sieć",
+		"file": "Pliki"
 	},
 	"auth": {
 		"signIn": "Zaloguj się",
 		"verifyCode": "Zweryfikuj kod",
 		"sendOneTimeCode": "Wyślij kod jednorazowy",
-		"oneTimePasswordInfo": "Kod jednorazowy zostanie wysłany na Twój adres e-mail",
+		"oneTimePasswordInfo": "Kod jednorazowy zostanie wysłany na Twój adres e-mail.",
 		"oneTimeCode": "Kod jednorazowy",
-		"emailPlaceholder": "E-mail",
+		"email": "E-mail",
+		"emailPlaceholder": "Adres E-Mail",
 		"checkEmailForCode": "Sprawdź swoją skrzynkę e-mail, aby znaleźć kod jednorazowy.",
 		"invalidCode": "Nieprawidłowy kod. Sprawdź kod wysłany na Twój adres e-mail.",
 		"invalidEmail": "Nieprawidłowy adres e-mail"

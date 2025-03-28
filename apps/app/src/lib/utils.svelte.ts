@@ -53,7 +53,7 @@ export function highlightText(
 ): HighlightSegment[] {
 	// When no search term is provided, return the full text as a single non-highlighted segment
 	if (!search) {
-		return [{ text, highlight: false }];
+		return [{ text, highlight: true }];
 	}
 
 	// Create a regular expression with a capturing group for the search term (case insensitive)
@@ -61,13 +61,15 @@ export function highlightText(
 	// Split the text while preserving the search term in the returned array parts
 	const parts = text.split(regex);
 
+	const filteredParts = parts.filter((part) => part !== "");
+
+	console.log(filteredParts);
+
 	// Map each part to an object indicating if it matches the search term (ignoring case)
-	return parts
-		.filter((part) => part !== "") // Remove empty strings if any
-		.map((part) => ({
-			text: part,
-			highlight: part.toLowerCase() === search.toLowerCase(),
-		}));
+	return filteredParts.map((part) => ({
+		text: part,
+		highlight: part.toLowerCase() === search.toLowerCase(),
+	}));
 }
 
 export async function activateWindow() {

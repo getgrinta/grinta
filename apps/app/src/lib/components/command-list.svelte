@@ -1,19 +1,19 @@
 <script lang="ts">
-	import { commandsStore } from "$lib/store/commands.svelte";
-	import { clickListener } from "$lib/utils.svelte";
-	import { _ } from "svelte-i18n";
-	import { VList } from "virtua/svelte";
-	import CommandListContextMenu from "./command-list-context-menu.svelte";
-	import CommandListItem from "./command-list-item.svelte";
+import { commandsStore } from "$lib/store/commands.svelte";
+import { clickListener } from "$lib/utils.svelte";
+import { _ } from "svelte-i18n";
+import { VList } from "virtua/svelte";
+import CommandListContextMenu from "./command-list-context-menu.svelte";
+import CommandListItem from "./command-list-item.svelte";
 
-	let contextMenu = $state<CommandListContextMenu>();
+let contextMenu = $state<CommandListContextMenu>();
 
-	function handleListScroll(offset: number) {
-		commandsStore.scrollTop = offset;
-	}
+function handleListScroll(offset: number) {
+	commandsStore.scrollTop = offset;
+}
 
-	// Hide context menu when clicking outside
-	$effect(clickListener);
+// Hide context menu when clicking outside
+$effect(clickListener);
 </script>
 
 <CommandListContextMenu bind:this={contextMenu} />
