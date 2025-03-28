@@ -1,5 +1,6 @@
 <script lang="ts">
 import clsx from "clsx";
+import { PressedKeys } from "runed";
 
 type Item = {
 	icon?: any;
@@ -11,6 +12,9 @@ type Item = {
 };
 
 const { items } = $props<{ items: Item[] }>();
+
+const pressedKeys = new PressedKeys();
+const isCmdPressed = $derived(pressedKeys.has("Meta"));
 </script>
 
 <div
@@ -45,7 +49,7 @@ const { items } = $props<{ items: Item[] }>();
             {#if item.text && (item.active || !item.icon)}
                 <span>{item.text}</span>
             {/if}
-            {#if item.shortcut}
+            {#if item.shortcut && isCmdPressed && !item.active}
                 <span>{item.shortcut}</span>
             {/if}
         </button>

@@ -12,6 +12,7 @@ const items = $derived([
 			appStore.searchMode = SEARCH_MODE.WEB;
 		},
 		active: appStore.searchMode === SEARCH_MODE.WEB,
+		shortcut: "⌘J",
 	},
 	{
 		icon: SparklesIcon,
@@ -20,6 +21,7 @@ const items = $derived([
 			appStore.searchMode = SEARCH_MODE.AI;
 		},
 		active: appStore.searchMode === SEARCH_MODE.AI,
+		shortcut: "⌘J",
 	},
 ]);
 

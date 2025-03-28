@@ -9,10 +9,12 @@ const {
 	item,
 	label,
 	size = 32,
+	active = false,
 } = $props<{
 	item: ExecutableCommand;
 	label: string;
 	size?: number;
+	active?: boolean;
 }>();
 
 const ext = $derived(item.label.split(".").pop() ?? "");
@@ -68,7 +70,7 @@ watch(
     />
 {:else}
     {@const IconComponent = getIcon(item)}
-    <div class={clsx("flex items-center justify-center")}>
+    <div class={clsx("flex items-center justify-center", active && "!text-primary-content")}>
         <IconComponent size={size - 4} />
     </div>
 {/if}

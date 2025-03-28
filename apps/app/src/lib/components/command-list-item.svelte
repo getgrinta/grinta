@@ -20,7 +20,7 @@ import { PressedKeys } from "runed";
 const props = $props();
 
 const pressedKeys = new PressedKeys();
-const isCmdPressed = pressedKeys.has("Meta");
+const isCmdPressed = $derived(pressedKeys.has("Meta"));
 
 type GetHelperProps = {
 	value: string;
@@ -94,6 +94,7 @@ const highlightedText = $derived(
 			<CommandListIcon
 				label={currentLabel}
 				item={props.item}
+				active={props.active}
 			/>
 			<div class="flex flex-col align-left">
 				<h2
@@ -119,7 +120,7 @@ const highlightedText = $derived(
 			<button
 				type="button"
 				class={clsx(
-					"btn btn-square btn-ghost btn-sm !border-0 p-[1px]",
+					"btn btn-square btn-ghost btn-sm btn-primary !border-0 p-[1px]", props.active && "text-primary-content",
 				)}
 				onclick={() => appStore.setQuery(currentLabel)}
 			>

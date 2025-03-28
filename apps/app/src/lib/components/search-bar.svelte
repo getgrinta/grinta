@@ -25,10 +25,6 @@ import {
 import { watch } from "runed";
 import { _ } from "svelte-i18n";
 import { match } from "ts-pattern";
-import { PressedKeys } from "runed";
-
-const pressedKeys = new PressedKeys();
-const isCmdPressed = pressedKeys.has("Meta");
 
 let queryInput: HTMLInputElement;
 
@@ -254,7 +250,7 @@ const indicatorButton = $derived(
 					text: $_(`barMode.${mode.value.toLowerCase()}`),
 					icon: mode.icon,
 					active: mode.value === appStore.barMode,
-					shortcut: isCmdPressed ? mode.shortcut : undefined,
+					shortcut: mode.shortcut,
 					testId: `search-bar-mode-${mode.value.toLowerCase()}`,
 					onClick: () => switchMode(mode.value),
 				}))}

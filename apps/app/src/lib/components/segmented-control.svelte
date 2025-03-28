@@ -1,5 +1,9 @@
 <script lang="ts">
 import clsx from "clsx";
+import { PressedKeys } from "runed";
+
+const pressedKeys = new PressedKeys();
+const isCmdPressed = $derived(pressedKeys.has("Meta"));
 
 type Item = {
 	text?: string;
@@ -39,7 +43,7 @@ const { items, hidingLabels = false } = $props<{
             {#if item.text && item.active || !hidingLabels}
                 <span>{item.text}</span>
             {/if}
-            {#if item.shortcut}
+            {#if item.shortcut && isCmdPressed && !item.active}
                 <span>{item.shortcut}</span>
             {/if}
         </button>

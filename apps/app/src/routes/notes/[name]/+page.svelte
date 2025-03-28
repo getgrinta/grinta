@@ -14,7 +14,7 @@ import { _ } from "svelte-i18n";
 import { toast } from "svelte-sonner";
 
 const pressedKeys = new PressedKeys();
-const isCmdPressed = pressedKeys.has("Meta");
+const isCmdPressed = $derived(pressedKeys.has("Meta"));
 
 // Initialize state
 
