@@ -74,6 +74,7 @@
 		"superjson": "2.2.2",
 		"svelte-i18n": "4.0.1",
 		"svelte-sonner": "0.3.28",
+		"tauri-plugin-macos-permissions-api": "^2.2.0",
 		"ts-pattern": "5.6.2",
 		"turndown": "7.2.0",
 		"virtua": "^0.40.3",

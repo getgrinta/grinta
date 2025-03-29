@@ -20,7 +20,8 @@
 		"tabs": {
 			"general": "Ogólne",
 			"search": "Wyszukiwanie",
-			"pro": "Pro"
+			"pro": "Pro",
+			"permissions": "Uprawnienia"
 		},
 		"fields": {
 			"shortcut": "Skrót",
@@ -38,7 +39,12 @@
 			"recordShortcut": "Naciśnij, aby zapisać",
 			"baseCurrency": "Waluta bazowa",
 			"fsSearchOnlyInHome": "Szukaj tylko w katalogu domowym",
-			"additional_extensions": "Dodatkowe rozszerzenia"
+			"additional_extensions": "Dodatkowe rozszerzenia",
+			"accessibilityPermissions": "Uprawnienia dostępności",
+			"requestAccessibilityPermissions": "Zapytaj o uprawnienia dostępności",
+			"fsPermissions": "Uprawnienia systemu plików",
+			"requestFsPermissions": "Zapytaj o uprawnienia systemu plików",
+			"granted": "Zezwolono"
 		},
 		"extension_already_added": "To rozszerzenie jest już dodane.",
 		"extension_supported_by_default": "To rozszerzenie jest obsługiwane domyślnie.",

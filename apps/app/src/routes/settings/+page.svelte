@@ -19,17 +19,26 @@ import packageJson from "../../../package.json" with { type: "json" };
 import { SUPPORTED_FILE_INDEXING_FILE_EXTENSIONS } from "$lib/grinta-invoke";
 import { toast } from "svelte-sonner";
 import { clipboardStore } from "$lib/store/clipboard.svelte";
+import {
+	requestAccessibilityPermission,
+	requestFullDiskAccessPermission,
+} from "tauri-plugin-macos-permissions-api";
 
 const pressedKeys = new PressedKeys();
 
 const baseTabs = [
 	{ label: $_("settings.tabs.general"), value: "general", hotkey: "⌘1" },
 	{ label: $_("settings.tabs.search"), value: "search", hotkey: "⌘2" },
+	{
+		label: $_("settings.tabs.permissions"),
+		value: "permissions",
+		hotkey: "⌘3",
+	},
 ];
 
 const proTabs = [
 	...baseTabs,
-	{ label: $_("settings.tabs.pro"), value: "pro", hotkey: "⌘3" },
+	{ label: $_("settings.tabs.pro"), value: "pro", hotkey: "⌘4" },
 ];
 
 const tabs = $derived(appStore.subscriptions.length > 0 ? proTabs : baseTabs);
@@ -87,11 +96,25 @@ async function wipeLocalData() {
 	return goto("/");
 }
 
+async function requestAccessibilityPermissions() {
+	await requestAccessibilityPermission();
+	await settingsStore.syncPermissions();
+}
+
+async function requestFsPermissions() {
+	await requestFullDiskAccessPermission();
+	await settingsStore.syncPermissions();
+}
+
 $effect(() => {
 	if (!recordingShortcut) return;
 	const newShortcut = pressedKeys.all;
 	if (newShortcut.length <= newToggleShortcut.length) return;
 	newToggleShortcut = newShortcut;
+});
+
+$effect(() => {
+	settingsStore.syncPermissions();
 });
 
 $effect(() => {
@@ -400,6 +423,30 @@ function addExtension(e?: Event) {
 						bind:checked={settingsStore.data.proAutocompleteEnabled}
 						class="toggle toggle-lg"
 					/>
+				</form>
+			{:else if currentTab === "permissions"}
+				<form
+					class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center"
+				>
+					<label class="text-sm"
+						>{$_("settings.fields.accessibilityPermissions")}</label
+					>
+					<button
+						class="btn"
+						disabled={settingsStore.data.accessibilityPermissions}
+						onclick={requestAccessibilityPermissions}
+					>
+						{settingsStore.data.accessibilityPermissions ? $_("settings.fields.granted") : $_("settings.fields.requestAccessibilityPermissions")}
+					</button>
+					<label class="text-sm"
+						>{$_("settings.fields.fsPermissions")}</label
+					>
+					<button
+						class="btn"
+						disabled={settingsStore.data.fsPermissions}
+						onclick={requestFsPermissions}
+					>{settingsStore.data.fsPermissions ? $_("settings.fields.granted") : $_("settings.fields.requestFsPermissions")}</button
+					>
 				</form>
 			{/if}
 		</div>

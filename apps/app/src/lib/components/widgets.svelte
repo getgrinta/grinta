@@ -37,7 +37,7 @@ $effect(clickListener);
                 <button
                     type="button"
                     class={clsx(
-                        "btn",
+                        "btn !shadow-none",
                         first && "ml-4",
                         last && "mr-4",
                     )}

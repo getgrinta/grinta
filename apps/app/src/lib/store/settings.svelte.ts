@@ -11,6 +11,14 @@ import { SEARCH_MODE, appStore } from "./app.svelte";
 import { commandsStore } from "./commands.svelte";
 import { notesStore } from "./notes.svelte";
 import { SecureStore } from "./secure.svelte";
+import {
+	focusOnWindow,
+	getLastFocusedWindowName,
+} from "$lib/system.utils.svelte";
+import {
+	checkAccessibilityPermission,
+	checkFullDiskAccessPermission,
+} from "tauri-plugin-macos-permissions-api";
 
 export const THEME = {
 	SYSTEM: "SYSTEM",
@@ -30,12 +38,13 @@ export const SEARCH_ENGINE_STYLED = {
 	[SEARCH_ENGINE.STARTPAGE]: "Startpage",
 	[SEARCH_ENGINE.GOOGLE]: "Google",
 	[SEARCH_ENGINE.DUCKDUCKGO]: "DuckDuckGo",
-} as const
+} as const;
 
 export const ACCENT_COLOR = {
 	MARE: "MARE",
 	IRIS: "IRIS",
 	FOAM: "FOAM",
+	ATOM: "ATOM",
 } as const;
 
 export type AccentColor = keyof typeof ACCENT_COLOR;
@@ -61,7 +70,7 @@ export const LANGUAGE_NATIVE_NAME = {
 	[LANGUAGE.EN]: "English",
 	[LANGUAGE.PL]: "Polski",
 	[LANGUAGE.DE]: "Deutsch",
-} as const
+} as const;
 
 export const BASE_CURRENCY = {
 	EUR: "EUR",
@@ -101,6 +110,8 @@ export const SettingsSchema = z.object({
 	baseCurrency: z.nativeEnum(BASE_CURRENCY).default(BASE_CURRENCY.USD),
 	fsSearchOnlyInHome: z.boolean().default(false),
 	fsSearchAdditionalExtensions: z.array(z.string()).default([]),
+	accessibilityPermissions: z.boolean().default(false),
+	fsPermissions: z.boolean().default(false),
 });
 
 export type Settings = z.infer<typeof SettingsSchema>;
@@ -110,17 +121,28 @@ async function toggleShortcutHandler(event: ShortcutEvent) {
 	if (event.state !== "Pressed") return;
 	const visible = await appStore.appWindow.isVisible();
 	if (!visible) {
+		appStore.setLastFocusedWindowName(await getLastFocusedWindowName());
 		await activateWindow();
 		const searchBar = document.getElementById("search-bar");
 		return searchBar?.focus();
 	}
-	return appStore.appWindow.hide();
+	if (appStore.lastFocusedWindowName) {
+		await focusOnWindow(appStore.lastFocusedWindowName);
+	}
+	return appStore.appWindow?.hide();
 }
 
 export class SettingsStore extends SecureStore<Settings> {
 	async initialize() {
 		await this.restore();
+		await this.syncPermissions();
 		await this.registerShortcuts();
+	}
+
+	async syncPermissions() {
+		const accessibilityPermissions = await checkAccessibilityPermission();
+		const fsPermissions = await checkFullDiskAccessPermission();
+		this.updateData({ accessibilityPermissions, fsPermissions });
 	}
 
 	async registerShortcuts() {
@@ -139,14 +161,16 @@ export class SettingsStore extends SecureStore<Settings> {
 		this.updateData({ onboardingCompleted: true });
 	}
 
-    setFsSearchAdditionalExtensions(fsSearchAdditionalExtensions: string[]) {
-        this.updateData({ fsSearchAdditionalExtensions });
-    }
+	setFsSearchAdditionalExtensions(fsSearchAdditionalExtensions: string[]) {
+		this.updateData({ fsSearchAdditionalExtensions });
+	}
 
-    removeFsSearchExtension(extension: string) {
-        const updatedExtensions = this.data.fsSearchAdditionalExtensions.filter(ext => ext !== extension);
-        this.updateData({ fsSearchAdditionalExtensions: updatedExtensions });
-    }
+	removeFsSearchExtension(extension: string) {
+		const updatedExtensions = this.data.fsSearchAdditionalExtensions.filter(
+			(ext) => ext !== extension,
+		);
+		this.updateData({ fsSearchAdditionalExtensions: updatedExtensions });
+	}
 
 	async setToggleShortcut(toggleShortcut: string) {
 		await this.unregisterShortcuts();

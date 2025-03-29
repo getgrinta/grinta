@@ -1,0 +1,12 @@
+---
+// eslint-disable-next-line
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+---
+
+<StarlightPage frontmatter={{ title: 'Your subscription was cancelled', template: 'splash' }}>
+    <p class="max-w-[48rem]">Your subscription was cancelled. We are sorry to hear that you are no longer satisfied with our service. We value your feedback and hope to improve our service to better meet your needs.</p>
+    <p>Please take a moment to share your feedback with us.</p>
+    <a href="https://forms.gle/28JA44kwFeNG7YmX9" target="_blank" class="btn btn-primary mt-4">Share Feedback</a>
+    <p class="mt-8">You can still use Grinta for free, but you will lose access to the Pro features on the next billing cycle end.</p>
+    <p>In case you have any questions or need further assistance, please don't hesitate to contact us at <a href="mailto:team@getgrinta.com">team@getgrinta.com</a>.</p>
+</StarlightPage>

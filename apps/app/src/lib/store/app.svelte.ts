@@ -35,6 +35,7 @@ export class AppStore {
 	barMode = $state<BarMode>(BAR_MODE.INITIAL);
 	searchMode = $state<SearchMode>(SEARCH_MODE.WEB);
 	appWindow = $state<Window>();
+	lastFocusedWindowName = $state<string>();
 	session = $state<Session>();
 	user = $state<User>();
 	subscriptions = $state<SanitizedSubscription[]>([]);
@@ -92,6 +93,10 @@ export class AppStore {
 
 	clearQuery() {
 		return this.setQuery("");
+	}
+
+	setLastFocusedWindowName(name: string) {
+		this.lastFocusedWindowName = name;
 	}
 
 	async positionWindow() {

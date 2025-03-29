@@ -63,12 +63,18 @@ const highlightedText = $derived(
 		appStore.query,
 	),
 );
+
+const smartMatch = $derived(
+	appStore.query.length > 0 &&
+		commandsStore.selectedIndex === 0 &&
+		props.item.smartMatch,
+);
 </script>
 
 <li
 	class={clsx(
 		"!w-[calc(100%-2rem)] mx-4 select-none",
-		appStore.query.length > 0 && commandsStore.selectedIndex === 0 && props.item.smartMatch && "border-gradient",
+		smartMatch && "border-gradient",
 	)}
 	data-command-index={props.index}
 	oncontextmenu={(event) => {
@@ -81,8 +87,8 @@ const highlightedText = $derived(
 >
 	<div
 		class={clsx(
-			"flex justify-between gap-4 border-2 border-transparent hover:bg-primary/40",
-			props.active && 'menu-active !bg-primary/20 text-primary-content !border-primary-content/50 shadow-none',
+			"flex justify-between gap-4 border border-transparent hover:bg-primary/40 !shadow-none",
+			props.active && 'menu-active !bg-primary/50 text-primary-content !border-primary-content/20',
 		)}
 	>
 		<button

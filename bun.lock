@@ -101,6 +101,7 @@
         "superjson": "2.2.2",
         "svelte-i18n": "4.0.1",
         "svelte-sonner": "0.3.28",
+        "tauri-plugin-macos-permissions-api": "^2.2.0",
         "ts-pattern": "5.6.2",
         "turndown": "7.2.0",
         "virtua": "^0.40.3",
@@ -1845,6 +1846,8 @@
     "tailwindcss-motion": ["tailwindcss-motion@1.1.0", "", { "peerDependencies": { "tailwindcss": ">=3.0.0 || insiders" } }, "sha512-0lK6rA4+367ffJdi1TtB72GlMCxJi2TP/xRiHc6An5pZSlU6WfIHhSvLxpcGilGZfBrOqc2q4woH1DEP/lCNbQ=="],
 
     "tapable": ["tapable@2.2.1", "", {}, "sha512-GNzQvQTOIP6RyTfE2Qxb8ZVlNmw0n88vp1szwWRimP02mnTsx3Wtn5qRdqY9w2XduFNUgvOwhNnQsjwCp+kqaQ=="],
+
+    "tauri-plugin-macos-permissions-api": ["tauri-plugin-macos-permissions-api@2.2.0", "", { "dependencies": { "@tauri-apps/api": "^2.1.1" } }, "sha512-pgcBqtUMucSColUJ/HcLOBOr+Z+sma2o0nAuobG1uSGBwFJXwltGKE4XsYynktzfzyTpha/xwta2eLezH+EqLg=="],
 
     "thenify": ["thenify@3.3.1", "", { "dependencies": { "any-promise": "^1.0.0" } }, "sha512-RVZSIV5IG10Hk3enotrhvz0T9em6cyHBLkH/YAZuKqd8hRkKhSfCGIcP2KUY0EPxndzANBmNllzWPwak+bheSw=="],
 

@@ -43,8 +43,8 @@ function goBack() {
 async function upgradeToPro() {
 	const { data, error } = await authClient.subscription.upgrade({
 		plan: "pro",
-		successUrl: "/profile",
-		cancelUrl: "/profile",
+		successUrl: "https://getgrinta.com/success",
+		cancelUrl: "https://getgrinta.com/",
 		uiMode: "hosted",
 		disableRedirect: true,
 	});
@@ -58,7 +58,7 @@ async function upgradeToPro() {
 
 async function cancelSubscription() {
 	const { data, error } = await authClient.subscription.cancel({
-		returnUrl: "/account",
+		returnUrl: "https://getgrinta.com/cancelled",
 		uiMode: "hosted",
 		disableRedirect: true,
 	});

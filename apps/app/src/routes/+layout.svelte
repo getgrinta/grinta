@@ -13,7 +13,7 @@ import { commandsStore } from "$lib/store/commands.svelte";
 import { settingsStore } from "$lib/store/settings.svelte";
 import { vaultStore } from "$lib/store/vault.svelte";
 import { widgetsStore } from "$lib/store/widgets.svelte";
-import { systemThemeWatcher } from "$lib/system-theme-watcher.svelte";
+import { systemThemeWatcher } from "$lib/system.utils.svelte";
 import { installHotkeys, ColorModeValue } from "$lib/utils.svelte";
 import { Menu } from "@tauri-apps/api/menu";
 import { TrayIcon } from "@tauri-apps/api/tray";

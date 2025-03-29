@@ -78,6 +78,7 @@
 		"updater:default",
 		"process:default",
 		"core:app:allow-default-window-icon",
-		"deep-link:default"
+		"deep-link:default",
+		"macos-permissions:default"
 	]
 }

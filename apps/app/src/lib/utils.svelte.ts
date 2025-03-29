@@ -4,6 +4,7 @@ import { install } from "@github/hotkey";
 import { type UnlistenFn, emit, listen } from "@tauri-apps/api/event";
 import { readDir } from "@tauri-apps/plugin-fs";
 import { fetch } from "@tauri-apps/plugin-http";
+// biome-ignore lint/suspicious/noShadowRestrictedNames: just do it
 import AggregateError from "aggregate-error";
 import { hc } from "hono/client";
 import {
@@ -23,7 +24,7 @@ import {
 	type ExecutableCommand,
 } from "./store/commands.svelte";
 import { vaultStore } from "./store/vault.svelte";
-import { systemThemeWatcher } from "./system-theme-watcher.svelte";
+import { systemThemeWatcher } from "./system.utils.svelte";
 import { THEME } from "./store/settings.svelte";
 
 export async function installHotkeys() {

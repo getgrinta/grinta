@@ -1,0 +1,15 @@
+---
+// eslint-disable-next-line
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+---
+
+<StarlightPage frontmatter={{ title: 'Welcome to Grinta Pro', template: 'splash' }}>
+    <p class="max-w-[48rem]">Thank you for your purchase! The pro plan offers a lot of convenience. Your purchase will help us continue developing and improving Grinta. You can now access all the features of Grinta Pro including:</p>
+    <ul>
+        <li><a href="/pro/notes/">Notes AI</a></li>
+    </ul>
+    <p>Your invoice will be sent to your account's email address automatically.</p>
+    <p>In case you have any questions or need further assistance, please don't hesitate to contact us at <a href="mailto:team@getgrinta.com">team@getgrinta.com</a>.</p>
+    <p>Sit back, relax, and have everything under your Command.</p>
+    <button type="button" class="btn btn-primary">Go back to Grinta</button>
+</StarlightPage>

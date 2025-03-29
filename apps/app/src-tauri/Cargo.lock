@@ -408,6 +408,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "block2"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1d59b4c170e16f0405a2e95aff44432a0d41aa97675f3d52623effe95792a037"
+dependencies = [
+ "objc2 0.6.0",
+]
+
+[[package]]
 name = "blocking"
 version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1744,6 +1753,7 @@ dependencies = [
  "tauri-plugin-fs",
  "tauri-plugin-global-shortcut",
  "tauri-plugin-http",
+ "tauri-plugin-macos-permissions",
  "tauri-plugin-opener",
  "tauri-plugin-positioner",
  "tauri-plugin-process",
@@ -2502,6 +2512,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c41e0c4fef86961ac6d6f8a82609f55f31b05e4fce149ac5710e439df7619ba4"
 
 [[package]]
+name = "macos-accessibility-client"
+version = "0.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "edf7710fbff50c24124331760978fb9086d6de6288dcdb38b25a97f8b1bdebbb"
+dependencies = [
+ "core-foundation 0.9.4",
+ "core-foundation-sys",
+]
+
+[[package]]
 name = "malloc_buf"
 version = "0.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2932,6 +2952,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3a21c6c9014b82c39515db5b396f91645182611c97d24637cf56ac01e5f8d998"
 dependencies = [
  "bitflags 2.6.0",
+ "block2 0.6.0",
+ "libc",
  "objc2 0.6.0",
  "objc2-core-foundation",
 ]
@@ -4764,6 +4786,22 @@ dependencies = [
  "tokio",
  "url",
  "urlpattern",
+]
+
+[[package]]
+name = "tauri-plugin-macos-permissions"
+version = "2.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "94f68ace46ec2ec44e4660056c4a866deccbbabf3317d4a707936dd32c101564"
+dependencies = [
+ "core-graphics 0.24.0",
+ "macos-accessibility-client",
+ "objc2 0.6.0",
+ "objc2-foundation 0.3.0",
+ "serde",
+ "tauri",
+ "tauri-plugin",
+ "thiserror 2.0.7",
 ]
 
 [[package]]

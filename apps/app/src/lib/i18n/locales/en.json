@@ -48,7 +48,8 @@
 		"tabs": {
 			"general": "General",
 			"search": "Search",
-			"pro": "Pro"
+			"pro": "Pro",
+			"permissions": "Permissions"
 		},
 		"fields": {
 			"shortcut": "Shortcut",
@@ -66,7 +67,12 @@
 			"checkForUpdate": "Check for update",
 			"baseCurrency": "Base Currency",
 			"fsSearchOnlyInHome": "Search only in home directory",
-			"additional_extensions": "Additional searchable extensions"
+			"additional_extensions": "Additional searchable extensions",
+			"accessibilityPermissions": "Accessibility Permissions",
+			"requestAccessibilityPermissions": "Request Accessibility Permissions",
+			"fsPermissions": "File System Permissions",
+			"requestFsPermissions": "Request File System Permissions",
+			"granted": "Granted"
 		},
 		"extension_already_added": "This extension is already added.",
 		"extension_supported_by_default": "This extension is already supported by default.",

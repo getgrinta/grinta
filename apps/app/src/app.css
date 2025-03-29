@@ -38,6 +38,17 @@
 	--color-foam-800: oklch(24.91% 0.0203 210.48);
 	--color-foam-900: oklch(0% 0 none);
 	--color-foam-950: oklch(0% 0 none);
+	--color-atom-50: oklch(90.052% 0.04581 41.824);
+	--color-atom-100: oklch(86.874% 0.06297 41.818);
+	--color-atom-200: oklch(80.653% 0.09698 41.296);
+	--color-atom-300: oklch(74.673% 0.13126 41.528);
+	--color-atom-400: oklch(69.237% 0.16598 40.102);
+	--color-atom-500: oklch(64.754% 0.19569 38.377);
+	--color-atom-600: oklch(55.358% 0.17341 37.921);
+	--color-atom-700: oklch(44.217% 0.1357 38.036);
+	--color-atom-800: oklch(32.482% 0.09389 38.828);
+	--color-atom-900: oklch(19.643% 0.04707 44.736);
+	--color-atom-950: oklch(12.046% 0.02291 55.137);
 }
 
 @plugin "daisyui/theme" {
@@ -151,6 +162,19 @@ main[data-accent="foam"] {
 	--color-primary-950: var(--color-foam-950);
 }
 
+main[data-accent="atom"] {
+	--color-primary-50: var(--color-atom-50);
+	--color-primary-100: var(--color-atom-100);
+	--color-primary-200: var(--color-atom-200);
+	--color-primary-300: var(--color-atom-300);
+	--color-primary-400: var(--color-atom-400);
+	--color-primary-600: var(--color-atom-600);
+	--color-primary-700: var(--color-atom-700);
+	--color-primary-800: var(--color-atom-800);
+	--color-primary-900: var(--color-atom-900);
+	--color-primary-950: var(--color-atom-950);
+}
+
 .border-invisible {
 	@apply border-none;
 }
@@ -166,7 +190,23 @@ main[data-accent="foam"] {
 .border-gradient::before {
 	mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
 	mask-composite: exclude;
-	@apply content-[""] absolute inset-0 pointer-events-none rounded-[1.25rem] p-[2px] bg-gradient-to-br from-blue-500 to-indigo-500;
+	@apply content-[""] absolute inset-0 pointer-events-none rounded-[1.25rem] p-[2px];
+}
+
+main[data-accent="mare"] .border-gradient::before {
+	@apply bg-gradient-to-br from-blue-500 to-indigo-500;
+}
+
+main[data-accent="iris"] .border-gradient::before {
+	@apply bg-gradient-to-br from-purple-500 to-indigo-500;
+}
+
+main[data-accent="foam"] .border-gradient::before {
+	@apply bg-gradient-to-br from-teal-500 to-blue-500;
+}
+
+main[data-accent="atom"] .border-gradient::before {
+	@apply bg-gradient-to-br from-orange-500 to-amber-500;
 }
 
 body {
