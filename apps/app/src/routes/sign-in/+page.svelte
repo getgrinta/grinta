@@ -81,11 +81,10 @@ const { form } = createForm({
 
 		if (mode === "sendCode") {
 			const data = SignInSchema.parse(values);
-			const { error, data: response } =
-				await authClient.emailOtp.sendVerificationOtp({
-					email: data.email,
-					type: "sign-in",
-				});
+			const { error } = await authClient.emailOtp.sendVerificationOtp({
+				email: data.email,
+				type: "sign-in",
+			});
 
 			interactionDisabled = false;
 			if (error) {

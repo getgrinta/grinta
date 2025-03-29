@@ -10,6 +10,7 @@ import { _ } from "$lib/i18n";
 
 type ViewState = "idle" | "subscribing";
 
+let viewState = $state<ViewState>("idle");
 let subscribingModalRef = $state<HTMLDialogElement>();
 let subscriptionCheckInterval = $state<number | NodeJS.Timer>();
 const authClient = getAuthClient();
