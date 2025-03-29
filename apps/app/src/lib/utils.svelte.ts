@@ -64,8 +64,6 @@ export function highlightText(
 
 	const filteredParts = parts.filter((part) => part !== "");
 
-	console.log(filteredParts);
-
 	// Map each part to an object indicating if it matches the search term (ignoring case)
 	return filteredParts.map((part) => ({
 		text: part,

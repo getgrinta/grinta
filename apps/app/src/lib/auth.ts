@@ -20,7 +20,6 @@ async function wrappedFetch(
 		},
 	});
 	const authCookie = response.headers.getSetCookie()?.[0];
-	console.log("Auth cookie:", authCookie);
 	if (authCookie) {
 		await vaultStore.setAuthCookie(authCookie);
 	}
