@@ -372,13 +372,6 @@ export class CommandsStore extends SecureStore<Commands> {
 	}
 
 	async buildAppCommands() {
-		// Use spotlight query through rust in the future
-		/*
-		let query = NSMetadataQuery()
-		query.searchScopes = [NSMetadataQueryLocalComputerScope]
-		query.predicate = NSPredicate(format: "kMDItemContentType == 'com.apple.application-bundle'")
-		*/
-
 		const apps = await findApps();
 		this.installedApps = apps;
 		this.appCommands = await buildAppCommands(this.installedApps);

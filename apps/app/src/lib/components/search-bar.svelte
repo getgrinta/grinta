@@ -144,7 +144,9 @@ async function buildAppCommandsAndAppIcons() {
 watch(
 	() => [appStore.query, appStore.searchMode, appStore.barMode],
 	() => {
-		buildCommands();
+		if (appStore.query.trim().length > 0) {
+			buildCommands();
+		}
 	},
 );
 
