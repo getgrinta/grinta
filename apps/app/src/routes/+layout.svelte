@@ -29,6 +29,7 @@ import {
 	type Monitor,
 } from "@tauri-apps/api/window";
 import PngIconUrl from "$lib/assets/tray.png?arraybuffer";
+    import { watch } from "runed";
 const { children } = $props();
 
 dayjs.extend(LocalizedFormat);
@@ -121,12 +122,14 @@ async function initTrayIcon(didFinishOnboarding: boolean) {
 		];
 	}
 
-	const TRAY_ID = "grinta";
-	TrayIcon.getById(TRAY_ID).then(async (trayIcon) => {
-		const menu = await Menu.new({
-			items: menuItems as any,
-		});
+	console.log(menuItems);
 
+	const TRAY_ID = "grinta";
+	const menu = await Menu.new({
+		items: menuItems as any,
+	});
+
+	TrayIcon.getById(TRAY_ID).then((trayIcon) => {
 		if (trayIcon) {
 			trayIcon.setMenu(menu);
 		} else {
@@ -174,7 +177,7 @@ async function initializeApp() {
 	initializing = true;
 	await setupI18n();
 	await vaultStore.initialize();
-	await appStore.fetchSession();
+	// await appStore.fetchSession();
 	await commandsStore.initialize();
 	await settingsStore.initialize();
 	await clipboardStore.initialize();
@@ -191,6 +194,8 @@ async function initializeApp() {
 }
 
 $effect(() => {
+	const _ = settingsStore.data.onboardingCompleted;
+
 	setTimeout(() => {
 		initTrayIcon(settingsStore.data.onboardingCompleted);
 	}, 1000);
