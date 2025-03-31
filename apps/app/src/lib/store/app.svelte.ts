@@ -49,6 +49,11 @@ export class AppStore {
 		this.user = user;
 	}
 
+	clearSessionData() {
+		this.session = undefined;
+		this.user = undefined;
+	}
+
 	async fetchSession() {
 		const apiClient = getApiClient();
 		const authClient = getAuthClient();
@@ -56,6 +61,9 @@ export class AppStore {
 			await authClient.getSession();
 		if (sessionError) {
 			throw fail("Session error", new Error(sessionError.message));
+		}
+		if (!sessionData) {
+			return;
 		}
 		this.setSessionData(sessionData);
 		const { data: profileRequest, error: profileRequestError } = await until(

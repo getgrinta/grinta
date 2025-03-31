@@ -22,7 +22,7 @@ import { exit } from "@tauri-apps/plugin-process";
 import { open } from "@tauri-apps/plugin-shell";
 import { clsx } from "clsx";
 import { onMount } from "svelte";
-import { Toaster } from "svelte-sonner";
+import { toast, Toaster } from "svelte-sonner";
 import {
 	currentMonitor,
 	type PhysicalSize,
@@ -177,7 +177,12 @@ async function initializeApp() {
 	initializing = true;
 	await setupI18n();
 	await vaultStore.initialize();
-	await appStore.fetchSession();
+	try {
+		await appStore.fetchSession();
+	} catch (error) {
+		console.error(error);
+		toast.warning(error.message);
+	}
 	await commandsStore.initialize();
 	await settingsStore.initialize();
 	await clipboardStore.initialize();
