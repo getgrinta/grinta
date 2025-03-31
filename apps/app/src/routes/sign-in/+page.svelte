@@ -94,8 +94,6 @@ const { form } = createForm({
 				throw error;
 			}
 
-			toast.success($_("auth.checkEmailForCode"));
-
 			otpCodeExpiryTime = Date.now() + 5 * 60 * 1000;
 			setMode("verifyOtp");
 
