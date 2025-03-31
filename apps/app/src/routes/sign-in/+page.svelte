@@ -169,11 +169,11 @@ const { form } = createForm({
 						bind:this={otpField}
 						id="otpField"
 						name="otp"
-						class="input input-lg w-full"
+						class="input base-content input-lg w-full"
 					/>
 					<div class="flex items-center">
 						<progress
-							class="m-auto progress accent progress-primary w-[95%] mt-2"
+							class="m-auto progress accent text-primary-content w-[95%] mt-2"
 							value={progress}
 							max="100"
 						></progress>
