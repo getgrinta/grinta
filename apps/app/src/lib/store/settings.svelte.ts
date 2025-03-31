@@ -121,11 +121,14 @@ async function toggleShortcutHandler(event: ShortcutEvent) {
 	if (event.state !== "Pressed") return;
 	const visible = await appStore.appWindow.isVisible();
 	if (!visible) {
-		appStore.setLastFocusedWindowName(await getLastFocusedWindowName());
+		getLastFocusedWindowName().then((name) => {
+			appStore.setLastFocusedWindowName(name);
+		});
 		await activateWindow();
 		const searchBar = document.getElementById("search-bar");
 		return searchBar?.focus();
 	}
+	
 	if (appStore.lastFocusedWindowName) {
 		await focusOnWindow(appStore.lastFocusedWindowName);
 	}
