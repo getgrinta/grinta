@@ -44,7 +44,9 @@
 			"requestAccessibilityPermissions": "Zapytaj o uprawnienia dostępności",
 			"fsPermissions": "Uprawnienia systemu plików",
 			"requestFsPermissions": "Zapytaj o uprawnienia systemu plików",
-			"granted": "Zezwolono"
+			"granted": "Zezwolono",
+			"autostart": "Autostart",
+			"requestAutostart": "Zezwól na autostart"
 		},
 		"extension_already_added": "To rozszerzenie jest już dodane.",
 		"extension_supported_by_default": "To rozszerzenie jest obsługiwane domyślnie.",
