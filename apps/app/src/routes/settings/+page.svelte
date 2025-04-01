@@ -23,6 +23,11 @@ import {
 	requestAccessibilityPermission,
 	requestFullDiskAccessPermission,
 } from "tauri-plugin-macos-permissions-api";
+import {
+	isEnabled as getIsAutostartEnabled,
+	enable as enableAutostart,
+} from "@tauri-apps/plugin-autostart";
+import { onMount } from "svelte";
 
 const pressedKeys = new PressedKeys();
 
@@ -47,6 +52,7 @@ let newToggleShortcut = $state<string[]>([]);
 let recordingShortcut = $state(false);
 let currentTab = $state("general");
 let extensionValue = $state("");
+let isAutostartEnabled = $state(false);
 const themes = Object.keys(THEME);
 const accentColors = Object.keys(ACCENT_COLOR);
 
@@ -106,6 +112,15 @@ async function requestFsPermissions() {
 	await settingsStore.syncPermissions();
 }
 
+async function initialize() {
+	isAutostartEnabled = await getIsAutostartEnabled();
+}
+
+async function requestAutostartPermission() {
+	await enableAutostart();
+	isAutostartEnabled = await getIsAutostartEnabled();
+}
+
 $effect(() => {
 	if (!recordingShortcut) return;
 	const newShortcut = pressedKeys.all;
@@ -142,6 +157,8 @@ watch(
 		}
 	},
 );
+
+onMount(initialize);
 
 const isCmdPressed = $derived(pressedKeys.has("Meta"));
 
@@ -447,6 +464,16 @@ function addExtension(e?: Event) {
 						onclick={requestFsPermissions}
 					>{settingsStore.data.fsPermissions ? $_("settings.fields.granted") : $_("settings.fields.requestFsPermissions")}</button
 					>
+					<label class="text-sm"
+						>{$_("settings.fields.autostart")}</label
+					>
+					<button
+						class="btn"
+						disabled={isAutostartEnabled}
+						onclick={requestAutostartPermission}
+					>
+						{isAutostartEnabled ? $_("settings.fields.granted") : $_("settings.fields.requestAutostart")}
+					</button>
 				</form>
 			{/if}
 		</div>

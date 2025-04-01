@@ -72,7 +72,9 @@
 			"requestAccessibilityPermissions": "Erlaubnis zur Barrierefreiheit beantragen",
 			"fsPermissions": "Dateisystemberechtigungen",
 			"requestFsPermissions": "Dateisystemberechtigungen beantragen",
-			"granted": "Erlaubt"
+			"granted": "Erlaubt",
+			"autostart": "Autostart",
+			"requestAutostart": "Autostart-Erlaubnis anfordern"
 		},
 		"extension_already_added": "Diese Erweiterung wurde bereits hinzugefügt.",
 		"extension_supported_by_default": "Diese Erweiterung wird bereits unterstützt.",

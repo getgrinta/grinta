@@ -36,6 +36,7 @@ import { type Note, notesStore } from "./notes.svelte";
 import { SecureStore } from "./secure.svelte";
 import { settingsStore } from "./settings.svelte";
 import debounce from "debounce";
+import { vaultStore } from "./vault.svelte";
 
 nlp.extend(dates);
 nlp.extend(numbers);
@@ -269,23 +270,24 @@ export class CommandsStore extends SecureStore<Commands> {
 	}
 
 	getMenuItems(): ExecutableCommand[] {
-		const userCommands = appStore?.user
-			? [
-					{
-						label: t("commands.menuItems.profile"),
-						value: SYSTEM_COMMAND.PROFILE,
-						handler: COMMAND_HANDLER.SYSTEM,
-						smartMatch: false,
-					},
-				]
-			: [
-					{
-						label: t("commands.menuItems.signIn"),
-						value: SYSTEM_COMMAND.SIGN_IN,
-						handler: COMMAND_HANDLER.SYSTEM,
-						smartMatch: false,
-					},
-				];
+		const userCommands =
+			vaultStore.data.authCookie?.length > 0
+				? [
+						{
+							label: t("commands.menuItems.profile"),
+							value: SYSTEM_COMMAND.PROFILE,
+							handler: COMMAND_HANDLER.SYSTEM,
+							smartMatch: false,
+						},
+					]
+				: [
+						{
+							label: t("commands.menuItems.signIn"),
+							value: SYSTEM_COMMAND.SIGN_IN,
+							handler: COMMAND_HANDLER.SYSTEM,
+							smartMatch: false,
+						},
+					];
 		return [
 			...userCommands,
 			...(settingsStore.data?.clipboardRecordingEnabled
