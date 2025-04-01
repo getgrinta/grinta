@@ -52,6 +52,10 @@ function scrollElementIntoView(index: number) {
 	});
 }
 
+listen("main_panel_did_resign_key", () => {
+	appStore.setQuery("");
+});
+
 listen("focus", () => {
 	queryInput?.focus();
 

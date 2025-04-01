@@ -127,9 +127,7 @@ async function toggleShortcutHandler(event: ShortcutEvent) {
 	}
 	
 	if (appStore.lastFocusedWindowName) {
-		console.log(appStore.lastFocusedWindowName)
 		await activateAppByName(appStore.lastFocusedWindowName)
-		//await focusOnWindow(appStore.lastFocusedWindowName);
 	}
 	return appStore.appWindow?.hide();
 }

@@ -122,8 +122,6 @@ async function initTrayIcon(didFinishOnboarding: boolean) {
 		];
 	}
 
-	console.log(menuItems);
-
 	const TRAY_ID = "grinta";
 	const menu = await Menu.new({
 		items: menuItems as any,
