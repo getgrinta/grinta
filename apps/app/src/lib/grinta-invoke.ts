@@ -77,6 +77,19 @@ export async function loadAppInfo(
 	});
 }
 
+export async function activateAppByName(name: string): Promise<boolean> {
+	return grintaInvoke("activate_application_by_name", { appName: name });
+}
+
+export async function getLastFocusedWindowName(): Promise<string> {
+	try {
+		return await grintaInvoke("get_frontmost_application_name");
+	} catch (error) {
+		console.error("Failed to get frontmost application name:", error);
+		return "";
+	}
+}
+
 export async function toggleVisibility(): Promise<string> {
 	return grintaInvoke("toggle_visibility");
 }
@@ -122,7 +135,9 @@ type GrintaInvokeCommand =
 	| "search_spotlight_apps"
 	| "set_vibrancy"
 	| "load_app_info"
-	| "toggle_visibility";
+	| "activate_application_by_name"
+	| "toggle_visibility"
+	| "get_frontmost_application_name";
 
 function grintaInvoke<T>(
 	cmd: GrintaInvokeCommand,

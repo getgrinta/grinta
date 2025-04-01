@@ -41,31 +41,3 @@ export class SystemThemeWatcher {
 }
 
 export const systemThemeWatcher = new SystemThemeWatcher();
-
-export async function getLastFocusedWindowName() {
-	const lastApp = await Command.create("osascript", [
-		"-e",
-		'tell application "System Events" to get name of first application process whose frontmost is true',
-	]).execute();
-	// If app name is Electron, it's likely a generic name for an Electron-based app
-	// Try to get the actual app name from the window title
-	const lastAppName = lastApp.stdout.trim();
-	if (lastAppName !== "Electron") return lastAppName;
-	const windowTitle = await Command.create("osascript", [
-		"-e",
-		'tell application "System Events" to get name of front window of first application process whose frontmost is true',
-	]).execute();
-	if (!windowTitle.stderr && windowTitle.stdout.trim()) {
-		return windowTitle.stdout.trim();
-	}
-	return "";
-}
-
-export async function focusOnWindow(windowName: string) {
-	const result = await Command.create("osascript", [
-		"-e",
-		`tell application "${windowName}" to activate`,
-	]).execute();
-	if (result.stderr) throw new Error(result.stderr);
-	return result.stdout;
-}

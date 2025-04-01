@@ -12,13 +12,10 @@ import { commandsStore } from "./commands.svelte";
 import { notesStore } from "./notes.svelte";
 import { SecureStore } from "./secure.svelte";
 import {
-	focusOnWindow,
-	getLastFocusedWindowName,
-} from "$lib/system.utils.svelte";
-import {
 	checkAccessibilityPermission,
 	checkFullDiskAccessPermission,
 } from "tauri-plugin-macos-permissions-api";
+import { activateAppByName, getLastFocusedWindowName } from "$lib/grinta-invoke";
 
 export const THEME = {
 	SYSTEM: "SYSTEM",
@@ -120,17 +117,19 @@ async function toggleShortcutHandler(event: ShortcutEvent) {
 	if (!appStore.appWindow) return;
 	if (event.state !== "Pressed") return;
 	const visible = await appStore.appWindow.isVisible();
+
 	if (!visible) {
-		getLastFocusedWindowName().then((name) => {
-			appStore.setLastFocusedWindowName(name);
-		});
+		const name = await getLastFocusedWindowName();
+		appStore.setLastFocusedWindowName(name);
 		await activateWindow();
 		const searchBar = document.getElementById("search-bar");
 		return searchBar?.focus();
 	}
 	
 	if (appStore.lastFocusedWindowName) {
-		await focusOnWindow(appStore.lastFocusedWindowName);
+		console.log(appStore.lastFocusedWindowName)
+		await activateAppByName(appStore.lastFocusedWindowName)
+		//await focusOnWindow(appStore.lastFocusedWindowName);
 	}
 	return appStore.appWindow?.hide();
 }

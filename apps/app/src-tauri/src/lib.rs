@@ -11,6 +11,7 @@ mod spotlight_utils;
 mod theme_utils;
 mod window;
 mod toggle_visibility;
+mod workspace_utils;
 
 pub const MAIN_WINDOW_LABEL: &str = "main";
 
@@ -89,9 +90,10 @@ pub fn run() {
                 );
             }
 
-            Ok({})
+            Ok(())
         })
         .manage(spotlight_utils::SpotlightState::new())
+        .manage(workspace_utils::WorkspaceState::new())
         .invoke_handler(tauri::generate_handler![
             theme_utils::set_vibrancy,
             theme_utils::set_appearance,
@@ -99,6 +101,8 @@ pub fn run() {
             icns_utils::load_extension_icons,
             spotlight_utils::search_spotlight_apps,
             toggle_visibility::toggle_visibility,
+            workspace_utils::activate_application_by_name,
+            workspace_utils::get_frontmost_application_name,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
