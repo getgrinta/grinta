@@ -7,6 +7,8 @@ import { fail } from "$lib/utils.svelte";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { onMount } from "svelte";
 import { _ } from "$lib/i18n";
+import { vaultStore } from "$lib/store/vault.svelte";
+import { toast } from "svelte-sonner";
 
 let subscribingModalRef = $state<HTMLDialogElement>();
 let subscriptionCheckInterval = $state<number | NodeJS.Timer>();
@@ -25,7 +27,11 @@ function stopSubscriptionCheck() {
 }
 
 async function initialize() {
-	await appStore.fetchSession();
+	try {
+		await appStore.fetchSession();
+	} catch (error) {
+		toast.warning(error.message ?? "Could not fetch the data.");
+	}
 }
 
 function goBack() {
@@ -64,6 +70,7 @@ async function signOut() {
 		throw fail("Sign out error", error);
 	}
 	appStore.clearSessionData();
+	vaultStore.setAuthCookie("");
 	return goto("/commands/MENU");
 }
 
@@ -118,7 +125,7 @@ $effect(() => {
 					>
 				{:else}
 					<button type="button" class="btn" onclick={upgradeToPro}
-						>{$_("profile.upgradeButton")}</button
+						>{$_("profile.upgrade")}</button
 					>
 				{/if}
 			</div>
