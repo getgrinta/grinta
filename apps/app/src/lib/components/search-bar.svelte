@@ -40,18 +40,6 @@ const { form } = createForm({
 	},
 });
 
-function getCommandElement(index: number) {
-	return document.querySelector(`[data-command-index="${index}"]`);
-}
-
-function scrollElementIntoView(index: number) {
-	const element = getCommandElement(index);
-	return element?.scrollIntoView({
-		block: "nearest",
-		behavior: "smooth",
-	});
-}
-
 listen("main_panel_did_resign_key", () => {
 	appStore.setQuery("");
 });
@@ -84,7 +72,6 @@ async function handleNavigation(event: KeyboardEvent) {
 			return;
 		}
 		commandsStore.selectedIndex = commandsStore.selectedIndex + 1;
-		scrollElementIntoView(commandsStore.selectedIndex);
 		return;
 	}
 	if (event.key === "ArrowUp" || (event.key === "k" && event.ctrlKey)) {
@@ -95,7 +82,6 @@ async function handleNavigation(event: KeyboardEvent) {
 			return;
 		}
 		commandsStore.selectedIndex = commandsStore.selectedIndex - 1;
-		scrollElementIntoView(commandsStore.selectedIndex);
 		return;
 	}
 	if (event.key === "Escape") {
@@ -153,9 +139,11 @@ watch(
 );
 
 watch(
-	() => appMetadataStore.appInfo.length,
-	() => {
-		buildAppCommandsAndAppIcons();
+	() => { return Object.keys(appMetadataStore.appInfo).length },
+	(prev, next) => {
+		if (prev != next) {
+			buildAppCommandsAndAppIcons();
+		}
 	},
 );
 

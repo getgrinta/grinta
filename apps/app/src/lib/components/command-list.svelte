@@ -8,10 +8,19 @@ import CommandListItem from "./command-list-item.svelte";
     import { appStore } from "$lib/store/app.svelte";
 
 let contextMenu = $state<CommandListContextMenu>();
+let virtualizer = $state<VList<any>>();
 
 function handleListScroll(offset: number) {
 	commandsStore.scrollTop = offset;
 }
+
+$effect(() => {
+	const selectedIndex = commandsStore.selectedIndex;
+
+	if (selectedIndex >= 0) {
+		virtualizer?.scrollToIndex(selectedIndex, { align: "start" });
+	}
+})
 
 // Hide context menu when clicking outside
 $effect(clickListener);
@@ -24,6 +33,7 @@ $effect(clickListener);
 	class="menu menu-lg flex-1 menu-vertical flex-nowrap overflow-hidden w-full p-0"
 >
 	<VList
+		bind:this={virtualizer}
 		data={commandsStore.commands}
 		style="height: 99vh;padding-top: var(--commands-padding);padding-bottom:1rem;"
 		getKey={(_, i) => i}
