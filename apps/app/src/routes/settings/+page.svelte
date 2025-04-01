@@ -146,12 +146,14 @@ $effect(() => {
 watch(
 	() => $state.snapshot(settingsStore.data),
 	(before, after) => {
+		if (!before || !after) return;
+
 		settingsStore.persist();
 
 		// Clear clipboard history when clipboard recording is disabled
 		if (
-			before?.clipboardRecordingEnabled &&
-			!after?.clipboardRecordingEnabled
+			before.clipboardRecordingEnabled &&
+			!after.clipboardRecordingEnabled
 		) {
 			clipboardStore.clearClipboardHistory();
 		}
