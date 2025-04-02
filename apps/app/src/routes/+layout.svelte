@@ -122,6 +122,19 @@ async function initTrayIcon(didFinishOnboarding: boolean) {
 		];
 	}
 
+	menuItems = [
+		{
+			id: "open",
+			text: $_("commands.menuItems.open"),
+			action() {
+				appStore.appWindow?.show();
+				appStore.appWindow?.setFocus();
+				return Promise.resolve();
+			},
+		},
+		...menuItems,
+	];
+
 	const TRAY_ID = "grinta";
 	const menu = await Menu.new({
 		items: menuItems as any,
