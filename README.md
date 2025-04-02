@@ -7,10 +7,15 @@ Grinta is an open-source, AI-powered, and privacy-focused alternative to MacOS S
 - **Search Mode**: Quickly find installed apps, perform web searches, and more—all from a single search bar.
 - **Shortcuts Integration**: Seamlessly access and execute your existing Shortcuts directly within Grinta.
 - **Notes Mode**: Write notes with the help of an AI copilot. Improve readability with rephrasing tools and open your Grinta notes as Obsidian vaults for enhanced organization.
-- **Formulas and Natural Language Processing (NLP)**: Use the search bar as a calculator or process natural language queries like "What’s 45 days from now?".
+- **Formulas and Natural Language Processing (NLP)**: Use the search bar as a calculator or process natural language queries like "What's 45 days from now?".
 - **Local LLM Support**: Bring your own OpenAI-compatible large language models (LLMs) to Grinta using tools like Ollama or LM Studio.
 - **Customizable Theme**: Choose between a light and dark mode, as well as a variety of color schemes to suit your style.
 - **Keyboard First**: Grinta is designed to be keyboard-centric, ensuring you can easily operate without relying on mouse or touch.
+- **Multi-language Support**: Enjoy Grinta in your preferred language with support for English, Polish, and German translations throughout the interface.
+- **Clipboard History**: Keep track of your clipboard history and quickly access previously copied items.
+- **High-quality App Icons**: Grinta displays crisp, native macOS app icons with preserved transparency for a polished look and feel.
+- **Virtualized Command List**: Smooth scrolling through large lists of commands and search results with optimized performance.
+- **Global Shortcut**: Quickly access Grinta from anywhere with a customizable global keyboard shortcut.
 
 ## Installation
 
