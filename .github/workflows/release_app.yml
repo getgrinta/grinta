@@ -59,7 +59,7 @@ jobs:
           PUBLIC_ENCRYPTION_KEY: ${{ secrets.PUBLIC_ENCRYPTION_KEY }}
         with:
           projectPath: apps/app
-          tauriScript: bunx --bun tauri
+          tauriScript: bun tauri
           tagName: v__VERSION__
           releaseName: 'Grinta v__VERSION__'
           releaseBody: 'See the assets to download this version and install.'
