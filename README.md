@@ -13,9 +13,6 @@ Grinta is an open-source, AI-powered, and privacy-focused alternative to MacOS S
 - **Keyboard First**: Grinta is designed to be keyboard-centric, ensuring you can easily operate without relying on mouse or touch.
 - **Multi-language Support**: Enjoy Grinta in your preferred language with support for English, Polish, and German translations throughout the interface.
 - **Clipboard History**: Keep track of your clipboard history and quickly access previously copied items.
-- **High-quality App Icons**: Grinta displays crisp, native macOS app icons with preserved transparency for a polished look and feel.
-- **Virtualized Command List**: Smooth scrolling through large lists of commands and search results with optimized performance.
-- **Global Shortcut**: Quickly access Grinta from anywhere with a customizable global keyboard shortcut.
 
 ## Installation
 
@@ -25,7 +22,7 @@ Grinta is an open-source, AI-powered, and privacy-focused alternative to MacOS S
 ## Roadmap
 
 - [ ] **GrintaFI**: AI-driven insights for quick access to stock and cryptocurrency data.
-- [ ] **Grinta Pro**: Unlock unlimited AI capabilities and premium features with a subscription plan.
+- [x] **Grinta Pro**: Unlock unlimited AI capabilities and premium features with a subscription plan.
 - [ ] **Grinta iOS**: A mobile version of Grinta for iOS with iCloud or alternative syncing options.
 - [ ] **Multiplatform**: Support for other platforms like Linux and Windows.
 
