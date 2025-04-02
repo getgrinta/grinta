@@ -360,9 +360,7 @@ export class CommandsStore extends SecureStore<Commands> {
 		this.watchForApplicationChanges();
 
 		setInterval(() => {
-			(async () => {
-				await this.buildShortcutCommands();
-			})();
+			this.buildShortcutCommands();
 		}, 10_000);
 	}
 

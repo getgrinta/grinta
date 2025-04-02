@@ -14,7 +14,6 @@ import { fail, getApiClient } from "../utils.svelte";
 import { check as checkUpdate } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
 import { toast } from "svelte-sonner";
-import { _ } from "svelte-i18n";
 
 export const BAR_MODE = {
 	INITIAL: "INITIAL",
@@ -116,7 +115,7 @@ export class AppStore {
 		if (!monitor) return;
 
 		const size = monitor.size.toLogical(monitor.scaleFactor);
-		let physicalSize = new PhysicalSize(0, 88);
+		const physicalSize = new PhysicalSize(0, 88);
 		return this.appWindow?.setPosition(
 			new LogicalPosition(
 				size.width / 2 - 400,

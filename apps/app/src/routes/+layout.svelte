@@ -29,7 +29,6 @@ import {
 	type Monitor,
 } from "@tauri-apps/api/window";
 import PngIconUrl from "$lib/assets/tray.png?arraybuffer";
-import { watch } from "runed";
 const { children } = $props();
 
 dayjs.extend(LocalizedFormat);
@@ -254,7 +253,9 @@ $effect(() => {
 
 onMount(() => {
 	console.info("[Grinta] Layout Mount");
-	initializeApp();
+	initializeApp().catch((error) => {
+		console.error("[Grinta] Initialization Error", error);
+	});
 	systemThemeWatcher.addEventListner();
 	const clipboardIntervalId = setInterval(clipboardSnapshot, 5000);
 	const centerWindowIntervalId = setInterval(centerWindow, 1000);
