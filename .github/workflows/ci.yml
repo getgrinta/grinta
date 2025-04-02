@@ -8,9 +8,12 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Add mask
+      - name: Mask multiline env
         run: |
-          echo "::add-mask::${{ secrets.HIDE_THIS }}" 
+          while read -r line;
+          do
+            echo "::add-mask::${line}"
+          done <<< "${{ secrets.HIDE_THIS }}"
       - name: Check out code
         uses: actions/checkout@v4
       - name: Setup Bun
