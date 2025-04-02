@@ -11,7 +11,7 @@ import { APIError } from "better-auth/api";
 
 const stripeClient = new Stripe(env.STRIPE_SECRET_KEY);
 
-export const auth = betterAuth({
+export const auth: ReturnType<typeof betterAuth> = betterAuth({
 	basePath: "/api/auth",
 	trustedOrigins: ["*"],
 	database: drizzleAdapter(db, {
