@@ -1,213 +1,220 @@
 <script lang="ts">
-import { goto } from "$app/navigation";
-import SegmentedControl from "$lib/components/segmented-control.svelte";
-import TopBar from "$lib/components/top-bar.svelte";
-import { appStore } from "$lib/store/app.svelte";
-import {
-	ACCENT_COLOR,
-	LANGUAGE_NATIVE_NAME,
-	SEARCH_ENGINE,
-	SEARCH_ENGINE_STYLED,
-	THEME,
-	baseCurrencies,
-	settingsStore,
-} from "$lib/store/settings.svelte";
-import humanizeString from "humanize-string";
-import { PressedKeys, watch } from "runed";
-import { _ } from "svelte-i18n";
-import packageJson from "../../../package.json" with { type: "json" };
-import { SUPPORTED_FILE_INDEXING_FILE_EXTENSIONS } from "$lib/grinta-invoke";
-import { toast } from "svelte-sonner";
-import { clipboardStore } from "$lib/store/clipboard.svelte";
-import {
-	requestAccessibilityPermission,
-	requestFullDiskAccessPermission,
-} from "tauri-plugin-macos-permissions-api";
-import {
-	isEnabled as getIsAutostartEnabled,
-	enable as enableAutostart,
-} from "@tauri-apps/plugin-autostart";
-import { onMount } from "svelte";
+	import { goto } from "$app/navigation";
+	import SegmentedControl from "$lib/components/segmented-control.svelte";
+	import TopBar from "$lib/components/top-bar.svelte";
+	import { appStore } from "$lib/store/app.svelte";
+	import {
+		ACCENT_COLOR,
+		LANGUAGE_NATIVE_NAME,
+		SEARCH_ENGINE,
+		SEARCH_ENGINE_STYLED,
+		THEME,
+		baseCurrencies,
+		settingsStore,
+	} from "$lib/store/settings.svelte";
+	import humanizeString from "humanize-string";
+	import { PressedKeys, watch } from "runed";
+	import { _ } from "svelte-i18n";
+	import packageJson from "../../../package.json" with { type: "json" };
+	import { SUPPORTED_FILE_INDEXING_FILE_EXTENSIONS } from "$lib/grinta-invoke";
+	import { toast } from "svelte-sonner";
+	import { clipboardStore } from "$lib/store/clipboard.svelte";
+	import {
+		requestAccessibilityPermission,
+		requestFullDiskAccessPermission,
+	} from "tauri-plugin-macos-permissions-api";
+	import {
+		isEnabled as getIsAutostartEnabled,
+		enable as enableAutostart,
+	} from "@tauri-apps/plugin-autostart";
+	import { onMount } from "svelte";
 
-const pressedKeys = new PressedKeys();
+	const pressedKeys = new PressedKeys();
 
-const baseTabs = [
-	{ label: $_("settings.tabs.general"), value: "general", hotkey: "⌘1" },
-	{ label: $_("settings.tabs.search"), value: "search", hotkey: "⌘2" },
-	{
-		label: $_("settings.tabs.permissions"),
-		value: "permissions",
-		hotkey: "⌘3",
-	},
-];
+	const baseTabs = [
+		{ label: $_("settings.tabs.general"), value: "general", hotkey: "⌘1" },
+		{ label: $_("settings.tabs.search"), value: "search", hotkey: "⌘2" },
+		{
+			label: $_("settings.tabs.permissions"),
+			value: "permissions",
+			hotkey: "⌘3",
+		},
+	];
 
-const proTabs = [
-	...baseTabs,
-	{ label: $_("settings.tabs.pro"), value: "pro", hotkey: "⌘4" },
-];
+	const proTabs = [
+		...baseTabs,
+		{ label: $_("settings.tabs.pro"), value: "pro", hotkey: "⌘4" },
+	];
 
-const tabs = $derived(appStore.subscriptions.length > 0 ? proTabs : baseTabs);
+	const tabs = $derived(
+		appStore.subscriptions.length > 0 ? proTabs : baseTabs,
+	);
 
-let newToggleShortcut = $state<string[]>([]);
-let recordingShortcut = $state(false);
-let currentTab = $state("general");
-let extensionValue = $state("");
-let isAutostartEnabled = $state(false);
-const themes = Object.keys(THEME);
-const accentColors = Object.keys(ACCENT_COLOR);
+	let newToggleShortcut = $state<string[]>([]);
+	let recordingShortcut = $state(false);
+	let currentTab = $state("general");
+	let extensionValue = $state("");
+	let isAutostartEnabled = $state(false);
+	const themes = Object.keys(THEME);
+	const accentColors = Object.keys(ACCENT_COLOR);
 
-function changeTab(tab: string) {
-	currentTab = tab;
-}
+	function changeTab(tab: string) {
+		currentTab = tab;
+	}
 
-function toggleShortcutRecording() {
-	newToggleShortcut = [];
-	recordingShortcut = !recordingShortcut;
-}
+	function toggleShortcutRecording() {
+		newToggleShortcut = [];
+		recordingShortcut = !recordingShortcut;
+	}
 
-const toggleShortcut = $derived(
-	newToggleShortcut.length > 1
-		? newToggleShortcut.join("+")
-		: settingsStore.data.toggleShortcut,
-);
+	const toggleShortcut = $derived(
+		newToggleShortcut.length > 1
+			? newToggleShortcut.join("+")
+			: settingsStore.data.toggleShortcut,
+	);
 
-const recordShortcutLabel = $derived(
-	recordingShortcut
-		? $_("settings.fields.recordShortcut")
-		: $_("settings.fields.changeShortcut"),
-);
+	const recordShortcutLabel = $derived(
+		recordingShortcut
+			? $_("settings.fields.recordShortcut")
+			: $_("settings.fields.changeShortcut"),
+	);
 
-function processShortcut(keys: string[]) {
-	return keys
-		.map((key) => {
-			if (key === "meta") return "CommandOrControl";
-			if (key === "space") return "Space";
-			if (key === " ") return "Space";
-			if (key === "alt") return "Alt";
-			if (key === "shift") return "Shift";
-			return key;
-		})
-		.join("+");
-}
+	function processShortcut(keys: string[]) {
+		return keys
+			.map((key) => {
+				if (key === "meta") return "CommandOrControl";
+				if (key === "space") return "Space";
+				if (key === " ") return "Space";
+				if (key === "alt") return "Alt";
+				if (key === "shift") return "Shift";
+				return key;
+			})
+			.join("+");
+	}
 
-function updateNotesDir(event: Event) {
-	const notesDirSplit = (event.target as HTMLInputElement).value.split("/");
-	return settingsStore.setNotesDir(notesDirSplit);
-}
+	function updateNotesDir(event: Event) {
+		const notesDirSplit = (event.target as HTMLInputElement).value.split(
+			"/",
+		);
+		return settingsStore.setNotesDir(notesDirSplit);
+	}
 
-const notesDirString = $derived(settingsStore.data.notesDir.join("/"));
+	const notesDirString = $derived(settingsStore.data.notesDir.join("/"));
 
-async function wipeLocalData() {
-	await settingsStore.wipeLocalData();
-	return goto("/");
-}
+	async function wipeLocalData() {
+		await settingsStore.wipeLocalData();
+		return goto("/");
+	}
 
-async function requestAccessibilityPermissions() {
-	await requestAccessibilityPermission();
-	await settingsStore.syncPermissions();
-}
+	async function requestAccessibilityPermissions() {
+		await requestAccessibilityPermission();
+		await settingsStore.syncPermissions();
+	}
 
-async function requestFsPermissions() {
-	await requestFullDiskAccessPermission();
-	await settingsStore.syncPermissions();
-}
+	async function requestFsPermissions() {
+		await requestFullDiskAccessPermission();
+		await settingsStore.syncPermissions();
+	}
 
-async function initialize() {
-	isAutostartEnabled = await getIsAutostartEnabled();
-}
+	async function initialize() {
+		isAutostartEnabled = await getIsAutostartEnabled();
+	}
 
-async function requestAutostartPermission() {
-	await enableAutostart();
-	isAutostartEnabled = await getIsAutostartEnabled();
-}
+	async function requestAutostartPermission() {
+		await enableAutostart();
+		isAutostartEnabled = await getIsAutostartEnabled();
+	}
 
-$effect(() => {
-	if (!recordingShortcut) return;
-	const newShortcut = pressedKeys.all;
-	if (newShortcut.length <= newToggleShortcut.length) return;
-	newToggleShortcut = newShortcut;
-});
+	$effect(() => {
+		if (!recordingShortcut) return;
+		const newShortcut = pressedKeys.all;
+		if (newShortcut.length <= newToggleShortcut.length) return;
+		newToggleShortcut = newShortcut;
+	});
 
-$effect(() => {
-	settingsStore.syncPermissions();
-});
+	$effect(() => {
+		settingsStore.syncPermissions();
+	});
 
-$effect(() => {
-	// Save new shortcut when theres a new toggle combo and user lifted up all keys
-	if (!recordingShortcut) return;
-	if (newToggleShortcut.length < 1) return;
-	if (pressedKeys.all.length !== 0) return;
-	const processedShortcut = processShortcut(newToggleShortcut);
-	settingsStore.setToggleShortcut(processedShortcut);
-	settingsStore.persist();
-	toggleShortcutRecording();
-});
-
-watch(
-	() => $state.snapshot(settingsStore.data),
-	(before, after) => {
-		if (!before || !after) return;
-
+	$effect(() => {
+		// Save new shortcut when theres a new toggle combo and user lifted up all keys
+		if (!recordingShortcut) return;
+		if (newToggleShortcut.length < 1) return;
+		if (pressedKeys.all.length !== 0) return;
+		const processedShortcut = processShortcut(newToggleShortcut);
+		settingsStore.setToggleShortcut(processedShortcut);
 		settingsStore.persist();
+		toggleShortcutRecording();
+	});
 
-		// Clear clipboard history when clipboard recording is disabled
-		if (
-			before.clipboardRecordingEnabled &&
-			!after.clipboardRecordingEnabled
-		) {
-			clipboardStore.clearClipboardHistory();
+	watch(
+		() => $state.snapshot(settingsStore.data),
+		(before, after) => {
+			if (!before || !after) return;
+
+			// Clear clipboard history when clipboard recording is disabled
+			if (
+				before.clipboardRecordingEnabled &&
+				!after.clipboardRecordingEnabled
+			) {
+				clipboardStore.clearClipboardHistory();
+				settingsStore.persist();
+			}
+		},
+	);
+
+	onMount(initialize);
+
+	const isCmdPressed = $derived(pressedKeys.has("Meta"));
+
+	const controls = $derived(
+		tabs.map((tab, i) => ({
+			text: $_(tab.label),
+			onClick: () => changeTab(tab.value),
+			active: currentTab === tab.value,
+			shortcut: isCmdPressed ? tab.hotkey : undefined,
+			hotkey: `Mod+${i + 1}`,
+		})),
+	);
+
+	function addExtension(e?: Event) {
+		e?.preventDefault();
+
+		let extension = extensionValue.trim();
+		if (!extension) return;
+		if (!extension.startsWith(".")) {
+			extension = `.${extension}`;
 		}
-	},
-);
 
-onMount(initialize);
+		const extensionRegex = /^\.[a-zA-Z0-9]+$/;
 
-const isCmdPressed = $derived(pressedKeys.has("Meta"));
+		if (!extensionRegex.test(extension)) {
+			toast.error($_("settings.extension_invalid_format"));
+			return;
+		}
 
-const controls = $derived(
-	tabs.map((tab, i) => ({
-		text: $_(tab.label),
-		onClick: () => changeTab(tab.value),
-		active: currentTab === tab.value,
-		shortcut: isCmdPressed ? tab.hotkey : undefined,
-		hotkey: `Mod+${i + 1}`,
-	})),
-);
+		if (
+			settingsStore.data.fsSearchAdditionalExtensions.includes(extension)
+		) {
+			toast.error($_("settings.extension_already_added"));
+			return;
+		}
 
-function addExtension(e?: Event) {
-	e?.preventDefault();
+		if (
+			SUPPORTED_FILE_INDEXING_FILE_EXTENSIONS.includes(
+				`*${extension}` as any,
+			)
+		) {
+			toast.error($_("settings.extension_supported_by_default"));
+			return;
+		}
 
-	let extension = extensionValue.trim();
-	if (!extension) return;
-	if (!extension.startsWith(".")) {
-		extension = `.${extension}`;
+		settingsStore.setFsSearchAdditionalExtensions([
+			...settingsStore.data.fsSearchAdditionalExtensions,
+			extension,
+		]);
+		extensionValue = "";
 	}
-
-	const extensionRegex = /^\.[a-zA-Z0-9]+$/;
-
-	if (!extensionRegex.test(extension)) {
-		toast.error($_("settings.extension_invalid_format"));
-		return;
-	}
-
-	if (settingsStore.data.fsSearchAdditionalExtensions.includes(extension)) {
-		toast.error($_("settings.extension_already_added"));
-		return;
-	}
-
-	if (
-		SUPPORTED_FILE_INDEXING_FILE_EXTENSIONS.includes(`*${extension}` as any)
-	) {
-		toast.error($_("settings.extension_supported_by_default"));
-		return;
-	}
-
-	settingsStore.setFsSearchAdditionalExtensions([
-		...settingsStore.data.fsSearchAdditionalExtensions,
-		extension,
-	]);
-	extensionValue = "";
-}
 </script>
 
 <div class="flex flex-1 flex-col">
@@ -237,8 +244,11 @@ function addExtension(e?: Event) {
 							name="toggleShortcut"
 							value={toggleShortcut}
 						/>
-						<button type="button" id="toggleShortcut" class="btn flex-1" disabled
-							>{toggleShortcut}</button
+						<button
+							type="button"
+							id="toggleShortcut"
+							class="btn flex-1"
+							disabled>{toggleShortcut}</button
 						>
 						<button
 							type="button"
@@ -251,15 +261,14 @@ function addExtension(e?: Event) {
 						>{$_("settings.fields.version")}</label
 					>
 					<div class="flex gap-2 items-center">
-						<button type="button" id="appVersion" class="btn flex-1" disabled
-							>{packageJson.version}</button
-						>
 						<button
 							type="button"
+							id="appVersion"
 							class="btn flex-1"
-							>{$_(
-								"settings.fields.checkForUpdate",
-							)}</button
+							disabled>{packageJson.version}</button
+						>
+						<button type="button" class="btn flex-1"
+							>{$_("settings.fields.checkForUpdate")}</button
 						>
 					</div>
 					<label class="text-sm" for="themeChoice"
@@ -344,7 +353,9 @@ function addExtension(e?: Event) {
 				<form
 					class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center"
 				>
-					<h2 class="font-semibold col-span-2">{$_("settings.web")}</h2>
+					<h2 class="font-semibold col-span-2">
+						{$_("settings.web")}
+					</h2>
 					<label class="text-sm" for="defaultSearchEngineChoice"
 						>{$_("settings.fields.defaultSearchEngine")}</label
 					>
@@ -373,7 +384,9 @@ function addExtension(e?: Event) {
 							<option value={baseCurrency}>{baseCurrency}</option>
 						{/each}
 					</select>
-					<h2 class="font-semibold col-span-2">{$_("settings.file")}</h2>
+					<h2 class="font-semibold col-span-2">
+						{$_("settings.file")}
+					</h2>
 					<label class="text-sm" for="fsSearchOnlyInHomeChoice"
 						>{$_("settings.fields.fsSearchOnlyInHome")}</label
 					>
@@ -390,20 +403,18 @@ function addExtension(e?: Event) {
 					<div>
 						<div class="mb-2 inline-block">
 							{#each settingsStore.data.fsSearchAdditionalExtensions as extension}
-								<div
-								class="badge badge-outline mr-2 mb-2"
-								>
-								{extension}
-								<button
-									type="button"
-									class="btn-ghost cursor-pointer"
-									onclick={(e) => {
-										e.preventDefault();
-										settingsStore.removeFsSearchExtension(
-											extension,
-										);
-									}}>x</button
-								>
+								<div class="badge badge-outline mr-2 mb-2">
+									{extension}
+									<button
+										type="button"
+										class="btn-ghost cursor-pointer"
+										onclick={(e) => {
+											e.preventDefault();
+											settingsStore.removeFsSearchExtension(
+												extension,
+											);
+										}}>x</button
+									>
 								</div>
 							{/each}
 						</div>
@@ -455,7 +466,11 @@ function addExtension(e?: Event) {
 						disabled={settingsStore.data.accessibilityPermissions}
 						onclick={requestAccessibilityPermissions}
 					>
-						{settingsStore.data.accessibilityPermissions ? $_("settings.fields.granted") : $_("settings.fields.requestAccessibilityPermissions")}
+						{settingsStore.data.accessibilityPermissions
+							? $_("settings.fields.granted")
+							: $_(
+									"settings.fields.requestAccessibilityPermissions",
+								)}
 					</button>
 					<label class="text-sm"
 						>{$_("settings.fields.fsPermissions")}</label
@@ -464,7 +479,11 @@ function addExtension(e?: Event) {
 						class="btn"
 						disabled={settingsStore.data.fsPermissions}
 						onclick={requestFsPermissions}
-					>{settingsStore.data.fsPermissions ? $_("settings.fields.granted") : $_("settings.fields.requestFsPermissions")}</button
+						>{settingsStore.data.fsPermissions
+							? $_("settings.fields.granted")
+							: $_(
+									"settings.fields.requestFsPermissions",
+								)}</button
 					>
 					<label class="text-sm"
 						>{$_("settings.fields.autostart")}</label
@@ -474,7 +493,9 @@ function addExtension(e?: Event) {
 						disabled={isAutostartEnabled}
 						onclick={requestAutostartPermission}
 					>
-						{isAutostartEnabled ? $_("settings.fields.granted") : $_("settings.fields.requestAutostart")}
+						{isAutostartEnabled
+							? $_("settings.fields.granted")
+							: $_("settings.fields.requestAutostart")}
 					</button>
 				</form>
 			{/if}
