@@ -56,7 +56,7 @@ $effect(() => {
 	}
 });
 
-async function initTrayIcon(didFinishOnboarding: boolean) {
+async function initTrayIcon(didFinishOnboarding: boolean, isClipboardEnabled = true) {
 	let menuItems = [
 		{
 			id: "help",
@@ -104,7 +104,7 @@ async function initTrayIcon(didFinishOnboarding: boolean) {
 					return goto(`/commands/${BAR_MODE.NOTES}`);
 				},
 			},
-			{
+			...(isClipboardEnabled ? [{
 				id: "clipboard",
 				text: $_("commands.menuItems.clipboardHistory"),
 				action() {
@@ -112,7 +112,7 @@ async function initTrayIcon(didFinishOnboarding: boolean) {
 					appStore.appWindow?.setFocus();
 					return goto(`/commands/${BAR_MODE.CLIPBOARD}`);
 				},
-			},
+			}] : []),
 			{
 				item: "Separator",
 			},
@@ -125,9 +125,25 @@ async function initTrayIcon(didFinishOnboarding: boolean) {
 					return goto("/settings");
 				},
 			},
+			{
+				item: "Separator",
+			},
 			...menuItems,
 		];
 	}
+
+	menuItems = [
+		{
+			id: "open",
+			text: $_("commands.menuItems.open"),
+			action() {
+				appStore.appWindow?.show();
+				appStore.appWindow?.setFocus();
+				return Promise.resolve();
+			},
+		},
+		...menuItems,
+	];
 
 	const TRAY_ID = "grinta";
 	const menu = await Menu.new({
@@ -206,11 +222,12 @@ async function initializeApp() {
 }
 
 $effect(() => {
-	const _ = settingsStore.data.onboardingCompleted;
+	const isOnboardingCompleted = settingsStore.data.onboardingCompleted;
+	const isClipboardEnabled = settingsStore.data.clipboardRecordingEnabled;
 
 	setTimeout(() => {
-		initTrayIcon(settingsStore.data.onboardingCompleted);
-	}, 1000);
+		initTrayIcon(isOnboardingCompleted, isClipboardEnabled);
+	}, 500);
 });
 
 const accentLower = $derived(
