@@ -137,7 +137,8 @@
 			"exit": "Beenden",
 			"signIn": "Anmelden",
 			"profile": "Profil",
-			"clipboardHistory": "Zwischenablage"
+			"clipboardHistory": "Zwischenablage",
+			"checkForUpdates": "Updates prüfen..."
 		},
 		"actions": {
 			"search": "Nach \"{query}\" suchen",

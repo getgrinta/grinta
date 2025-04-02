@@ -3,11 +3,17 @@ on:
   push:
     tags:
       - "v*.*.*"
-permissions:
-  contents: write
 jobs:
   build:
-    runs-on: macos-latest
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: 'macos-latest'
+            args: '--target aarch64-apple-darwin'
+    runs-on: ${{ matrix.platform }}
     steps:
       - name: Mask multiline env
         run: |
@@ -38,23 +44,15 @@ jobs:
           xcode-version: latest-stable
       - name: Install dependenties
         run: bun install
-      - name: Build artifacts
-        run: bun run tauri build --target aarch64-apple-darwin
+      - uses: tauri-apps/tauri-action@v0
         env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-        working-directory: apps/app
-      - name: Get Package Version
-        id: package-version
-        run: echo "version=$(cat package.json | jq -r '.version')" >> $GITHUB_OUTPUT
-        working-directory: apps/app
-      - name: Release
-        uses: softprops/action-gh-release@v2
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: apps/app/src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/grinta_${{ steps.package-version.outputs.version }}_aarch64.dmg
+          projectPath: apps/app
+          tauriScript: bun run
+          tagName: v__VERSION__
+          releaseName: 'Grinta v__VERSION__'
+          releaseBody: 'See the assets to download this version and install.'
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}

@@ -11,6 +11,10 @@ import type { Session, User } from "better-auth";
 import { z } from "zod";
 import { getAuthClient } from "../auth";
 import { fail, getApiClient } from "../utils.svelte";
+import { check as checkUpdate } from "@tauri-apps/plugin-updater";
+import { relaunch } from "@tauri-apps/plugin-process";
+import { toast } from "svelte-sonner";
+import { _ } from "svelte-i18n";
 
 export const BAR_MODE = {
 	INITIAL: "INITIAL",
@@ -119,6 +123,19 @@ export class AppStore {
 				physicalSize.toLogical(monitor.scaleFactor).height,
 			),
 		);
+	}
+
+	async updateApp() {
+		await this.appWindow?.show();
+		try {
+			const update = await checkUpdate();
+			if (!update) return toast.info("No update available.");
+			await update.downloadAndInstall();
+			return relaunch();
+		} catch (error) {
+			console.error(error);
+			toast.error("Failed to update app.");
+		}
 	}
 }
 

@@ -137,7 +137,8 @@
 			"exit": "Exit",
 			"signIn": "Sign In",
 			"profile": "Profile",
-			"clipboardHistory": "Clipboard History"
+			"clipboardHistory": "Clipboard History",
+			"checkForUpdates": "Check for Updates..."
 		},
 		"actions": {
 			"search": "Search for \"{query}\"",

@@ -13,7 +13,9 @@ import humanizeString from "humanize-string";
 import { onMount } from "svelte";
 import { _ } from "svelte-i18n";
 import { enable } from "@tauri-apps/plugin-autostart";
+import { appStore } from "$lib/store/app.svelte";
 
+let finishingOnboarding = $state(false);
 let audio = $state<HTMLAudioElement>();
 
 const ONBOARDING_SHORTCUTS = {
@@ -22,9 +24,12 @@ const ONBOARDING_SHORTCUTS = {
 };
 
 async function finishOnboarding() {
+	finishingOnboarding = true;
 	await requestAccessToUserFolders();
 	await enable();
 	settingsStore.finishOnboarding();
+	finishingOnboarding = false;
+	appStore.appWindow?.show();
 	return goto("/commands/INITIAL");
 }
 
@@ -74,6 +79,6 @@ onMount(() => {
                 {/each}
             </div>
         </div>
-        <button class="btn" onclick={finishOnboarding}>{$_("common.next")}</button>
+        <button class="btn" onclick={finishOnboarding} disabled={finishingOnboarding}>{$_("common.next")}</button>
     </div>
 </div>

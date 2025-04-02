@@ -29,7 +29,7 @@ import {
 	type Monitor,
 } from "@tauri-apps/api/window";
 import PngIconUrl from "$lib/assets/tray.png?arraybuffer";
-    import { watch } from "runed";
+import { watch } from "runed";
 const { children } = $props();
 
 dayjs.extend(LocalizedFormat);
@@ -63,6 +63,13 @@ async function initTrayIcon(didFinishOnboarding: boolean) {
 			text: $_("commands.menuItems.help"),
 			action() {
 				return open("https://getgrinta.com/guides");
+			},
+		},
+		{
+			id: "update",
+			text: $_("commands.menuItems.checkForUpdates"),
+			action() {
+				return appStore.updateApp();
 			},
 		},
 		{
@@ -176,6 +183,8 @@ async function initializeApp() {
 	await setupI18n();
 	await vaultStore.initialize();
 	try {
+		const authCookie = vaultStore.data?.authCookie ?? "";
+		if (authCookie.length === 0) return;
 		await appStore.fetchSession();
 	} catch (error) {
 		console.error(error);
