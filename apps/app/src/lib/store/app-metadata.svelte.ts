@@ -4,6 +4,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { COMMAND_HANDLER, type ExecutableCommand } from "./commands.svelte";
 
 export class AppMetadataStore {
+	loadingState = $state<Record<string, boolean>>({});
 	appInfo = $state<Record<string, AppInfo>>({});
 	extInfo = $state<Record<string, ExtInfo>>({});
 	loading = $state<boolean>(false);
@@ -53,12 +54,14 @@ export class AppMetadataStore {
 		this.loadingApps.add(appName);
 
 		try {
-			const appInfo = await loadAppInfo([`${resourcePath}/Contents/Resources/`]);
-			
-			// Update the store with the new icon
-			this.appInfo = { ...this.appInfo, ...appInfo };
-			
-			return appInfo[appName]?.base64Image || null;
+			loadAppInfo([`${resourcePath}/Contents/Resources/`]).then((appInfo) => {
+				// Update the store with the new icon
+				// Only update keys with new values instead of creating a new object
+				for (const [key, value] of Object.entries(appInfo)) {
+					if (value) this.appInfo[key] = value;
+				}
+			});
+			return null;
 		} catch (error) {
 			console.error(`Error loading icon for ${appName}:`, error);
 			return null;
@@ -103,8 +106,12 @@ export class AppMetadataStore {
 
 	// Get an icon, loading it if necessary
 	async getIconAsync(command: ExecutableCommand): Promise<string | null> {
+		console.log(`Getting icon for ${command.label}`)
 		if (command.handler === COMMAND_HANDLER.APP) {
+			if (this.loadingState[command.label]) return null;
+
 			if (!command.path) return null;
+			this.loadingState[command.label] = true;
 			return this.loadAppIcon(command.label, command.path);
 		}
 		if (command.handler === COMMAND_HANDLER.FS_ITEM) {
@@ -112,7 +119,10 @@ export class AppMetadataStore {
 				return this.loadExtensionIcon("folder");
 			}
 			const extension = command.value.split(".").pop();
+
 			if (extension) {
+				if (this.loadingState[extension]) return null;
+				this.loadingState[extension] = true;
 				return this.loadExtensionIcon(extension);
 			}
 		}

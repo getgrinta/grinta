@@ -18,7 +18,7 @@ const {
 }>();
 
 const ext = $derived(item.label.split(".").pop() ?? "");
-function loadCommandIcon(command: ExecutableCommand) {
+async function loadCommandIcon(command: ExecutableCommand) {
 	if (!command.path) return;
 
 	appMetadataStore.getIconAsync(command);
