@@ -15,7 +15,7 @@ import {
 	checkAccessibilityPermission,
 	checkFullDiskAccessPermission,
 } from "tauri-plugin-macos-permissions-api";
-import { activateAppByName, getLastFocusedWindowName } from "$lib/grinta-invoke";
+import { activateAppByName, getLastFocusedWindowName } from "../grinta-invoke";
 
 export const THEME = {
 	SYSTEM: "SYSTEM",
@@ -125,9 +125,9 @@ async function toggleShortcutHandler(event: ShortcutEvent) {
 		const searchBar = document.getElementById("search-bar");
 		return searchBar?.focus();
 	}
-	
+
 	if (appStore.lastFocusedWindowName) {
-		await activateAppByName(appStore.lastFocusedWindowName)
+		await activateAppByName(appStore.lastFocusedWindowName);
 	}
 	return appStore.appWindow?.hide();
 }

@@ -1,5 +1,5 @@
-use std::sync::{Arc, Mutex};
-use tauri::{command, Runtime, State};
+use std::sync::Mutex;
+use tauri::{command, State};
 
 #[allow(non_snake_case)]
 #[derive(serde::Serialize, serde::Deserialize, Clone, Debug)]
@@ -29,8 +29,8 @@ pub fn activate_application_by_name(
     state: State<'_, WorkspaceState>,
     app_name: String,
 ) -> Result<bool, String> {
-    use cocoa::base::{id, nil, YES};
-    use cocoa::foundation::{NSArray, NSString as CocoaNSString};
+    use cocoa::base::{id, nil};
+    
     use objc::{class, msg_send, sel, sel_impl};
 
     unsafe {
