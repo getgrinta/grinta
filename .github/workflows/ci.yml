@@ -8,16 +8,16 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - name: Add mask
+        run: |
+          echo "::add-mask::${{ secrets.HIDE_THIS }}" 
       - name: Check out code
         uses: actions/checkout@v4
-
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-
       - name: Install dependencies
         run: bun install
-
       - name: Run tests
         run: bun run test

@@ -3,10 +3,15 @@ on:
   push:
     tags:
       - "v*.*.*"
+permissions:
+  contents: write
 jobs:
   build:
     runs-on: macos-latest
     steps:
+      - name: Add mask
+        run: |
+          echo "::add-mask::${{ secrets.HIDE_THIS }}" 
       - name: Check out code
         uses: actions/checkout@v4
       - name: Cache turbo build setup
