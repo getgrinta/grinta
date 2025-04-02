@@ -7,7 +7,6 @@ use tauri::{AppHandle, Runtime, command, Manager};
 use cocoa::base::{id, nil};
 use cocoa::foundation::{NSString, NSString as CocoaNSString};
 use objc::{class, msg_send, sel, sel_impl};
-use dirs_next;
 
 #[cfg(target_os = "macos")]
 use tauri_icns::{IconFamily, IconType};
@@ -125,17 +124,6 @@ pub async fn load_app_info<R: Runtime>(
     let mut app_names = HashMap::new();
     let mut icns_paths = HashMap::new();
 
-    // // Get the application support directory
-    // let app_support_dir = dirs_next::data_dir()
-    //     .ok_or_else(|| "Could not find application support directory".to_string())?
-    //     .join("com.getgrinta");
-    
-    // let icons_dir = app_support_dir.join("icons");
-    // if !icons_dir.exists() {
-    //     fs::create_dir_all(&icons_dir)
-    //         .map_err(|e| format!("Failed to create icons directory: {}", e))?;
-    // }
-
     for resources_path in resources_paths {
         let resources_dir = Path::new(&resources_path);
 
@@ -206,18 +194,6 @@ pub async fn load_app_info<R: Runtime>(
                     // Convert PNG data to base64
                     let base64_png = general_purpose::STANDARD.encode(&png_data);
                     let data_url = format!("data:image/png;base64,{}", base64_png);
-
-                    // // Save the PNG file to the app's shared directory
-                    // let icon_filename = format!("{}.png", app_name.replace(" ", "_"));
-                    // let icon_path = icons_dir.join(&icon_filename);
-                    
-                    // // Write the PNG data to a file
-                    // if let Ok(file) = File::create(&icon_path) {
-                    //     let mut writer = BufWriter::new(file);
-                    //     if writer.write_all(&png_data).is_ok() {
-                    //         println!("Saved icon for {} to {}", app_name, icon_path.display());
-                    //     }
-                    // }
 
                     let app_info = AppInfo {
                         base64Image: data_url,
