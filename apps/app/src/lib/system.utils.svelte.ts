@@ -1,4 +1,3 @@
-import { Command } from "@tauri-apps/plugin-shell";
 import { settingsStore } from "./store/settings.svelte";
 
 const THEME_QUERY = "(prefers-color-scheme: dark)";

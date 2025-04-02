@@ -1,8 +1,8 @@
-name: Build App
+name: Publish App
 on:
-  workflow_dispatch:
-  release:
-    types: [published]
+  push:
+    tags:
+      - "v*.*.*"
 jobs:
   build:
     runs-on: macos-latest
@@ -46,7 +46,7 @@ jobs:
         id: package-version
         run: echo "version=$(cat package.json | jq -r '.version')" >> $GITHUB_OUTPUT
         working-directory: apps/app
-      - uses: actions/upload-artifact@v4
+      - name: Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: Grinta-MacOS-${{ steps.package-version.outputs.version }}
-          path: apps/app/src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/grinta_${{ steps.package-version.outputs.version }}_aarch64.dmg
+          files: apps/app/src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/grinta_${{ steps.package-version.outputs.version }}_aarch64.dmg
