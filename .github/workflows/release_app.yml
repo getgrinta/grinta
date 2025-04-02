@@ -49,7 +49,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           projectPath: apps/app
-          tauriScript: bun run
+          tauriScript: bunx --bun tauri
           tagName: v__VERSION__
           releaseName: 'Grinta v__VERSION__'
           releaseBody: 'See the assets to download this version and install.'
