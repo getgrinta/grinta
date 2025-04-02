@@ -11,7 +11,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: 'macos-latest'
+          - platform: macos-latest
+            target: aarch64-apple-darwin
             args: '--target aarch64-apple-darwin'
     runs-on: ${{ matrix.platform }}
     steps:
@@ -37,7 +38,7 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-apple-darwin
+          targets: ${{ matrix.target }}
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
@@ -59,11 +60,11 @@ jobs:
           PUBLIC_ENCRYPTION_KEY: ${{ secrets.PUBLIC_ENCRYPTION_KEY }}
         with:
           projectPath: apps/app
-          tauriScript: "PUBLIC_API_URL=$PUBLIC_API_URL PUBLIC_ENCRYPTION_KEY=$PUBLIC_ENCRYPTION_KEY bun tauri"
+          tauriScript: bun tauri
           tagName: v__VERSION__
           releaseName: 'Grinta v__VERSION__'
           releaseBody: 'See the assets to download this version and install.'
           releaseDraft: true
           prerelease: false
-          bundleIdentifier: com.getgrinta.app
+          bundleIdentifier: com.getgrinta.desktop
           args: ${{ matrix.args }}

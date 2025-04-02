@@ -56,7 +56,10 @@ $effect(() => {
 	}
 });
 
-async function initTrayIcon(didFinishOnboarding: boolean, isClipboardEnabled = true) {
+async function initTrayIcon(
+	didFinishOnboarding: boolean,
+	isClipboardEnabled = true,
+) {
 	let menuItems = [
 		{
 			id: "help",
@@ -104,15 +107,19 @@ async function initTrayIcon(didFinishOnboarding: boolean, isClipboardEnabled = t
 					return goto(`/commands/${BAR_MODE.NOTES}`);
 				},
 			},
-			...(isClipboardEnabled ? [{
-				id: "clipboard",
-				text: $_("commands.menuItems.clipboardHistory"),
-				action() {
-					appStore.appWindow?.show();
-					appStore.appWindow?.setFocus();
-					return goto(`/commands/${BAR_MODE.CLIPBOARD}`);
-				},
-			}] : []),
+			...(isClipboardEnabled
+				? [
+						{
+							id: "clipboard",
+							text: $_("commands.menuItems.clipboardHistory"),
+							action() {
+								appStore.appWindow?.show();
+								appStore.appWindow?.setFocus();
+								return goto(`/commands/${BAR_MODE.CLIPBOARD}`);
+							},
+						},
+					]
+				: []),
 			{
 				item: "Separator",
 			},
@@ -200,25 +207,27 @@ async function initializeApp() {
 	await vaultStore.initialize();
 	try {
 		const authCookie = vaultStore.data?.authCookie ?? "";
-		if (authCookie.length === 0) return;
-		await appStore.fetchSession();
+		if (authCookie.length > 0) {
+			await appStore.fetchSession();
+		}
 	} catch (error) {
 		console.error(error);
-		toast.warning(error.message);
+		if (error instanceof Error) {
+			toast.warning(error.message);
+		}
 	}
 	await commandsStore.initialize();
 	await settingsStore.initialize();
 	await clipboardStore.initialize();
 	await widgetsStore.initialize();
-	appMetadataStore.initialize();
-
+	await appMetadataStore.initialize();
 	monitor = await currentMonitor();
 	lastMonitorScreenSize = monitor?.size ?? null;
-
 	await appStore.positionWindow();
 	await appStore.appWindow?.show();
 
 	initializing = false;
+	console.info("[Grinta] App initialized");
 }
 
 $effect(() => {
@@ -239,6 +248,7 @@ const bgClass = new ColorModeValue("bg-base-100/60", "bg-base-100/80");
 const vibrancyValue = new ColorModeValue<"light" | "dark">("light", "dark");
 
 $effect(() => {
+	if (!vibrancyValue.value) return;
 	setVibrancy(vibrancyValue.value);
 });
 

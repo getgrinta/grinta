@@ -63,7 +63,7 @@ export type SupportedFileExtension =
 export function setVibrancy(
 	materialName: "dark" | "light",
 ): Promise<SpotlightSearchResult[]> {
-	return grintaInvoke("set_vibrancy", { materialName: materialName });
+	return grintaInvoke("set_vibrancy", { materialName });
 }
 
 export type AppInfo = { base64Image: string; localizedName: string };

@@ -10,6 +10,7 @@ const host = process.env.TAURI_DEV_HOST;
 export default defineConfig(async () => ({
 	plugins: [sveltekit(), tailwindcss(), svelteTesting(), arraybuffer()],
 	clearScreen: false,
+	envPrefix: ["PUBLIC_", "TAURI_ENV_"],
 	server: {
 		port: 1420,
 		strictPort: true,

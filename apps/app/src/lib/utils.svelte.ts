@@ -1,4 +1,3 @@
-import { env } from "$env/dynamic/public";
 import type { AppType } from "@getgrinta/api";
 import { install } from "@github/hotkey";
 import { type UnlistenFn, emit, listen } from "@tauri-apps/api/event";
@@ -26,6 +25,7 @@ import {
 import { vaultStore } from "./store/vault.svelte";
 import { systemThemeWatcher } from "./system.utils.svelte";
 import { THEME } from "./store/settings.svelte";
+import { env } from "./env";
 
 export async function installHotkeys() {
 	for (const el of document.querySelectorAll("[data-hotkey]")) {
