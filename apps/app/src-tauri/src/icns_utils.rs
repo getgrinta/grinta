@@ -1,12 +1,13 @@
-use base64::{Engine as _, engine::general_purpose};
+use base64::{engine::general_purpose, Engine as _};
+use cocoa::base::{id, nil};
+use cocoa::foundation::{NSString, NSString as CocoaNSString};
+use objc::{class, msg_send, sel, sel_impl};
+use plist::Value;
 use std::collections::HashMap;
 use std::fs::{self, File};
 use std::io::{BufWriter, Write};
 use std::path::Path;
-use tauri::{AppHandle, Runtime, command, Manager};
-use cocoa::base::{id, nil};
-use cocoa::foundation::{NSString, NSString as CocoaNSString};
-use objc::{class, msg_send, sel, sel_impl};
+use tauri::{command, AppHandle, Manager, Runtime};
 
 #[cfg(target_os = "macos")]
 use tauri_icns::{IconFamily, IconType};
@@ -149,25 +150,33 @@ pub async fn load_app_info<R: Runtime>(
             .unwrap_or("unknown")
             .replace(".app", "");
 
-        // Find the first .icns file in the directory
-        let mut icns_path = None;
-
-        if let Ok(entries) = fs::read_dir(resources_dir) {
-            for entry in entries.filter_map(Result::ok) {
-                let path = entry.path();
-                if path.is_file() && path.extension().map_or(false, |ext| ext == "icns") {
-                    icns_path = Some(path);
-                    break;
-                }
-            }
-        }
-
         let app_path_str = app_path.to_string_lossy().to_string();
         app_paths.push(app_path_str.clone());
         app_names.insert(app_path_str.clone(), app_name);
 
-        if let Some(path) = icns_path {
-            icns_paths.insert(app_path_str, path);
+        let info_path = format!("{}/Contents/Info.plist", app_path.display());
+
+        if let Ok(plist) = Value::from_file(&info_path) {
+            let icon_file = plist
+                .as_dictionary()
+                .and_then(|dict| dict.get("CFBundleIconFile"))
+                .and_then(|icon_file| icon_file.as_string());
+
+            if let Some(icon_file) = icon_file {
+                let icon_file_path = format!(
+                    "{}/Contents/Resources/{}{}",
+                    app_path.display(),
+                    icon_file,
+                    if !icon_file.ends_with(".icns") {
+                        ".icns"
+                    } else {
+                        ""
+                    }
+                );
+                icns_paths.insert(app_path_str, icon_file_path);
+            }
+
+        
         }
     }
 
@@ -189,7 +198,7 @@ pub async fn load_app_info<R: Runtime>(
         // Check if we have an icon path for this app
         if let Some(icns_path) = icns_paths.get(&app_path_str) {
             // Load and convert ICNS to PNG
-            match load_icns_file(icns_path) {
+            match load_icns_file(&Path::new(icns_path)) {
                 Ok(Some(png_data)) => {
                     // Convert PNG data to base64
                     let base64_png = general_purpose::STANDARD.encode(&png_data);
