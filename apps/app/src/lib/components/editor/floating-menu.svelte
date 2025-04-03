@@ -66,7 +66,7 @@ function handlePromptKeyDown(event: KeyboardEvent) {
 		{#if menuState === "idle"}
 			<button
 				type="button"
-				class="btn-sm rounded-full text-primary-content"
+				class="btn btn-sm rounded-full text-primary-content"
 				onclick={toggleState}
 			>
 				<span>⌘L</span>

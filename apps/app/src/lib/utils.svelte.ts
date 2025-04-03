@@ -168,6 +168,9 @@ export async function findApps(): Promise<FileEntry[]> {
 		await Promise.all([
 			findAppsInDirectory("/Applications"),
 			findAppsInDirectory("/System/Applications"),
+			findAppsInDirectory(
+				"/System/Volumes/Preboot/Cryptexes/App/System/Applications",
+			),
 		])
 	).flat();
 
