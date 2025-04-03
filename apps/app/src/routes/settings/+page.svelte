@@ -48,6 +48,7 @@ const proTabs = [
 
 const tabs = $derived(appStore.subscriptions.length > 0 ? proTabs : baseTabs);
 
+let extensionInput = $state<HTMLInputElement | null>(null);
 let newToggleShortcut = $state<string[]>([]);
 let recordingShortcut = $state(false);
 let currentTab = $state("general");
@@ -203,6 +204,7 @@ function addExtension(e?: Event) {
 		extension,
 	]);
 	extensionValue = "";
+	extensionInput?.focus();
 }
 </script>
 
@@ -392,7 +394,7 @@ function addExtension(e?: Event) {
 					<div>
 						<div class="mb-2 inline-block">
 							{#each settingsStore.data.fsSearchAdditionalExtensions as extension}
-								<div class="badge badge-outline mr-2 mb-2">
+								<div class="badge badge-outline border-neutral-500 mr-2 mb-2">
 									{extension}
 									<button
 										type="button"
@@ -409,6 +411,7 @@ function addExtension(e?: Event) {
 						</div>
 						<div class="flex gap-2">
 							<input
+								bind:this={extensionInput}
 								type="text"
 								placeholder="e.g. .txt"
 								class="input flex-2/3"
