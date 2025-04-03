@@ -627,14 +627,16 @@ export class CommandsStore extends SecureStore<Commands> {
 		window.scrollTo({ top: 0 });
 		return match(command)
 			.with({ handler: COMMAND_HANDLER.APP }, async ({ value }) => {
-				await Command.create("open", ["-a", value]).execute();
+				toggleVisibility();
+				Command.create("open", ["-a", value]).execute();
 			})
 			.with({ handler: COMMAND_HANDLER.FS_ITEM }, async ({ value }) => {
-				await Command.create("open", [value]).execute();
+				toggleVisibility();
+				Command.create("open", [value]).execute();
 			})
 			.with({ handler: COMMAND_HANDLER.URL }, async ({ value }) => {
-				await this.openUrl(value);
 				toggleVisibility();
+				this.openUrl(value);
 			})
 			.with({ handler: COMMAND_HANDLER.CHANGE_MODE }, async ({ value }) => {
 				return goto(`/commands/${value}`);
@@ -658,6 +660,7 @@ export class CommandsStore extends SecureStore<Commands> {
 						return goto("/");
 					})
 					.with(SYSTEM_COMMAND.HELP, async () => {
+						toggleVisibility();
 						return this.openUrl("https://getgrinta.com/guides");
 					})
 					.with(SYSTEM_COMMAND.SETTINGS, async () => {
