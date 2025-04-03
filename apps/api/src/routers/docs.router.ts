@@ -5,8 +5,6 @@ export const docsRouter = createRouter().get(
 	"/reference",
 	apiReference({
 		theme: "kepler",
-		spec: {
-			url: "/openapi.json",
-		},
+		url: "/openapi.json",
 	}),
 );
