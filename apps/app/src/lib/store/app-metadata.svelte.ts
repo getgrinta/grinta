@@ -37,6 +37,7 @@ export class AppMetadataStore {
 		}
 
 		this.loadExtensionIcon("folder");
+		this.loadExtensionIcon("md");
 	}
 
 	// Legacy method for backward compatibility
@@ -118,6 +119,9 @@ export class AppMetadataStore {
 			if (command.metadata?.contentType === "public.folder") {
 				return this.loadExtensionIcon("folder");
 			}
+			if (command.metadata?.contentType === "com.unknown.md") {
+				return this.loadExtensionIcon("md");
+			}
 			const extension = command.value.split(".").pop();
 
 			if (extension) {
@@ -144,6 +148,13 @@ export class AppMetadataStore {
 				const icon = this.extInfo["folder"]?.base64Image;
 				if (!icon) {
 					this.loadExtensionIcon("folder");
+				}
+				return icon || null;
+			}
+			if (command.metadata?.contentType === "com.unknown.md") {
+				const icon = this.extInfo["md"]?.base64Image;
+				if (!icon) {
+					this.loadExtensionIcon("md");
 				}
 				return icon || null;
 			}

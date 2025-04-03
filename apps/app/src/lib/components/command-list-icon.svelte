@@ -1,6 +1,7 @@
 <script lang="ts">
 import { appMetadataStore } from "$lib/store/app-metadata.svelte";
 import type { ExecutableCommand } from "$lib/store/commands.svelte";
+import { COMMAND_HANDLER } from "$lib/store/commands.svelte";
 import { getIcon } from "$lib/utils.svelte";
 import clsx from "clsx";
 import { watch } from "runed";
@@ -47,6 +48,14 @@ watch(
 {#if item.metadata?.contentType === "public.folder"}
     <img
         src={appMetadataStore.extInfo["folder"]?.base64Image}
+        alt={label}
+        width={size}
+        height={size}
+        class={clsx("object-contain")}
+    />
+{:else if item.handler === COMMAND_HANDLER.OPEN_NOTE}
+    <img
+        src={appMetadataStore.extInfo["md"]?.base64Image}
         alt={label}
         width={size}
         height={size}
