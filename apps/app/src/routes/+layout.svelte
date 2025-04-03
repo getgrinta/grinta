@@ -246,6 +246,12 @@ const themeName = new ColorModeValue("grinta-light", "grinta-dark");
 const bgClass = new ColorModeValue("bg-base-100/60", "bg-base-100/80");
 const vibrancyValue = new ColorModeValue<"light" | "dark">("light", "dark");
 
+function preventCloseHandler(event: KeyboardEvent) {
+	if (event.key === "q" && event.metaKey) {
+		event.preventDefault();
+	}
+}
+
 $effect(() => {
 	if (!vibrancyValue.value) return;
 	setVibrancy(vibrancyValue.value);
@@ -259,12 +265,14 @@ onMount(() => {
 	systemThemeWatcher.addEventListner();
 	const clipboardIntervalId = setInterval(clipboardSnapshot, 5000);
 	const centerWindowIntervalId = setInterval(centerWindow, 1000);
+	document.addEventListener("keydown", preventCloseHandler);
 
 	return () => {
 		settingsStore.unregisterShortcuts();
 		systemThemeWatcher.removeEventListner();
 		clearInterval(clipboardIntervalId);
 		clearInterval(centerWindowIntervalId);
+		document.removeEventListener("keydown", preventCloseHandler);
 	};
 });
 

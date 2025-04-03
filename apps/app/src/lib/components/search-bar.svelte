@@ -29,9 +29,14 @@ import { match } from "ts-pattern";
 let queryInput: HTMLInputElement;
 
 const INDICATOR_MODES = [
-	{ value: BAR_MODE.INITIAL, icon: GrintaIcon, shortcut: "⌘1" },
-	{ value: BAR_MODE.NOTES, icon: AiNoteIcon, shortcut: "⌘2" },
-	{ value: BAR_MODE.MENU, icon: MenuIcon, shortcut: "⌘K" },
+	{
+		value: BAR_MODE.INITIAL,
+		icon: GrintaIcon,
+		shortcut: "⌘1",
+		hotkey: "Mod+1",
+	},
+	{ value: BAR_MODE.NOTES, icon: AiNoteIcon, shortcut: "⌘2", hotkey: "Mod+2" },
+	{ value: BAR_MODE.MENU, icon: MenuIcon, shortcut: "⌘K", hotkey: "Mod+K" },
 ];
 
 const { form } = createForm({
@@ -135,13 +140,18 @@ watch(
 	() => [appStore.query, appStore.searchMode, appStore.barMode],
 	() => {
 		buildCommands();
+		setTimeout(() => {
+			queryInput?.focus();
+		}, 50);
 	},
 );
 
 watch(
-	() => { return Object.keys(appMetadataStore.appInfo).length },
+	() => {
+		return Object.keys(appMetadataStore.appInfo).length;
+	},
 	(prev, next) => {
-		if (prev != next) {
+		if (prev !== next) {
 			buildAppCommandsAndAppIcons();
 		}
 	},
@@ -153,12 +163,6 @@ watch(
 		queryInput?.focus();
 	},
 );
-
-$effect(() => {
-	if (appStore.query === "@") {
-		switchMode(BAR_MODE.NOTES);
-	}
-});
 
 const inputProps = $derived(
 	match(appStore.barMode)
@@ -233,8 +237,8 @@ const indicatorButton = $derived(
 			onkeydown={handleNavigation}
 			placeholder={inputProps.placeholder}
 			autocomplete="off"
+			spellcheck="false"
 			data-testid="search-bar"
-			autofocus
 		/>
 		<div slot="addon">
 			<SegmentedControl
@@ -243,6 +247,7 @@ const indicatorButton = $derived(
 					icon: mode.icon,
 					active: mode.value === appStore.barMode,
 					shortcut: mode.shortcut,
+					hotkey: mode.hotkey,
 					testId: `search-bar-mode-${mode.value.toLowerCase()}`,
 					onClick: () => switchMode(mode.value),
 				}))}
