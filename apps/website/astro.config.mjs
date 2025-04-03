@@ -1,12 +1,16 @@
 import starlight from "@astrojs/starlight";
 import svelte from "@astrojs/svelte";
-import tailwind from "@astrojs/tailwind";
+import tailwindcss from "@tailwindcss/vite";
 // @ts-check
 import { defineConfig } from "astro/config";
 import starlightBlog from "starlight-blog";
 
 // https://astro.build/config
 export default defineConfig({
+	site: "https://getgrinta.com",
+	vite: {
+		plugins: [tailwindcss()],
+	},
 	integrations: [
 		starlight({
 			title: "Grinta",
@@ -91,7 +95,6 @@ export default defineConfig({
 			},
 			plugins: [starlightBlog({ title: "Changelog" })],
 		}),
-		tailwind({ applyBaseStyles: false }),
 		svelte(),
 	],
 });

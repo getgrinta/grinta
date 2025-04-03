@@ -40,7 +40,7 @@
     },
     "apps/app": {
       "name": "@grintabar/app",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "dependencies": {
         "@ai-sdk/openai-compatible": "0.2.5",
         "@better-auth/stripe": "1.2.5",
@@ -137,7 +137,6 @@
       "dependencies": {
         "@astrojs/starlight": "0.32.5",
         "@astrojs/starlight-tailwind": "3.0.1",
-        "@astrojs/tailwind": "6.0.2",
         "@openpanel/web": "^1.0.1",
         "astro": "5.5.6",
         "lucide-svelte": "0.487.0",
@@ -146,6 +145,7 @@
       },
       "devDependencies": {
         "@astrojs/svelte": "7.0.9",
+        "@tailwindcss/vite": "^4.1.1",
         "daisyui": "5.0.12",
         "starlight-blog": "0.19.0",
         "tailwindcss-intersect": "2.2.0",

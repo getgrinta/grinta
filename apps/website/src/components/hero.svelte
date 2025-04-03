@@ -1,3 +1,12 @@
+<script lang="ts">
+import packageJson from "../../../app/package.json";
+
+let version = $state(packageJson.version);
+const downloadUrl = $derived(
+	`https://github.com/getgrinta/grinta/releases/download/v${packageJson.version}/Grinta_${packageJson.version}_aarch64.dmg`,
+);
+</script>
+
 <section
     class="flex flex-col gap-4 justify-center items-center !mt-20 sm:!mt-32 px-4"
 >
@@ -24,10 +33,9 @@
     <div
         class="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center justify-center !mt-6 sm:!mt-8 w-full max-w-md sm:max-w-none"
     >
-        <button
-            type="button"
+        <a
+            href={downloadUrl}
             class="btn sm:btn-md lg:btn-lg !bg-zinc-800 border-2 !text-white rounded-full hover:border-primary shadow-2xl hover:shadow-primary/40 w-full sm:w-auto"
-            disabled
         >
             <img
                 src="/mac.svg"
@@ -37,7 +45,7 @@
                 alt="Mac Icon"
             />
             <span>Download for Mac</span>
-        </button>
+        </a>
         <a
             href="/guides"
             class="btn sm:btn-md lg:btn-lg btn-secondary bg-white !text-black rounded-full border-2 border-white hover:bg-primary hover:border-primary hover:!text-white shadow-2xl hover:shadow-primary/40 w-full sm:w-auto"

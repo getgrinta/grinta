@@ -1,6 +1,7 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@plugin "daisyui" {
+	themes: night --default;
+}
 
 body {
 	--sl-color-bg-sidebar: #0c0c0e;
@@ -18,7 +19,7 @@ header.header {
 }
 
 [data-open-modal] {
-	@apply !rounded-full !border-2 hover !border-primary;
+	@apply !rounded-full !border-2 !border-primary;
 }
 
 .blueprint {
