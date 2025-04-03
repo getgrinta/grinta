@@ -125,16 +125,28 @@ export class AppStore {
 	}
 
 	async updateApp() {
+		let finished = false;
 		await this.appWindow?.show();
-		try {
-			const update = await checkUpdate();
-			if (!update) return toast.info("No update available.");
-			await update.downloadAndInstall();
-			return relaunch();
-		} catch (error) {
-			console.error(error);
-			toast.error("Failed to update app.");
-		}
+		const updateCheckPromise = checkUpdate();
+		toast.promise(updateCheckPromise, {
+			loading: "Checking for updates...",
+			error: "Failed to check for updates.",
+		});
+		const update = await updateCheckPromise;
+		console.log("Update check result:", update);
+		if (!update) return toast.info("No update available.");
+		const installPromise = update.downloadAndInstall(({ event }) => {
+			if (event === "Finished") {
+				finished = true;
+			}
+		});
+		toast.promise(installPromise, {
+			loading: "Installing update...",
+			error: "Failed to install update.",
+		});
+		await installPromise;
+		if (!finished) return;
+		return relaunch();
 	}
 }
 
