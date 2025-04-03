@@ -1,80 +1,74 @@
 <script lang="ts">
-	import { clsx } from "clsx";
-	import { ArrowDownLeftIcon } from "lucide-svelte";
-	import { appStore, BAR_MODE } from "$lib/store/app.svelte";
-	import {
-		COMMAND_HANDLER,
-		commandsStore,
-		type FileMetadataSchema,
-		type CommandHandler,
-	} from "$lib/store/commands.svelte";
-	import { handleContextMenu } from "$lib/utils.svelte";
-	import { highlightText } from "$lib/utils.svelte";
-	import { match, P } from "ts-pattern";
-	import { _ } from "svelte-i18n";
-	import type { z } from "zod";
-	import CommandListIcon from "./command-list-icon.svelte";
-	import { widgetsStore } from "$lib/store/widgets.svelte";
-	import { PressedKeys } from "runed";
+import { clsx } from "clsx";
+import { ArrowDownLeftIcon } from "lucide-svelte";
+import { appStore, BAR_MODE } from "$lib/store/app.svelte";
+import {
+	COMMAND_HANDLER,
+	commandsStore,
+	type FileMetadataSchema,
+	type CommandHandler,
+} from "$lib/store/commands.svelte";
+import { handleContextMenu } from "$lib/utils.svelte";
+import { highlightText } from "$lib/utils.svelte";
+import { match, P } from "ts-pattern";
+import { _ } from "svelte-i18n";
+import type { z } from "zod";
+import CommandListIcon from "./command-list-icon.svelte";
+import { widgetsStore } from "$lib/store/widgets.svelte";
+import { PressedKeys } from "runed";
 
-	const props = $props();
+const props = $props();
 
-	const pressedKeys = new PressedKeys();
-	const isCmdPressed = $derived(pressedKeys.has("Meta"));
+const pressedKeys = new PressedKeys();
+const isCmdPressed = $derived(pressedKeys.has("Meta"));
 
-	type GetHelperProps = {
-		value: string;
-		handler: CommandHandler;
-		metadata?: z.infer<typeof FileMetadataSchema>;
-	};
+type GetHelperProps = {
+	value: string;
+	handler: CommandHandler;
+	metadata?: z.infer<typeof FileMetadataSchema>;
+};
 
-	function getCommandTypeLabel({ value, handler, metadata }: GetHelperProps) {
-		return match(handler)
-			.with(COMMAND_HANDLER.APP, () => $_("commands.helperText.app"))
-			.with(COMMAND_HANDLER.FS_ITEM, () => {
-				if (metadata?.contentType === "public.folder") {
-					return $_("commands.helperText.folder");
-				}
-				return $_("commands.helperText.file");
-			})
-			.with(COMMAND_HANDLER.URL, () => $_("commands.helperText.web"))
-			.with(COMMAND_HANDLER.SYSTEM, () =>
-				$_("commands.helperText.barCommand"),
-			)
-			.with(COMMAND_HANDLER.CHANGE_MODE, () =>
-				$_("commands.helperText.changeMode"),
-			)
-			.with(P.union(COMMAND_HANDLER.COPY_TO_CLIPBOARD), () =>
-				$_("commands.helperText.copyToClipboard"),
-			)
-			.with(COMMAND_HANDLER.OPEN_NOTE, () =>
-				$_("commands.helperText.openNote"),
-			)
-			.with(COMMAND_HANDLER.CREATE_NOTE, () =>
-				$_("commands.helperText.createNote"),
-			)
-			.with(COMMAND_HANDLER.RUN_SHORTCUT, () =>
-				$_("commands.helperText.runShortcut"),
-			)
-			.otherwise(() => value);
-	}
+function getCommandTypeLabel({ value, handler, metadata }: GetHelperProps) {
+	return match(handler)
+		.with(COMMAND_HANDLER.APP, () => $_("commands.helperText.app"))
+		.with(COMMAND_HANDLER.FS_ITEM, () => {
+			if (metadata?.contentType === "public.folder") {
+				return $_("commands.helperText.folder");
+			}
+			return $_("commands.helperText.file");
+		})
+		.with(COMMAND_HANDLER.URL, () => $_("commands.helperText.web"))
+		.with(COMMAND_HANDLER.SYSTEM, () => $_("commands.helperText.barCommand"))
+		.with(COMMAND_HANDLER.CHANGE_MODE, () =>
+			$_("commands.helperText.changeMode"),
+		)
+		.with(P.union(COMMAND_HANDLER.COPY_TO_CLIPBOARD), () =>
+			$_("commands.helperText.copyToClipboard"),
+		)
+		.with(COMMAND_HANDLER.OPEN_NOTE, () => $_("commands.helperText.openNote"))
+		.with(COMMAND_HANDLER.CREATE_NOTE, () =>
+			$_("commands.helperText.createNote"),
+		)
+		.with(COMMAND_HANDLER.RUN_SHORTCUT, () =>
+			$_("commands.helperText.runShortcut"),
+		)
+		.otherwise(() => value);
+}
 
-	const currentLabel = $derived(
-		props.item.localizedLabel ?? props.item.label,
-	);
+const currentLabel = $derived(props.item.localizedLabel ?? props.item.label);
 
-	const highlightedText = $derived(
-		highlightText(
-			isCmdPressed ? (props.item.path ?? currentLabel) : currentLabel,
-			appStore.query,
-		),
-	);
+const highlightedText = $derived(
+	highlightText(
+		isCmdPressed ? (props.item.path ?? currentLabel) : currentLabel,
+		appStore.query,
+	),
+);
 
-	const smartMatch = $derived(
-		appStore.query.length > 0 &&
-			commandsStore.selectedIndex === 0 &&
-			props.item.smartMatch,
-	);
+const smartMatch = $derived(
+	appStore.query.length > 0 &&
+		commandsStore.selectedIndex === 0 &&
+		props.item.smartMatch,
+);
 </script>
 
 <li
@@ -136,11 +130,13 @@
 		</button>
 		<div class="flex gap-1 items-center">
 			{#if props.barMode === BAR_MODE.INITIAL}
-				<span
+				<button
+					type="button"
+					onclick={() => commandsStore.handleCommand(props.item)}
 					class={clsx(
-						"badge badge-lg border-none bg-transparent border-primary-content/50 font-semibold",
+						"btn btn-ghost hover:bg-transparent border-0 shadow-none",
 						props.active &&
-							"badge-primary !text-primary-content !border-primary-content/50",
+							"!text-primary-content !border-primary-content/50",
 					)}
 				>
 					{getCommandTypeLabel({
@@ -148,8 +144,7 @@
 						handler: props.item.handler,
 						metadata: props.item.metadata,
 					})}
-				</span>
-
+				</button>
 				<button
 					type="button"
 					class={clsx(
