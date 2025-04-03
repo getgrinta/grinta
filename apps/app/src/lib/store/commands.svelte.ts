@@ -549,7 +549,7 @@ export class CommandsStore extends SecureStore<Commands> {
 			label: query,
 			value,
 			handler: COMMAND_HANDLER.URL,
-			smartMatch: false,
+			smartMatch: true,
 		};
 		return [command];
 	}
@@ -558,6 +558,13 @@ export class CommandsStore extends SecureStore<Commands> {
 		prev,
 		next,
 	}: { prev: ExecutableCommand; next: ExecutableCommand }): number {
+		if (prev.handler === COMMAND_HANDLER.URL && prev.smartMatch) {
+			return -1;
+		}
+		if (next.handler === COMMAND_HANDLER.URL && next.smartMatch) {
+			return 1;
+		}
+
 		return (
 			commandsPriority.indexOf(prev.handler) -
 			commandsPriority.indexOf(next.handler)
