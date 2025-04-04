@@ -278,7 +278,6 @@ $effect(() => {
 });
 
 onMount(() => {
-	console.log(process.env.NODE_ENV);
 	let deepLinkUnlisten: UnlistenFn;
 	console.info("[Grinta] Layout Mount");
 	initializeApp().catch((error) => {

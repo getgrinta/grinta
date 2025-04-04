@@ -133,7 +133,6 @@ export class AppStore {
 			error: "Failed to check for updates.",
 		});
 		const update = await updateCheckPromise;
-		console.log("Update check result:", update);
 		if (!update) return toast.info("No update available.");
 		const installPromise = update.downloadAndInstall(({ event }) => {
 			if (event === "Finished") {
