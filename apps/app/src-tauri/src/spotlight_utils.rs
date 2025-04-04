@@ -45,8 +45,6 @@ pub async fn search_spotlight_apps<R: Runtime>(
     extensions: Vec<String>,
     search_only_in_home: bool,
 ) -> Result<Vec<SpotlightAppInfo>, String> {
-    use cocoa::base::{id, nil, YES};
-    use cocoa::foundation::{NSString as CocoaNSString, NSUInteger};
 
     // Generate a unique ID for this query
     let query_id = format!(
@@ -247,13 +245,13 @@ unsafe fn create_search_scope(search_only_in_home: bool) -> id {
     } else {
         // Standard directories to search
         let directories = [
-            (15, "NSDownloadsDirectory"), // Downloads
-            (9, "NSDocumentDirectory"),  // Documents
-            (12, "NSDesktopDirectory"),   // Desktop
+            (15, "NSDownloadsDirectory"),
+            (9, "NSDocumentDirectory"),
+            (12, "NSDesktopDirectory"),
         ];
 
         let computer_scope: id = msg_send![class!(NSString), stringWithUTF8String:"kMDQueryScopeComputer".as_ptr()];
-        let scope_array: id = msg_send![class!(NSMutableArray), arrayWithObject: computer_scope]; // Start with computer scope
+        let scope_array: id = msg_send![class!(NSMutableArray), arrayWithObject: computer_scope];
 
         for (directory_constant, _name) in directories.iter() {
             let urls: id = msg_send![
@@ -293,7 +291,6 @@ unsafe fn create_search_scope(search_only_in_home: bool) -> id {
     }
 }
 
-// Helper function to create metadata query
 unsafe fn create_metadata_query(search_only_in_home: bool, query: Option<String>, extensions: Option<Vec<String>>) -> id {
     let query_obj: id = msg_send![class!(NSMetadataQuery), new];
 
