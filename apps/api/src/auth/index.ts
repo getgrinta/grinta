@@ -8,6 +8,7 @@ import { sendOtp } from "../utils/mail.utils.js";
 import { env } from "../utils/env.utils.js";
 import { isDisposableEmail } from "../utils/DISPOSABLE_EMAIL_DOMAINS.js";
 import { APIError } from "better-auth/api";
+import { sendWebhook } from "../utils/webhook.utils.js";
 
 const stripeClient = new Stripe(env.STRIPE_SECRET_KEY);
 
@@ -54,6 +55,12 @@ export const auth: ReturnType<typeof betterAuth> = betterAuth({
 			stripeClient,
 			stripeWebhookSecret: env.STRIPE_WEBHOOK_SECRET,
 			createCustomerOnSignUp: true,
+			onCustomerCreate: async ({ stripeCustomer }) => {
+				await sendWebhook({
+					type: "stripe",
+					message: `New customer 🎉 ${stripeCustomer.name} (${stripeCustomer.email})`,
+				});
+			},
 			subscription: {
 				enabled: true,
 				plans: [

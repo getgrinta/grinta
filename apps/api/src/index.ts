@@ -1,4 +1,5 @@
 import { logger } from "hono/logger";
+import { HTTPException } from "hono/http-exception";
 import { auth } from "./auth/index.js";
 import { aiRouter } from "./routers/ai.router.js";
 import { dataRouter } from "./routers/data.router.js";
@@ -10,6 +11,7 @@ import {
 	createRouter,
 	databaseContext,
 } from "./utils/router.utils.js";
+import { sendWebhook } from "./utils/webhook.utils.js";
 
 const app = createRouter()
 	.doc("/openapi.json", {
@@ -20,6 +22,16 @@ const app = createRouter()
 		},
 	})
 	.use(logger())
+	.onError(async (error, c) => {
+		await sendWebhook({
+			type: "logs",
+			message: error.message,
+		});
+		if (error instanceof HTTPException) {
+			return error.getResponse();
+		}
+		return c.text("Internal Server Error", 500);
+	})
 	.use(databaseContext)
 	.use(authSession)
 	.use("/api/ai/*", authenticatedGuard)
@@ -39,5 +51,5 @@ export type { SanitizedSubscription } from "./utils/schema.utils.js";
 
 export default {
 	port: 3000,
-	fetch: app.fetch
+	fetch: app.fetch,
 };
