@@ -3,6 +3,7 @@ use objc::{class, msg_send, sel, sel_impl};
 use tauri::{Listener as _, Manager as _};
 use tauri_nspanel::ManagerExt as _;
 use tauri_plugin_autostart::MacosLauncher;
+use tauri_plugin_deep_link::DeepLinkExt;
 
 use window::WebviewWindowExt as _;
 mod command;
@@ -20,7 +21,6 @@ pub fn run() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![command::show, command::hide])
         .plugin(tauri_nspanel::init())
-        .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_dialog::init())
@@ -30,6 +30,7 @@ pub fn run() {
             Some(vec![]),
         ))
         .plugin(tauri_plugin_single_instance::init(|_app, _args, _cwd| {}))
+        .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_shell::init())
@@ -89,7 +90,6 @@ pub fn run() {
                     },
                 );
             }
-
             Ok(())
         })
         .manage(spotlight_utils::SpotlightState::new())

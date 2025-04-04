@@ -29,7 +29,10 @@ export class AppMetadataStore {
 	}
 
 	// Load an app icon on demand
-	async loadAppIcon(appName: string, resourcePath: string): Promise<string | null> {
+	async loadAppIcon(
+		appName: string,
+		resourcePath: string,
+	): Promise<string | null> {
 		// Return cached icon if available
 		if (this.appInfo[appName]?.base64Image) {
 			return this.appInfo[appName].base64Image;
@@ -69,9 +72,9 @@ export class AppMetadataStore {
 		this.loadingExtensions.add(extension);
 
 		try {
-			const icons = await invoke("load_extension_icons", {
+			const icons = (await invoke("load_extension_icons", {
 				extensions: [extension],
-			}) as Record<string, string>;
+			})) as Record<string, string>;
 
 			const data: Record<string, ExtInfo> = {};
 			for (const [ext, base64Image] of Object.entries(icons)) {
@@ -90,7 +93,6 @@ export class AppMetadataStore {
 
 	// Get an icon, loading it if necessary
 	async getIconAsync(command: ExecutableCommand): Promise<string | null> {
-		console.log(`Getting icon for ${command.label}`)
 		if (command.handler === COMMAND_HANDLER.APP) {
 			if (this.loadingState[command.label]) return null;
 

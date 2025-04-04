@@ -29,6 +29,9 @@ import {
 	type Monitor,
 } from "@tauri-apps/api/window";
 import PngIconUrl from "$lib/assets/tray.png?arraybuffer";
+import PngDevIconUrl from "$lib/assets/tray-dev.png?arraybuffer";
+import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
+import type { UnlistenFn } from "@tauri-apps/api/event";
 const { children } = $props();
 
 dayjs.extend(LocalizedFormat);
@@ -67,13 +70,21 @@ async function initTrayIcon(
 				return open("https://getgrinta.com/guides");
 			},
 		},
-		{
-			id: "update",
-			text: $_("commands.menuItems.checkForUpdates"),
-			action() {
-				return appStore.updateApp();
-			},
-		},
+		process.env.NODE_ENV === "development"
+			? {
+					id: "development",
+					text: "🧑‍💻 Development",
+					action() {
+						return Promise.resolve();
+					},
+				}
+			: {
+					id: "update",
+					text: $_("commands.menuItems.checkForUpdates"),
+					action() {
+						return appStore.updateApp();
+					},
+				},
 		{
 			item: "Separator",
 		},
@@ -163,8 +174,9 @@ async function initTrayIcon(
 			TrayIcon.new({
 				id: TRAY_ID,
 				menu,
-				icon: PngIconUrl,
-				iconAsTemplate: true,
+				icon:
+					process.env.NODE_ENV === "development" ? PngDevIconUrl : PngIconUrl,
+				iconAsTemplate: process.env.NODE_ENV !== "development",
 			});
 		}
 	});
@@ -252,12 +264,21 @@ function preventCloseHandler(event: KeyboardEvent) {
 	}
 }
 
+function deepLinkHandler(urls: string[]) {
+	if (urls.length === 0) return;
+	if (urls[0] === "grinta://start") {
+		appStore.appWindow?.show();
+		appStore.appWindow?.setFocus();
+	}
+}
+
 $effect(() => {
 	if (!vibrancyValue.value) return;
 	setVibrancy(vibrancyValue.value);
 });
 
 onMount(() => {
+	let deepLinkUnlisten: UnlistenFn;
 	console.info("[Grinta] Layout Mount");
 	initializeApp().catch((error) => {
 		console.error("[Grinta] Initialization Error", error);
@@ -266,12 +287,16 @@ onMount(() => {
 	const clipboardIntervalId = setInterval(clipboardSnapshot, 5000);
 	const centerWindowIntervalId = setInterval(centerWindow, 1000);
 	document.addEventListener("keydown", preventCloseHandler);
+	onOpenUrl(deepLinkHandler).then((unlisten) => {
+		deepLinkUnlisten = unlisten;
+	});
 
 	return () => {
 		settingsStore.unregisterShortcuts();
 		systemThemeWatcher.removeEventListner();
 		clearInterval(clipboardIntervalId);
 		clearInterval(centerWindowIntervalId);
+		deepLinkUnlisten?.();
 		document.removeEventListener("keydown", preventCloseHandler);
 	};
 });

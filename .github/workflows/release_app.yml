@@ -66,5 +66,4 @@ jobs:
           releaseBody: 'See the assets to download this version and install.'
           releaseDraft: true
           prerelease: false
-          bundleIdentifier: com.getgrinta.desktop
-          args: ${{ matrix.args }}
+          args: ${{ matrix.args }} --config src-tauri/tauri.prod.conf.json
