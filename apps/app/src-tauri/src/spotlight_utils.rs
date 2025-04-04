@@ -26,6 +26,11 @@ impl SpotlightState {
         }
     }
 }
+extern "C" {
+    static kMDItemPath: id;
+    static kMDItemDisplayName: id;
+    static kMDItemContentType: id;
+}
 
 #[cfg(target_os = "macos")]
 #[command]
@@ -96,7 +101,7 @@ pub async fn search_spotlight_apps<R: Runtime>(
             let query_obj: id = msg_send![class!(NSMetadataQuery), new];
 
             // Set the search scope to the computer
-            let computer_scope = CocoaNSString::alloc(nil).init_str("kMDQueryScopeComputer");
+            let computer_scope: id = msg_send![class!(NSString), stringWithUTF8String:"kMDQueryScopeComputer".as_ptr()];
             let scope_array: id = msg_send![class!(NSMutableArray), array];
             let _: () = msg_send![scope_array, addObject:computer_scope];
 
@@ -156,21 +161,23 @@ pub async fn search_spotlight_apps<R: Runtime>(
             let _: () = msg_send![query_obj, setSearchScopes: scope_array];
 
             // Set sort descriptors
-            let sort_descriptor: id = msg_send![class!(NSSortDescriptor), sortDescriptorWithKey:CocoaNSString::alloc(nil).init_str("kMDItemDisplayName") ascending:YES];
+            let sort_key: id = msg_send![class!(NSString), stringWithUTF8String:"kMDItemDisplayName".as_ptr()];
+            let sort_descriptor: id = msg_send![class!(NSSortDescriptor), sortDescriptorWithKey:sort_key ascending:YES];
             let sort_descriptors_array: id =
                 msg_send![class!(NSArray), arrayWithObject:sort_descriptor];
             let _: () = msg_send![query_obj, setSortDescriptors:sort_descriptors_array];
 
             // Set value list attributes
             let value_list_attributes: id = msg_send![class!(NSMutableArray), array];
-            let _: () = msg_send![value_list_attributes, addObject:CocoaNSString::alloc(nil).init_str("kMDItemDisplayName")];
-            let _: () = msg_send![value_list_attributes, addObject:CocoaNSString::alloc(nil).init_str("kMDItemPath")];
-            let _: () = msg_send![value_list_attributes, addObject:CocoaNSString::alloc(nil).init_str("kMDItemContentType")];
+            let display_name_attr: id = msg_send![class!(NSString), stringWithUTF8String:"kMDItemDisplayName".as_ptr()];
+            let path_attr: id = msg_send![class!(NSString), stringWithUTF8String:"kMDItemPath".as_ptr()];
+            let content_type_attr: id = msg_send![class!(NSString), stringWithUTF8String:"kMDItemContentType".as_ptr()];
+            
+            let _: () = msg_send![value_list_attributes, addObject:display_name_attr];
+            let _: () = msg_send![value_list_attributes, addObject:path_attr];
+            let _: () = msg_send![value_list_attributes, addObject:content_type_attr];
 
             let _: () = msg_send![query_obj, setValueListAttributes:value_list_attributes];
-
-            // Release the pool
-            let _: () = msg_send![pool, drain];
 
             // Create a block with captured variables from our context
             let window_for_block = window_clone.clone();
@@ -179,6 +186,10 @@ pub async fn search_spotlight_apps<R: Runtime>(
 
             // Use the block API to handle results directly
             let block = block::ConcreteBlock::new(move |notification: id| -> () {
+
+            // Create an autorelease pool
+                let pool: id = msg_send![class!(NSAutoreleasePool), new];
+
                 // Get the query object
                 let query_obj: id = msg_send![notification, object];
 
@@ -191,15 +202,10 @@ pub async fn search_spotlight_apps<R: Runtime>(
                     for i in 0..std::cmp::min(count, 100) {
                         let item: id = msg_send![query_results, objectAtIndex: i];
 
-                        let path_attr = CocoaNSString::alloc(nil).init_str("kMDItemPath");
-                        let name_attr = CocoaNSString::alloc(nil).init_str("kMDItemDisplayName");
-                        let content_type_attr =
-                            CocoaNSString::alloc(nil).init_str("kMDItemContentType");
-
-                        let path_value: id = msg_send![item, valueForAttribute: path_attr];
-                        let name_value: id = msg_send![item, valueForAttribute: name_attr];
+                        let path_value: id = msg_send![item, valueForAttribute: kMDItemPath];
+                        let name_value: id = msg_send![item, valueForAttribute: kMDItemDisplayName];
                         let content_type_value: id =
-                            msg_send![item, valueForAttribute: content_type_attr];
+                            msg_send![item, valueForAttribute: kMDItemContentType];
 
                         if path_value != nil && name_value != nil && content_type_value != nil {
                             let path_str: *const i8 = msg_send![path_value, UTF8String];
@@ -233,6 +239,7 @@ pub async fn search_spotlight_apps<R: Runtime>(
                     window_for_block.emit("spotlight-search-complete", query_id_for_block.clone());
 
                 let _: () = msg_send![query_obj, stopQuery];
+                let _: () = msg_send![pool, drain];
             });
 
             let block = block.copy();
@@ -248,6 +255,9 @@ pub async fn search_spotlight_apps<R: Runtime>(
                 queue: {let main_queue: id = msg_send![class!(NSOperationQueue), mainQueue]; main_queue}
                 usingBlock: block
             ];
+
+            // Release the pool
+            let _: () = msg_send![pool, drain];
 
             // Start the query
             let _: () = msg_send![query_obj, startQuery];

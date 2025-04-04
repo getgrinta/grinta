@@ -9,7 +9,6 @@ export class AppMetadataStore {
 	extInfo = $state<Record<string, ExtInfo>>({});
 	loading = $state<boolean>(false);
 	initialized = $state<boolean>(false);
-	appResourcePaths = $state<Record<string, string>>({});
 	loadingApps = $state<Set<string>>(new Set());
 	loadingExtensions = $state<Set<string>>(new Set());
 
@@ -18,25 +17,10 @@ export class AppMetadataStore {
 		if (this.initialized || this.loading) return;
 		this.loading = true;
 
-		try {
-			const apps = await findApps();
-			const appNameMap: Record<string, string> = {};
-
-			for (const app of apps) {
-				const appName = app.name.replace(".app", "");
-				const resourcesPath = `${app.path}/Contents/Resources/`;
-				appNameMap[appName] = resourcesPath;
-			}
-
-			this.appResourcePaths = appNameMap;
-		} catch (error) {
-			console.error("Error initializing app metadata:", error);
-		} finally {
-			this.loading = false;
-			this.initialized = true;
-		}
-
 		this.loadExtensionIcon("folder");
+
+		this.loading = false;
+		this.initialized = true;
 	}
 
 	// Legacy method for backward compatibility
