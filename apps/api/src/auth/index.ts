@@ -65,6 +65,13 @@ export const auth: ReturnType<typeof betterAuth> = betterAuth({
 						},
 					},
 				],
+				getCheckoutSessionParams() {
+					return {
+						params: {
+							allow_promotion_codes: true,
+						},
+					};
+				},
 			},
 		}),
 		openAPI(),
