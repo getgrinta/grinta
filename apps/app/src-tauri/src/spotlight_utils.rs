@@ -30,6 +30,28 @@ impl SpotlightState {
         }
     }
 }
+
+// A simple wrapper for NSAutoreleasePool to be shared (unsafe: not thread-safe, but used to make it work)
+struct SharedAutoreleasePool {
+    pool: id,
+}
+
+// Mark the wrapper as Send (unsafe, but for our purposes)
+unsafe impl Send for SharedAutoreleasePool {}
+
+impl SharedAutoreleasePool {
+    fn new() -> Self {
+        let pool: id = unsafe { msg_send![class!(NSAutoreleasePool), new] };
+        SharedAutoreleasePool { pool }
+    }
+}
+
+impl Drop for SharedAutoreleasePool {
+    fn drop(&mut self) {
+        unsafe { let _: () = msg_send![self.pool, drain]; }
+    }
+}
+
 extern "C" {
     static kMDItemPath: id;
     static kMDItemDisplayName: id;
@@ -46,7 +68,6 @@ pub async fn search_spotlight_apps<R: Runtime>(
     extensions: Vec<String>,
     search_only_in_home: bool,
 ) -> Result<Vec<SpotlightAppInfo>, String> {
-    // Generate a unique ID for this query
     let query_id = format!(
         "query_{}",
         SystemTime::now()
@@ -55,143 +76,137 @@ pub async fn search_spotlight_apps<R: Runtime>(
             .as_millis()
     );
 
-    // Create a shared results vector
-    let results = Arc::new(Mutex::new(Vec::new()));
+    // Execute synchronous operations within an autorelease pool scope
+    let rx = {
+        let _shared_pool = SharedAutoreleasePool::new();
 
-    // Store the results in the state
-    {
-        let mut queries = state.queries.lock().unwrap();
-        queries.insert(query_id.clone(), results.clone());
-    }
+        // Create a shared results vector
+        let results = Arc::new(Mutex::new(Vec::new()));
 
-    // Create a oneshot channel to wait for the event
-    let (tx, rx) = oneshot::channel();
-
-    // Set up an event listener for the completion event
-    let event_name = "spotlight-search-complete";
-    let query_id_for_listener = query_id.clone();
-    let tx = Arc::new(Mutex::new(Some(tx)));
-    let tx_clone = tx.clone();
-
-    let _listener = window.listen(event_name, move |event| {
-        // Parse the payload as a string
-        let payload_str = event.payload().to_string();
-        // Remove quotes if present (JSON string)
-        let clean_payload = payload_str.trim_matches('"');
-        if clean_payload == query_id_for_listener {
-            // Take the sender out of the Option to consume it
-            if let Some(sender) = tx_clone.lock().unwrap().take() {
-                let _ = sender.send(());
-            }
+        // Store the results in the state
+        {
+            let mut queries = state.queries.lock().unwrap();
+            queries.insert(query_id.clone(), results.clone());
         }
-    });
 
-    // Clone the window and query_id for the thread
-    let window_clone = window.clone();
-    let query_id_clone = query_id.clone();
-    let results_clone = results.clone();
+        // Create a oneshot channel to wait for the event
+        let (tx, rx) = oneshot::channel();
 
-    // Spawn a thread to handle the Objective-C run loop
-    std::thread::spawn(move || {
-        unsafe {
-            // Create an autorelease pool
-            let pool: id = msg_send![class!(NSAutoreleasePool), new];
+        // Set up an event listener for the completion event
+        let event_name = "spotlight-search-complete";
+        let query_id_for_listener = query_id.clone();
+        let tx = Arc::new(Mutex::new(Some(tx)));
+        let tx_clone = tx.clone();
 
-            // Create a block with captured variables from our context
-            let window_for_block = window_clone.clone();
-            let query_id_for_block = query_id_clone.clone();
-            let results_for_block = results_clone.clone();
+        let _listener = window.listen(event_name, move |event| {
+            // Parse the payload as a string
+            let payload_str = event.payload().to_string();
+            // Remove quotes if present (JSON string)
+            let clean_payload = payload_str.trim_matches('"');
+            if clean_payload == query_id_for_listener {
+                // Take the sender out of the Option to consume it
+                if let Some(sender) = tx_clone.lock().unwrap().take() {
+                    let _ = sender.send(());
+                }
+            }
+        });
 
-            // Use the block API to handle results directly
-            let block = block::ConcreteBlock::new(move |notification: id| -> () {
-                // Create an autorelease pool
-                let pool: id = msg_send![class!(NSAutoreleasePool), new];
+        // Clone the window and query_id for the thread
+        let window_clone = window.clone();
+        let query_id_clone = query_id.clone();
+        let results_clone = results.clone();
 
-                // Get the query object
-                let query_obj: id = msg_send![notification, object];
+        // Spawn a thread to handle the Objective-C run loop
+        std::thread::spawn(move || {
+            unsafe {
+                // Create a block with captured variables from our context
+                let window_for_block = window_clone.clone();
+                let query_id_for_block = query_id_clone.clone();
+                let results_for_block = results_clone.clone();
 
-                // Process the results
-                let query_results: id = msg_send![query_obj, results];
-                let count: usize = msg_send![query_results, count];
+                // Use the block API to handle results directly
+                let block = block::ConcreteBlock::new(move |notification: id| -> () {
+                    // Get the query object
+                    let query_obj: id = msg_send![notification, object];
 
-                // Store the results
-                if let Ok(mut results_vec) = results_for_block.lock() {
-                    for i in 0..std::cmp::min(count, 100) {
-                        let item: id = msg_send![query_results, objectAtIndex: i];
+                    // Process the results
+                    let query_results: id = msg_send![query_obj, results];
+                    let count: usize = msg_send![query_results, count];
 
-                        let path_value: id = msg_send![item, valueForAttribute: kMDItemPath];
-                        let name_value: id = msg_send![item, valueForAttribute: kMDItemDisplayName];
-                        let content_type_value: id =
-                            msg_send![item, valueForAttribute: kMDItemContentType];
+                    // Store the results
+                    if let Ok(mut results_vec) = results_for_block.lock() {
+                        for i in 0..std::cmp::min(count, 100) {
+                            let item: id = msg_send![query_results, objectAtIndex: i];
 
-                        if path_value != nil && name_value != nil && content_type_value != nil {
-                            let path_str: *const i8 = msg_send![path_value, UTF8String];
-                            let name_str: *const i8 = msg_send![name_value, UTF8String];
-                            let content_type_str: *const i8 =
-                                msg_send![content_type_value, UTF8String];
+                            let path_value: id = msg_send![item, valueForAttribute: kMDItemPath];
+                            let name_value: id = msg_send![item, valueForAttribute: kMDItemDisplayName];
+                            let content_type_value: id =
+                                msg_send![item, valueForAttribute: kMDItemContentType];
 
-                            let path = std::ffi::CStr::from_ptr(path_str)
-                                .to_string_lossy()
-                                .into_owned();
+                            if path_value != nil && name_value != nil && content_type_value != nil {
+                                let path_str: *const i8 = msg_send![path_value, UTF8String];
+                                let name_str: *const i8 = msg_send![name_value, UTF8String];
+                                let content_type_str: *const i8 =
+                                    msg_send![content_type_value, UTF8String];
 
-                            let name = std::ffi::CStr::from_ptr(name_str)
-                                .to_string_lossy()
-                                .into_owned();
+                                let path = std::ffi::CStr::from_ptr(path_str)
+                                    .to_string_lossy()
+                                    .into_owned();
 
-                            let content_type = std::ffi::CStr::from_ptr(content_type_str)
-                                .to_string_lossy()
-                                .into_owned();
+                                let name = std::ffi::CStr::from_ptr(name_str)
+                                    .to_string_lossy()
+                                    .into_owned();
 
-                            results_vec.push(SpotlightAppInfo {
-                                path,
-                                display_name: name,
-                                content_type,
-                            });
+                                let content_type = std::ffi::CStr::from_ptr(content_type_str)
+                                    .to_string_lossy()
+                                    .into_owned();
+
+                                results_vec.push(SpotlightAppInfo {
+                                    path,
+                                    display_name: name,
+                                    content_type,
+                                });
+                            }
                         }
                     }
-                }
 
-                // Signal completion by emitting event
-                let _ =
-                    window_for_block.emit("spotlight-search-complete", query_id_for_block.clone());
+                    // Signal completion by emitting event
+                    let _ =
+                        window_for_block.emit("spotlight-search-complete", query_id_for_block.clone());
 
-                let _: () = msg_send![query_obj, stopQuery];
-                CFRunLoopStop(CFRunLoopGetCurrent());
-                let _: () = msg_send![pool, drain];
-            });
+                    let _: () = msg_send![query_obj, stopQuery];
+                    CFRunLoopStop(CFRunLoopGetCurrent());
+                });
 
-            let block = block.copy();
+                let block = block.copy();
 
-            // Register for the notification
-            let notification_name =
-                CocoaNSString::alloc(nil).init_str("NSMetadataQueryDidFinishGatheringNotification");
-            let notification_center: id = msg_send![class!(NSNotificationCenter), defaultCenter];
+                // Register for the notification
+                let notification_name =
+                    CocoaNSString::alloc(nil).init_str("NSMetadataQueryDidFinishGatheringNotification");
+                let notification_center: id = msg_send![class!(NSNotificationCenter), defaultCenter];
 
-            let query_obj = create_metadata_query(search_only_in_home, query, Some(extensions));
+                let query_obj = create_metadata_query(search_only_in_home, query, Some(extensions));
 
-            let _: () = msg_send![notification_center,
-                addObserverForName: notification_name
-                object: query_obj
-                queue: {let main_queue: id = msg_send![class!(NSOperationQueue), mainQueue]; main_queue}
-                usingBlock: block
-            ];
+                let _: () = msg_send![notification_center,
+                    addObserverForName: notification_name
+                    object: query_obj
+                    queue: {let main_queue: id = msg_send![class!(NSOperationQueue), mainQueue]; main_queue}
+                    usingBlock: block
+                ];
 
-            // Release the pool
-            let _: () = msg_send![pool, drain];
+                // Start the query
+                let _: () = msg_send![query_obj, startQuery];
+                // Run the run loop until the query completes
+                use core_foundation::runloop::{kCFRunLoopDefaultMode, CFRunLoopRunInMode};
+                CFRunLoopRunInMode(kCFRunLoopDefaultMode, 5.0, 0);
+            }
+        });
 
-            // Start the query
-            let _: () = msg_send![query_obj, startQuery];
-            // Run the run loop until the query completes
-
-            use core_foundation::runloop::{kCFRunLoopDefaultMode, CFRunLoopRunInMode};
-            CFRunLoopRunInMode(kCFRunLoopDefaultMode, 5.0, 0);
-        }
-    });
-
-    // Wait for the query to complete
+        rx
+    };
     let _ = rx.await;
 
-    // Get the results
+    // After await, the shared autorelease pool will be dropped when going out of scope
     let results_vec = {
         let mut queries = state.queries.lock().unwrap();
         let results_arc = queries
@@ -332,9 +347,6 @@ pub fn create_spotlight_predicate(query_text: &str, allowed_extensions: Vec<Stri
             predicate
         }
 
-        // Create an autorelease pool to manage memory
-        let pool: id = msg_send![class!(NSAutoreleasePool), new];
-
         // Create predicates for each allowed extension
         let mut allow_predicates: Vec<id> = Vec::with_capacity(allowed_extensions.len());
         for (_i, ext) in allowed_extensions.iter().enumerate() {
@@ -389,9 +401,6 @@ pub fn create_spotlight_predicate(query_text: &str, allowed_extensions: Vec<Stri
 
         // Try to retain the predicate to prevent it from being released too early
         let _: () = msg_send![final_predicate, retain];
-
-        // Release the autorelease pool
-        let _: () = msg_send![pool, drain];
 
         final_predicate
     }

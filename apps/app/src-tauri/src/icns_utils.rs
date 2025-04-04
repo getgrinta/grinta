@@ -7,7 +7,7 @@ use std::collections::HashMap;
 use std::fs::{self, File};
 use std::io::{BufWriter, Write};
 use std::path::Path;
-use tauri::{command, AppHandle, Manager, Runtime};
+use tauri::{command, AppHandle, Runtime};
 
 #[cfg(target_os = "macos")]
 use tauri_icns::{IconFamily, IconType};
@@ -117,7 +117,7 @@ pub struct AppInfo {
 #[command]
 #[cfg(target_os = "macos")]
 pub async fn load_app_info<R: Runtime>(
-    app_handle: AppHandle<R>,
+    _app_handle: AppHandle<R>,
     resources_paths: Vec<String>,
 ) -> Result<HashMap<String, AppInfo>, String> {
     let mut result = HashMap::new();
