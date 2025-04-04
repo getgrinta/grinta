@@ -2,10 +2,7 @@ use base64::{engine::general_purpose, Engine as _};
 use cocoa::base::{id, nil};
 use cocoa::foundation::{NSString, NSString as CocoaNSString};
 use objc::{class, msg_send, sel, sel_impl};
-<<<<<<< Updated upstream
 use plist::Value;
-=======
->>>>>>> Stashed changes
 use std::collections::HashMap;
 use std::fs::{self, File};
 use std::io::{BufWriter, Write};
@@ -38,10 +35,10 @@ fn load_icns_file(path: &Path) -> Result<Option<Vec<u8>>, String> {
 
     // Try to get the largest icon (preferably 256x256 or 128x128)
     let icon_types = [
+        IconType::RGBA32_512x512,
+        IconType::RGBA32_256x256,
         IconType::RGBA32_128x128,
         IconType::RGB24_128x128,
-        IconType::RGBA32_256x256,
-        IconType::RGBA32_512x512,
         IconType::RGBA32_512x512_2x,
         IconType::RGBA32_256x256_2x,
         IconType::RGBA32_128x128_2x,
@@ -123,19 +120,18 @@ pub async fn load_app_info<R: Runtime>(
     app_handle: AppHandle<R>,
     resources_paths: Vec<String>,
 ) -> Result<HashMap<String, AppInfo>, String> {
-    unsafe {
-        // Create an autorelease pool to manage memory
-        let pool: id = msg_send![class!(NSAutoreleasePool), new];
+    let mut result = HashMap::new();
+    let mut app_paths = Vec::new();
+    let mut app_names = HashMap::new();
+    let mut icns_paths = HashMap::new();
 
-        let mut result = HashMap::new();
-        let mut app_paths = Vec::new();
-        let mut app_names = HashMap::new();
-        let mut icns_paths = HashMap::new();
+    for resources_path in resources_paths {
+        let resources_dir = Path::new(&resources_path);
 
-        for resources_path in resources_paths {
-            let resources_dir = Path::new(&resources_path);
+        if !resources_dir.exists() || !resources_dir.is_dir() {
+            continue;
+        }
 
-<<<<<<< Updated upstream
         // Get app path (parent directory of Resources/Contents
         let app_path = resources_dir
             .parent() // This gets "Contents"
@@ -235,113 +231,12 @@ pub async fn load_app_info<R: Runtime>(
             let app_info = AppInfo {
                 base64Image: String::new(),
                 localizedName: localized_name,
-=======
-            if !resources_dir.exists() || !resources_dir.is_dir() {
-                continue;
-            }
-
-            // Get app path (parent directory of Resources/Contents
-            let app_path = resources_dir
-                .parent() // This gets "Contents"
-                .and_then(|p| p.parent()); // This gets "App.app"
-
-            // Skip if we can't get the app path
-            let app_path = match app_path {
-                Some(path) => path,
-                None => continue,
->>>>>>> Stashed changes
             };
-
-            // Get app name from path
-            let app_name = app_path
-                .file_name()
-                .and_then(|s| s.to_str())
-                .unwrap_or("unknown")
-                .replace(".app", "");
-
-            // Find the first .icns file in the directory
-            let mut icns_path = None;
-
-            if let Ok(entries) = fs::read_dir(resources_dir) {
-                for entry in entries.filter_map(Result::ok) {
-                    let path = entry.path();
-                    if path.is_file() && path.extension().map_or(false, |ext| ext == "icns") {
-                        icns_path = Some(path);
-                        break;
-                    }
-                }
-            }
-
-            let app_path_str = app_path.to_string_lossy().to_string();
-            app_paths.push(app_path_str.clone());
-            app_names.insert(app_path_str.clone(), app_name);
-
-            if let Some(path) = icns_path {
-                icns_paths.insert(app_path_str, path);
-            }
+            result.insert(app_name, app_info);
         }
-
-        // Get all localized names at once using mdls
-        let localized_names = get_localized_app_names(&app_paths);
-
-        for app_path_str in app_paths {
-            let app_name = match app_names.get(&app_path_str) {
-                Some(name) => name.clone(),
-                None => continue,
-            };
-
-            // Get the localized name or fall back to app name
-            let localized_name = localized_names
-                .get(&app_path_str)
-                .cloned()
-                .unwrap_or_else(|| app_name.clone());
-
-            // Check if we have an icon path for this app
-            if let Some(icns_path) = icns_paths.get(&app_path_str) {
-                // Load and convert ICNS to PNG
-                match load_icns_file(icns_path) {
-                    Ok(Some(png_data)) => {
-                        // Convert PNG data to base64
-                        let base64_png = general_purpose::STANDARD.encode(&png_data);
-                        let data_url = format!("data:image/png;base64,{}", base64_png);
-
-                        let app_info = AppInfo {
-                            base64Image: data_url,
-                            localizedName: localized_name,
-                        };
-                        result.insert(app_name, app_info);
-                    }
-                    Ok(None) => {
-                        // No suitable icon found, create AppInfo with empty image
-                        let app_info = AppInfo {
-                            base64Image: String::new(),
-                            localizedName: localized_name.clone(),
-                        };
-                        result.insert(app_name, app_info);
-                    }
-                    Err(_) => {
-                        let app_info = AppInfo {
-                            base64Image: String::new(),
-                            localizedName: localized_name.clone(),
-                        };
-                        result.insert(app_name, app_info);
-                    }
-                }
-            } else {
-                // No icon path, create AppInfo with empty image
-                let app_info = AppInfo {
-                    base64Image: String::new(),
-                    localizedName: localized_name,
-                };
-                result.insert(app_name, app_info);
-            }
-        }
-
-        // Release the autorelease pool
-        let _: () = msg_send![pool, drain];
-
-        Ok(result)
     }
+
+    Ok(result)
 }
 
 // Define a struct to hold app information for non-macOS platforms
@@ -414,13 +309,9 @@ pub async fn load_app_info<R: Runtime>(
 pub fn load_extension_icons(extensions: Vec<String>) -> Result<HashMap<String, String>, String> {
     let mut icon_map = HashMap::new();
 
-    unsafe {
-        // Create an autorelease pool to manage memory
-        let pool: id = msg_send![class!(NSAutoreleasePool), new];
-
-        for ext in extensions {
-            let icon = unsafe {
-                // Special case for folder icon
+    for ext in extensions {
+        let icon = unsafe {
+            // Special case for folder icon
             if ext == "folder" {
                 let ns_image_class = class!(NSImage);
                 // NSImage.folderName in Swift is "NSFolder" in Objective-C
@@ -430,7 +321,7 @@ pub fn load_extension_icons(extensions: Vec<String>) -> Result<HashMap<String, S
                 // Regular file extension icon
                 let workspace = class!(NSWorkspace);
                 let shared_workspace: id = msg_send![workspace, sharedWorkspace];
-                let ns_string: id = msg_send![class!(NSString), stringWithUTF8String:ext.as_ptr()];
+                let ns_string = CocoaNSString::alloc(nil).init_str(&ext);
                 let icon: id = msg_send![shared_workspace, iconForFileType:ns_string];
                 icon
             }
@@ -473,10 +364,7 @@ pub fn load_extension_icons(extensions: Vec<String>) -> Result<HashMap<String, S
         let base64_icon = general_purpose::STANDARD.encode(png_bytes);
         let data_url = format!("data:image/png;base64,{}", base64_icon);
         icon_map.insert(ext, data_url);
-
-        let _: () = msg_send![pool, drain];
     }
-}
 
     Ok(icon_map)
 }
