@@ -1814,6 +1814,7 @@ dependencies = [
  "block",
  "block2 0.3.0",
  "cocoa",
+ "core-foundation 0.9.4",
  "fix-path-env",
  "objc",
  "plist",
