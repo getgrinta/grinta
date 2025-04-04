@@ -1,11 +1,12 @@
+use cocoa::base::{id, nil, YES};
+use cocoa::foundation::{NSString as CocoaNSString, NSUInteger};
+use core_foundation::runloop::{CFRunLoopGetCurrent, CFRunLoopStop};
+use objc::{class, msg_send, sel, sel_impl};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
-use cocoa::foundation::{NSString as CocoaNSString, NSUInteger};
-use objc::{class, msg_send, sel, sel_impl};
 use tauri::{command, Emitter, Listener, Runtime, State, Window};
 use tokio::sync::oneshot;
-use cocoa::base::{id, nil, YES};
 
 #[allow(non_snake_case)]
 #[derive(serde::Serialize, serde::Deserialize, Clone)]
@@ -45,7 +46,6 @@ pub async fn search_spotlight_apps<R: Runtime>(
     extensions: Vec<String>,
     search_only_in_home: bool,
 ) -> Result<Vec<SpotlightAppInfo>, String> {
-
     // Generate a unique ID for this query
     let query_id = format!(
         "query_{}",
@@ -156,6 +156,7 @@ pub async fn search_spotlight_apps<R: Runtime>(
                     window_for_block.emit("spotlight-search-complete", query_id_for_block.clone());
 
                 let _: () = msg_send![query_obj, stopQuery];
+                CFRunLoopStop(CFRunLoopGetCurrent());
                 let _: () = msg_send![pool, drain];
             });
 
@@ -181,8 +182,9 @@ pub async fn search_spotlight_apps<R: Runtime>(
             // Start the query
             let _: () = msg_send![query_obj, startQuery];
             // Run the run loop until the query completes
-            let run_loop: id = msg_send![class!(NSRunLoop), currentRunLoop];
-            let _: () = msg_send![run_loop, run];
+
+            use core_foundation::runloop::{kCFRunLoopDefaultMode, CFRunLoopRunInMode};
+            CFRunLoopRunInMode(kCFRunLoopDefaultMode, 5.0, 0);
         }
     });
 
@@ -250,7 +252,8 @@ unsafe fn create_search_scope(search_only_in_home: bool) -> id {
             (12, "NSDesktopDirectory"),
         ];
 
-        let computer_scope: id = msg_send![class!(NSString), stringWithUTF8String:"kMDQueryScopeComputer".as_ptr()];
+        let computer_scope: id =
+            msg_send![class!(NSString), stringWithUTF8String:"kMDQueryScopeComputer".as_ptr()];
         let scope_array: id = msg_send![class!(NSMutableArray), arrayWithObject: computer_scope];
 
         for (directory_constant, _name) in directories.iter() {
@@ -261,14 +264,15 @@ unsafe fn create_search_scope(search_only_in_home: bool) -> id {
             ];
             let count: NSUInteger = msg_send![urls, count];
             if urls != nil && count > 0 {
-                 let url: id = msg_send![urls, firstObject];
-                 if url != nil {
-                     let path: id = msg_send![url, path]; // Use path instead of relativePath
-                     if path != nil {
+                let url: id = msg_send![urls, firstObject];
+                if url != nil {
+                    let path: id = msg_send![url, path]; // Use path instead of relativePath
+                    if path != nil {
                         // Check if path is not nil and not empty before adding
                         let path_str = if path != nil {
                             let ns_string: id = msg_send![path, description];
-                            let utf8_str: *const std::os::raw::c_char = msg_send![ns_string, UTF8String];
+                            let utf8_str: *const std::os::raw::c_char =
+                                msg_send![ns_string, UTF8String];
                             if !utf8_str.is_null() {
                                 std::ffi::CStr::from_ptr(utf8_str).to_str().unwrap_or("")
                             } else {
@@ -280,8 +284,8 @@ unsafe fn create_search_scope(search_only_in_home: bool) -> id {
                         if !path_str.is_empty() {
                             let _: () = msg_send![scope_array, addObject: path];
                         }
-                     }
-                 }
+                    }
+                }
             }
         }
         // Explicitly add home directory if not already covered or desired
@@ -291,7 +295,11 @@ unsafe fn create_search_scope(search_only_in_home: bool) -> id {
     }
 }
 
-unsafe fn create_metadata_query(search_only_in_home: bool, query: Option<String>, extensions: Option<Vec<String>>) -> id {
+unsafe fn create_metadata_query(
+    search_only_in_home: bool,
+    query: Option<String>,
+    extensions: Option<Vec<String>>,
+) -> id {
     let query_obj: id = msg_send![class!(NSMetadataQuery), new];
 
     let scope_array = create_search_scope(search_only_in_home);
