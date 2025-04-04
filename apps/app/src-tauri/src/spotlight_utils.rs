@@ -1,8 +1,11 @@
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
+use cocoa::foundation::{NSString as CocoaNSString, NSUInteger};
+use objc::{class, msg_send, sel, sel_impl};
 use tauri::{command, Emitter, Listener, Runtime, State, Window};
 use tokio::sync::oneshot;
+use cocoa::base::{id, nil, YES};
 
 #[allow(non_snake_case)]
 #[derive(serde::Serialize, serde::Deserialize, Clone)]
@@ -44,7 +47,6 @@ pub async fn search_spotlight_apps<R: Runtime>(
 ) -> Result<Vec<SpotlightAppInfo>, String> {
     use cocoa::base::{id, nil, YES};
     use cocoa::foundation::{NSString as CocoaNSString, NSUInteger};
-    use objc::{class, msg_send, sel, sel_impl};
 
     // Generate a unique ID for this query
     let query_id = format!(
@@ -97,88 +99,6 @@ pub async fn search_spotlight_apps<R: Runtime>(
             // Create an autorelease pool
             let pool: id = msg_send![class!(NSAutoreleasePool), new];
 
-            // Create a metadata query
-            let query_obj: id = msg_send![class!(NSMetadataQuery), new];
-
-            // Set the search scope to the computer
-            let computer_scope: id = msg_send![class!(NSString), stringWithUTF8String:"kMDQueryScopeComputer".as_ptr()];
-            let scope_array: id = msg_send![class!(NSMutableArray), array];
-            let _: () = msg_send![scope_array, addObject:computer_scope];
-
-            let _: () = msg_send![query_obj, setSearchScopes: scope_array];
-
-            // Set up the predicate
-            let search_term = query.as_deref().unwrap_or("");
-
-            // Create the predicate
-            let predicate: id = create_spotlight_predicate(search_term, extensions);
-
-            // Set the predicate on the query object
-            let _: () = msg_send![query_obj, setPredicate: predicate];
-
-            // Get standard directories using FileManager instead of manually appending paths
-            let file_manager: id = msg_send![class!(NSFileManager), defaultManager];
-
-            let user_domain_mask: NSUInteger = 1;
-
-            // Get home directory using homeDirectoryForCurrentUser
-            let home_url: id = msg_send![file_manager, homeDirectoryForCurrentUser];
-            let home_path: id = msg_send![home_url, path];
-
-            // Create scope array based on search_only_in_home flag
-            let scope_array: id = if search_only_in_home {
-                let array: id = msg_send![class!(NSMutableArray), arrayWithObject:home_path];
-                array
-            } else {
-                // Get Downloads directory
-                let downloads_directory: NSUInteger = 15; // NSDownloadsDirectory
-                let downloads_urls: id = msg_send![file_manager, URLsForDirectory:downloads_directory inDomains:user_domain_mask]; // NSUserDomainMask
-                let downloads_url: id = msg_send![downloads_urls, firstObject];
-
-                // Get Documents directory
-                let documents_directory: NSUInteger = 9; // NSDocumentDirectory
-                let documents_urls: id = msg_send![file_manager, URLsForDirectory:documents_directory inDomains:user_domain_mask]; // NSUserDomainMask
-                let documents_url: id = msg_send![documents_urls, firstObject];
-
-                // Get Desktop directory
-                let desktop_directory: NSUInteger = 12; // NSDesktopDirectory
-                let desktop_urls: id = msg_send![file_manager, URLsForDirectory:desktop_directory inDomains:user_domain_mask]; // NSUserDomainMask
-                let desktop_url: id = msg_send![desktop_urls, firstObject];
-
-                let downloads_path: id = msg_send![downloads_url, relativePath];
-                let documents_path: id = msg_send![documents_url, relativePath];
-                let desktop_path: id = msg_send![desktop_url, relativePath];
-
-                // Update the search scopes to include user directories
-                let array: id = msg_send![class!(NSMutableArray), arrayWithObject:computer_scope];
-                let _: () = msg_send![array, addObject:desktop_path];
-                let _: () = msg_send![array, addObject:documents_path];
-                let _: () = msg_send![array, addObject:downloads_path];
-                array
-            };
-
-            // Set the search scopes for the query
-            let _: () = msg_send![query_obj, setSearchScopes: scope_array];
-
-            // Set sort descriptors
-            let sort_key: id = msg_send![class!(NSString), stringWithUTF8String:"kMDItemDisplayName".as_ptr()];
-            let sort_descriptor: id = msg_send![class!(NSSortDescriptor), sortDescriptorWithKey:sort_key ascending:YES];
-            let sort_descriptors_array: id =
-                msg_send![class!(NSArray), arrayWithObject:sort_descriptor];
-            let _: () = msg_send![query_obj, setSortDescriptors:sort_descriptors_array];
-
-            // Set value list attributes
-            let value_list_attributes: id = msg_send![class!(NSMutableArray), array];
-            let display_name_attr: id = msg_send![class!(NSString), stringWithUTF8String:"kMDItemDisplayName".as_ptr()];
-            let path_attr: id = msg_send![class!(NSString), stringWithUTF8String:"kMDItemPath".as_ptr()];
-            let content_type_attr: id = msg_send![class!(NSString), stringWithUTF8String:"kMDItemContentType".as_ptr()];
-            
-            let _: () = msg_send![value_list_attributes, addObject:display_name_attr];
-            let _: () = msg_send![value_list_attributes, addObject:path_attr];
-            let _: () = msg_send![value_list_attributes, addObject:content_type_attr];
-
-            let _: () = msg_send![query_obj, setValueListAttributes:value_list_attributes];
-
             // Create a block with captured variables from our context
             let window_for_block = window_clone.clone();
             let query_id_for_block = query_id_clone.clone();
@@ -186,8 +106,7 @@ pub async fn search_spotlight_apps<R: Runtime>(
 
             // Use the block API to handle results directly
             let block = block::ConcreteBlock::new(move |notification: id| -> () {
-
-            // Create an autorelease pool
+                // Create an autorelease pool
                 let pool: id = msg_send![class!(NSAutoreleasePool), new];
 
                 // Get the query object
@@ -249,6 +168,8 @@ pub async fn search_spotlight_apps<R: Runtime>(
                 CocoaNSString::alloc(nil).init_str("NSMetadataQueryDidFinishGatheringNotification");
             let notification_center: id = msg_send![class!(NSNotificationCenter), defaultCenter];
 
+            let query_obj = create_metadata_query(search_only_in_home, query, Some(extensions));
+
             let _: () = msg_send![notification_center,
                 addObserverForName: notification_name
                 object: query_obj
@@ -285,24 +206,135 @@ pub async fn search_spotlight_apps<R: Runtime>(
     Ok(results_vec)
 }
 
-use cocoa::base::{id, nil};
+// Helper function to create sort descriptors array
+unsafe fn create_sort_descriptors() -> id {
+    let sort_key: id =
+        msg_send![class!(NSString), stringWithUTF8String:"kMDItemDisplayName".as_ptr()];
+    let sort_descriptor: id = msg_send![
+        class!(NSSortDescriptor),
+        sortDescriptorWithKey:sort_key
+        ascending:YES
+    ];
+    msg_send![class!(NSArray), arrayWithObject:sort_descriptor]
+}
+
+// Helper function to create value list attributes array
+unsafe fn create_value_list_attributes() -> id {
+    let value_list_attributes: id = msg_send![class!(NSMutableArray), array];
+    let display_name_attr: id =
+        msg_send![class!(NSString), stringWithUTF8String:"kMDItemDisplayName".as_ptr()];
+    let path_attr: id = msg_send![class!(NSString), stringWithUTF8String:"kMDItemPath".as_ptr()];
+    let content_type_attr: id =
+        msg_send![class!(NSString), stringWithUTF8String:"kMDItemContentType".as_ptr()];
+
+    let _: () = msg_send![value_list_attributes, addObject:display_name_attr];
+    let _: () = msg_send![value_list_attributes, addObject:path_attr];
+    let _: () = msg_send![value_list_attributes, addObject:content_type_attr];
+    value_list_attributes
+}
+
+// Helper function to create search scope array
+unsafe fn create_search_scope(search_only_in_home: bool) -> id {
+    let file_manager: id = msg_send![class!(NSFileManager), defaultManager];
+    let user_domain_mask: NSUInteger = 1; // NSUserDomainMask
+
+    // Get home directory
+    let home_url: id = msg_send![file_manager, homeDirectoryForCurrentUser];
+    let home_path: id = msg_send![home_url, path];
+
+    if search_only_in_home {
+        msg_send![class!(NSMutableArray), arrayWithObject: home_path]
+    } else {
+        // Standard directories to search
+        let directories = [
+            (15, "NSDownloadsDirectory"), // Downloads
+            (9, "NSDocumentDirectory"),  // Documents
+            (12, "NSDesktopDirectory"),   // Desktop
+        ];
+
+        let computer_scope: id = msg_send![class!(NSString), stringWithUTF8String:"kMDQueryScopeComputer".as_ptr()];
+        let scope_array: id = msg_send![class!(NSMutableArray), arrayWithObject: computer_scope]; // Start with computer scope
+
+        for (directory_constant, _name) in directories.iter() {
+            let urls: id = msg_send![
+                file_manager,
+                URLsForDirectory: *directory_constant as NSUInteger
+                inDomains: user_domain_mask
+            ];
+            let count: NSUInteger = msg_send![urls, count];
+            if urls != nil && count > 0 {
+                 let url: id = msg_send![urls, firstObject];
+                 if url != nil {
+                     let path: id = msg_send![url, path]; // Use path instead of relativePath
+                     if path != nil {
+                        // Check if path is not nil and not empty before adding
+                        let path_str = if path != nil {
+                            let ns_string: id = msg_send![path, description];
+                            let utf8_str: *const std::os::raw::c_char = msg_send![ns_string, UTF8String];
+                            if !utf8_str.is_null() {
+                                std::ffi::CStr::from_ptr(utf8_str).to_str().unwrap_or("")
+                            } else {
+                                ""
+                            }
+                        } else {
+                            ""
+                        };
+                        if !path_str.is_empty() {
+                            let _: () = msg_send![scope_array, addObject: path];
+                        }
+                     }
+                 }
+            }
+        }
+        // Explicitly add home directory if not already covered or desired
+        // let _: () = msg_send![scope_array, addObject: home_path];
+
+        scope_array
+    }
+}
+
+// Helper function to create metadata query
+unsafe fn create_metadata_query(search_only_in_home: bool, query: Option<String>, extensions: Option<Vec<String>>) -> id {
+    let query_obj: id = msg_send![class!(NSMetadataQuery), new];
+
+    let scope_array = create_search_scope(search_only_in_home);
+    let _: () = msg_send![query_obj, setSearchScopes: scope_array];
+
+    let search_term = query.as_deref().unwrap_or("");
+    // Pass extensions.unwrap_or_default() to handle the Option
+    let predicate: id = create_spotlight_predicate(search_term, extensions.unwrap_or_default());
+    let _: () = msg_send![query_obj, setPredicate: predicate];
+
+    let sort_descriptors_array = create_sort_descriptors();
+    let _: () = msg_send![query_obj, setSortDescriptors:sort_descriptors_array];
+
+    let value_list_attributes_array = create_value_list_attributes();
+    let _: () = msg_send![query_obj, setValueListAttributes:value_list_attributes_array];
+
+    query_obj
+}
+
 #[cfg(target_os = "macos")]
-fn create_spotlight_predicate(query_text: &str, allowed_extensions: Vec<std::string::String>) -> id {
+pub fn create_spotlight_predicate(query_text: &str, allowed_extensions: Vec<String>) -> id {
     use cocoa::foundation::NSString as CocoaNSString;
-    use objc::{class, msg_send, sel, sel_impl};
 
     unsafe {
+        unsafe fn create_predicate(format: &str) -> id {
+            let predicate_str = CocoaNSString::alloc(nil).init_str(format);
+            let predicate: id = msg_send![class!(NSPredicate), predicateWithFormat: predicate_str];
+
+            let _: () = msg_send![predicate_str, release];
+            predicate
+        }
+
         // Create an autorelease pool to manage memory
         let pool: id = msg_send![class!(NSAutoreleasePool), new];
 
         // Create predicates for each allowed extension
         let mut allow_predicates: Vec<id> = Vec::with_capacity(allowed_extensions.len());
         for (_i, ext) in allowed_extensions.iter().enumerate() {
-            // Use a simpler predicate format without parameters first
             let format_str = format!("kMDItemDisplayName LIKE[c] '{}'", ext);
-            let predicate_str = CocoaNSString::alloc(nil).init_str(&format_str);
-            let predicate: id = msg_send![class!(NSPredicate), predicateWithFormat:predicate_str];
-            allow_predicates.push(predicate);
+            allow_predicates.push(create_predicate(&format_str));
         }
 
         // Create NSArray from the allow_predicates vector
@@ -318,16 +350,12 @@ fn create_spotlight_predicate(query_text: &str, allowed_extensions: Vec<std::str
 
         // Create search predicate based on query text
         let search_format = format!("kMDItemDisplayName CONTAINS[cd] '{}'", query_text);
-        let search_predicate_str = CocoaNSString::alloc(nil).init_str(&search_format);
-        let search_predicate: id =
-            msg_send![class!(NSPredicate), predicateWithFormat:search_predicate_str];
+        let search_predicate: id = create_predicate(&search_format);
 
         // If we found a folder, it can't have dots
         let folder_format =
             "kMDItemContentType == 'public.folder' AND NOT (kMDItemDisplayName CONTAINS[cd] '.')";
-        let folder_predicate_str = CocoaNSString::alloc(nil).init_str(folder_format);
-        let folder_predicate: id =
-            msg_send![class!(NSPredicate), predicateWithFormat:folder_predicate_str];
+        let folder_predicate: id = create_predicate(folder_format);
 
         // Create OR compound predicate for extensions or folders
         let extensions_or_folder_predicates = [allow_compound_predicate, folder_predicate];
@@ -339,10 +367,7 @@ fn create_spotlight_predicate(query_text: &str, allowed_extensions: Vec<std::str
 
         // Create exclude system file predicate
         let exclude_system_format = "NOT (kMDItemSupportFileType == 'MDSystemFile')";
-        let exclude_system_predicate_str =
-            CocoaNSString::alloc(nil).init_str(exclude_system_format);
-        let exclude_system_file_predicate: id =
-            msg_send![class!(NSPredicate), predicateWithFormat:exclude_system_predicate_str];
+        let exclude_system_file_predicate: id = create_predicate(exclude_system_format);
 
         // Create final AND compound predicate
         let final_predicates = [
@@ -350,15 +375,12 @@ fn create_spotlight_predicate(query_text: &str, allowed_extensions: Vec<std::str
             extensions_or_folder_predicate,
             exclude_system_file_predicate,
         ];
-        let final_array: id = msg_send![
-            class!(NSArray),
-            arrayWithObjects:final_predicates.as_ptr() count:3
-        ];
 
-        let final_predicate: id = msg_send![
-            class!(NSCompoundPredicate),
-            andPredicateWithSubpredicates:final_array
-        ];
+        let final_array: id =
+            msg_send![class!(NSArray),arrayWithObjects:final_predicates.as_ptr() count:3];
+
+        let final_predicate: id =
+            msg_send![class!(NSCompoundPredicate), andPredicateWithSubpredicates:final_array];
 
         // Try to retain the predicate to prevent it from being released too early
         let _: () = msg_send![final_predicate, retain];
