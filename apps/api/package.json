@@ -3,7 +3,7 @@
 	"type": "module",
 	"module": "dist/index.js",
 	"types": "dist/index.d.ts",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
@@ -17,7 +17,8 @@
 		"start": "bun run --bun dist/index.js",
 		"db:push": "drizzle-kit push",
 		"db:generate": "drizzle-kit generate",
-		"db:migrate": "drizzle-kit migrate"
+		"db:migrate": "drizzle-kit migrate",
+		"script:notify": "bun ./scripts/notify-deployed.ts"
 	},
 	"dependencies": {
 		"@ai-sdk/openai-compatible": "0.2.5",
@@ -33,7 +34,7 @@
 		"hono": "4.7.5",
 		"postgres": "3.4.5",
 		"resend": "4.2.0",
-		"stripe": "18.0.0",
+		"stripe": "17.7.0",
 		"ts-pattern": "5.7.0",
 		"zod": "3.24.2"
 	},

@@ -15,7 +15,7 @@
     },
     "apps/api": {
       "name": "@getgrinta/api",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@ai-sdk/openai-compatible": "0.2.5",
         "@better-auth/stripe": "1.2.5",
@@ -30,7 +30,7 @@
         "hono": "4.7.5",
         "postgres": "3.4.5",
         "resend": "4.2.0",
-        "stripe": "18.0.0",
+        "stripe": "17.7.0",
         "ts-pattern": "5.7.0",
         "zod": "3.24.2",
       },
@@ -40,7 +40,7 @@
     },
     "apps/app": {
       "name": "@grintabar/app",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "dependencies": {
         "@ai-sdk/openai-compatible": "0.2.5",
         "@better-auth/stripe": "1.2.5",
@@ -1724,7 +1724,7 @@
 
     "strip-final-newline": ["strip-final-newline@3.0.0", "", {}, "sha512-dOESqjYr96iWYylGObzd39EuNTa5VJxyvVAEm5Jnh7KGo75V43Hk1odPQkNDyXNmUR6k+gEiDVXnjB8HJ3crXw=="],
 
-    "stripe": ["stripe@18.0.0", "", { "dependencies": { "@types/node": ">=8.1.0", "qs": "^6.11.0" } }, "sha512-3Fs33IzKUby//9kCkCa1uRpinAoTvj6rJgQ2jrBEysoxEvfsclvXdna1amyEYbA2EKkjynuB4+L/kleCCaWTpA=="],
+    "stripe": ["stripe@17.7.0", "", { "dependencies": { "@types/node": ">=8.1.0", "qs": "^6.11.0" } }, "sha512-aT2BU9KkizY9SATf14WhhYVv2uOapBWX0OFWF4xvcj1mPaNotlSc2CsxpS4DS46ZueSppmCF5BX1sNYBtwBvfw=="],
 
     "strnum": ["strnum@1.1.2", "", {}, "sha512-vrN+B7DBIoTTZjnPNewwhx6cBA/H+IS7rfW68n7XxC1y7uoiGQBxaKzqucGUgavX15dJgiGztLJ8vxuEzwqBdA=="],
 
