@@ -16,7 +16,6 @@
 	"dependencies": {
 		"@ai-sdk/openai-compatible": "0.2.5",
 		"@better-auth/stripe": "1.2.5",
-		"@expo/plist": "^0.2.2",
 		"@felte/validator-zod": "1.0.18",
 		"@fontsource-variable/dm-sans": "5.2.5",
 		"@github/hotkey": "3.1.1",
