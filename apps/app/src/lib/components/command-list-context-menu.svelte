@@ -16,7 +16,7 @@
 	import * as PathApi from "@tauri-apps/api/path";
 
 	import * as TauriFs from "@tauri-apps/plugin-fs";
-    import { notesStore } from "$lib/store/notes.svelte";
+	import { notesStore } from "$lib/store/notes.svelte";
 
 	let contextMenuItems = $state<MenuItem[]>([]);
 
@@ -129,7 +129,6 @@
 					}
 
 					let pathToOpen = path;
-
 
 					console.log(pathToOpen);
 
