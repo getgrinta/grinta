@@ -12,6 +12,11 @@
 	import { get } from "svelte/store";
 	import ContextMenu from "./context-menu.svelte";
 	import type { MenuItem } from "./context-menu.svelte";
+	import { settingsStore } from "$lib/store/settings.svelte";
+	import * as PathApi from "@tauri-apps/api/path";
+
+	import * as TauriFs from "@tauri-apps/plugin-fs";
+	import { notesStore } from "$lib/store/notes.svelte";
 
 	let contextMenuItems = $state<MenuItem[]>([]);
 
@@ -49,6 +54,34 @@
 				onClick: async () => {
 					await commandsStore.removeHistoryEntry(command);
 					commandsStore.buildCommands({ isRefresh: false });
+				},
+			});
+		}
+
+		if (command.handler === COMMAND_HANDLER.OPEN_NOTE) {
+			// Show in finder
+			menuItems.push({
+				label: t("commands.contextMenu.showInFinder"),
+				icon: EyeIcon as any,
+				onClick: async () => {
+					const homePath = await PathApi.homeDir();
+					const fullPath = await PathApi.join(
+						homePath,
+						...settingsStore.data.notesDir,
+						command.value,
+					);
+
+					Command.create("open", ["-R", fullPath]).execute();
+				},
+			});
+
+			// Remove
+			menuItems.push({
+				label: t("commands.contextMenu.remove"),
+				icon: XIcon as any,
+				onClick: async () => {
+					await notesStore.deleteNote(command.value);
+					commandsStore.buildCommands({ isRefresh: true });
 				},
 			});
 		}
@@ -92,16 +125,7 @@
 						return;
 					}
 
-					let pathToOpen = path;
-					const lastSlash = pathToOpen.lastIndexOf("/");
-					if (
-						lastSlash !== -1 &&
-						command.metadata?.contentType !== "public.folder"
-					) {
-						pathToOpen = pathToOpen.substring(0, lastSlash);
-					}
-
-					Command.create("open", [pathToOpen]).execute();
+					Command.create("open", ["-R", path]).execute();
 				},
 			});
 
