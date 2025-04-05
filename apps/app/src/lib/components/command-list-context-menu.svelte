@@ -12,6 +12,11 @@
 	import { get } from "svelte/store";
 	import ContextMenu from "./context-menu.svelte";
 	import type { MenuItem } from "./context-menu.svelte";
+	import { settingsStore } from "$lib/store/settings.svelte";
+	import * as PathApi from "@tauri-apps/api/path";
+
+	import * as TauriFs from "@tauri-apps/plugin-fs";
+    import { notesStore } from "$lib/store/notes.svelte";
 
 	let contextMenuItems = $state<MenuItem[]>([]);
 
@@ -53,6 +58,35 @@
 			});
 		}
 
+		if (command.handler === COMMAND_HANDLER.OPEN_NOTE) {
+			// Show in finder
+			menuItems.push({
+				label: t("commands.contextMenu.showInFinder"),
+				icon: EyeIcon as any,
+				onClick: async () => {
+					console.log(command);
+					const homePath = await PathApi.homeDir();
+					const fullPath = await PathApi.join(
+						homePath,
+						...settingsStore.data.notesDir,
+						command.value,
+					);
+
+					Command.create("open", ["-R", fullPath]).execute();
+				},
+			});
+
+			// Remove
+			menuItems.push({
+				label: t("commands.contextMenu.remove"),
+				icon: XIcon as any,
+				onClick: async () => {
+					await notesStore.deleteNote(command.value);
+					commandsStore.buildCommands({ isRefresh: true });
+				},
+			});
+		}
+
 		if (command.handler === COMMAND_HANDLER.APP) {
 			menuItems.push({
 				label: t("commands.contextMenu.open"),
@@ -86,22 +120,20 @@
 				label: t("commands.contextMenu.showInFinder"),
 				icon: EyeIcon as any,
 				onClick: () => {
-					const { path } = command;
+					let { path } = command;
+
+					console.log(command);
 
 					if (!path) {
 						return;
 					}
 
 					let pathToOpen = path;
-					const lastSlash = pathToOpen.lastIndexOf("/");
-					if (
-						lastSlash !== -1 &&
-						command.metadata?.contentType !== "public.folder"
-					) {
-						pathToOpen = pathToOpen.substring(0, lastSlash);
-					}
 
-					Command.create("open", [pathToOpen]).execute();
+
+					console.log(pathToOpen);
+
+					Command.create("open", ["-R", pathToOpen]).execute();
 				},
 			});
 
