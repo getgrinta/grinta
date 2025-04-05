@@ -40,7 +40,7 @@ export class AppMetadataStore {
 		this.loadingApps.add(appName);
 
 		try {
-			loadAppInfo([`${resourcePath}/Contents/Resources/`]).then((appInfo) => {
+			loadAppInfo([`${resourcePath}`]).then((appInfo) => {
 				// Update the store with the new icon
 				// Only update keys with new values instead of creating a new object
 				for (const [key, value] of Object.entries(appInfo)) {
