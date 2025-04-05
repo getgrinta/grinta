@@ -2,7 +2,7 @@ use base64::{engine::general_purpose, Engine as _};
 use cocoa::base::{id, nil};
 use cocoa::foundation::{NSString, NSString as CocoaNSString};
 use objc::{class, msg_send, sel, sel_impl};
-use plist::Value;
+use plist::{Dictionary, Value};
 use std::collections::HashMap;
 use std::fs::{self, File};
 use std::io::{BufWriter, Write};
@@ -105,6 +105,92 @@ fn load_icns_file(path: &Path) -> Result<Option<Vec<u8>>, String> {
     Ok(None)
 }
 
+// Helper function to format a single icon file path
+fn format_icon_path(target_app_path: &str, icon_file: &str) -> String {
+    format!(
+        "{}/{}{}", // Using simpler path join for now as requested previously
+        target_app_path,
+        icon_file,
+        if !icon_file.contains(".") { ".icns" } else { "" }
+    )
+}
+
+fn process_icon_files_array(icon_files: &Vec<plist::Value>, target_app_path: &str) -> Option<String> {
+    // Prioritize .icns files
+    for icon_file_value in icon_files {
+        if let Some(icon_file) = icon_file_value.as_string() {
+            if icon_file.ends_with(".icns") {
+                return Some(format_icon_path(target_app_path, icon_file));
+            }
+        }
+    }
+
+    // Then, check for existing files ending directly in .png
+    for icon_file_value in icon_files {
+        if let Some(icon_file) = icon_file_value.as_string() {
+            if icon_file.ends_with(".png") {
+                let potential_path_str = format!("{}/{}", target_app_path, icon_file);
+                let potential_path = Path::new(&potential_path_str);
+                if potential_path.exists() {
+                    return Some(potential_path_str);
+                }
+            }
+        }
+    }
+
+    // If no .icns file found, take the first name and try PNG variations
+    if let Some(first_icon_base) = icon_files.first().and_then(|f| f.as_string()) {
+        let base_name = if first_icon_base.ends_with(".png") {
+             first_icon_base.trim_end_matches(".png")
+        } else {
+             first_icon_base
+        };
+
+        let png_suffixes = ["@2x.png", "@3x.png"]; // Only check multipliers now
+        for suffix in png_suffixes.iter() {
+            let potential_path_str = format!("{}/{}{}", target_app_path, base_name, suffix);
+            let potential_path = Path::new(&potential_path_str);
+            if potential_path.exists() {
+                return Some(potential_path_str);
+            }
+        }
+    }
+    None
+}
+
+// Updated function to extract icon path with prioritization
+fn extract_icon_path(plist_dict: Option<&Dictionary>, target_app_path: &str) -> Option<String> {
+    let dict = match plist_dict {
+        Some(d) => d,
+        None => return None,
+    };
+
+    // Check top-level CFBundleIconFile
+    if let Some(top_icon_file) = dict.get("CFBundleIconFile").and_then(Value::as_string) {
+       return Some(format_icon_path(target_app_path, top_icon_file));
+   }
+    
+    // Check top-level CFBundleIconFiles
+    if let Some(top_icon_files) = dict.get("CFBundleIconFiles").and_then(Value::as_array) {
+         if let Some(path) = process_icon_files_array(top_icon_files, target_app_path) {
+            return Some(path);
+        }
+    }
+
+    // Check CFBundleIcons~ipad -> CFBundlePrimaryIcon -> CFBundleIconFiles
+    if let Some(ipad_icons_dict) = dict.get("CFBundleIcons~ipad").and_then(Value::as_dictionary) {
+        if let Some(primary_icon_dict) = ipad_icons_dict.get("CFBundlePrimaryIcon").and_then(Value::as_dictionary) {
+            if let Some(icon_files) = primary_icon_dict.get("CFBundleIconFiles").and_then(Value::as_array) {
+                if let Some(path) = process_icon_files_array(icon_files, target_app_path) {
+                    return Some(path);
+                }
+            }
+        }
+    }
+
+    None
+}
+
 // Define a struct to hold app information
 #[derive(serde::Serialize, serde::Deserialize)]
 #[cfg(target_os = "macos")]
@@ -132,16 +218,7 @@ pub async fn load_app_info<R: Runtime>(
             continue;
         }
 
-        // Get app path (parent directory of Resources/Contents
-        let app_path = resources_dir
-            .parent() // This gets "Contents"
-            .and_then(|p| p.parent()); // This gets "App.app"
-
-        // Skip if we can't get the app path
-        let app_path = match app_path {
-            Some(path) => path,
-            None => continue,
-        };
+        let app_path = resources_dir;
 
         // Get app name from path
         let app_name = app_path
@@ -157,26 +234,35 @@ pub async fn load_app_info<R: Runtime>(
         let info_path = format!("{}/Contents/Info.plist", app_path.display());
 
         if let Ok(plist) = Value::from_file(&info_path) {
-            let icon_file = plist
-                .as_dictionary()
-                .and_then(|dict| dict.get("CFBundleIconFile"))
-                .and_then(|icon_file| icon_file.as_string());
-
-            if let Some(icon_file) = icon_file {
-                let icon_file_path = format!(
-                    "{}/Contents/Resources/{}{}",
-                    app_path.display(),
-                    icon_file,
-                    if !icon_file.ends_with(".icns") {
-                        ".icns"
-                    } else {
-                        ""
-                    }
-                );
-                icns_paths.insert(app_path_str, icon_file_path);
+            if let Some(icon_file_path) = extract_icon_path(plist.as_dictionary(), &format!("{}/Contents/Resources", app_path_str)) {
+                icns_paths.insert(app_path_str.clone(), icon_file_path);
             }
+        } else {
+            // Try to read alias or symlink that might point to an app
+            let symlink_path = format!("{}/WrappedBundle", app_path_str.clone());
 
-        
+            if let Ok(metadata) = fs::symlink_metadata(&symlink_path) {
+                if metadata.file_type().is_symlink() {
+                    if let Ok(target_path) = fs::read_link(&symlink_path) {
+                        // If the target is an app bundle, use that path for the Info.plist
+                        let target_str = target_path.to_string_lossy().to_string();
+                        let target_app_path = if !target_path.is_absolute() {
+                            // Resolve the relative path against the symlink itself
+                            Path::new(&app_path_str).join(&target_path).to_string_lossy().to_string()
+                        } else {
+                            target_str
+                        };
+                        
+                        let info_path = format!("{}/Info.plist", target_app_path);
+
+                        if let Ok(plist) = Value::from_file(&info_path) {
+                            if let Some(icon_file_path) = extract_icon_path(plist.as_dictionary(), &target_app_path) {
+                                icns_paths.insert(app_path_str.clone(), icon_file_path);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -197,33 +283,56 @@ pub async fn load_app_info<R: Runtime>(
 
         // Check if we have an icon path for this app
         if let Some(icns_path) = icns_paths.get(&app_path_str) {
-            // Load and convert ICNS to PNG
-            match load_icns_file(&Path::new(icns_path)) {
-                Ok(Some(png_data)) => {
-                    // Convert PNG data to base64
-                    let base64_png = general_purpose::STANDARD.encode(&png_data);
-                    let data_url = format!("data:image/png;base64,{}", base64_png);
+            if Path::new(icns_path).extension().and_then(|e| e.to_str()) == Some("png") {
+                // If file is a png, load it directly
+                match fs::read(icns_path) {
+                    Ok(png_data) => {
+                        // Convert PNG data to base64
+                        let base64_png = general_purpose::STANDARD.encode(&png_data);
+                        let data_url = format!("data:image/png;base64,{}", base64_png);
 
-                    let app_info = AppInfo {
-                        base64Image: data_url,
-                        localizedName: localized_name,
-                    };
-                    result.insert(app_name, app_info);
+                        let app_info = AppInfo {
+                            base64Image: data_url,
+                            localizedName: localized_name,
+                        };
+                        result.insert(app_name, app_info);
+                    },
+                    Err(_) => {
+                        let app_info = AppInfo {
+                            base64Image: String::new(),
+                            localizedName: localized_name.clone(),
+                        };
+                        result.insert(app_name, app_info);
+                    }
                 }
-                Ok(None) => {
-                    // No suitable icon found, create AppInfo with empty image
-                    let app_info = AppInfo {
-                        base64Image: String::new(),
-                        localizedName: localized_name.clone(),
-                    };
-                    result.insert(app_name, app_info);
-                }
-                Err(_) => {
-                    let app_info = AppInfo {
-                        base64Image: String::new(),
-                        localizedName: localized_name.clone(),
-                    };
-                    result.insert(app_name, app_info);
+            } else {
+                match load_icns_file(&Path::new(icns_path)) {
+                    Ok(Some(png_data)) => {
+                        // Convert PNG data to base64
+                        let base64_png = general_purpose::STANDARD.encode(&png_data);
+                        let data_url = format!("data:image/png;base64,{}", base64_png);
+
+                        let app_info = AppInfo {
+                            base64Image: data_url,
+                            localizedName: localized_name,
+                        };
+                        result.insert(app_name, app_info);
+                    },
+                    Ok(None) => {
+                        // No suitable icon found, create AppInfo with empty image
+                        let app_info = AppInfo {
+                            base64Image: String::new(),
+                            localizedName: localized_name.clone(),
+                        };
+                        result.insert(app_name, app_info);
+                    },
+                    Err(_) => {
+                        let app_info = AppInfo {
+                            base64Image: String::new(),
+                            localizedName: localized_name.clone(),
+                        };
+                        result.insert(app_name, app_info);
+                    }
                 }
             }
         } else {
