@@ -64,7 +64,6 @@
 				label: t("commands.contextMenu.showInFinder"),
 				icon: EyeIcon as any,
 				onClick: async () => {
-					console.log(command);
 					const homePath = await PathApi.homeDir();
 					const fullPath = await PathApi.join(
 						homePath,
@@ -122,17 +121,11 @@
 				onClick: () => {
 					let { path } = command;
 
-					console.log(command);
-
 					if (!path) {
 						return;
 					}
 
-					let pathToOpen = path;
-
-					console.log(pathToOpen);
-
-					Command.create("open", ["-R", pathToOpen]).execute();
+					Command.create("open", ["-R", path]).execute();
 				},
 			});
 
