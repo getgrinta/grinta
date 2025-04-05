@@ -1,5 +1,4 @@
 import { type AppInfo, type ExtInfo, loadAppInfo } from "../grinta-invoke";
-import { findApps } from "../utils.svelte";
 import { invoke } from "@tauri-apps/api/core";
 import { COMMAND_HANDLER, type ExecutableCommand } from "./commands.svelte";
 
