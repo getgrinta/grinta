@@ -273,32 +273,32 @@ export class CommandsStore extends SecureStore<Commands> {
 		const userCommands =
 			vaultStore.data.authCookie?.length > 0
 				? [
-						{
-							label: t("commands.menuItems.profile"),
-							value: SYSTEM_COMMAND.PROFILE,
-							handler: COMMAND_HANDLER.SYSTEM,
-							smartMatch: false,
-						},
-					]
+					{
+						label: t("commands.menuItems.profile"),
+						value: SYSTEM_COMMAND.PROFILE,
+						handler: COMMAND_HANDLER.SYSTEM,
+						smartMatch: false,
+					},
+				]
 				: [
-						{
-							label: t("commands.menuItems.signIn"),
-							value: SYSTEM_COMMAND.SIGN_IN,
-							handler: COMMAND_HANDLER.SYSTEM,
-							smartMatch: false,
-						},
-					];
+					{
+						label: t("commands.menuItems.signIn"),
+						value: SYSTEM_COMMAND.SIGN_IN,
+						handler: COMMAND_HANDLER.SYSTEM,
+						smartMatch: false,
+					},
+				];
 		return [
 			...userCommands,
 			...(settingsStore.data?.clipboardRecordingEnabled
 				? [
-						{
-							label: t("commands.menuItems.clipboardHistory"),
-							value: SYSTEM_COMMAND.CLIPBOARD,
-							handler: COMMAND_HANDLER.SYSTEM,
-							smartMatch: false,
-						},
-					]
+					{
+						label: t("commands.menuItems.clipboardHistory"),
+						value: SYSTEM_COMMAND.CLIPBOARD,
+						handler: COMMAND_HANDLER.SYSTEM,
+						smartMatch: false,
+					},
+				]
 				: []),
 			{
 				label: t("commands.menuItems.clearNotes"),
@@ -404,7 +404,10 @@ export class CommandsStore extends SecureStore<Commands> {
 	}: {
 		isRefresh: boolean;
 	}) {
-		this.selectedIndex = 0;
+		if (!isRefresh) {
+			this.selectedIndex = 0;
+		}
+
 		const queryIsUrl = HOSTNAME_REGEX.test(appStore.query);
 		const newCommandsToken = generateCancellationToken();
 		this.buildCommandsToken = newCommandsToken;
@@ -450,15 +453,15 @@ export class CommandsStore extends SecureStore<Commands> {
 				const createNoteCommand =
 					appStore.query.length > 0
 						? [
-								{
-									label: t("commands.actions.createNote", {
-										query: appStore.query,
-									}),
-									value: appStore.query,
-									handler: COMMAND_HANDLER.CREATE_NOTE,
-									smartMatch: false,
-								},
-							]
+							{
+								label: t("commands.actions.createNote", {
+									query: appStore.query,
+								}),
+								value: appStore.query,
+								handler: COMMAND_HANDLER.CREATE_NOTE,
+								smartMatch: false,
+							},
+						]
 						: [];
 
 				await notesStore.fetchNotes();
@@ -470,8 +473,8 @@ export class CommandsStore extends SecureStore<Commands> {
 			appStore.query.length === 0
 				? commands
 				: matchSorter(commands, appStore.query, {
-						keys: ["localizedLabel", "label"],
-					}).sort((a, b) => this.sortCommands({ prev: a, next: b }));
+					keys: ["localizedLabel", "label"],
+				}).sort((a, b) => this.sortCommands({ prev: a, next: b }));
 
 		const formulaCommands = await buildFormulaCommands(appStore.query);
 
