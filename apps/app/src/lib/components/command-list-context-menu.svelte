@@ -119,7 +119,7 @@
 				label: t("commands.contextMenu.showInFinder"),
 				icon: EyeIcon as any,
 				onClick: () => {
-					let { path } = command;
+					const { path } = command;
 
 					if (!path) {
 						return;
