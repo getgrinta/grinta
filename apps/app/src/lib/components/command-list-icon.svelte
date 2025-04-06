@@ -4,7 +4,6 @@
     import { getIcon } from "$lib/utils.svelte";
     import clsx from "clsx";
     import { watch } from "runed";
-    import { invoke } from "@tauri-apps/api/core";
     import { fetchFavicon } from "$lib/grinta-invoke";
 
     const {
