@@ -14,6 +14,7 @@ mod window;
 mod toggle_visibility;
 mod workspace_utils;
 mod favicon_utils;
+mod keyring_utils;
 
 pub const MAIN_WINDOW_LABEL: &str = "main";
 
@@ -43,11 +44,23 @@ pub fn run() {
         .setup(|app| {
             #[cfg(target_os = "macos")]
             {
+                // Check if we're running in development mode
+                let is_dev = cfg!(debug_assertions) || std::env::var("NODE_ENV").unwrap_or_default() == "development";
+                if !is_dev {
+                    match initialize_master_key() {
+                        Ok(_) => {
+                            // Master key initialized successfully
+                        },
+                        Err(e) => eprintln!("Failed to initialize master key: {}", e),
+                    }
+                }
+
                 app.set_activation_policy(tauri::ActivationPolicy::Accessory);
 
                 let handle = app.app_handle();
 
                 let window = handle.get_webview_window(MAIN_WINDOW_LABEL).unwrap();
+
 
                 // Convert the window to a spotlight panel
                 let panel = window.to_spotlight_panel()?;
@@ -105,7 +118,59 @@ pub fn run() {
             workspace_utils::activate_application_by_name,
             workspace_utils::get_frontmost_application_name,
             favicon_utils::fetch_favicon,
+            keyring_utils::set_secret,
+            keyring_utils::get_secret,
+            keyring_utils::delete_secret,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+fn initialize_master_key() -> Result<(), String> {
+    use crate::keyring_utils::{get_secret, set_secret};
+    use base64::{engine::general_purpose::STANDARD, Engine as _};
+    use rand::RngCore;
+
+    const KEYRING_SERVICE: &str = "grinta";
+    const KEYRING_ACCOUNT_KEY: &str = "master-key";
+
+    match get_secret(KEYRING_SERVICE.to_string(), KEYRING_ACCOUNT_KEY.to_string()) {
+        Ok(_) => {
+            Ok(())
+        }
+        Err(_) => {
+            println!(
+                "Master secret not found, generating and setting..."
+            );
+
+            // Generate 32 random bytes
+            let mut key_bytes = [0u8; 32];
+            rand::thread_rng().fill_bytes(&mut key_bytes);
+
+            // Encode bytes to Base64
+            let key_base64 = STANDARD.encode(key_bytes);
+
+            // Set the secret in the keychain
+            match set_secret(
+                KEYRING_SERVICE.to_string(),
+                KEYRING_ACCOUNT_KEY.to_string(),
+                key_base64,
+            ) {
+                Ok(_) => {
+                    println!(
+                        "Successfully set new master key."
+                    );
+                    Ok(())
+                }
+                Err(e) => {
+                    let error_msg = format!(
+                        "Failed to set master key: {}",
+                        e
+                    );
+                    eprintln!("{}", error_msg);
+                    Err(error_msg)
+                }
+            }
+        }
+    }
 }

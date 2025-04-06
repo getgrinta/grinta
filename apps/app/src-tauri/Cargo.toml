@@ -38,10 +38,12 @@ zip = "2.3.0"
 block = "0.1.6"
 block2 = "0.3"
 thiserror = "1.0.63"
+keyring = { git = "https://github.com/open-source-cooperative/keyring-rs" }
 fix-path-env = { git = "https://github.com/tauri-apps/fix-path-env-rs" }
 tauri-plugin-macos-permissions = "2.2.0"
 plist = "1.7.1"
 favicon-picker = "1.1.0"
+rand = "0.8"
 url = "2.5"
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
