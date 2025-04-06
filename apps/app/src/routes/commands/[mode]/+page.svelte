@@ -31,8 +31,8 @@ $effect(() => {
 <div class="flex flex-1 flex-col gap-1">
 	<SearchBar />
 	<div class="flex flex-col relative">
-		<Widgets />
 		<CommandList />
+		<Widgets />
 	</div>
 	{#if appStore.barMode !== BAR_MODE.MENU}
 		<div class="flex fixed bottom-4 right-4 left-4 justify-end pointer-events-none">

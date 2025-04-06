@@ -13,6 +13,7 @@ mod theme_utils;
 mod window;
 mod toggle_visibility;
 mod workspace_utils;
+mod favicon_utils;
 
 pub const MAIN_WINDOW_LABEL: &str = "main";
 
@@ -103,6 +104,7 @@ pub fn run() {
             toggle_visibility::toggle_visibility,
             workspace_utils::activate_application_by_name,
             workspace_utils::get_frontmost_application_name,
+            favicon_utils::fetch_favicon,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

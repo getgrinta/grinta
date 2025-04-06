@@ -5,6 +5,7 @@ import { clickListener, handleContextMenu } from "$lib/utils.svelte";
 import clsx from "clsx";
 import WidgetsContextMenu from "./widgets-context-menu.svelte";
 import CommandListIcon from "./command-list-icon.svelte";
+import { settingsStore } from "$lib/store/settings.svelte";
 
 let widgetsContextMenu = $state<WidgetsContextMenu>();
 const widgets = $derived(widgetsStore.data.widgets ?? []);
@@ -48,9 +49,12 @@ $effect(clickListener);
                         label={widget.data.label}
                         size={24}
                     />
-                    <span
-                        >{widget.data.localizedLabel ?? widget.data.label}</span
-                    >
+
+                    {#if settingsStore.data.showWidgetLabels}
+                        <span
+                            >{widget.data.localizedLabel ?? widget.data.label}</span
+                        >
+                    {/if}
                 </button>
             </div>
         {/each}

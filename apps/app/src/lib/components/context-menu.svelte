@@ -86,12 +86,12 @@ $effect(() => {
 {#if isVisible}
 	<div
 		class={clsx(
-			"overflow-hidden bg-base-300 rounded-box p-0 w-[200px] shadow-lg absolute z-50",
+			"overflow-hidden bg-base-300 rounded-box p-0 w-[240px] shadow-lg absolute z-50",
 		)}
 		style="left: {x}px; top: {y}px;"
 		bind:this={menuElement}
 	>
-		<div class="overflow-y-auto w-[200px] max-h-[150px]">
+		<div class="overflow-y-auto w-[240px] max-h-[150px]">
 			<ul class="menu menu-vertical w-full">
 				{#each items as item}
 					<li class="w-full">
