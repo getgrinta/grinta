@@ -1,5 +1,5 @@
 {
-	"name": "@grintabar/app",
+	"name": "@getgrinta/app",
 	"version": "0.2.3",
 	"type": "module",
 	"scripts": {
@@ -14,6 +14,7 @@
 		"cleanup": "rimraf node_modules .svelte-kit .turbo build"
 	},
 	"dependencies": {
+		"@getgrinta/core": "workspace:*",
 		"@ai-sdk/openai-compatible": "0.2.5",
 		"@better-auth/stripe": "1.2.5",
 		"@felte/validator-zod": "1.0.18",

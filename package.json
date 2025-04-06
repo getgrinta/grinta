@@ -11,6 +11,7 @@
 		"prepare": "husky"
 	},
 	"devDependencies": {
+		"@tsconfig/bun": "^1.0.7",
 		"@types/bun": "1.2.8",
 		"husky": "9.1.7",
 		"lint-staged": "15.5.0",

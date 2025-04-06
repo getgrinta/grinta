@@ -126,7 +126,7 @@ export class AppMetadataStore {
 		}
 		if (command.handler === COMMAND_HANDLER.FS_ITEM) {
 			if (command.metadata?.contentType === "public.folder") {
-				const icon = this.extInfo["folder"]?.base64Image;
+				const icon = this.extInfo.folder?.base64Image;
 				if (!icon) {
 					this.loadExtensionIcon("folder");
 				}

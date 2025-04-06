@@ -4,6 +4,7 @@
     "": {
       "name": "getgrintacom",
       "devDependencies": {
+        "@tsconfig/bun": "^1.0.7",
         "@types/bun": "1.2.8",
         "husky": "9.1.7",
         "lint-staged": "15.5.0",
@@ -39,13 +40,14 @@
       },
     },
     "apps/app": {
-      "name": "@grintabar/app",
-      "version": "0.2.2",
+      "name": "@getgrinta/app",
+      "version": "0.2.3",
       "dependencies": {
         "@ai-sdk/openai-compatible": "0.2.5",
         "@better-auth/stripe": "1.2.5",
         "@felte/validator-zod": "1.0.18",
         "@fontsource-variable/dm-sans": "5.2.5",
+        "@getgrinta/core": "workspace:*",
         "@github/hotkey": "3.1.1",
         "@open-draft/until": "^2.1.0",
         "@svelte-drama/swr": "2.1.2",
@@ -132,7 +134,7 @@
       },
     },
     "apps/website": {
-      "name": "website",
+      "name": "@getgrinta/website",
       "version": "0.1.0",
       "dependencies": {
         "@astrojs/starlight": "0.32.5",
@@ -150,6 +152,23 @@
         "starlight-blog": "0.19.0",
         "tailwindcss-intersect": "2.2.0",
         "tailwindcss-motion": "1.1.0",
+      },
+    },
+    "packages/core": {
+      "name": "@getgrinta/core",
+      "version": "0.1.0",
+      "dependencies": {
+        "zod": "3.24.2",
+      },
+    },
+    "packages/plugin": {
+      "name": "@getgrinta/plugin",
+      "version": "0.1.0",
+      "dependencies": {
+        "@getgrinta/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@tauri-apps/plugin-http": "^2.4.3",
       },
     },
   },
@@ -300,9 +319,15 @@
 
     "@getgrinta/api": ["@getgrinta/api@workspace:apps/api"],
 
-    "@github/hotkey": ["@github/hotkey@3.1.1", "", {}, "sha512-H30I6XDO3gFSgLuEuHoMBRZG9c3uCKNdAcYklL1FaZDPdU1bXfgjnpzGDPcUr0U6eGQ+T3XLY9slatwZYWL1dA=="],
+    "@getgrinta/app": ["@getgrinta/app@workspace:apps/app"],
 
-    "@grintabar/app": ["@grintabar/app@workspace:apps/app"],
+    "@getgrinta/core": ["@getgrinta/core@workspace:packages/core"],
+
+    "@getgrinta/plugin": ["@getgrinta/plugin@workspace:packages/plugin"],
+
+    "@getgrinta/website": ["@getgrinta/website@workspace:apps/website"],
+
+    "@github/hotkey": ["@github/hotkey@3.1.1", "", {}, "sha512-H30I6XDO3gFSgLuEuHoMBRZG9c3uCKNdAcYklL1FaZDPdU1bXfgjnpzGDPcUr0U6eGQ+T3XLY9slatwZYWL1dA=="],
 
     "@happy-dom/global-registrator": ["@happy-dom/global-registrator@17.4.4", "", { "dependencies": { "happy-dom": "^17.4.4" } }, "sha512-njrU74GrYVHO43upIJr96f7pEmUG7YLZbHCGiHALBECeVnDKpepzL9kVc7KIl8S2nQOkPA0rAA1EyC3xASb54w=="],
 
@@ -657,6 +682,8 @@
     "@tiptap/starter-kit": ["@tiptap/starter-kit@2.11.7", "", { "dependencies": { "@tiptap/core": "^2.11.7", "@tiptap/extension-blockquote": "^2.11.7", "@tiptap/extension-bold": "^2.11.7", "@tiptap/extension-bullet-list": "^2.11.7", "@tiptap/extension-code": "^2.11.7", "@tiptap/extension-code-block": "^2.11.7", "@tiptap/extension-document": "^2.11.7", "@tiptap/extension-dropcursor": "^2.11.7", "@tiptap/extension-gapcursor": "^2.11.7", "@tiptap/extension-hard-break": "^2.11.7", "@tiptap/extension-heading": "^2.11.7", "@tiptap/extension-history": "^2.11.7", "@tiptap/extension-horizontal-rule": "^2.11.7", "@tiptap/extension-italic": "^2.11.7", "@tiptap/extension-list-item": "^2.11.7", "@tiptap/extension-ordered-list": "^2.11.7", "@tiptap/extension-paragraph": "^2.11.7", "@tiptap/extension-strike": "^2.11.7", "@tiptap/extension-text": "^2.11.7", "@tiptap/extension-text-style": "^2.11.7", "@tiptap/pm": "^2.11.7" } }, "sha512-K+q51KwNU/l0kqRuV5e1824yOLVftj6kGplGQLvJG56P7Rb2dPbM/JeaDbxQhnHT/KDGamG0s0Po0M3pPY163A=="],
 
     "@tiptap/suggestion": ["@tiptap/suggestion@2.11.7", "", { "peerDependencies": { "@tiptap/core": "^2.7.0", "@tiptap/pm": "^2.7.0" } }, "sha512-I1ckVAEErpErPn/H9ZdDmTb5zuPNPiKj3krxCtJDUU4+3we0cgJY9NQFXl9//mrug3UIngH0ZQO+arbZfIk75A=="],
+
+    "@tsconfig/bun": ["@tsconfig/bun@1.0.7", "", {}, "sha512-udGrGJBNQdXGVulehc1aWT73wkR9wdaGBtB6yL70RJsqwW/yJhIg6ZbRlPOfIUiFNrnBuYLBi9CSmMKfDC7dvA=="],
 
     "@types/aria-query": ["@types/aria-query@5.0.4", "", {}, "sha512-rfT93uj5s0PRL7EzccGMs3brplhcrghnDoV26NqKhCAS1hVo+WdNsPvE/yb6ilfr5hi2MEk6d5EWJTKdxg8jVw=="],
 
@@ -1874,8 +1901,6 @@
 
     "webidl-conversions": ["webidl-conversions@7.0.0", "", {}, "sha512-VwddBukDzu71offAQR975unBIGqfKZpM+8ZX6ySk8nYhVoo5CYaZyzt3YBvYtRtO+aoGlqxPg/B87NGVZ/fu6g=="],
 
-    "website": ["website@workspace:apps/website"],
-
     "whatwg-mimetype": ["whatwg-mimetype@3.0.0", "", {}, "sha512-nt+N2dzIutVRxARx1nghPKGv1xHikU7HKdfafKkLNLindmPU/ch3U31NOCGGA/dmPcmb1VlofO0vnKAcsm0o/Q=="],
 
     "which": ["which@4.0.0", "", { "dependencies": { "isexe": "^3.1.1" }, "bin": { "node-which": "bin/which.js" } }, "sha512-GlaYyEb07DPxYCKhKzplCWBJtvxZcZMrL+4UkrTSJHHPyZU4mYYTv3qaOe77H7EODLSSopAUFAc6W8U4yqvscg=="],
@@ -1917,6 +1942,8 @@
     "@esbuild-kit/core-utils/esbuild": ["esbuild@0.18.20", "", { "optionalDependencies": { "@esbuild/android-arm": "0.18.20", "@esbuild/android-arm64": "0.18.20", "@esbuild/android-x64": "0.18.20", "@esbuild/darwin-arm64": "0.18.20", "@esbuild/darwin-x64": "0.18.20", "@esbuild/freebsd-arm64": "0.18.20", "@esbuild/freebsd-x64": "0.18.20", "@esbuild/linux-arm": "0.18.20", "@esbuild/linux-arm64": "0.18.20", "@esbuild/linux-ia32": "0.18.20", "@esbuild/linux-loong64": "0.18.20", "@esbuild/linux-mips64el": "0.18.20", "@esbuild/linux-ppc64": "0.18.20", "@esbuild/linux-riscv64": "0.18.20", "@esbuild/linux-s390x": "0.18.20", "@esbuild/linux-x64": "0.18.20", "@esbuild/netbsd-x64": "0.18.20", "@esbuild/openbsd-x64": "0.18.20", "@esbuild/sunos-x64": "0.18.20", "@esbuild/win32-arm64": "0.18.20", "@esbuild/win32-ia32": "0.18.20", "@esbuild/win32-x64": "0.18.20" }, "bin": { "esbuild": "bin/esbuild" } }, "sha512-ceqxoedUrcayh7Y7ZX6NdbbDzGROiyVBgC4PriJThBKSVPWnnFHZAkfI1lJT8QFkOwH4qOS2SJkS4wvpGl8BpA=="],
 
     "@expressive-code/plugin-shiki/shiki": ["shiki@1.29.2", "", { "dependencies": { "@shikijs/core": "1.29.2", "@shikijs/engine-javascript": "1.29.2", "@shikijs/engine-oniguruma": "1.29.2", "@shikijs/langs": "1.29.2", "@shikijs/themes": "1.29.2", "@shikijs/types": "1.29.2", "@shikijs/vscode-textmate": "^10.0.1", "@types/hast": "^3.0.4" } }, "sha512-njXuliz/cP+67jU2hukkxCNuH1yUi4QfdZZY+sMr5PPrIyXSu5iTb/qYC4BiWWB0vZ+7TbdvYUCeL23zpwCfbg=="],
+
+    "@getgrinta/plugin/@tauri-apps/plugin-http": ["@tauri-apps/plugin-http@2.4.3", "", { "dependencies": { "@tauri-apps/api": "^2.0.0" } }, "sha512-Us8X+FikzpaZRNr4kH4HLwyXascHbM42p6LxAqRTQnHPrrqp1usaH4vxWAZalPvTbHJ3gBEMJPHusFJgtjGJjA=="],
 
     "@isaacs/cliui/string-width": ["string-width@5.1.2", "", { "dependencies": { "eastasianwidth": "^0.2.0", "emoji-regex": "^9.2.2", "strip-ansi": "^7.0.1" } }, "sha512-HnLOCR3vjcY8beoNLtcjZ5/nxn2afmME6lhrDrebokqMap+XbeW8n9TXpPDOqdGK5qcI3oT0GKTW6wC7EMiVqA=="],
 
