@@ -144,6 +144,12 @@ $effect(() => {
 	toggleShortcutRecording();
 });
 
+
+$effect(() => {
+	const _ = settingsStore.data.showWidgetLabels;
+	settingsStore.persist();
+});
+
 watch(
 	() => $state.snapshot(settingsStore.data),
 	(before, after) => {
@@ -317,6 +323,16 @@ function addExtension(e?: Event) {
 						bind:checked={
 							settingsStore.data.clipboardRecordingEnabled
 						}
+					/>
+					<label class="text-sm" for="showWidgetLabelsChoice"
+						>{$_("settings.showWidgetLabels")}</label
+					>
+					<input
+						class="toggle toggle-primary"
+						id="showWidgetLabelsChoice"
+						name="showWidgetLabels"
+						type="checkbox"
+						bind:checked={settingsStore.data.showWidgetLabels}
 					/>
 					<label class="text-sm" for="notesDirInput"
 						>{$_("settings.fields.notesDirectory")}</label

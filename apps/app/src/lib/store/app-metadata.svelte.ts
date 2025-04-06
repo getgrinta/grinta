@@ -6,6 +6,7 @@ export class AppMetadataStore {
 	loadingState = $state<Record<string, boolean>>({});
 	appInfo = $state<Record<string, AppInfo>>({});
 	extInfo = $state<Record<string, ExtInfo>>({});
+	favIcons = $state<Record<string, string>>({});
 	loading = $state<boolean>(false);
 	initialized = $state<boolean>(false);
 	loadingApps = $state<Set<string>>(new Set());

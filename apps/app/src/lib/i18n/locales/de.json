@@ -81,6 +81,7 @@
 		"extension_invalid_format": "Die Erweiterung darf nur Buchstaben und Zahlen enthalten.",
 		"clipboardRecordingEnabled": "Zwischenablage-Verlauf aufzeichnen",
 		"language": "Sprache",
+		"showWidgetLabels": "Widget-Beschriftungen anzeigen",
 		"web": "Web",
 		"file": "Datei"
 	},

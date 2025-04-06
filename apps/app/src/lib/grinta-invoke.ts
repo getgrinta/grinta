@@ -109,6 +109,10 @@ export async function searchSpotlightApps(
 	});
 }
 
+export async function fetchFavicon(url: string): Promise<string> {
+	return await invoke<string>("fetch_favicon", { url });
+}
+
 export async function requestAccessToUserFolders(): Promise<
 	SpotlightSearchResult[]
 > {

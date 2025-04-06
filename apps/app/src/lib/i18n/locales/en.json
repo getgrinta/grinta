@@ -81,6 +81,7 @@
 		"extension_invalid_format": "Extension must contain only letters and numbers.",
 		"clipboardRecordingEnabled": "Record Clipboard History",
 		"language": "Language",
+		"showWidgetLabels": "Show Widget Labels",
 		"web": "Web",
 		"file": "File"
 	},

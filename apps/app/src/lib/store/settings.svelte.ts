@@ -104,6 +104,7 @@ export const SettingsSchema = z.object({
 	notesDir: z.array(z.string()).default(["Grinta", "notes"]),
 	proAutocompleteEnabled: z.boolean().default(true),
 	incognitoEnabled: z.boolean().default(false),
+	showWidgetLabels: z.boolean().default(true),
 	baseCurrency: z.nativeEnum(BASE_CURRENCY).default(BASE_CURRENCY.USD),
 	fsSearchOnlyInHome: z.boolean().default(false),
 	fsSearchAdditionalExtensions: z.array(z.string()).default([]),
