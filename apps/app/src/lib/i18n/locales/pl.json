@@ -6,10 +6,6 @@
 		"title": "Witaj w Grincie",
 		"subtitle": "Przed rozpoczęciem, możesz dostosować te ustawienia."
 	},
-	"searchMode": {
-		"web": "Sieć",
-		"ai": "AI"
-	},
 	"barMode": {
 		"initial": "Szukaj",
 		"notes": "Notatki",
@@ -68,6 +64,14 @@
 		"invalidCode": "Nieprawidłowy kod. Sprawdź kod wysłany na Twój adres e-mail.",
 		"invalidEmail": "Nieprawidłowy adres e-mail",
 		"help": "Pomoc"
+	},
+	"search": {
+		"grintai": "GrintAI"
+	},
+	"ai": {
+		"copy": "Kopiuj",
+		"copySuccess": "Skopiowano do schowka",
+		"createNote": "Utwórz notatkę"
 	},
 	"notes": {
 		"placeholder": "Nazwa notatki",

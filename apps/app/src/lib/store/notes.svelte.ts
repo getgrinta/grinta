@@ -1,15 +1,9 @@
 import * as PathApi from "@tauri-apps/api/path";
 import dayjs from "dayjs";
 import { createFsStorage } from "../storage";
-import { COMMAND_HANDLER, commandsStore } from "./commands.svelte";
+import { commandsStore } from "./commands.svelte";
 import { settingsStore } from "./settings.svelte";
-
-export type Note = {
-	title: string;
-	filename: string;
-	path: string;
-	updatedAt: string;
-};
+import { COMMAND_HANDLER, type Note } from "@getgrinta/core";
 
 export type ExtendedNote = {
 	title: string;
@@ -74,14 +68,14 @@ export class NotesStore {
 		};
 	}
 
-	async createNote(name?: string) {
+	async createNote(name?: string, content?: string) {
 		const fsStorage = createFsStorage(
 			await PathApi.join(...settingsStore.data.notesDir),
 		);
 		const ensuredName = name ?? dayjs().format("ll");
 		const uniqueName = await findUnusedFilename(ensuredName);
 		const filename = `${uniqueName}.md`;
-		await fsStorage.setItem({ filename, content: "" });
+		await fsStorage.setItem({ filename, content: content ?? "" });
 		return filename;
 	}
 

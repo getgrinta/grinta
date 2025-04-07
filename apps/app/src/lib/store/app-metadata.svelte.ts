@@ -1,6 +1,6 @@
 import { type AppInfo, type ExtInfo, loadAppInfo } from "../grinta-invoke";
 import { invoke } from "@tauri-apps/api/core";
-import { COMMAND_HANDLER, type ExecutableCommand } from "./commands.svelte";
+import { COMMAND_HANDLER, type ExecutableCommand } from "@getgrinta/core";
 
 export class AppMetadataStore {
 	loadingState = $state<Record<string, boolean>>({});
@@ -95,9 +95,9 @@ export class AppMetadataStore {
 		if (command.handler === COMMAND_HANDLER.APP) {
 			if (this.loadingState[command.label]) return null;
 
-			if (!command.path) return null;
+			if (!command.metadata?.path) return null;
 			this.loadingState[command.label] = true;
-			return this.loadAppIcon(command.label, command.path);
+			return this.loadAppIcon(command.label, command.metadata.path);
 		}
 		if (command.handler === COMMAND_HANDLER.FS_ITEM) {
 			if (command.metadata?.contentType === "public.folder") {
@@ -118,9 +118,9 @@ export class AppMetadataStore {
 	getIcon(command: ExecutableCommand): string | null {
 		if (command.handler === COMMAND_HANDLER.APP) {
 			const icon = this.appInfo[command.label]?.base64Image;
-			if (!icon && command.path) {
+			if (!icon && command.metadata?.path) {
 				// Trigger async load but don't wait for it
-				this.loadAppIcon(command.label, command.path);
+				this.loadAppIcon(command.label, command.metadata.path);
 			}
 			return icon || null;
 		}

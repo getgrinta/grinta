@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { BAR_MODE, appStore } from "./app.svelte";
-import { ExecutableCommandSchema } from "./commands.svelte";
+import { appStore } from "./app.svelte";
+import { APP_MODE, ExecutableCommandSchema } from "@getgrinta/core";
 import { SecureStore } from "./secure.svelte";
 
 export const WidgetSchema = z.object({
@@ -20,7 +20,7 @@ export class WidgetsStore extends SecureStore<Widgets> {
 	showWidgets = $derived(
 		this.data.widgets?.length > 0 &&
 			appStore.query.length === 0 &&
-			appStore.barMode === BAR_MODE.INITIAL,
+			appStore.appMode === APP_MODE.INITIAL,
 	);
 
 	async initialize() {

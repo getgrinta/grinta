@@ -6,11 +6,26 @@ import { parse } from "equation-parser";
 import { resolve } from "equation-resolver";
 import { match } from "ts-pattern";
 import {
+	APP_MODE,
 	COMMAND_HANDLER,
+	COMMAND_PRIORITY,
+	ExecutableCommandSchema,
 	type ExecutableCommand,
-} from "./store/commands.svelte";
-import { settingsStore } from "./store/settings.svelte";
-import { formatCurrency, getApiClient } from "./utils.svelte";
+} from "@getgrinta/core";
+import { formatCurrency } from "@getgrinta/core";
+import type { PluginContext } from "@getgrinta/plugin";
+
+function buildResponse(value: string) {
+	return ExecutableCommandSchema.parse({
+		label: value,
+		localizedLabel: value,
+		value,
+		handler: COMMAND_HANDLER.COPY_TO_CLIPBOARD,
+		smartMatch: true,
+		priority: COMMAND_PRIORITY.TOP,
+		appModes: [APP_MODE.INITIAL],
+	})
+}
 
 type TimeUnit =
 	| "minute"
@@ -37,12 +52,7 @@ export function parseMathExpression(query: string): ExecutableCommand[] {
 	if (resolved.type === "number") {
 		const value = resolved.value.toString();
 		return [
-			{
-				label: value,
-				value,
-				handler: COMMAND_HANDLER.COPY_TO_CLIPBOARD,
-				smartMatch: true,
-			},
+			buildResponse(value)
 		];
 	}
 	return [];
@@ -227,12 +237,7 @@ export function parseTextMathExpression(query: string): ExecutableCommand[] {
 					const value = roundedResult.toString();
 
 					return [
-						{
-							label: value,
-							value,
-							handler: COMMAND_HANDLER.COPY_TO_CLIPBOARD,
-							smartMatch: true,
-						},
+						buildResponse(value)
 					];
 				}
 			}
@@ -386,12 +391,7 @@ export function parseTextMathExpression(query: string): ExecutableCommand[] {
 			const value = roundedResult.toString();
 
 			return [
-				{
-					label: value,
-					value,
-					handler: COMMAND_HANDLER.COPY_TO_CLIPBOARD,
-					smartMatch: true,
-				},
+				buildResponse(value)
 			];
 		}
 	} catch (error) {
@@ -486,12 +486,7 @@ export function parseTextMathExpression(query: string): ExecutableCommand[] {
 					const value = roundedResult.toString();
 
 					return [
-						{
-							label: value,
-							value,
-							handler: COMMAND_HANDLER.COPY_TO_CLIPBOARD,
-							smartMatch: true,
-						},
+						buildResponse(value)
 					];
 				}
 			}
@@ -556,12 +551,7 @@ export function parseTextMathExpression(query: string): ExecutableCommand[] {
 					const value = roundedResult.toString();
 
 					return [
-						{
-							label: value,
-							value,
-							handler: COMMAND_HANDLER.COPY_TO_CLIPBOARD,
-							smartMatch: true,
-						},
+						buildResponse(value)
 					];
 				}
 			}
@@ -662,12 +652,7 @@ export function parseTextMathExpression(query: string): ExecutableCommand[] {
 					const value = roundedResult.toString();
 
 					return [
-						{
-							label: value,
-							value,
-							handler: COMMAND_HANDLER.COPY_TO_CLIPBOARD,
-							smartMatch: true,
-						},
+						buildResponse(value)
 					];
 				}
 			}
@@ -725,12 +710,7 @@ export function parseTextMathExpression(query: string): ExecutableCommand[] {
 					const value = roundedResult.toString();
 
 					return [
-						{
-							label: value,
-							value,
-							handler: COMMAND_HANDLER.COPY_TO_CLIPBOARD,
-							smartMatch: true,
-						},
+						buildResponse(value)
 					];
 				}
 			}
@@ -788,12 +768,7 @@ export function parseTextMathExpression(query: string): ExecutableCommand[] {
 					const value = roundedResult.toString();
 
 					return [
-						{
-							label: value,
-							value,
-							handler: COMMAND_HANDLER.COPY_TO_CLIPBOARD,
-							smartMatch: true,
-						},
+						buildResponse(value)
 					];
 				}
 			}
@@ -859,12 +834,7 @@ export function parseTextMathExpression(query: string): ExecutableCommand[] {
 					const value = result.toString();
 
 					return [
-						{
-							label: value,
-							value,
-							handler: COMMAND_HANDLER.COPY_TO_CLIPBOARD,
-							smartMatch: true,
-						},
+						buildResponse(value)
 					];
 				}
 			}
@@ -946,12 +916,7 @@ export function parseTextMathExpression(query: string): ExecutableCommand[] {
 			const value = roundedResult.toString();
 
 			return [
-				{
-					label: value,
-					value,
-					handler: COMMAND_HANDLER.COPY_TO_CLIPBOARD,
-					smartMatch: true,
-				},
+				buildResponse(value)
 			];
 		}
 	} catch (error) {
@@ -1108,12 +1073,7 @@ export function parseTextMathExpression(query: string): ExecutableCommand[] {
 						const value = roundedResult.toString();
 
 						return [
-							{
-								label: value,
-								value,
-								handler: COMMAND_HANDLER.COPY_TO_CLIPBOARD,
-								smartMatch: true,
-							},
+							buildResponse(value)
 						];
 					}
 				}
@@ -1269,12 +1229,7 @@ export function parseFraction(query: string): ExecutableCommand[] {
 					const value = roundedResult.toString();
 
 					return [
-						{
-							label: value,
-							value,
-							handler: COMMAND_HANDLER.COPY_TO_CLIPBOARD,
-							smartMatch: true,
-						},
+						buildResponse(value)
 					];
 				}
 			}
@@ -1353,12 +1308,7 @@ export function parseFraction(query: string): ExecutableCommand[] {
 					const value = roundedResult.toString();
 
 					return [
-						{
-							label: value,
-							value,
-							handler: COMMAND_HANDLER.COPY_TO_CLIPBOARD,
-							smartMatch: true,
-						},
+						buildResponse(value)
 					];
 				}
 			}
@@ -1485,20 +1435,10 @@ export function parseRelativeTime(query: string): ExecutableCommand[] {
 
 		date = new Date(referenceDate + ms * numberText * direction);
 	}
-	const value = date.toISOString();
-	const label = match(unit)
-		.with("minute", "minutes", "hour", "hours", () =>
-			dayjs(value).format("YYYY-MM-DD HH:mm"),
-		)
-		.otherwise(() => dayjs(value).format("YYYY-MM-DD"));
+	const value = dayjs(date).format('ll');
 
 	return [
-		{
-			label,
-			value,
-			handler: COMMAND_HANDLER.COPY_TO_CLIPBOARD,
-			smartMatch: true,
-		},
+		buildResponse(value)
 	];
 }
 
@@ -2227,15 +2167,9 @@ export function parseUnitConversion(query: string): ExecutableCommand[] {
 				const result = specialConversions[fromUnit][toUnit](value);
 				const roundedResult = Math.round(result * 100) / 100;
 				const resultValue = roundedResult.toString();
-				const resultLabel = `${resultValue} ${toUnit}`;
 
 				return [
-					{
-						label: resultLabel,
-						value: resultValue,
-						handler: COMMAND_HANDLER.COPY_TO_CLIPBOARD,
-						smartMatch: true,
-					},
+					buildResponse(resultValue)
 				];
 			} catch (error) {
 				console.error("Error in special conversion:", error);
@@ -2253,15 +2187,9 @@ export function parseUnitConversion(query: string): ExecutableCommand[] {
 				: Math.round(Number(result) * 100) / 100;
 
 			const resultValue = roundedResult.toString();
-			const resultLabel = `${resultValue} ${toUnit}`;
 
 			return [
-				{
-					label: resultLabel,
-					value: resultValue,
-					handler: COMMAND_HANDLER.COPY_TO_CLIPBOARD,
-					smartMatch: true,
-				},
+				buildResponse(resultValue)
 			];
 		} catch {
 			// For volume conversions, handle special cases
@@ -2348,19 +2276,16 @@ export function parseUnitConversion(query: string): ExecutableCommand[] {
 
 async function fetchCurrencyRates(
 	baseCurrency: string,
+    context: PluginContext
 ): Promise<Record<string, number>> {
-	const apiClient = getApiClient();
-	const response = await apiClient.api.data.currency[":ticker"].$get({
-		param: {
-			ticker: baseCurrency,
-		},
-	});
-	const data = await response.json();
-	return data;
+    const request = await context.fetch(`https://api.getgrinta.com/api/data/currency/${baseCurrency}`);
+    const response = await request.json();
+	return response;
 }
 
 export async function parseCurrencyConversion(
 	query: string,
+	context: PluginContext
 ): Promise<ExecutableCommand[]> {
 	// Handle formats like: "25 pln to usd", "10 eur to jpy", "1usd to cad"
 	// Also handle formats without "to": "25 pln usd", "10eur jpy"
@@ -2395,18 +2320,13 @@ export async function parseCurrencyConversion(
 
 				if (!Number.isNaN(amount) && toCurrency.length === 3) {
 					const fromCurrency = "usd";
-					const rates = await fetchCurrencyRates(fromCurrency);
+					const rates = await fetchCurrencyRates(fromCurrency, context);
 					const rate = rates[toCurrency];
 
 					if (rate) {
 						const value = formatCurrency(amount * rate, toCurrency);
 						return [
-							{
-								label: value,
-								value,
-								handler: COMMAND_HANDLER.COPY_TO_CLIPBOARD,
-								smartMatch: true,
-							},
+							buildResponse(value)
 						];
 					}
 				}
@@ -2494,9 +2414,9 @@ export async function parseCurrencyConversion(
 				const fromCurrency = singleMatch[2].toLowerCase();
 
 				// For single currency, use the configured base currency as target
-				const toCurrency = settingsStore.data.baseCurrency.toLowerCase();
+				const toCurrency = context.settings.baseCurrency.toLowerCase();
 
-				const rates = await fetchCurrencyRates(fromCurrency);
+				const rates = await fetchCurrencyRates(fromCurrency, context);
 				const rate = rates[toCurrency];
 
 				if (!rate) {
@@ -2507,12 +2427,7 @@ export async function parseCurrencyConversion(
 
 				// Return a command that will trigger the conversion when executed
 				return [
-					{
-						label: value,
-						value,
-						handler: COMMAND_HANDLER.COPY_TO_CLIPBOARD,
-						smartMatch: true,
-					},
+					buildResponse(value)
 				];
 			}
 
@@ -2523,7 +2438,7 @@ export async function parseCurrencyConversion(
 		const fromCurrency = match[2].toLowerCase();
 		const toCurrency = match[3].toLowerCase();
 
-		const rates = await fetchCurrencyRates(fromCurrency);
+		const rates = await fetchCurrencyRates(fromCurrency, context);
 		const rate = rates[toCurrency];
 
 		if (!rate) {
@@ -2533,12 +2448,7 @@ export async function parseCurrencyConversion(
 		const value = formatCurrency(amount * rate, toCurrency);
 		// Return a command that will trigger the conversion when executed
 		return [
-			{
-				label: value,
-				value,
-				handler: COMMAND_HANDLER.COPY_TO_CLIPBOARD,
-				smartMatch: true,
-			},
+			buildResponse(value)
 		];
 	} catch (error) {
 		console.error("Error in currency conversion:", error);

@@ -12,7 +12,11 @@ export function createPlugin(init: PluginInit): Plugin {
 				(await init.handleCommand?.(command, context)) ?? { matched: false }
 			);
 		},
-		addAppModes: init.addAppModes,
-		addSearchResults: init.addSearchResults,
+		async addAppModes() {
+			return await init.addAppModes?.(context) ?? [];
+		},
+		async addSearchResults(query: string) {
+			return await init.addSearchResults?.(query, context) ?? [];
+		},
 	});
 }

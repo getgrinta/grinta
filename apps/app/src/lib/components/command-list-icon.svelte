@@ -1,7 +1,7 @@
 <script lang="ts">
 import { appMetadataStore } from "$lib/store/app-metadata.svelte";
-import type { ExecutableCommand } from "$lib/store/commands.svelte";
 import { getIcon } from "$lib/utils.svelte";
+import type { ExecutableCommand } from "@getgrinta/core";
 import clsx from "clsx";
 import { watch } from "runed";
 
@@ -19,7 +19,7 @@ const {
 
 const ext = $derived(item.label.split(".").pop() ?? "");
 async function loadCommandIcon(command: ExecutableCommand) {
-	if (!command.path) return;
+	if (!command.metadata?.path) return;
 
 	appMetadataStore.getIconAsync(command);
 }

@@ -1,25 +1,32 @@
 import { it, mock, expect } from "bun:test";
 import { createPlugin } from "./plugin";
-import type { ExecutableCommand } from "@getgrinta/core";
+import { APP_MODE, COMMAND_HANDLER, ExecutableCommandSchema, SettingsSchema, type ExecutableCommand } from "@getgrinta/core";
+import { PluginContext } from "./types";
 
-const MOCK_COMMAND: ExecutableCommand = {
+const MOCK_COMMAND: ExecutableCommand = ExecutableCommandSchema.parse({
 	label: "TestCommand",
 	value: "test",
-	handler: "SYSTEM",
+	handler: COMMAND_HANDLER.SYSTEM,
 	localizedLabel: "TestCommand",
-	metadata: {},
-	appModes: [],
-	smartMatch: false,
-	priority: 0,
-	historical: false,
-};
+	appModes: [APP_MODE.INITIAL],
+});
 
-function createContextMock() {
+function createContextMock(): PluginContext {
 	const fetchMock = mock();
 	const execMock = mock();
+    const tMock = mock();
+    const failMock = mock()
 	return {
 		fetch: fetchMock,
 		exec: execMock,
+		t: tMock,
+        fail: failMock,
+		app: {
+            query: "",
+            appMode: APP_MODE.INITIAL,
+        },
+		settings: SettingsSchema.parse({}),
+		notes: [],
 	};
 }
 
@@ -65,7 +72,7 @@ it("adds search results", async () => {
 		name: "TestPlugin",
 		addSearchResults: addSearchResultsSpy,
 	});
-	const searchResults = await plugin(contextMock).addSearchResults?.();
+	const searchResults = await plugin(contextMock).addSearchResults?.("test");
 	expect(searchResults).toEqual([MOCK_COMMAND]);
 	expect(addSearchResultsSpy).toHaveBeenCalled();
 });
