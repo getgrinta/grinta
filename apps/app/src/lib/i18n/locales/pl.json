@@ -119,7 +119,8 @@
 			"getInfo": "Informacje",
 			"copyName": "Kopiuj nazwę",
 			"copyPath": "Kopiuj ścieżkę",
-			"search": "Szukaj..."
+			"search": "Szukaj...",
+			"translate": "Przetłumacz"
 		},
 		"menuItems": {
 			"clearNotes": "Wyczyść notatki",

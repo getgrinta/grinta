@@ -131,7 +131,7 @@
 				<input
 					bind:this={searchInput}
 					type="text"
-					placeholder={$_("context_menu.search")}
+					placeholder={$_("commands.contextMenu.search")}
 					class="input input-sm w-full"
 					bind:value={searchQuery}
 				/>
