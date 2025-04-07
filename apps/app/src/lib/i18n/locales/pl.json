@@ -42,11 +42,16 @@
 			"requestFsPermissions": "Zapytaj o uprawnienia systemu plików",
 			"granted": "Zezwolono",
 			"autostart": "Autostart",
-			"requestAutostart": "Zezwól na autostart"
+			"requestAutostart": "Zezwól na autostart",
+			"extension_invalid_format": "Rozszerzenie może zawierać tylko litery i cyfry.",
+			"clipboardRecordingEnabled": "Nagrywaj historię schowka",
+			"language": "Język",
+			"showWidgetLabels": "Pokaż etykiety widżetów",
+			"web": "Sieć",
+			"file": "Plik"
 		},
 		"extension_already_added": "To rozszerzenie jest już dodane.",
 		"extension_supported_by_default": "To rozszerzenie jest obsługiwane domyślnie.",
-		"extension_invalid_format": "Rozszerzenie może zawierać tylko litery i cyfry.",
 		"clipboardRecordingEnabled": "Rejestruj historię schowka",
 		"language": "Język",
 		"web": "Sieć",
@@ -91,7 +96,8 @@
 		"shorter": "Krócej",
 		"grammar": "Popraw gramatykę",
 		"professional": "Profesjonalnie",
-		"askAi": "Zapytaj AI"
+		"askAi": "Zapytaj AI",
+		"translate": "Przetłumacz"
 	},
 	"commands": {
 		"helperText": {
@@ -116,7 +122,9 @@
 			"quickLook": "Szybki podgląd",
 			"getInfo": "Informacje",
 			"copyName": "Kopiuj nazwę",
-			"copyPath": "Kopiuj ścieżkę"
+			"copyPath": "Kopiuj ścieżkę",
+			"search": "Szukaj...",
+			"translate": "Przetłumacz"
 		},
 		"menuItems": {
 			"clearNotes": "Wyczyść notatki",

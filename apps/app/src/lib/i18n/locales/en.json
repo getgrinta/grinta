@@ -77,6 +77,7 @@
 		"extension_invalid_format": "Extension must contain only letters and numbers.",
 		"clipboardRecordingEnabled": "Record Clipboard History",
 		"language": "Language",
+		"showWidgetLabels": "Show Widget Labels",
 		"web": "Web",
 		"file": "File"
 	},
@@ -106,7 +107,8 @@
 		"shorter": "Shorter",
 		"grammar": "Improve grammar",
 		"professional": "Professional",
-		"askAi": "Ask AI"
+		"askAi": "Ask AI",
+		"translate": "Translate"
 	},
 	"commands": {
 		"helperText": {
@@ -131,7 +133,8 @@
 			"quickLook": "Quick Look",
 			"getInfo": "Get Info",
 			"copyName": "Copy Name",
-			"copyPath": "Copy Path"
+			"copyPath": "Copy Path",
+			"search": "Search..."
 		},
 		"menuItems": {
 			"clearNotes": "Clear notes",

@@ -6,6 +6,7 @@ export class AppMetadataStore {
 	loadingState = $state<Record<string, boolean>>({});
 	appInfo = $state<Record<string, AppInfo>>({});
 	extInfo = $state<Record<string, ExtInfo>>({});
+	favIcons = $state<Record<string, string>>({});
 	loading = $state<boolean>(false);
 	initialized = $state<boolean>(false);
 	loadingApps = $state<Set<string>>(new Set());
@@ -40,7 +41,7 @@ export class AppMetadataStore {
 		this.loadingApps.add(appName);
 
 		try {
-			loadAppInfo([`${resourcePath}/Contents/Resources/`]).then((appInfo) => {
+			loadAppInfo([`${resourcePath}`]).then((appInfo) => {
 				// Update the store with the new icon
 				// Only update keys with new values instead of creating a new object
 				for (const [key, value] of Object.entries(appInfo)) {

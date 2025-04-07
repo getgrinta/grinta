@@ -14,7 +14,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { marked } from "marked";
 import { onDestroy } from "svelte";
 import TurndownService from "turndown";
-import BubbleMenu from "./editor/bubble-menu.svelte";
+import NoteBubbleMenu from "./editor/note-bubble-menu.svelte";
 import FloatingMenu from "./editor/floating-menu.svelte";
 import { APP_MODE } from "@getgrinta/core";
 
@@ -324,7 +324,7 @@ $effect(() => {
 	<FloatingMenu bind:this={floatingMenu} {editor} {onStartGenerating} {onStopGenerating} />
 </div>
 <div bind:this={bubbleMenuTooltip}>
-	<BubbleMenu {editor} {onStartGenerating} {onStopGenerating} />
+	<NoteBubbleMenu {editor} {onStartGenerating} {onStopGenerating} />
 </div>
 <div class="prose" bind:this={element}></div>
 

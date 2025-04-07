@@ -1,52 +1,94 @@
 <script lang="ts">
-import { appMetadataStore } from "$lib/store/app-metadata.svelte";
-import { getIcon } from "$lib/utils.svelte";
-import type { ExecutableCommand } from "@getgrinta/core";
-import clsx from "clsx";
-import { watch } from "runed";
+    import { appMetadataStore } from "$lib/store/app-metadata.svelte";
+    import { getIcon } from "$lib/utils.svelte";
+    import clsx from "clsx";
+    import { watch } from "runed";
+    import { fetchFavicon } from "$lib/grinta-invoke";
+    import type { ExecutableCommand } from "@getgrinta/core";
 
-const {
-	item,
-	label,
-	size = 32,
-	active = false,
-} = $props<{
-	item: ExecutableCommand;
-	label: string;
-	size?: number;
-	active?: boolean;
-}>();
+    const {
+        item,
+        label,
+        size = 32,
+        active = false,
+    } = $props<{
+        item: ExecutableCommand;
+        label: string;
+        size?: number;
+        active?: boolean;
+    }>();
 
-const ext = $derived(item.label.split(".").pop() ?? "");
-async function loadCommandIcon(command: ExecutableCommand) {
-	if (!command.metadata?.path) return;
+    const ext = $derived(item.label.split(".").pop() ?? "");
 
-	appMetadataStore.getIconAsync(command);
-}
+    function normalizeUrlForFavicon(value: string): string {
+        const hostname = new URL(value).hostname;
+        return `https://${hostname.startsWith("www.") ? "" : "www."}${hostname}`;
+    }
 
-watch(
-	() => [item.path],
-	() => {
-		let needsLoading = false;
+    async function loadCommandIcon(command: ExecutableCommand) {
+        if (!command.metadata?.path) return;
 
-		if (item.handler === "APP" && !appMetadataStore.appInfo[item.label]) {
-			needsLoading = true;
-		}
+        appMetadataStore.getIconAsync(command);
+    }
 
-		if (item.handler === "FS_ITEM" && !appMetadataStore.extInfo[ext]) {
-			needsLoading = true;
-		}
+    watch(
+        () => [item.path],
+        () => {
+            let needsLoading = false;
 
-		if (needsLoading) {
-			loadCommandIcon(item);
-		}
-	},
-);
+            if (
+                item.handler === "APP" &&
+                !appMetadataStore.appInfo[item.label]
+            ) {
+                needsLoading = true;
+            }
+
+            if (item.handler === "FS_ITEM" && !appMetadataStore.extInfo[ext]) {
+                needsLoading = true;
+            }
+
+            if (item.handler === "URL") {
+                const normalizedUrl = normalizeUrlForFavicon(item.value);
+
+                if (!appMetadataStore.favIcons[normalizedUrl]) {
+                    fetchFavicon(normalizedUrl)
+                        .then((faviconUrl) => {
+                            if (faviconUrl) {
+                                appMetadataStore.favIcons[normalizedUrl] =
+                                    faviconUrl;
+                            }
+                        })
+                        .catch((error) => {
+                            console.error(
+                                `Failed to fetch favicon for ${item.value}:`,
+                                error,
+                            );
+                        });
+                }
+            }
+
+            if (needsLoading) {
+                loadCommandIcon(item);
+            }
+        },
+    );
+
+    const faviconBaseValue = $derived.by(() => {
+        return normalizeUrlForFavicon(item.value);
+    });
 </script>
 
 {#if item.metadata?.contentType === "public.folder"}
     <img
         src={appMetadataStore.extInfo["folder"]?.base64Image}
+        alt={label}
+        width={size}
+        height={size}
+        class={clsx("object-contain")}
+    />
+{:else if item.handler === "URL" && appMetadataStore.favIcons[faviconBaseValue]}
+    <img
+        src={appMetadataStore.favIcons[faviconBaseValue]}
         alt={label}
         width={size}
         height={size}
@@ -70,7 +112,12 @@ watch(
     />
 {:else}
     {@const IconComponent = getIcon(item)}
-    <div class={clsx("flex items-center justify-center", active && "!text-primary-content")}>
+    <div
+        class={clsx(
+            "flex items-center justify-center",
+            active && "!text-primary-content",
+        )}
+    >
         <IconComponent size={size - 4} />
     </div>
 {/if}

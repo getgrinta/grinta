@@ -280,7 +280,10 @@ export class CommandsStore extends SecureStore<Commands> {
 	}: {
 		isRefresh: boolean;
 	}) {
-		this.selectedIndex = 0;
+		if (!isRefresh) {
+			this.selectedIndex = 0;
+		}
+
 		const queryIsUrl = HOSTNAME_REGEX.test(appStore.query);
 		const newCommandsToken = generateCancellationToken();
 		this.buildCommandsToken = newCommandsToken;
