@@ -103,7 +103,8 @@
 		"shorter": "Shorter",
 		"grammar": "Improve grammar",
 		"professional": "Professional",
-		"askAi": "Ask AI"
+		"askAi": "Ask AI",
+		"translate": "Translate"
 	},
 	"commands": {
 		"helperText": {
@@ -128,7 +129,8 @@
 			"quickLook": "Quick Look",
 			"getInfo": "Get Info",
 			"copyName": "Copy Name",
-			"copyPath": "Copy Path"
+			"copyPath": "Copy Path",
+			"search": "Search..."
 		},
 		"menuItems": {
 			"clearNotes": "Clear notes",
@@ -174,9 +176,27 @@
 			"askAI": "Ask AI"
 		}
 	},
-	"additionalContextPlaceholder": "Additional context for note generation.\r\ne.g. \"Respond in professional style. Be concise\".",
+	"additionalContextPlaceholder": "Additional context for note generation.\r\nEg. \"Reply in a professional style. Be concise\".",
 	"toast": {
 		"checkEmailForCode": "Please check your email inbox for the one-time code.",
 		"invalidCode": "Invalid code. Please verify the code sent to your e-mail."
+	},
+	"context_menu": {
+		"search": "Search..."
+	},
+	"profile": {
+		"title": "Profile",
+		"account": "Account",
+		"emailAddress": "Email Address",
+		"subscription": "Subscription",
+		"grintaPro": "Grinta Pro",
+		"upgrade": "Upgrade to Pro",
+		"cancel": "Cancel",
+		"signOut": "Sign out",
+		"subscriptionModal": {
+			"title": "Continue in the browser",
+			"description": "Continue the subscription process in the browser.",
+			"cancel": "Cancel"
+		}
 	}
 }

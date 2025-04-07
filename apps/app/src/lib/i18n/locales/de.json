@@ -103,7 +103,8 @@
 		"shorter": "Kürzer",
 		"grammar": "Grammatik verbessern",
 		"professional": "Professionell",
-		"askAi": "KI fragen"
+		"askAi": "KI fragen",
+		"translate": "Übersetzen"
 	},
 	"commands": {
 		"helperText": {
@@ -128,7 +129,8 @@
 			"quickLook": "Schnellansicht",
 			"getInfo": "Informationen",
 			"copyName": "Name kopieren",
-			"copyPath": "Pfad kopieren"
+			"copyPath": "Pfad kopieren",
+			"search": "Suchen..."
 		},
 		"menuItems": {
 			"clearNotes": "Notizen löschen",
