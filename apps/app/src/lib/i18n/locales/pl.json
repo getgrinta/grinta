@@ -92,9 +92,7 @@
 		"shorter": "Krócej",
 		"grammar": "Popraw gramatykę",
 		"professional": "Profesjonalnie",
-		"askAi": "Zapytaj AI",
-		"translate": "Przetłumacz",
-		"command_menu_simplify_language": "Uprość język"
+		"askAi": "Zapytaj AI"
 	},
 	"commands": {
 		"helperText": {
@@ -119,7 +117,8 @@
 			"quickLook": "Szybki podgląd",
 			"getInfo": "Informacje",
 			"copyName": "Kopiuj nazwę",
-			"copyPath": "Kopiuj ścieżkę"
+			"copyPath": "Kopiuj ścieżkę",
+			"search": "Szukaj..."
 		},
 		"menuItems": {
 			"clearNotes": "Wyczyść notatki",
@@ -164,9 +163,6 @@
 			"moveRight": "Przesuń w prawo",
 			"remove": "Usuń"
 		}
-	},
-	"context_menu": {
-		"search": "Szukaj..."
 	},
 	"additionalContextPlaceholder": "Dodatkowy kontekst dla generowania notatek.\r\nnp. \"Odpowiadaj w profesjonalnym stylu. Bądź zwięzły\".",
 	"profile": {
