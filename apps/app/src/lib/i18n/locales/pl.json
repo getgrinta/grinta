@@ -92,7 +92,8 @@
 		"shorter": "Krócej",
 		"grammar": "Popraw gramatykę",
 		"professional": "Profesjonalnie",
-		"askAi": "Zapytaj AI"
+		"askAi": "Zapytaj AI",
+		"translate": "Przetłumacz"
 	},
 	"commands": {
 		"helperText": {
