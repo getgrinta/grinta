@@ -141,7 +141,11 @@ type GrintaInvokeCommand =
 	| "load_app_info"
 	| "activate_application_by_name"
 	| "toggle_visibility"
-	| "get_frontmost_application_name";
+	| "get_frontmost_application_name"
+	| "fetch_favicon"
+	| "set_secret"
+	| "get_secret"
+	| "delete_secret";
 
 function grintaInvoke<T>(
 	cmd: GrintaInvokeCommand,
@@ -149,4 +153,11 @@ function grintaInvoke<T>(
 	options?: InvokeOptions,
 ): Promise<T> {
 	return invoke(cmd, args, options);
+}
+
+export async function getMasterKey(): Promise<string> {
+	return grintaInvoke("get_secret", {
+		serviceName: "grinta",
+		accountName: "master-key"
+	});
 }

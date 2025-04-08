@@ -1,4 +1,4 @@
-import { env } from "$env/dynamic/public";
+import { getMasterKey } from "$lib/grinta-invoke";
 import { type Store, load } from "@tauri-apps/plugin-store";
 import { AesGcm, Bytes, Hex } from "ox";
 import superjson from "superjson";
@@ -88,16 +88,18 @@ export abstract class SecureStore<T extends object> {
 	 * @throws Error if encryption key is not set
 	 */
 	private async getEncryptionKey(): Promise<CryptoKey> {
-		if (!env.PUBLIC_ENCRYPTION_KEY) {
-			const error = new Error("PUBLIC_ENCRYPTION_KEY is not set");
-			this.handleError(error, "encryption");
-			throw error;
-		}
-
 		try {
+			let salt: string;
+
+			if (process.env.NODE_ENV === "development") {
+				salt = "test";
+			} else {
+				salt = await getMasterKey();
+			}
+
 			return AesGcm.getKey({
 				password: "",
-				salt: Bytes.fromString(env.PUBLIC_ENCRYPTION_KEY),
+				salt: Bytes.fromString(salt),
 			});
 		} catch (error) {
 			this.handleError(error as Error, "encryption");

@@ -57,7 +57,6 @@ jobs:
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
           APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
           PUBLIC_API_URL: ${{ secrets.PUBLIC_API_URL }}
-          PUBLIC_ENCRYPTION_KEY: ${{ secrets.PUBLIC_ENCRYPTION_KEY }}
         with:
           projectPath: apps/app
           tauriScript: bun tauri

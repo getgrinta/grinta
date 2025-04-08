@@ -44,7 +44,6 @@ plugin({
 				exports: {
 					env: {
 						PUBLIC_API_URL: "http://localhost:1420",
-						PUBLIC_ENCRYPTION_KEY: "test",
 					},
 				},
 				loader: "object",
