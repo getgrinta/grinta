@@ -20,8 +20,8 @@
 
     const ext = $derived(item.label.split(".").pop() ?? "");
 
-    function normalizeUrlForFavicon(value: string): string {
-        const hostname = new URL(value).hostname;
+    function normalizeUrlForFavicon(url: URL): string {
+        const hostname = url.hostname;
         return `https://${hostname.startsWith("www.") ? "" : "www."}${hostname}`;
     }
 
@@ -48,22 +48,27 @@
             }
 
             if (item.handler === "URL") {
-                const normalizedUrl = normalizeUrlForFavicon(item.value);
+                try {
+                    const url = new URL(item.value);
+                    const normalizedUrl = normalizeUrlForFavicon(url);
 
-                if (!appMetadataStore.favIcons[normalizedUrl]) {
-                    fetchFavicon(normalizedUrl)
-                        .then((faviconUrl) => {
-                            if (faviconUrl) {
-                                appMetadataStore.favIcons[normalizedUrl] =
-                                    faviconUrl;
-                            }
-                        })
-                        .catch((error) => {
-                            console.error(
-                                `Failed to fetch favicon for ${item.value}:`,
-                                error,
-                            );
-                        });
+                    if (!appMetadataStore.favIcons[normalizedUrl]) {
+                        fetchFavicon(normalizedUrl)
+                            .then((faviconUrl) => {
+                                if (faviconUrl) {
+                                    appMetadataStore.favIcons[normalizedUrl] =
+                                        faviconUrl;
+                                }
+                            })
+                            .catch((error) => {
+                                console.error(
+                                    `Failed to fetch favicon for ${item.value}:`,
+                                    error,
+                                );
+                            });
+                    }
+                } catch (error) {
+                    /* Failed to parse url for icon */
                 }
             }
 
@@ -74,7 +79,13 @@
     );
 
     const faviconBaseValue = $derived.by(() => {
-        return normalizeUrlForFavicon(item.value);
+        try {
+            const url = new URL(item.value);
+            return normalizeUrlForFavicon(url);
+        } catch (error) {
+            /* Failed to parse url for icon */
+            return "";
+        }
     });
 </script>
 
