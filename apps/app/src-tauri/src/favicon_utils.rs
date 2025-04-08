@@ -1,29 +1,36 @@
-use tauri::{command};
+use tauri::{command, AppHandle, Runtime};
 use favicon_picker::get_default_favicon_url;
+use tauri_plugin_http::reqwest::{self, Client};
+use favicon_picker::get_favicons_from_url;
 use url::Url;
 
-// Define the error type for the command
-#[derive(Debug, serde::Serialize)]
-pub struct FetchError {
-    message: String,
-}
-
-// The Tauri command to fetch the favicon
 #[command]
-pub async fn fetch_favicon(url: String) -> Result<String, FetchError> {
-    match Url::parse(&url) { 
-        Ok(base_url) => {
-            match get_default_favicon_url(&base_url) { 
-                Ok(icon) => {
-                    Ok(icon.to_string())
-                },
-                Err(e) => {
-                    Err(FetchError { message: e.to_string() })
+pub async fn fetch_favicon<R: Runtime>(
+    _app_handle: AppHandle<R>,
+    url: String,
+) -> Result<String, String> {
+    let base_url = Url::parse(&url).map_err(|e| e.to_string())?;
+    let client = Client::new();
+
+    match get_favicons_from_url(&client, &base_url).await {
+        Ok(favicons) => {
+            if let Some(first_icon) = favicons.first() {
+                let icon_url = first_icon.href.clone();
+                Ok(icon_url.to_string())
+            } else {
+                if let Ok(icon_url) = get_default_favicon_url(&base_url) {
+                    Ok(icon_url.to_string())
+                } else {
+                    Err("Failed to find any favicon for the given URL".to_string())
                 }
             }
         },
         Err(e) => {
-            Err(FetchError { message: e.to_string() })
+            if let Ok(icon_url) = get_default_favicon_url(&base_url) {
+                Ok(icon_url.to_string())
+            } else {
+                Err("Failed to find any favicon for the given URL".to_string())
+            }
         }
     }
 }
