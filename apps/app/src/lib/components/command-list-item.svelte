@@ -1,75 +1,87 @@
 <script lang="ts">
-import { clsx } from "clsx";
-import { ArrowDownLeftIcon } from "lucide-svelte";
-import { appStore } from "$lib/store/app.svelte";
-import { commandsStore } from "$lib/store/commands.svelte";
-import { handleContextMenu } from "$lib/utils.svelte";
-import { highlightText } from "$lib/utils.svelte";
-import { match, P } from "ts-pattern";
-import { _ } from "svelte-i18n";
-import type { z } from "zod";
-import CommandListIcon from "./command-list-icon.svelte";
-import { widgetsStore } from "$lib/store/widgets.svelte";
-import { PressedKeys } from "runed";
-import {
-	APP_MODE,
-	COMMAND_HANDLER,
-	type CommandHandler,
-	type MetadataSchema,
-} from "@getgrinta/core";
+	import { clsx } from "clsx";
+	import { ArrowDownLeftIcon } from "lucide-svelte";
+	import { appStore } from "$lib/store/app.svelte";
+	import { commandsStore } from "$lib/store/commands.svelte";
+	import { handleContextMenu } from "$lib/utils.svelte";
+	import { highlightText } from "$lib/utils.svelte";
+	import { match, P } from "ts-pattern";
+	import { _ } from "svelte-i18n";
+	import type { z } from "zod";
+	import CommandListIcon from "./command-list-icon.svelte";
+	import { widgetsStore } from "$lib/store/widgets.svelte";
+	import { PressedKeys } from "runed";
+	import {
+		APP_MODE,
+		COMMAND_HANDLER,
+		type CommandHandler,
+		type MetadataSchema,
+	} from "@getgrinta/core";
 
-const props = $props();
+	const props = $props();
 
-const pressedKeys = new PressedKeys();
-const isCmdPressed = $derived(pressedKeys.has("Meta"));
+	const pressedKeys = new PressedKeys();
+	const isCmdPressed = $derived(pressedKeys.has("Meta"));
 
-type GetHelperProps = {
-	value: string;
-	handler: CommandHandler;
-	metadata?: z.infer<typeof MetadataSchema>;
-};
+	type GetHelperProps = {
+		value: string;
+		handler: CommandHandler;
+		metadata?: z.infer<typeof MetadataSchema>;
+	};
 
-function getCommandTypeLabel({ value, handler, metadata }: GetHelperProps) {
-	return match(handler)
-		.with(COMMAND_HANDLER.APP, () => $_("commands.helperText.app"))
-		.with(COMMAND_HANDLER.FS_ITEM, () => {
-			if (metadata?.contentType === "public.folder") {
-				return $_("commands.helperText.folder");
-			}
-			return $_("commands.helperText.file");
-		})
-		.with(COMMAND_HANDLER.URL, () => $_("commands.helperText.web"))
-		.with(COMMAND_HANDLER.SYSTEM, () => $_("commands.helperText.barCommand"))
-		.with(COMMAND_HANDLER.CHANGE_MODE, () =>
-			$_("commands.helperText.changeMode"),
-		)
-		.with(P.union(COMMAND_HANDLER.COPY_TO_CLIPBOARD), () =>
-			$_("commands.helperText.copyToClipboard"),
-		)
-		.with(COMMAND_HANDLER.OPEN_NOTE, () => $_("commands.helperText.openNote"))
-		.with(COMMAND_HANDLER.CREATE_NOTE, () =>
-			$_("commands.helperText.createNote"),
-		)
-		.with(COMMAND_HANDLER.RUN_SHORTCUT, () =>
-			$_("commands.helperText.runShortcut"),
-		)
-		.otherwise(() => value);
-}
+	function getCommandTypeLabel({ value, handler, metadata }: GetHelperProps) {
+		return match(handler)
+			.with(COMMAND_HANDLER.APP, () => $_("commands.helperText.app"))
+			.with(COMMAND_HANDLER.FS_ITEM, () => {
+				if (metadata?.contentType === "public.folder") {
+					return $_("commands.helperText.folder");
+				}
+				return $_("commands.helperText.file");
+			})
+			.with(COMMAND_HANDLER.URL, () => $_("commands.helperText.web"))
+			.with(COMMAND_HANDLER.SYSTEM, () =>
+				$_("commands.helperText.barCommand"),
+			)
+			.with(COMMAND_HANDLER.CHANGE_MODE, () =>
+				$_("commands.helperText.changeMode"),
+			)
+			.with(P.union(COMMAND_HANDLER.COPY_TO_CLIPBOARD), () =>
+				$_("commands.helperText.copyToClipboard"),
+			)
+			.with(COMMAND_HANDLER.OPEN_NOTE, () =>
+				$_("commands.helperText.openNote"),
+			)
+			.with(COMMAND_HANDLER.CREATE_NOTE, () =>
+				$_("commands.helperText.createNote"),
+			)
+			.with(COMMAND_HANDLER.RUN_SHORTCUT, () =>
+				$_("commands.helperText.runShortcut"),
+			)
+			.otherwise(() => value);
+	}
 
-const currentLabel = $derived(props.item.localizedLabel ?? props.item.label);
+	const currentLabel = $derived(
+		props.item.localizedLabel ?? props.item.label,
+	);
 
-const highlightedText = $derived(
-	highlightText(
-		isCmdPressed ? (props.item.path ?? currentLabel) : currentLabel,
-		appStore.query,
-	),
-);
+	const highlightedText = $derived(
+		highlightText(
+			isCmdPressed ? (props.item.path ?? currentLabel) : currentLabel,
+			appStore.query,
+		),
+	);
 
-const smartMatch = $derived(
-	appStore.query.length > 0 &&
-		commandsStore.selectedIndex === 0 &&
-		props.item.smartMatch,
-);
+	const smartMatch = $derived(
+		appStore.query.length > 0 &&
+			commandsStore.selectedIndex === 0 &&
+			props.item.smartMatch,
+	);
+
+	function renderChunkSpaces(text: string): string {
+		return text
+			.replace(/^(\s+)/, (match) => "&nbsp;".repeat(match.length))
+			.replace(/(\s+)$/, (match) => "&nbsp;".repeat(match.length));
+	}
 </script>
 
 <li
@@ -123,7 +135,7 @@ const smartMatch = $derived(
 								props.active && "!text-primary-content",
 							)}
 						>
-							{chunk.text}
+							{@html renderChunkSpaces(chunk.text)}
 						</span>
 					{/each}
 				</h2>
