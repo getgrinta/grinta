@@ -1,0 +1,26 @@
+{
+	"name": "@getgrinta/plugin",
+	"description": "Plugin interface for Grinta.",
+	"type": "module",
+	"version": "0.1.0",
+	"module": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		}
+	},
+	"files": ["dist"],
+	"scripts": {
+		"build": "tsc && bun build src/index.ts --outdir ./dist",
+		"test": "bun test"
+	},
+	"dependencies": {
+		"@getgrinta/core": "workspace:*",
+		"zod": "^3.24.2"
+	},
+	"devDependencies": {
+		"@tauri-apps/plugin-http": "^2.4.3"
+	}
+}

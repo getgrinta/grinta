@@ -2,6 +2,18 @@ import { getApiClient } from "$lib/utils.svelte";
 import type { ContentType } from "@getgrinta/api";
 
 export class AiStore {
+	grintAiResult = $state<string>()
+
+	async fetchGrintAiResult(query: string) {
+		const result = await this.generateText({
+			prompt: query,
+			context: "",
+			contentType: "GRINTAI",
+		});
+		const { text } = await result.json()
+		this.grintAiResult = text
+	}
+
 	generateText({
 		prompt,
 		context,

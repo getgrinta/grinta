@@ -34,10 +34,6 @@
 		"title": "Welcome to Grinta",
 		"subtitle": "Before you start, you may want to adjust these settings."
 	},
-	"searchMode": {
-		"web": "Web",
-		"ai": "AI"
-	},
 	"barMode": {
 		"initial": "Search",
 		"notes": "Notes",
@@ -85,6 +81,14 @@
 		"web": "Web",
 		"file": "File"
 	},
+	"search": {
+		"grintai": "GrintAI"
+	},
+	"ai": {
+		"copy": "Copy",
+		"copySuccess": "Copied to clipboard",
+		"createNote": "Create Note"
+	},
 	"notes": {
 		"placeholder": "Note name",
 		"regenerateWithAI": "Regenerate with AI",
@@ -103,7 +107,8 @@
 		"shorter": "Shorter",
 		"grammar": "Improve grammar",
 		"professional": "Professional",
-		"askAi": "Ask AI"
+		"askAi": "Ask AI",
+		"translate": "Translate"
 	},
 	"commands": {
 		"helperText": {
@@ -128,7 +133,8 @@
 			"quickLook": "Quick Look",
 			"getInfo": "Get Info",
 			"copyName": "Copy Name",
-			"copyPath": "Copy Path"
+			"copyPath": "Copy Path",
+			"search": "Search..."
 		},
 		"menuItems": {
 			"clearNotes": "Clear notes",

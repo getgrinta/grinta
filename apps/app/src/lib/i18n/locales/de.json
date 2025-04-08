@@ -34,10 +34,6 @@
 		"title": "Willkommen bei Grinta",
 		"subtitle": "Bevor du losmachst, möchtest du vielleicht diese Einstellungen anpassen?"
 	},
-	"searchMode": {
-		"web": "Netz",
-		"ai": "KI"
-	},
 	"barMode": {
 		"initial": "Suche",
 		"notes": "Notizen",
@@ -85,6 +81,14 @@
 		"web": "Web",
 		"file": "Datei"
 	},
+	"search": {
+		"grintai": "GrintAI"
+	},
+	"ai": {
+		"copy": "Kopieren",
+		"copySuccess": "Kopiert in die Zwischenablage",
+		"createNote": "Notiz erstellen"
+	},
 	"notes": {
 		"placeholder": "Notizname",
 		"regenerateWithAI": "Mit KI neu generieren",
@@ -103,7 +107,8 @@
 		"shorter": "Kürzer",
 		"grammar": "Grammatik verbessern",
 		"professional": "Professionell",
-		"askAi": "KI fragen"
+		"askAi": "KI fragen",
+		"translate": "Übersetzen"
 	},
 	"commands": {
 		"helperText": {
@@ -128,7 +133,8 @@
 			"quickLook": "Schnellansicht",
 			"getInfo": "Informationen",
 			"copyName": "Name kopieren",
-			"copyPath": "Pfad kopieren"
+			"copyPath": "Pfad kopieren",
+			"search": "Suchen..."
 		},
 		"menuItems": {
 			"clearNotes": "Notizen löschen",

@@ -17,14 +17,15 @@ import {
 	StickyNoteIcon,
 } from "lucide-svelte";
 import { match } from "ts-pattern";
-import { BAR_MODE, appStore } from "./store/app.svelte";
+import { appStore } from "./store/app.svelte";
 import {
 	COMMAND_HANDLER,
 	type ExecutableCommand,
-} from "./store/commands.svelte";
+	APP_MODE,
+	THEME,
+} from "@getgrinta/core";
 import { vaultStore } from "./store/vault.svelte";
 import { systemThemeWatcher } from "./system.utils.svelte";
-import { THEME } from "./store/settings.svelte";
 import { env } from "./env";
 
 export async function installHotkeys() {
@@ -130,7 +131,7 @@ export function clickListener() {
 }
 
 export function getIcon(command: ExecutableCommand) {
-	if (appStore.barMode !== BAR_MODE.INITIAL) return ChevronRightIcon;
+	if (appStore.appMode !== APP_MODE.INITIAL) return ChevronRightIcon;
 	return match(command.handler)
 		.with(COMMAND_HANDLER.URL, () => GlobeIcon)
 		.with(COMMAND_HANDLER.APP, () => AppWindowIcon)
@@ -145,14 +146,6 @@ export function getIcon(command: ExecutableCommand) {
 			return FileIcon;
 		})
 		.otherwise(() => ChevronRightIcon);
-}
-
-export function formatCurrency(amount: number, currency: string) {
-	const locale = window.navigator.language ?? "en";
-	return new Intl.NumberFormat(locale, {
-		style: "currency",
-		currency,
-	}).format(amount);
 }
 
 export type FileEntry = {

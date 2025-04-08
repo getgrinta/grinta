@@ -1,5 +1,4 @@
 import { goto } from "$app/navigation";
-import { until } from "@open-draft/until";
 import { watch } from "@tauri-apps/plugin-fs";
 import { fetch } from "@tauri-apps/plugin-http";
 import { openUrl } from "@tauri-apps/plugin-opener";
@@ -9,20 +8,23 @@ import nlp from "compromise";
 import dates from "compromise-dates";
 import numbers from "compromise-numbers";
 import { matchSorter } from "match-sorter";
-import { uniq } from "rambda";
+import { sortBy, uniq } from "rambda";
 import { _ } from "svelte-i18n";
 import { toast } from "svelte-sonner";
 import { get } from "svelte/store";
 import { P, match } from "ts-pattern";
 import { z } from "zod";
 import {
-	parseCurrencyConversion,
-	parseFraction,
-	parseMathExpression,
-	parseRelativeTime,
-	parseTextMathExpression,
-	parseUnitConversion,
-} from "../formula-commands";
+	type ExecutableCommand,
+	COMMAND_HANDLER,
+	ExecutableCommandSchema,
+	type CommandHandler,
+	APP_MODE,
+	HOSTNAME_REGEX,
+	COMMAND_PRIORITY,
+} from "@getgrinta/core";
+import { type PluginContext } from "@getgrinta/plugin"
+import { PluginWebSearch, PluginNotes, PluginNlp, PluginExactUrl } from "@getgrinta/plugin-search"
 import { searchSpotlightApps, toggleVisibility } from "../grinta-invoke";
 import { appMetadataStore } from "../store/app-metadata.svelte";
 import {
@@ -30,9 +32,9 @@ import {
 	findApps,
 	generateCancellationToken,
 } from "../utils.svelte";
-import { BAR_MODE, appStore } from "./app.svelte";
+import { appStore } from "./app.svelte";
 import { clipboardStore } from "./clipboard.svelte";
-import { type Note, notesStore } from "./notes.svelte";
+import { notesStore } from "./notes.svelte";
 import { SecureStore } from "./secure.svelte";
 import { settingsStore } from "./settings.svelte";
 import debounce from "debounce";
@@ -50,43 +52,6 @@ function t(key: string, params: Record<string, string> = {}) {
 	}
 }
 
-const HOSTNAME_REGEX = /[a-zA-Z0-9\-.]{1,61}\.[a-zA-Z]{2,}/;
-
-// The order is important for command sorting.
-export const COMMAND_HANDLER = {
-	SYSTEM: "SYSTEM",
-	APP: "APP",
-	CHANGE_MODE: "CHANGE_MODE",
-	COPY_TO_CLIPBOARD: "COPY_TO_CLIPBOARD",
-	RUN_SHORTCUT: "RUN_SHORTCUT",
-	OPEN_NOTE: "OPEN_NOTE",
-	CREATE_NOTE: "CREATE_NOTE",
-	URL: "URL",
-	EMBEDDED_URL: "EMBEDDED_URL",
-	FS_ITEM: "FS_ITEM",
-} as const;
-
-export type CommandHandler = keyof typeof COMMAND_HANDLER;
-
-const commandsPriority = Object.keys(COMMAND_HANDLER);
-export const FileMetadataSchema = z.object({
-	contentType: z.string(),
-});
-
-export const ExecutableCommandSchema = z.object({
-	label: z.string(),
-	localizedLabel: z.string().optional(),
-	value: z.string(),
-	path: z.string().nullable().optional(),
-	metadata: FileMetadataSchema.optional().nullable(),
-	handler: z.nativeEnum(COMMAND_HANDLER),
-	smartMatch: z.boolean().optional().default(false),
-});
-
-export type ExecutableCommand = z.infer<typeof ExecutableCommandSchema> & {
-	isHistory?: boolean;
-};
-
 export const SYSTEM_COMMAND = {
 	SIGN_IN: "SIGN_IN",
 	PROFILE: "PROFILE",
@@ -102,140 +67,40 @@ export type SystemCommand = keyof typeof SYSTEM_COMMAND;
 
 type HistoryEntry = Omit<ExecutableCommand, "label">;
 
-async function fetchCompletions(query: string) {
-	type CompletionResult = [string, string[]];
-	const encodedQuery = encodeURIComponent(query);
-	const completionUrl = `https://www.startpage.com/osuggestions?q=${encodedQuery}`;
-	const { data: response, error: fetchError } = await until(() =>
-		fetch(completionUrl),
-	);
-	if (fetchError) {
-		toast.error("Failed to fetch completions");
-	}
-	if (!response) return [query, []] as CompletionResult;
-	const { data: json, error: jsonError } = await until<Error, CompletionResult>(
-		() => response.json(),
-	);
-	if (jsonError) {
-		toast.error("Failed to parse completions");
-	}
-	if (!json) return [query, []] as CompletionResult;
-	return json;
-}
-
-async function buildFormulaCommands(
-	currentQuery: string,
-): Promise<ExecutableCommand[]> {
-	// Try parsing as a mathematical expression first
-	const mathCommands = parseMathExpression(currentQuery);
-	if (mathCommands.length > 0) {
-		return mathCommands;
-	}
-
-	// Try parsing text-based math expressions like "five times seven"
-	const textMathCommands = parseTextMathExpression(currentQuery);
-	if (textMathCommands.length > 0) {
-		return textMathCommands;
-	}
-
-	// Try parsing currency conversions like "10 usd to eur"
-	const currencyCommands = await parseCurrencyConversion(currentQuery);
-	if (currencyCommands.length > 0) {
-		return currencyCommands;
-	}
-
-	// Try parsing unit conversions like "5 inches to cm"
-	const unitConversionCommands = parseUnitConversion(currentQuery);
-	if (unitConversionCommands.length > 0) {
-		return unitConversionCommands;
-	}
-
-	// Try parsing relative time expressions
-	const timeCommands = parseRelativeTime(currentQuery);
-	if (timeCommands.length > 0) {
-		return timeCommands;
-	}
-
-	// Try parsing text fractions like "two thirds"
-	const fractionCommands = parseFraction(currentQuery);
-	if (fractionCommands.length > 0) {
-		return fractionCommands;
-	}
-
-	return [];
-}
-
 async function buildAppCommands(
 	apps: FileEntry[],
 ): Promise<ExecutableCommand[]> {
 	return apps.map((app) => {
 		const defaultName = app.name.slice(0, -4);
-		const localizedName = appMetadataStore.getLocalizedName(defaultName);
+		const localizedName =
+			appMetadataStore.getLocalizedName(defaultName) ?? defaultName;
 
-		return {
+		return ExecutableCommandSchema.parse({
 			label: defaultName,
 			localizedLabel: localizedName,
 			value: app.name,
-			path: app.path,
+			metadata: {
+				path: app.path,
+			},
 			handler: COMMAND_HANDLER.APP,
-			smartMatch: false,
-		};
+			priority: COMMAND_PRIORITY.HIGH,
+			appModes: [APP_MODE.INITIAL],
+		});
 	});
-}
-
-function buildNoteCommands(notes: Note[]): ExecutableCommand[] {
-	return notes.map((note) => ({
-		label: note.title,
-		value: note.filename,
-		handler: COMMAND_HANDLER.OPEN_NOTE,
-		smartMatch: false,
-	}));
 }
 
 function buildShortcutCommands(stdout: string) {
 	const shortcuts = stdout.split(/\r?\n/);
-	return shortcuts.map((shortcut) => ({
-		label: shortcut,
-		value: shortcut,
-		handler: COMMAND_HANDLER.RUN_SHORTCUT,
-		smartMatch: false,
-	}));
-}
-
-async function buildQueryCommands(
-	query: string,
-	excludeResult: string | null = null,
-) {
-	const queryMatchSearch = [
-		{
-			label: t("commands.actions.search", { query }),
-			value: settingsStore.getSearchUrl(query),
-			handler: COMMAND_HANDLER.URL,
-			smartMatch: false,
-		},
-	];
-	if (query.length < 3) return queryMatchSearch;
-	const completions = await fetchCompletions(query);
-	const completionList = completions[1].map((completion: string) => {
-		const completionQuery = encodeURIComponent(completion);
-		return {
-			label: completion,
-			value: settingsStore.getSearchUrl(completionQuery),
-			handler: COMMAND_HANDLER.URL,
-			smartMatch: false,
-		};
-	});
-	const literalSearch = completionList.length > 0 ? [] : queryMatchSearch;
-	return [
-		...completionList,
-		...literalSearch,
-		{
-			label: t("commands.actions.createNote", { query }),
-			value: query,
-			handler: COMMAND_HANDLER.CREATE_NOTE,
-			smartMatch: false,
-		},
-	].filter((a) => a.label !== excludeResult);
+	return shortcuts.map((shortcut) =>
+		ExecutableCommandSchema.parse({
+			label: shortcut,
+			localizedLabel: shortcut,
+			value: shortcut,
+			handler: COMMAND_HANDLER.RUN_SHORTCUT,
+			priority: COMMAND_PRIORITY.HIGH,
+			appModes: [APP_MODE.INITIAL],
+		}),
+	);
 }
 
 const CommandsSchema = z.object({
@@ -273,63 +138,71 @@ export class CommandsStore extends SecureStore<Commands> {
 		const userCommands =
 			vaultStore.data.authCookie?.length > 0
 				? [
-					{
-						label: t("commands.menuItems.profile"),
-						value: SYSTEM_COMMAND.PROFILE,
-						handler: COMMAND_HANDLER.SYSTEM,
-						smartMatch: false,
-					},
-				]
+						ExecutableCommandSchema.parse({
+							label: t("commands.menuItems.profile"),
+							localizedLabel: t("commands.menuItems.profile"),
+							value: SYSTEM_COMMAND.PROFILE,
+							handler: COMMAND_HANDLER.SYSTEM,
+							appModes: [APP_MODE.MENU],
+						}),
+					]
 				: [
-					{
-						label: t("commands.menuItems.signIn"),
-						value: SYSTEM_COMMAND.SIGN_IN,
-						handler: COMMAND_HANDLER.SYSTEM,
-						smartMatch: false,
-					},
-				];
+						ExecutableCommandSchema.parse({
+							label: t("commands.menuItems.signIn"),
+							localizedLabel: t("commands.menuItems.signIn"),
+							value: SYSTEM_COMMAND.SIGN_IN,
+							handler: COMMAND_HANDLER.SYSTEM,
+							appModes: [APP_MODE.MENU],
+						}),
+					];
 		return [
 			...userCommands,
 			...(settingsStore.data?.clipboardRecordingEnabled
 				? [
-					{
-						label: t("commands.menuItems.clipboardHistory"),
-						value: SYSTEM_COMMAND.CLIPBOARD,
-						handler: COMMAND_HANDLER.SYSTEM,
-						smartMatch: false,
-					},
-				]
+						ExecutableCommandSchema.parse({
+							label: t("commands.menuItems.clipboardHistory"),
+							localizedLabel: t("commands.menuItems.clipboardHistory"),
+							value: SYSTEM_COMMAND.CLIPBOARD,
+							handler: COMMAND_HANDLER.SYSTEM,
+							appModes: [APP_MODE.MENU],
+						}),
+					]
 				: []),
-			{
+			ExecutableCommandSchema.parse({
 				label: t("commands.menuItems.clearNotes"),
+				localizedLabel: t("commands.menuItems.clearNotes"),
 				value: SYSTEM_COMMAND.CLEAR_NOTES,
 				handler: COMMAND_HANDLER.SYSTEM,
-				smartMatch: false,
-			},
-			{
+				appModes: [APP_MODE.MENU],
+			}),
+			ExecutableCommandSchema.parse({
 				label: t("commands.menuItems.clearHistory"),
+				localizedLabel: t("commands.menuItems.clearHistory"),
 				value: SYSTEM_COMMAND.CLEAR_HISTORY,
 				handler: COMMAND_HANDLER.SYSTEM,
-				smartMatch: false,
-			},
-			{
+				appModes: [APP_MODE.MENU],
+			}),
+			ExecutableCommandSchema.parse({
 				label: t("commands.menuItems.help"),
+				localizedLabel: t("commands.menuItems.help"),
 				value: SYSTEM_COMMAND.HELP,
 				handler: COMMAND_HANDLER.SYSTEM,
-				smartMatch: false,
-			},
-			{
+				appModes: [APP_MODE.MENU],
+			}),
+			ExecutableCommandSchema.parse({
 				label: t("commands.menuItems.settings"),
+				localizedLabel: t("commands.menuItems.settings"),
 				value: SYSTEM_COMMAND.SETTINGS,
 				handler: COMMAND_HANDLER.SYSTEM,
-				smartMatch: false,
-			},
-			{
+				appModes: [APP_MODE.MENU],
+			}),
+			ExecutableCommandSchema.parse({
 				label: t("commands.menuItems.exit"),
+				localizedLabel: t("commands.menuItems.exit"),
 				value: SYSTEM_COMMAND.EXIT,
 				handler: COMMAND_HANDLER.SYSTEM,
-				smartMatch: false,
-			},
+				appModes: [APP_MODE.MENU],
+			}),
 		];
 	}
 
@@ -337,12 +210,15 @@ export class CommandsStore extends SecureStore<Commands> {
 		return clipboardStore.data.clipboardHistory
 			.filter((clipboardEntry) => clipboardEntry.trim().length > 0)
 			.reverse()
-			.map((clipboardEntry) => ({
-				label: clipboardEntry,
-				value: clipboardEntry,
-				handler: COMMAND_HANDLER.COPY_TO_CLIPBOARD,
-				smartMatch: false,
-			}));
+			.map((clipboardEntry) =>
+				ExecutableCommandSchema.parse({
+					label: clipboardEntry,
+					localizedLabel: clipboardEntry,
+					value: clipboardEntry,
+					handler: COMMAND_HANDLER.COPY_TO_CLIPBOARD,
+					appModes: [APP_MODE.INITIAL, APP_MODE.CLIPBOARD],
+				}),
+			);
 	}
 
 	async initialize() {
@@ -412,15 +288,11 @@ export class CommandsStore extends SecureStore<Commands> {
 		const newCommandsToken = generateCancellationToken();
 		this.buildCommandsToken = newCommandsToken;
 
-		let commands: ExecutableCommand[] = [];
-
-		commands = await match(appStore.barMode)
-			.with(BAR_MODE.INITIAL, async () => {
+		let commands: ExecutableCommand[] = await match(appStore.appMode)
+			.with(APP_MODE.INITIAL, async () => {
 				let commandHistory = this.commandHistory
 					.slice()
 					.reverse()
-					.map((command) => ({ ...command, isHistory: true }));
-
 				if (appStore.query.length === 0) {
 					return commandHistory;
 				}
@@ -433,9 +305,11 @@ export class CommandsStore extends SecureStore<Commands> {
 					);
 				}
 
+				const exactUrlCommands = await PluginExactUrl(this.buildPluginContext())?.addSearchResults?.(appStore.query) ?? [];
+
 				return [
 					...this.appCommands,
-					...this.buildUrlCommands(queryIsUrl, appStore.query),
+					...exactUrlCommands,
 					...this.webSearchCommands,
 					...this.spotlightCommands,
 					...commandHistory,
@@ -443,50 +317,50 @@ export class CommandsStore extends SecureStore<Commands> {
 					...this.getMenuItems(),
 				];
 			})
-			.with(BAR_MODE.MENU, () => {
+			.with(APP_MODE.MENU, () => {
 				return this.getMenuItems();
 			})
-			.with(BAR_MODE.CLIPBOARD, async () => {
+			.with(APP_MODE.CLIPBOARD, async () => {
 				return this.getClipboardCommands();
 			})
-			.with(BAR_MODE.NOTES, async () => {
-				const createNoteCommand =
-					appStore.query.length > 0
-						? [
-							{
-								label: t("commands.actions.createNote", {
-									query: appStore.query,
-								}),
-								value: appStore.query,
-								handler: COMMAND_HANDLER.CREATE_NOTE,
-								smartMatch: false,
-							},
-						]
-						: [];
-
+			.with(APP_MODE.NOTES, async () => {
 				await notesStore.fetchNotes();
-				return [...createNoteCommand, ...buildNoteCommands(notesStore.notes)];
+				const noteCommands = await PluginNotes(this.buildPluginContext())?.addSearchResults?.(appStore.query) ?? [];
+				return noteCommands;
 			})
 			.exhaustive();
 
-		const sortedAndFilteredCommands =
-			appStore.query.length === 0
-				? commands
-				: matchSorter(commands, appStore.query, {
-					keys: ["localizedLabel", "label"],
-				}).sort((a, b) => this.sortCommands({ prev: a, next: b }));
+		if (appStore.query.length === 0 && appStore.appMode === APP_MODE.INITIAL) {
+			this.commands = sortBy((command: ExecutableCommand) => command.metadata?.ranAt ?? new Date())(commands).reverse();
+			return
+		}
 
-		const formulaCommands = await buildFormulaCommands(appStore.query);
+		const filteredCommands = matchSorter(commands, appStore.query, {
+			keys: ["localizedLabel", "label"],
+		})
 
 		// Prevent overriding commands
 		if (newCommandsToken !== this.buildCommandsToken) {
 			return;
 		}
 
-		this.commands = uniq([...formulaCommands, ...sortedAndFilteredCommands]);
+		if (appStore.appMode === APP_MODE.MENU) {
+			this.commands = uniq(filteredCommands)
+			return
+		}
+
+		if (appStore.appMode === APP_MODE.NOTES) {
+			this.commands = uniq(sortBy((command: ExecutableCommand) => command.metadata?.updatedAt ?? new Date())(filteredCommands).reverse())
+			return
+		}
+
+		// Formula commands would be filtered out by matchSorted, so it needs to happen here.
+		const formulaCommands = appStore.appMode === APP_MODE.INITIAL ? await PluginNlp(this.buildPluginContext())?.addSearchResults?.(appStore.query) ?? [] : [];
+
+		this.commands = uniq([...formulaCommands, ...filteredCommands]).sort((a, b) => this.sortCommands({ prev: a, next: b }));
 
 		if (
-			appStore.barMode === BAR_MODE.INITIAL &&
+			appStore.appMode === APP_MODE.INITIAL &&
 			!isRefresh &&
 			!this.isUpdatingExternalSource
 		) {
@@ -523,14 +397,17 @@ export class CommandsStore extends SecureStore<Commands> {
 				return;
 			}
 
-			this.spotlightCommands = result.map((entry) => ({
-				label: entry.display_name,
-				smartMatch: false,
-				value: entry.path,
-				path: entry.path,
-				metadata: { contentType: entry.content_type },
-				handler: COMMAND_HANDLER.FS_ITEM,
-			}));
+			this.spotlightCommands = result.map((entry) =>
+				ExecutableCommandSchema.parse({
+					label: entry.display_name,
+					localizedLabel: entry.display_name,
+					value: entry.path,
+					path: entry.path,
+					metadata: { contentType: entry.content_type },
+					handler: COMMAND_HANDLER.FS_ITEM,
+					appModes: [APP_MODE.INITIAL],
+				}),
+			);
 
 			this.isUpdatingExternalSource = true;
 			this.buildCommands({
@@ -540,38 +417,11 @@ export class CommandsStore extends SecureStore<Commands> {
 		});
 	}
 
-	private buildUrlCommands(
-		queryIsUrl: boolean,
-		query: string,
-	): ExecutableCommand[] {
-		if (!queryIsUrl) {
-			return [];
-		}
-		const value = query.match(/^https?:\/\//) ? query : `https://${query}`;
-		const command = {
-			label: query,
-			value,
-			handler: COMMAND_HANDLER.URL,
-			smartMatch: true,
-		};
-		return [command];
-	}
-
 	sortCommands({
 		prev,
 		next,
 	}: { prev: ExecutableCommand; next: ExecutableCommand }): number {
-		if (prev.handler === COMMAND_HANDLER.URL && prev.smartMatch) {
-			return -1;
-		}
-		if (next.handler === COMMAND_HANDLER.URL && next.smartMatch) {
-			return 1;
-		}
-
-		return (
-			commandsPriority.indexOf(prev.handler) -
-			commandsPriority.indexOf(next.handler)
-		);
+		return next.priority - prev.priority;
 	}
 
 	async removeHistoryOfType(handler: CommandHandler) {
@@ -581,7 +431,10 @@ export class CommandsStore extends SecureStore<Commands> {
 		await this.updateData({ commandHistory: filteredHistory });
 	}
 
-	async removeHistoryEntry({ value, handler }: HistoryEntry) {
+	async removeHistoryEntry({
+		value,
+		handler,
+	}: Pick<HistoryEntry, "value" | "handler">) {
 		const filteredHistory = this.commandHistory
 			.slice()
 			.filter((entry) => entry.handler !== handler || entry.value !== value);
@@ -590,10 +443,6 @@ export class CommandsStore extends SecureStore<Commands> {
 
 	async clearHistory() {
 		await this.updateData({ commandHistory: [] });
-	}
-
-	async openUrl(url: string) {
-		return openUrl(url);
 	}
 
 	async handleCommand(command: ExecutableCommand) {
@@ -618,7 +467,7 @@ export class CommandsStore extends SecureStore<Commands> {
 						pastCommand.value !== command.value ||
 						pastCommand.handler !== command.handler,
 				);
-			filteredHistory.push(command);
+			filteredHistory.push({ ...command, metadata: { ...command.metadata, ranAt: new Date() } });
 			await this.updateData({ commandHistory: filteredHistory });
 			setTimeout(() => {
 				// Build with timeout, so it's not visible in the UI before user is moved to the app.
@@ -628,18 +477,24 @@ export class CommandsStore extends SecureStore<Commands> {
 			}, 100);
 		}
 		window.scrollTo({ top: 0 });
+
+		const handleExternalOpen = () => {
+			appStore.clearQuery();
+			toggleVisibility();
+		};
+
 		return match(command)
 			.with({ handler: COMMAND_HANDLER.APP }, async ({ value }) => {
-				toggleVisibility();
+				handleExternalOpen();
 				Command.create("open", ["-a", value]).execute();
 			})
 			.with({ handler: COMMAND_HANDLER.FS_ITEM }, async ({ value }) => {
-				toggleVisibility();
+				handleExternalOpen();
 				Command.create("open", [value]).execute();
 			})
 			.with({ handler: COMMAND_HANDLER.URL }, async ({ value }) => {
-				toggleVisibility();
-				this.openUrl(value);
+				handleExternalOpen();
+				openUrl(value);
 			})
 			.with({ handler: COMMAND_HANDLER.CHANGE_MODE }, async ({ value }) => {
 				return goto(`/commands/${value}`);
@@ -651,7 +506,7 @@ export class CommandsStore extends SecureStore<Commands> {
 				async ({ value }) => {
 					await navigator.clipboard.writeText(value);
 
-					toggleVisibility();
+					handleExternalOpen();
 				},
 			)
 			.with({ handler: COMMAND_HANDLER.SYSTEM }, async ({ value }) => {
@@ -659,12 +514,12 @@ export class CommandsStore extends SecureStore<Commands> {
 					.with(SYSTEM_COMMAND.CLEAR_NOTES, async () => {
 						await notesStore.clearNotes();
 						this.removeHistoryOfType(COMMAND_HANDLER.OPEN_NOTE);
-						appStore.barMode = BAR_MODE.INITIAL;
+						appStore.switchMode(APP_MODE.INITIAL);
 						return goto("/");
 					})
 					.with(SYSTEM_COMMAND.HELP, async () => {
 						toggleVisibility();
-						return this.openUrl("https://getgrinta.com/guides");
+						return openUrl("https://getgrinta.com/guides");
 					})
 					.with(SYSTEM_COMMAND.SETTINGS, async () => {
 						return goto("/settings");
@@ -674,7 +529,7 @@ export class CommandsStore extends SecureStore<Commands> {
 					})
 					.with(SYSTEM_COMMAND.CLEAR_HISTORY, async () => {
 						await this.clearHistory();
-						appStore.barMode = BAR_MODE.INITIAL;
+						appStore.switchMode(APP_MODE.INITIAL);
 						return goto("/");
 					})
 					.with(SYSTEM_COMMAND.SIGN_IN, async () => {
@@ -684,7 +539,7 @@ export class CommandsStore extends SecureStore<Commands> {
 						return goto("/profile");
 					})
 					.with(SYSTEM_COMMAND.CLIPBOARD, async () => {
-						return appStore.switchMode(BAR_MODE.CLIPBOARD);
+						return appStore.switchMode(APP_MODE.CLIPBOARD);
 					})
 					.exhaustive();
 			})
@@ -708,7 +563,24 @@ export class CommandsStore extends SecureStore<Commands> {
 				const encodedValue = encodeURIComponent(value);
 				return goto(`/web/${encodedValue}`);
 			})
-			.exhaustive();
+			.otherwise(() => {
+				console.log("Run custom plugin handlers");
+			});
+	}
+
+	buildPluginContext(): PluginContext {
+		return {
+			fetch,
+			exec: this.handleCommand,
+			t,
+			fail: toast.error,
+			app: {
+				query: appStore.query,
+				appMode: appStore.appMode,
+			},
+			settings: settingsStore.data,
+			notes: notesStore.notes,
+		}
 	}
 
 	async fetchWebSearchCommands({
@@ -721,7 +593,7 @@ export class CommandsStore extends SecureStore<Commands> {
 		excludeResult: string | null;
 	}) {
 		try {
-			const webSearchCommands = await buildQueryCommands(query, excludeResult);
+			const webSearchCommands = await PluginWebSearch(this.buildPluginContext())?.addSearchResults?.(query) ?? [];
 
 			// Check if the token is still valid (user hasn't typed something else)
 			if (token !== this.buildCommandsToken) {
@@ -731,7 +603,7 @@ export class CommandsStore extends SecureStore<Commands> {
 			// Set flag to prevent infinite loop
 			this.isUpdatingExternalSource = true;
 
-			this.webSearchCommands = webSearchCommands;
+			this.webSearchCommands = webSearchCommands.filter((cmd) => cmd.value !== excludeResult);
 			this.buildCommands({
 				isRefresh: true,
 			});

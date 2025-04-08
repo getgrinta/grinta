@@ -6,10 +6,6 @@
 		"title": "Witaj w Grincie",
 		"subtitle": "Przed rozpoczęciem, możesz dostosować te ustawienia."
 	},
-	"searchMode": {
-		"web": "Sieć",
-		"ai": "AI"
-	},
 	"barMode": {
 		"initial": "Szukaj",
 		"notes": "Notatki",
@@ -74,6 +70,14 @@
 		"invalidEmail": "Nieprawidłowy adres e-mail",
 		"help": "Pomoc"
 	},
+	"search": {
+		"grintai": "GrintAI"
+	},
+	"ai": {
+		"copy": "Kopiuj",
+		"copySuccess": "Skopiowano do schowka",
+		"createNote": "Utwórz notatkę"
+	},
 	"notes": {
 		"placeholder": "Nazwa notatki",
 		"regenerateWithAI": "Wygeneruj ponownie z AI",
@@ -92,7 +96,8 @@
 		"shorter": "Krócej",
 		"grammar": "Popraw gramatykę",
 		"professional": "Profesjonalnie",
-		"askAi": "Zapytaj AI"
+		"askAi": "Zapytaj AI",
+		"translate": "Przetłumacz"
 	},
 	"commands": {
 		"helperText": {
@@ -117,7 +122,9 @@
 			"quickLook": "Szybki podgląd",
 			"getInfo": "Informacje",
 			"copyName": "Kopiuj nazwę",
-			"copyPath": "Kopiuj ścieżkę"
+			"copyPath": "Kopiuj ścieżkę",
+			"search": "Szukaj...",
+			"translate": "Przetłumacz"
 		},
 		"menuItems": {
 			"clearNotes": "Wyczyść notatki",

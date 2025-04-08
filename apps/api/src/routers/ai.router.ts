@@ -14,6 +14,7 @@ export const CONTENT_TYPE = {
 	AUTOCOMPLETION: "AUTOCOMPLETION",
 	INLINE_AI: "INLINE_AI",
 	REPHRASE: "REPHRASE",
+	GRINTAI: "GRINTAI",
 } as const;
 
 export const ContentTypeEnum = z.nativeEnum(CONTENT_TYPE);

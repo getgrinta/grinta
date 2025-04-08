@@ -1,6 +1,6 @@
 {
-	"name": "@grintabar/app",
-	"version": "0.2.3",
+	"name": "@getgrinta/app",
+	"version": "0.3.0",
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
@@ -14,6 +14,9 @@
 		"cleanup": "rimraf node_modules .svelte-kit .turbo build"
 	},
 	"dependencies": {
+		"@getgrinta/core": "workspace:*",
+		"@getgrinta/plugin": "workspace:*",
+		"@getgrinta/plugin-search": "workspace:*",
 		"@ai-sdk/openai-compatible": "0.2.5",
 		"@better-auth/stripe": "1.2.5",
 		"@felte/validator-zod": "1.0.18",

@@ -3,12 +3,12 @@ import { goto } from "$app/navigation";
 import { page } from "$app/state";
 import CommandList from "$lib/components/command-list.svelte";
 import SearchBar from "$lib/components/search-bar.svelte";
-import SearchModeToggle from "$lib/components/search-mode-toggle.svelte";
 import ViewActions from "$lib/components/view-actions.svelte";
 import Widgets from "$lib/components/widgets.svelte";
-import { BAR_MODE, appStore } from "$lib/store/app.svelte";
+import { appStore } from "$lib/store/app.svelte";
 import { commandsStore } from "$lib/store/commands.svelte";
 import { notesStore } from "$lib/store/notes.svelte";
+import { APP_MODE } from "@getgrinta/core";
 import { _ } from "svelte-i18n";
 
 async function createNote() {
@@ -18,7 +18,7 @@ async function createNote() {
 	return goto(`/notes/${filename}`);
 }
 
-const viewActions = [
+const notesViewActions = [
 	{ label: $_("notes.createNote"), onclick: createNote, shortcut: "⌘N" },
 ];
 
@@ -34,12 +34,10 @@ $effect(() => {
 		<Widgets />
 		<CommandList />
 	</div>
-	{#if appStore.barMode !== BAR_MODE.MENU}
+	{#if appStore.appMode !== APP_MODE.MENU}
 		<div class="flex fixed bottom-4 right-4 left-4 justify-end pointer-events-none">
-			{#if appStore.barMode === BAR_MODE.INITIAL}
-				<SearchModeToggle />
-			{:else if appStore.barMode === BAR_MODE.NOTES}
-				<ViewActions actions={viewActions} />
+			{#if appStore.appMode === APP_MODE.NOTES}
+				<ViewActions actions={notesViewActions} />
 			{/if}
 		</div>
 	{/if}
