@@ -247,7 +247,7 @@ const indicatorButton = $derived(
 			spellcheck="false"
 			data-testid="search-bar"
 		/>
-		<div slot="addon">
+		<div slot="addon" class="flex items-center gap-1">
 			{#if appStore.appMode === APP_MODE.INITIAL && appStore.query.length >= 3}
 				<ViewActions actions={searchViewActions} size="sm" />
 			{:else}

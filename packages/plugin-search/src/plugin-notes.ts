@@ -13,6 +13,7 @@ export const PluginNotes = createPlugin({
                 value: note.filename,
                 metadata: {
                     path: note.path,
+                    updatedAt: new Date(note.updatedAt),
                 },
                 handler: COMMAND_HANDLER.OPEN_NOTE,
                 appModes: [APP_MODE.INITIAL, APP_MODE.NOTES],

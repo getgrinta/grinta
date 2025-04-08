@@ -36,6 +36,7 @@ export const MetadataSchema = z.object({
 	contentType: z.string().optional(),
 	path: z.string().optional(),
 	ranAt: z.date().optional(),
+	updatedAt: z.date().optional(),
 });
 
 export const COMMAND_PRIORITY = {

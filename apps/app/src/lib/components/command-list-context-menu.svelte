@@ -53,12 +53,40 @@ export function createContextMenuItems(
 		});
 	}
 
+	if (command.handler === COMMAND_HANDLER.OPEN_NOTE) {
+		// Show in finder
+		menuItems.push({
+			label: t("commands.contextMenu.showInFinder"),
+				icon: EyeIcon as any,
+				onClick: async () => {
+					const homePath = await PathApi.homeDir();
+					const fullPath = await PathApi.join(
+						homePath,
+						...settingsStore.data.notesDir,
+						command.value,
+					);
+
+					Command.create("open", ["-R", fullPath]).execute();
+				},
+			});
+
+			// Remove
+			menuItems.push({
+				label: t("commands.contextMenu.remove"),
+				icon: XIcon as any,
+				onClick: async () => {
+					await notesStore.deleteNote(command.value);
+					commandsStore.buildCommands({ isRefresh: true });
+				},
+			});
+	}
+
 	if (command.handler === COMMAND_HANDLER.APP) {
 		menuItems.push({
 			label: t("commands.contextMenu.open"),
 			icon: FolderIcon as any,
 			onClick: () => {
-				const path = command.metadata?.path
+				const path = command.metadata?.path;
 
 				if (!path) {
 					return;
@@ -86,22 +114,13 @@ export function createContextMenuItems(
 			label: t("commands.contextMenu.showInFinder"),
 			icon: EyeIcon as any,
 			onClick: () => {
-				const path = command.metadata?.path
+				const path = command.metadata?.path;
 
 				if (!path) {
 					return;
 				}
 
-				let pathToOpen = path;
-				const lastSlash = pathToOpen.lastIndexOf("/");
-				if (
-					lastSlash !== -1 &&
-					command.metadata?.contentType !== "public.folder"
-				) {
-					pathToOpen = pathToOpen.substring(0, lastSlash);
-				}
-
-				Command.create("open", [pathToOpen]).execute();
+				Command.create("open", ["-R", path]).execute();
 			},
 		});
 
@@ -109,7 +128,7 @@ export function createContextMenuItems(
 			label: t("commands.contextMenu.quickLook"),
 			icon: EyeIcon as any,
 			onClick: () => {
-				const path = command.metadata?.path
+				const path = command.metadata?.path;
 
 				if (!path) {
 					return;
@@ -123,7 +142,7 @@ export function createContextMenuItems(
 			label: t("commands.contextMenu.getInfo"),
 			icon: TextIcon as any,
 			onClick: () => {
-				const path = command.metadata?.path
+				const path = command.metadata?.path;
 
 				if (!path) {
 					return;
@@ -153,40 +172,12 @@ export function createContextMenuItems(
 			});
 		}
 
-		if (command.handler === COMMAND_HANDLER.OPEN_NOTE) {
-			// Show in finder
-			menuItems.push({
-				label: t("commands.contextMenu.showInFinder"),
-				icon: EyeIcon as any,
-				onClick: async () => {
-					const homePath = await PathApi.homeDir();
-					const fullPath = await PathApi.join(
-						homePath,
-						...settingsStore.data.notesDir,
-						command.value,
-					);
-
-					Command.create("open", ["-R", fullPath]).execute();
-				},
-			});
-
-			// Remove
-			menuItems.push({
-				label: t("commands.contextMenu.remove"),
-				icon: XIcon as any,
-				onClick: async () => {
-					await notesStore.deleteNote(command.value);
-					commandsStore.buildCommands({ isRefresh: true });
-				},
-			});
-		}
-
-		if (command.handler === COMMAND_HANDLER.APP) {
+		if (command.metadata?.path) {
 			menuItems.push({
 				label: t("commands.contextMenu.copyPath"),
 				icon: CopyIcon as any,
 				onClick: () => {
-					const path = command.metadata?.path;
+					const path = command.metadata.path;
 
 					if (!path) {
 						return;
@@ -195,89 +186,6 @@ export function createContextMenuItems(
 					navigator.clipboard.writeText(path);
 				},
 			});
-		}
-
-		if (
-			command.handler === COMMAND_HANDLER.FS_ITEM ||
-			command.handler === COMMAND_HANDLER.APP
-		) {
-			menuItems.push({
-				label: t("commands.contextMenu.showInFinder"),
-				icon: EyeIcon as any,
-				onClick: () => {
-					const path = command.metadata?.path;
-
-					if (!path) {
-						return;
-					}
-
-					Command.create("open", ["-R", path]).execute();
-				},
-			});
-
-			menuItems.push({
-				label: t("commands.contextMenu.quickLook"),
-				icon: EyeIcon as any,
-				onClick: () => {
-					const path = command.metadata?.path;
-
-					if (!path) {
-						return;
-					}
-
-					Command.create("qlmanage", ["-p", path]).execute();
-				},
-			});
-
-			menuItems.push({
-				label: t("commands.contextMenu.getInfo"),
-				icon: TextIcon as any,
-				onClick: () => {
-					const path = command.metadata?.path;
-
-					if (!path) {
-						return;
-					}
-
-					Command.create("osascript", [
-						"-e",
-						`tell application "Finder" to open information window of file (POSIX file "${path}")`,
-					]).execute();
-				},
-			});
-
-			if (command.localizedLabel || command.label) {
-				menuItems.push({
-					label: t("commands.contextMenu.copyName"),
-					icon: CopyIcon as any,
-					onClick: () => {
-						const { label, localizedLabel } = command;
-
-						const targetLabel = localizedLabel || label;
-						if (!targetLabel) {
-							return;
-						}
-
-						navigator.clipboard.writeText(targetLabel);
-					},
-				});
-			}
-
-			if (command.metadata?.path) {
-				menuItems.push({
-					label: t("commands.contextMenu.copyPath"),
-					icon: CopyIcon as any,
-					onClick: () => {
-						const path = command.metadata.path;
-
-						if (!path) {
-							return;
-						}
-
-						navigator.clipboard.writeText(path);
-					},
-				});
-			}
 		}
 	}
 	contextMenuItems = menuItems;
