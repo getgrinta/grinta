@@ -47,6 +47,12 @@ export const REPHRASE_SYSTEM_PROMPT = dedent`
 	2. Output Format: Return only the continuation of the paragraph wrapped in an XML <response> tag. Do not include any additional text or explanations.
 `;
 
+export const GRINTAI_SYSTEM_PROMPT = dedent`
+    You are a highly intelligent AI assistant.
+	1. Your task is to provide concise and informative summaries for the prompts in <request></request> tag.
+	2. Output Format: Return only the continuation of the paragraph wrapped in an XML <response> tag. Do not include any additional text or explanations.
+`;
+
 export class AiService {
 	createModel({ provider, model }: { provider: AiProvider; model: string }) {
 		return createOpenAICompatible({
@@ -102,6 +108,7 @@ export class AiService {
 			.with(CONTENT_TYPE.AUTOCOMPLETION, () => AUTOCOMPLETE_SYSTEM_PROMPT)
 			.with(CONTENT_TYPE.INLINE_AI, () => INLINE_SYSTEM_PROMPT)
 			.with(CONTENT_TYPE.REPHRASE, () => REPHRASE_SYSTEM_PROMPT)
+			.with(CONTENT_TYPE.GRINTAI, () => GRINTAI_SYSTEM_PROMPT)
 			.exhaustive();
 		const { text } = await generateText({
 			prompt,

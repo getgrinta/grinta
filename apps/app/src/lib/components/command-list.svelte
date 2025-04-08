@@ -5,7 +5,6 @@ import { _ } from "svelte-i18n";
 import { VList } from "virtua/svelte";
 import CommandListContextMenu from "./command-list-context-menu.svelte";
 import CommandListItem from "./command-list-item.svelte";
-    import { appStore } from "$lib/store/app.svelte";
 
 let contextMenu = $state<CommandListContextMenu>();
 let virtualizer = $state<VList<any>>();
@@ -20,7 +19,7 @@ $effect(() => {
 	if (selectedIndex >= 0) {
 		virtualizer?.scrollToIndex(selectedIndex, { align: "start" });
 	}
-})
+});
 
 // Hide context menu when clicking outside
 $effect(clickListener);
@@ -41,7 +40,7 @@ $effect(clickListener);
 	>
 		{#snippet children(item, index)}
 			{@const active = commandsStore.selectedIndex === index}
-			<CommandListItem barMode={appStore.barMode} {item} {index} {active} {contextMenu} />
+			<CommandListItem {item} {index} {active} {contextMenu} />
 		{/snippet}
 	</VList>
 </ul>

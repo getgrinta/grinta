@@ -34,10 +34,6 @@
 		"title": "Welcome to Grinta",
 		"subtitle": "Before you start, you may want to adjust these settings."
 	},
-	"searchMode": {
-		"web": "Web",
-		"ai": "AI"
-	},
 	"barMode": {
 		"initial": "Search",
 		"notes": "Notes",
@@ -84,6 +80,14 @@
 		"showWidgetLabels": "Show Widget Labels",
 		"web": "Web",
 		"file": "File"
+	},
+	"search": {
+		"grintai": "GrintAI"
+	},
+	"ai": {
+		"copy": "Copy",
+		"copySuccess": "Copied to clipboard",
+		"createNote": "Create Note"
 	},
 	"notes": {
 		"placeholder": "Note name",

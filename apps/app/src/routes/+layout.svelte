@@ -7,7 +7,7 @@ import { afterNavigate, goto } from "$app/navigation";
 import { setVibrancy } from "$lib/grinta-invoke";
 import { locale, setupI18n, _ } from "$lib/i18n";
 import { appMetadataStore } from "$lib/store/app-metadata.svelte";
-import { BAR_MODE, appStore } from "$lib/store/app.svelte";
+import { appStore } from "$lib/store/app.svelte";
 import { clipboardStore } from "$lib/store/clipboard.svelte";
 import { commandsStore } from "$lib/store/commands.svelte";
 import { settingsStore } from "$lib/store/settings.svelte";
@@ -32,6 +32,7 @@ import PngIconUrl from "$lib/assets/tray.png?arraybuffer";
 import PngDevIconUrl from "$lib/assets/tray-dev.png?arraybuffer";
 import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
 import type { UnlistenFn } from "@tauri-apps/api/event";
+import { APP_MODE, COMMAND_HANDLER } from "@getgrinta/core";
 const { children } = $props();
 
 dayjs.extend(LocalizedFormat);
@@ -75,8 +76,17 @@ async function initTrayIcon(
 					id: "development",
 					text: "🧑‍💻 Development",
 					action() {
-						return Promise.resolve();
-					},
+						return commandsStore.handleCommand({
+							handler: COMMAND_HANDLER.URL,
+							value: "https://www.youtube.com/watch?v=AGsjA1pXajk",
+							label: "Development",
+							appModes: [APP_MODE.INITIAL],
+							localizedLabel: "Development",
+							metadata: {},
+							smartMatch: false,
+							priority: 0
+					});
+				},
 				}
 			: {
 					id: "update",
@@ -114,7 +124,7 @@ async function initTrayIcon(
 				action() {
 					appStore.appWindow?.show();
 					appStore.appWindow?.setFocus();
-					return goto(`/commands/${BAR_MODE.NOTES}`);
+					return goto(`/commands/${APP_MODE.NOTES}`);
 				},
 			},
 			...(isClipboardEnabled
@@ -125,7 +135,7 @@ async function initTrayIcon(
 							action() {
 								appStore.appWindow?.show();
 								appStore.appWindow?.setFocus();
-								return goto(`/commands/${BAR_MODE.CLIPBOARD}`);
+								return goto(`/commands/${APP_MODE.CLIPBOARD}`);
 							},
 						},
 					]
@@ -209,7 +219,7 @@ function centerWindow() {
 }
 
 async function openMenu() {
-	return goto(`/commands/${BAR_MODE.MENU}`);
+	return goto(`/commands/${APP_MODE.MENU}`);
 }
 
 async function initializeApp() {

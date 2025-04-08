@@ -1,10 +1,10 @@
 <script lang="ts">
     import { appMetadataStore } from "$lib/store/app-metadata.svelte";
-    import type { ExecutableCommand } from "$lib/store/commands.svelte";
     import { getIcon } from "$lib/utils.svelte";
     import clsx from "clsx";
     import { watch } from "runed";
     import { fetchFavicon } from "$lib/grinta-invoke";
+    import type { ExecutableCommand } from "@getgrinta/core";
 
     const {
         item,
@@ -26,7 +26,7 @@
     }
 
     async function loadCommandIcon(command: ExecutableCommand) {
-        if (!command.path) return;
+        if (!command.metadata?.path) return;
 
         appMetadataStore.getIconAsync(command);
     }

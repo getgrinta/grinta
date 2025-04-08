@@ -27,6 +27,7 @@ function scrollDown() {
 
 <div class="fixed flex flex-row left-0 top-0 right-0 z-10 items-center gap-2">
 	<label
+		for="nothing"
 		class="input px-6 h-14 !outline-none bg-base-100/80 border-b backdrop-blur border-x-transparent border-t-transparent border-base-300 !shadow-none rounded-none flex-1 flex items-center gap-4 w-full"
 	>
 		<slot name="indicator">

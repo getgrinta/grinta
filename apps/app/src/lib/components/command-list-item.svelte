@@ -1,13 +1,8 @@
 <script lang="ts">
 import { clsx } from "clsx";
 import { ArrowDownLeftIcon } from "lucide-svelte";
-import { appStore, BAR_MODE } from "$lib/store/app.svelte";
-import {
-	COMMAND_HANDLER,
-	commandsStore,
-	type FileMetadataSchema,
-	type CommandHandler,
-} from "$lib/store/commands.svelte";
+import { appStore } from "$lib/store/app.svelte";
+import { commandsStore } from "$lib/store/commands.svelte";
 import { handleContextMenu } from "$lib/utils.svelte";
 import { highlightText } from "$lib/utils.svelte";
 import { match, P } from "ts-pattern";
@@ -16,6 +11,12 @@ import type { z } from "zod";
 import CommandListIcon from "./command-list-icon.svelte";
 import { widgetsStore } from "$lib/store/widgets.svelte";
 import { PressedKeys } from "runed";
+import {
+	APP_MODE,
+	COMMAND_HANDLER,
+	type CommandHandler,
+	type MetadataSchema,
+} from "@getgrinta/core";
 
 const props = $props();
 
@@ -25,7 +26,7 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
 type GetHelperProps = {
 	value: string;
 	handler: CommandHandler;
-	metadata?: z.infer<typeof FileMetadataSchema>;
+	metadata?: z.infer<typeof MetadataSchema>;
 };
 
 function getCommandTypeLabel({ value, handler, metadata }: GetHelperProps) {
@@ -129,7 +130,7 @@ const smartMatch = $derived(
 			</div>
 		</button>
 		<div class="flex gap-1 items-center">
-			{#if props.barMode === BAR_MODE.INITIAL}
+			{#if appStore.appMode === APP_MODE.INITIAL}
 				<button
 					type="button"
 					onclick={() => commandsStore.handleCommand(props.item)}

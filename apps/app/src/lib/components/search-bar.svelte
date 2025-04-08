@@ -6,10 +6,11 @@ import SegmentedControl from "$lib/components/segmented-control.svelte";
 import TopBar from "$lib/components/top-bar.svelte";
 import { toggleVisibility } from "$lib/grinta-invoke";
 import { appMetadataStore } from "$lib/store/app-metadata.svelte";
-import { BAR_MODE, type BarMode, appStore } from "$lib/store/app.svelte";
+import { appStore } from "$lib/store/app.svelte";
 import { commandsStore } from "$lib/store/commands.svelte";
 import { notesStore } from "$lib/store/notes.svelte";
 import { settingsStore } from "$lib/store/settings.svelte";
+import { APP_MODE, type AppMode } from "@getgrinta/core";
 import { listen } from "@tauri-apps/api/event";
 import { clsx } from "clsx";
 import { createForm } from "felte";
@@ -21,22 +22,32 @@ import {
 	MenuIcon,
 	SearchIcon,
 	StickyNoteIcon,
+  XIcon,
 } from "lucide-svelte";
 import { watch } from "runed";
 import { _ } from "svelte-i18n";
 import { match } from "ts-pattern";
+  import ViewActions from "./view-actions.svelte";
 
 let queryInput: HTMLInputElement;
 
+async function handleGrintAi() {
+	return goto("/ai")
+}
+
 const INDICATOR_MODES = [
 	{
-		value: BAR_MODE.INITIAL,
+		value: APP_MODE.INITIAL,
 		icon: GrintaIcon,
 		shortcut: "⌘1",
 		hotkey: "Mod+1",
 	},
-	{ value: BAR_MODE.NOTES, icon: AiNoteIcon, shortcut: "⌘2", hotkey: "Mod+2" },
-	{ value: BAR_MODE.MENU, icon: MenuIcon, shortcut: "⌘K", hotkey: "Mod+K" },
+	{ value: APP_MODE.NOTES, icon: AiNoteIcon, shortcut: "⌘2", hotkey: "Mod+2" },
+	{ value: APP_MODE.MENU, icon: MenuIcon, shortcut: "⌘K", hotkey: "Mod+K" },
+];
+
+const searchViewActions = [
+	{ label: $_("search.grintai"), onclick: handleGrintAi, shortcut: "⌘L" },
 ];
 
 const { form } = createForm({
@@ -52,12 +63,12 @@ listen("main_panel_did_resign_key", () => {
 listen("focus", () => {
 	queryInput?.focus();
 
-	if (appStore.barMode !== BAR_MODE.INITIAL) {
-		switchMode(BAR_MODE.INITIAL);
+	if (appStore.appMode !== APP_MODE.INITIAL) {
+		switchMode(APP_MODE.INITIAL);
 	}
 });
 
-function switchMode(mode: BarMode) {
+function switchMode(mode: AppMode) {
 	return goto(`/commands/${mode}`);
 }
 
@@ -91,35 +102,35 @@ async function handleNavigation(event: KeyboardEvent) {
 	}
 	if (event.key === "Escape") {
 		event.preventDefault();
-		if (appStore.barMode !== BAR_MODE.INITIAL) {
-			return switchMode(BAR_MODE.INITIAL);
+		if (appStore.appMode !== APP_MODE.INITIAL) {
+			return switchMode(APP_MODE.INITIAL);
 		}
 		toggleVisibility();
 	}
 	if (event.key === "Backspace" && appStore.query.length === 0) {
-		appStore.barMode = BAR_MODE.INITIAL;
+		appStore.appMode = APP_MODE.INITIAL;
 		return;
-	}
-	if (event.key === "j" && event.metaKey) {
-		return appStore.toggleSearchMode();
 	}
 	if (event.key === "k" && event.metaKey) {
 		event.preventDefault();
-		const shouldGoBack = appStore.barMode === BAR_MODE.MENU;
+		const shouldGoBack = appStore.appMode === APP_MODE.MENU;
 		if (shouldGoBack) return window.history.back();
-		return switchMode(BAR_MODE.MENU);
+		return switchMode(APP_MODE.MENU);
 	}
 	if (event.key === "p" && event.metaKey) {
 		return settingsStore.toggleIncognito();
+	}
+	if (event.key === "l" && event.metaKey) {
+		return goto("/ai");
 	}
 	if (event.key === "n" && event.metaKey) {
 		return createNote();
 	}
 	if (event.key === "1" && event.metaKey) {
-		return switchMode(BAR_MODE.INITIAL);
+		return switchMode(APP_MODE.INITIAL);
 	}
 	if (event.key === "2" && event.metaKey) {
-		return switchMode(BAR_MODE.NOTES);
+		return switchMode(APP_MODE.NOTES);
 	}
 }
 
@@ -137,7 +148,7 @@ async function buildAppCommandsAndAppIcons() {
 }
 
 watch(
-	() => [appStore.query, appStore.searchMode, appStore.barMode],
+	() => [appStore.query, appStore.appMode],
 	() => {
 		buildCommands();
 		setTimeout(() => {
@@ -157,28 +168,21 @@ watch(
 	},
 );
 
-watch(
-	() => appStore.searchMode,
-	() => {
-		queryInput?.focus();
-	},
-);
-
 const inputProps = $derived(
-	match(appStore.barMode)
-		.with(BAR_MODE.INITIAL, () => ({
+	match(appStore.appMode)
+		.with(APP_MODE.INITIAL, () => ({
 			icon: SearchIcon,
 			placeholder: $_("searchBar.placeholder.initial"),
 		}))
-		.with(BAR_MODE.MENU, () => ({
+		.with(APP_MODE.MENU, () => ({
 			icon: MenuIcon,
 			placeholder: $_("searchBar.placeholder.menu"),
 		}))
-		.with(BAR_MODE.NOTES, () => ({
+		.with(APP_MODE.NOTES, () => ({
 			icon: StickyNoteIcon,
 			placeholder: $_("searchBar.placeholder.notes"),
 		}))
-		.with(BAR_MODE.CLIPBOARD, () => ({
+		.with(APP_MODE.CLIPBOARD, () => ({
 			icon: ClipboardIcon,
 			placeholder: $_("searchBar.placeholder.clipboard"),
 		}))
@@ -186,9 +190,12 @@ const inputProps = $derived(
 );
 
 const indicatorButton = $derived(
-	match(appStore.barMode)
-		.with(BAR_MODE.INITIAL, () =>
-			settingsStore.data.incognitoEnabled
+	match(appStore.appMode)
+		.with(APP_MODE.INITIAL, () =>
+			appStore.query.length > 0 ? {
+				icon: XIcon,
+				onClick: () => appStore.setQuery("")
+			} : settingsStore.data.incognitoEnabled
 				? {
 						icon: EyeOffIcon,
 						onClick: () => settingsStore.toggleIncognito(),
@@ -241,18 +248,22 @@ const indicatorButton = $derived(
 			data-testid="search-bar"
 		/>
 		<div slot="addon">
-			<SegmentedControl
-				items={INDICATOR_MODES.map((mode) => ({
-					text: $_(`barMode.${mode.value.toLowerCase()}`),
-					icon: mode.icon,
-					active: mode.value === appStore.barMode,
-					shortcut: mode.shortcut,
-					hotkey: mode.hotkey,
-					testId: `search-bar-mode-${mode.value.toLowerCase()}`,
-					onClick: () => switchMode(mode.value),
-				}))}
-				hidingLabels
-			/>
+			{#if appStore.appMode === APP_MODE.INITIAL && appStore.query.length >= 3}
+				<ViewActions actions={searchViewActions} size="sm" />
+			{:else}
+				<SegmentedControl
+					items={INDICATOR_MODES.map((mode) => ({
+						text: $_(`barMode.${mode.value.toLowerCase()}`),
+						icon: mode.icon,
+						active: mode.value === appStore.appMode,
+						shortcut: mode.shortcut,
+						hotkey: mode.hotkey,
+						testId: `search-bar-mode-${mode.value.toLowerCase()}`,
+						onClick: () => switchMode(mode.value),
+					}))}
+					hidingLabels
+				/>
+			{/if}
 		</div>
 	</TopBar>
 </form>

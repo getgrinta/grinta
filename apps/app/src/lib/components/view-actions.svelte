@@ -1,4 +1,5 @@
 <script lang="ts">
+import clsx from "clsx";
 import { PressedKeys } from "runed";
 
 type Action = {
@@ -7,7 +8,7 @@ type Action = {
 	shortcut?: string;
 };
 
-const { actions } = $props<{ actions: Action[] }>();
+const { actions, size } = $props<{ actions: Action[], size?: "sm" | "md" }>();
 
 const pressedKeys = new PressedKeys();
 const isCmdPressed = $derived(pressedKeys.has("Meta"));
@@ -17,7 +18,7 @@ const isCmdPressed = $derived(pressedKeys.has("Meta"));
 	{#each actions as action}
 		<button
 			type="button"
-			class="btn"
+			class={clsx("btn", size === "sm" && "btn-sm")}
 			onclick={action.onclick}
 		>
 			<span>{action.label}</span>

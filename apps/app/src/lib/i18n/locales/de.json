@@ -34,10 +34,6 @@
 		"title": "Willkommen bei Grinta",
 		"subtitle": "Bevor du losmachst, möchtest du vielleicht diese Einstellungen anpassen?"
 	},
-	"searchMode": {
-		"web": "Netz",
-		"ai": "KI"
-	},
 	"barMode": {
 		"initial": "Suche",
 		"notes": "Notizen",
@@ -84,6 +80,14 @@
 		"showWidgetLabels": "Widget-Beschriftungen anzeigen",
 		"web": "Web",
 		"file": "Datei"
+	},
+	"search": {
+		"grintai": "GrintAI"
+	},
+	"ai": {
+		"copy": "Kopieren",
+		"copySuccess": "Kopiert in die Zwischenablage",
+		"createNote": "Notiz erstellen"
 	},
 	"notes": {
 		"placeholder": "Notizname",

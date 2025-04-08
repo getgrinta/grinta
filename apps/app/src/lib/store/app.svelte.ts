@@ -8,35 +8,16 @@ import {
 	PhysicalSize,
 } from "@tauri-apps/api/window";
 import type { Session, User } from "better-auth";
-import { z } from "zod";
 import { getAuthClient } from "../auth";
 import { fail, getApiClient } from "../utils.svelte";
 import { check as checkUpdate } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
 import { toast } from "svelte-sonner";
-
-export const BAR_MODE = {
-	INITIAL: "INITIAL",
-	MENU: "MENU",
-	NOTES: "NOTES",
-	CLIPBOARD: "CLIPBOARD",
-} as const;
-
-export type BarMode = keyof typeof BAR_MODE;
-
-export const barModeEnum = z.nativeEnum(BAR_MODE);
-
-export const SEARCH_MODE = {
-	WEB: "WEB",
-	AI: "AI",
-} as const;
-
-export type SearchMode = keyof typeof SEARCH_MODE;
+import { APP_MODE, appModeEnum, type AppMode } from "@getgrinta/core";
 
 export class AppStore {
 	query = $state("");
-	barMode = $state<BarMode>(BAR_MODE.INITIAL);
-	searchMode = $state<SearchMode>(SEARCH_MODE.WEB);
+	appMode = $state<AppMode>(APP_MODE.INITIAL);
 	appWindow = $state<Window>();
 	lastFocusedWindowName = $state<string>();
 	session = $state<Session>();
@@ -87,15 +68,9 @@ export class AppStore {
 		this.subscriptions = profile?.subscriptions ?? [];
 	}
 
-	async switchMode(mode: string) {
-		const barMode = barModeEnum.parse(mode);
-		this.barMode = barMode;
-	}
-
-	toggleSearchMode() {
-		const searchMode =
-			this.searchMode === SEARCH_MODE.WEB ? SEARCH_MODE.AI : SEARCH_MODE.WEB;
-		this.searchMode = searchMode;
+	switchMode(mode: string) {
+		const appMode = appModeEnum.parse(mode);
+		this.appMode = appMode;
 	}
 
 	setQuery(query: string) {

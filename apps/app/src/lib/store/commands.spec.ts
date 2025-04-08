@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import { commandsStore } from "./commands.svelte";
-import { COMMAND_HANDLER, SYSTEM_COMMAND } from "./commands.svelte";
+import { SYSTEM_COMMAND } from "./commands.svelte";
+import { APP_MODE, COMMAND_HANDLER, ExecutableCommandSchema } from "@getgrinta/core";
 
 describe("Commands Store", () => {
 	it("should create command store instance", () => {
@@ -32,7 +33,6 @@ describe("Commands Store", () => {
 		// Test that the essential methods exist
 		expect(typeof commandsStore.getMenuItems).toBe("function");
 		expect(typeof commandsStore.sortCommands).toBe("function");
-		expect(typeof commandsStore.openUrl).toBe("function");
 		expect(typeof commandsStore.handleCommand).toBe("function");
 		expect(typeof commandsStore.removeHistoryOfType).toBe("function");
 		expect(typeof commandsStore.removeHistoryEntry).toBe("function");
@@ -69,26 +69,29 @@ describe("Commands Store", () => {
 
 	it("should sort commands by handler priority", () => {
 		// Create test commands with different handlers
-		const systemCommand = {
+		const systemCommand = ExecutableCommandSchema.parse({
 			label: "System Command",
+			localizedLabel: "System Command",
 			value: "system",
 			handler: COMMAND_HANDLER.SYSTEM,
-			smartMatch: false,
-		};
+			appModes: [APP_MODE.INITIAL],
+		});
 
-		const appCommand = {
+		const appCommand = ExecutableCommandSchema.parse({
 			label: "App Command",
+			localizedLabel: "App Command",
 			value: "app",
 			handler: COMMAND_HANDLER.APP,
-			smartMatch: false,
-		};
+			appModes: [APP_MODE.INITIAL],
+		});
 
-		const urlCommand = {
+		const urlCommand = ExecutableCommandSchema.parse({
 			label: "URL Command",
+			localizedLabel: "URL Command",
 			value: "url",
 			handler: COMMAND_HANDLER.URL,
-			smartMatch: false,
-		};
+			appModes: [APP_MODE.INITIAL],
+		});
 
 		// Test sortCommands method
 		// Lower number means higher priority
@@ -133,6 +136,7 @@ describe("Commands Store", () => {
 		// All menu items should have the required properties of a command
 		for (const command of menuItems) {
 			expect(command).toHaveProperty("label");
+			expect(command).toHaveProperty("localizedLabel");
 			expect(command).toHaveProperty("value");
 			expect(command).toHaveProperty("handler");
 		}

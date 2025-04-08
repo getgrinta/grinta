@@ -3,8 +3,8 @@ import { goto } from "$app/navigation";
 import { page } from "$app/state";
 import NoteEditor from "$lib/components/editor.svelte";
 import TopBar from "$lib/components/top-bar.svelte";
-import { BAR_MODE } from "$lib/store/app.svelte";
 import { type ExtendedNote, notesStore } from "$lib/store/notes.svelte";
+import { APP_MODE } from "@getgrinta/core";
 import { BaseDirectory, type UnwatchFn, watch } from "@tauri-apps/plugin-fs";
 import clsx from "clsx";
 import { MoreVerticalIcon } from "lucide-svelte";
@@ -125,7 +125,7 @@ async function deleteNote() {
 	}
 	await notesStore.deleteNote(filename);
 	toast.success($_("notes.noteDeleted"));
-	return goto(`/commands/${BAR_MODE.NOTES}`);
+	return goto(`/commands/${APP_MODE.NOTES}`);
 }
 
 async function setupNoteWatcher() {
