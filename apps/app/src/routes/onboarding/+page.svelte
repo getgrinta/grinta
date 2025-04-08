@@ -1,19 +1,14 @@
 <script lang="ts">
 import { goto } from "$app/navigation";
 import { requestAccessToUserFolders } from "$lib/grinta-invoke";
-import {
-	ACCENT_COLOR,
-	LANGUAGE_NATIVE_NAME,
-	SEARCH_ENGINE,
-	settingsStore,
-	SEARCH_ENGINE_STYLED,
-} from "$lib/store/settings.svelte";
 import clsx from "clsx";
 import humanizeString from "humanize-string";
 import { onMount } from "svelte";
 import { _ } from "svelte-i18n";
 import { enable } from "@tauri-apps/plugin-autostart";
 import { appStore } from "$lib/store/app.svelte";
+  import { ACCENT_COLOR, LANGUAGE_NATIVE_NAME, SEARCH_ENGINE, SEARCH_ENGINE_STYLED } from "@getgrinta/core";
+  import { settingsStore } from "$lib/store/settings.svelte";
 
 let finishingOnboarding = $state(false);
 let audio = $state<HTMLAudioElement>();

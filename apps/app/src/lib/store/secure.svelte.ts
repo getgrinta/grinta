@@ -168,6 +168,7 @@ export abstract class SecureStore<T extends object> {
 		} catch (error) {
 			this.handleError(error as Error, "restore");
 			// Initialize with empty data on error
+			await this.clear();
 			this.#data = this.schema.parse({}) as T;
 			this.#initialized = true;
 		}
