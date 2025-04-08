@@ -344,6 +344,16 @@ export class CommandsStore extends SecureStore<Commands> {
 			return;
 		}
 
+		if (appStore.appMode === APP_MODE.MENU) {
+			this.commands = uniq(filteredCommands)
+			return
+		}
+
+		if (appStore.appMode === APP_MODE.NOTES) {
+			this.commands = uniq(sortBy((command: ExecutableCommand) => command.metadata?.updatedAt ?? new Date())(filteredCommands).reverse())
+			return
+		}
+
 		// Formula commands would be filtered out by matchSorted, so it needs to happen here.
 		const formulaCommands = appStore.appMode === APP_MODE.INITIAL ? await PluginNlp(this.buildPluginContext())?.addSearchResults?.(appStore.query) ?? [] : [];
 
