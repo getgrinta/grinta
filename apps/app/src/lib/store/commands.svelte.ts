@@ -467,17 +467,23 @@ export class CommandsStore extends SecureStore<Commands> {
 			}, 100);
 		}
 		window.scrollTo({ top: 0 });
+
+		const handleExternalOpen = () => {
+			appStore.clearQuery();
+			toggleVisibility();
+		};
+
 		return match(command)
 			.with({ handler: COMMAND_HANDLER.APP }, async ({ value }) => {
-				toggleVisibility();
+				handleExternalOpen();
 				Command.create("open", ["-a", value]).execute();
 			})
 			.with({ handler: COMMAND_HANDLER.FS_ITEM }, async ({ value }) => {
-				toggleVisibility();
+				handleExternalOpen();
 				Command.create("open", [value]).execute();
 			})
 			.with({ handler: COMMAND_HANDLER.URL }, async ({ value }) => {
-				toggleVisibility();
+				handleExternalOpen();
 				openUrl(value);
 			})
 			.with({ handler: COMMAND_HANDLER.CHANGE_MODE }, async ({ value }) => {
@@ -490,7 +496,7 @@ export class CommandsStore extends SecureStore<Commands> {
 				async ({ value }) => {
 					await navigator.clipboard.writeText(value);
 
-					toggleVisibility();
+					handleExternalOpen();
 				},
 			)
 			.with({ handler: COMMAND_HANDLER.SYSTEM }, async ({ value }) => {
