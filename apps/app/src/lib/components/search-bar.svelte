@@ -56,8 +56,24 @@ const { form } = createForm({
 	},
 });
 
+let clearQueryTimeoutToken: NodeJS.Timeout | null = null;
+
 listen("main_panel_did_resign_key", () => {
-	appStore.setQuery("");
+	const timeout = 30 * 60 * 1000; // 30 minutes
+
+	if (clearQueryTimeoutToken) {
+		clearTimeout(clearQueryTimeoutToken);
+	}
+
+	clearQueryTimeoutToken = setTimeout(() => {
+		appStore.setQuery("");
+	}, timeout);
+});
+
+listen("main_panel_did_become_key", () => {
+	if (clearQueryTimeoutToken) {
+		clearTimeout(clearQueryTimeoutToken);
+	}
 });
 
 listen("focus", () => {

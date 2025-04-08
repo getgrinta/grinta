@@ -360,8 +360,8 @@ export const TextSuggestion = Extension.create({
 							if (debounceTimer) clearTimeout(debounceTimer);
 
 							// Show loading state
-							const pos = view.state.selection.$from.pos;
-							const loadingWidget = createSuggestionDecoration(pos, "", true);
+							const posBefore = view.state.selection.$from.pos;
+							const loadingWidget = createSuggestionDecoration(posBefore, "", true);
 							const loadingDeco = DecorationSet.create(view.state.doc, [
 								loadingWidget,
 							]);
@@ -388,6 +388,9 @@ export const TextSuggestion = Extension.create({
 										const widget = createSuggestionDecoration(pos, suggestion);
 										deco = DecorationSet.create(view.state.doc, [widget]);
 									}
+
+									// If the selection changed between the start and finish, don't update
+									if (view.state.selection.$from.pos !== posBefore) return;
 
 									view.dispatch(
 										view.state.tr.setMeta(suggestionPluginKey, {
