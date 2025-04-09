@@ -117,6 +117,7 @@
 		"contextMenu": {
 			"pin": "Przypnij",
 			"remove": "Usuń",
+			"remove_from_history": "Usuń z historii",
 			"open": "Otwórz",
 			"showInFinder": "Pokaż w Finderze",
 			"quickLook": "Szybki podgląd",

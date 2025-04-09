@@ -44,7 +44,7 @@ export function createContextMenuItems(
 
 	if (command.metadata?.ranAt) {
 		menuItems.push({
-			label: t("commands.contextMenu.remove"),
+			label: t("commands.contextMenu.remove_from_history"),
 			icon: XIcon as any,
 			onClick: async () => {
 				await commandsStore.removeHistoryEntry(command);

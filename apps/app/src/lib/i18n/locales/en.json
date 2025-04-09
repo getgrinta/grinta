@@ -128,6 +128,7 @@
 		"contextMenu": {
 			"pin": "Pin",
 			"remove": "Remove",
+			"remove_from_history": "Remove from history",
 			"open": "Open",
 			"showInFinder": "Show in Finder",
 			"quickLook": "Quick Look",
