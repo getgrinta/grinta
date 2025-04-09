@@ -5,6 +5,7 @@
     import { watch } from "runed";
     import { fetchFavicon } from "$lib/grinta-invoke";
     import type { ExecutableCommand } from "@getgrinta/core";
+    import { GlobeIcon } from "lucide-svelte";
 
     const {
         item,
@@ -19,10 +20,18 @@
     }>();
 
     const ext = $derived(item.label.split(".").pop() ?? "");
+    let showErrorFavicon = $state<Record<string, boolean>>({});
 
     function normalizeUrlForFavicon(url: URL): string {
         const hostname = url.hostname;
-        return `https://${hostname.startsWith("www.") ? "" : "www."}${hostname}`;
+
+        if (url.protocol !== "http:" && url.protocol !== "https:") {
+            return `https://${hostname.startsWith("www.") ? "" : "www."}${hostname}`;
+        }
+
+        // Create a new URL with just the origin (protocol + hostname + port)
+        const origin = `${url.protocol}//${url.hostname}${url.port ? ":" + url.port : ""}`;
+        return origin;
     }
 
     async function loadCommandIcon(command: ExecutableCommand) {
@@ -98,13 +107,20 @@
         class={clsx("object-contain")}
     />
 {:else if item.handler === "URL" && appMetadataStore.favIcons[faviconBaseValue]}
-    <img
-        src={appMetadataStore.favIcons[faviconBaseValue]}
-        alt={label}
-        width={size}
-        height={size}
-        class={clsx("object-contain")}
-    />
+    {#if showErrorFavicon[faviconBaseValue]}
+        <GlobeIcon size={size - 8} />
+    {:else}
+        <img
+            src={appMetadataStore.favIcons[faviconBaseValue]}
+            alt={label}
+            width={size}
+            height={size}
+            class={clsx("object-contain")}
+            onerror={(e) => {
+                showErrorFavicon[faviconBaseValue] = true;
+            }}
+        />
+    {/if}
 {:else if appMetadataStore.appInfo[item.label]?.base64Image}
     <img
         src={appMetadataStore.appInfo[item.label]?.base64Image}
