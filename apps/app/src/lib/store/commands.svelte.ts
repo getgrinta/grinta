@@ -445,7 +445,10 @@ export class CommandsStore extends SecureStore<Commands> {
 		await this.updateData({ commandHistory: [] });
 	}
 
-	async handleCommand(command: ExecutableCommand) {
+	async handleCommand({
+		command,
+		recordingEnabled = true,
+	}: { command: ExecutableCommand; recordingEnabled?: boolean }) {
 		if (!appStore.appWindow) return;
 		const otherThanLast =
 			this.commandHistory[this.commandHistory.length - 1]?.value !==
@@ -455,7 +458,7 @@ export class CommandsStore extends SecureStore<Commands> {
 			COMMAND_HANDLER.SYSTEM,
 		] as string[];
 
-		const shouldRecord =
+		const shouldRecord = recordingEnabled &&
 			!settingsStore.data.incognitoEnabled &&
 			!commandsToSkip.includes(command.handler);
 

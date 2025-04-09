@@ -42,7 +42,7 @@ $effect(clickListener);
                         first && "ml-4",
                         last && "mr-4",
                     )}
-                    onclick={() => commandsStore.handleCommand(widget.data)}
+                    onclick={() => commandsStore.handleCommand({ command: widget.data, recordingEnabled: false })}
                 >
                     <CommandListIcon
                         item={widget.data}
