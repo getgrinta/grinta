@@ -62,7 +62,6 @@
                     const normalizedUrl = normalizeUrlForFavicon(url);
 
                     if (!appMetadataStore.favIcons[normalizedUrl]) {
-                        console.log("Fetching favicon for URL:", normalizedUrl);
                         fetchFavicon(normalizedUrl)
                             .then((faviconUrl) => {
                                 if (faviconUrl) {
