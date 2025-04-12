@@ -38,7 +38,6 @@ import { notesStore } from "./notes.svelte";
 import { SecureStore } from "./secure.svelte";
 import { settingsStore } from "./settings.svelte";
 import debounce from "debounce";
-import { vaultStore } from "./vault.svelte";
 
 nlp.extend(dates);
 nlp.extend(numbers);
@@ -132,78 +131,6 @@ export class CommandsStore extends SecureStore<Commands> {
 	// Ensure we have a valid commandHistory even before initialization
 	get commandHistory(): ExecutableCommand[] {
 		return this.data?.commandHistory || [];
-	}
-
-	getMenuItems(): ExecutableCommand[] {
-		const userCommands =
-			vaultStore.data.authCookie?.length > 0
-				? [
-						ExecutableCommandSchema.parse({
-							label: t("commands.menuItems.profile"),
-							localizedLabel: t("commands.menuItems.profile"),
-							value: SYSTEM_COMMAND.PROFILE,
-							handler: COMMAND_HANDLER.SYSTEM,
-							appModes: [APP_MODE.MENU],
-						}),
-					]
-				: [
-						ExecutableCommandSchema.parse({
-							label: t("commands.menuItems.signIn"),
-							localizedLabel: t("commands.menuItems.signIn"),
-							value: SYSTEM_COMMAND.SIGN_IN,
-							handler: COMMAND_HANDLER.SYSTEM,
-							appModes: [APP_MODE.MENU],
-						}),
-					];
-		return [
-			...userCommands,
-			...(settingsStore.data?.clipboardRecordingEnabled
-				? [
-						ExecutableCommandSchema.parse({
-							label: t("commands.menuItems.clipboardHistory"),
-							localizedLabel: t("commands.menuItems.clipboardHistory"),
-							value: SYSTEM_COMMAND.CLIPBOARD,
-							handler: COMMAND_HANDLER.SYSTEM,
-							appModes: [APP_MODE.MENU],
-						}),
-					]
-				: []),
-			ExecutableCommandSchema.parse({
-				label: t("commands.menuItems.clearNotes"),
-				localizedLabel: t("commands.menuItems.clearNotes"),
-				value: SYSTEM_COMMAND.CLEAR_NOTES,
-				handler: COMMAND_HANDLER.SYSTEM,
-				appModes: [APP_MODE.MENU],
-			}),
-			ExecutableCommandSchema.parse({
-				label: t("commands.menuItems.clearHistory"),
-				localizedLabel: t("commands.menuItems.clearHistory"),
-				value: SYSTEM_COMMAND.CLEAR_HISTORY,
-				handler: COMMAND_HANDLER.SYSTEM,
-				appModes: [APP_MODE.MENU],
-			}),
-			ExecutableCommandSchema.parse({
-				label: t("commands.menuItems.help"),
-				localizedLabel: t("commands.menuItems.help"),
-				value: SYSTEM_COMMAND.HELP,
-				handler: COMMAND_HANDLER.SYSTEM,
-				appModes: [APP_MODE.MENU],
-			}),
-			ExecutableCommandSchema.parse({
-				label: t("commands.menuItems.settings"),
-				localizedLabel: t("commands.menuItems.settings"),
-				value: SYSTEM_COMMAND.SETTINGS,
-				handler: COMMAND_HANDLER.SYSTEM,
-				appModes: [APP_MODE.MENU],
-			}),
-			ExecutableCommandSchema.parse({
-				label: t("commands.menuItems.exit"),
-				localizedLabel: t("commands.menuItems.exit"),
-				value: SYSTEM_COMMAND.EXIT,
-				handler: COMMAND_HANDLER.SYSTEM,
-				appModes: [APP_MODE.MENU],
-			}),
-		];
 	}
 
 	getClipboardCommands(): ExecutableCommand[] {
@@ -314,11 +241,7 @@ export class CommandsStore extends SecureStore<Commands> {
 					...this.spotlightCommands,
 					...commandHistory,
 					...this.shortcutCommands,
-					...this.getMenuItems(),
 				];
-			})
-			.with(APP_MODE.MENU, () => {
-				return this.getMenuItems();
 			})
 			.with(APP_MODE.CLIPBOARD, async () => {
 				return this.getClipboardCommands();
@@ -342,11 +265,6 @@ export class CommandsStore extends SecureStore<Commands> {
 		// Prevent overriding commands
 		if (newCommandsToken !== this.buildCommandsToken) {
 			return;
-		}
-
-		if (appStore.appMode === APP_MODE.MENU) {
-			this.commands = uniq(filteredCommands)
-			return
 		}
 
 		if (appStore.appMode === APP_MODE.NOTES) {

@@ -24,7 +24,7 @@ async function toggleShortcutHandler(event: ShortcutEvent) {
 		const name = await getLastFocusedWindowName();
 		appStore.setLastFocusedWindowName(name);
 		await activateWindow();
-		const searchBar = document.getElementById("search-bar");
+		const searchBar = document.getElementById("searchBar");
 		return searchBar?.focus();
 	}
 

@@ -14,12 +14,16 @@ import { check as checkUpdate } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
 import { toast } from "svelte-sonner";
 import { APP_MODE, appModeEnum, type AppMode } from "@getgrinta/core";
+import { toggleVisibility } from "../grinta-invoke";
+import { page } from "$app/state";
+import { goto } from "$app/navigation";
 
 export class AppStore {
 	query = $state("");
 	appMode = $state<AppMode>(APP_MODE.INITIAL);
 	appWindow = $state<Window>();
 	lastFocusedWindowName = $state<string>();
+	menuOpen = $state<boolean>(false);
 	session = $state<Session>();
 	user = $state<User>();
 	subscriptions = $state<SanitizedSubscription[]>([]);
@@ -83,6 +87,21 @@ export class AppStore {
 
 	setLastFocusedWindowName(name: string) {
 		this.lastFocusedWindowName = name;
+	}
+
+	setMenuOpen(open: boolean) {
+		this.menuOpen = open;
+	}
+
+	handleEscape() {
+		if (this.menuOpen) return this.setMenuOpen(false);
+		if (this.appMode !== APP_MODE.INITIAL) {
+			return this.switchMode(APP_MODE.INITIAL);
+		}
+		if (!page.url.pathname.includes('/commands')) {
+			return goto('/commands/INITIAL')
+		}
+		return toggleVisibility()
 	}
 
 	async positionWindow() {

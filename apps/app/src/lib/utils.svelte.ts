@@ -1,5 +1,4 @@
 import type { AppType } from "@getgrinta/api";
-import { install } from "@github/hotkey";
 import { type UnlistenFn, emit, listen } from "@tauri-apps/api/event";
 import { readDir } from "@tauri-apps/plugin-fs";
 import { fetch } from "@tauri-apps/plugin-http";
@@ -27,12 +26,6 @@ import {
 import { vaultStore } from "./store/vault.svelte";
 import { systemThemeWatcher } from "./system.utils.svelte";
 import { env } from "./env";
-
-export async function installHotkeys() {
-	for (const el of document.querySelectorAll("[data-hotkey]")) {
-		install(el as HTMLElement);
-	}
-}
 
 interface HighlightSegment {
 	text: string;
