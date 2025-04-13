@@ -2,7 +2,6 @@ import { z } from "zod";
 
 export const APP_MODE = {
 	INITIAL: "INITIAL",
-	MENU: "MENU",
 	NOTES: "NOTES",
 	CLIPBOARD: "CLIPBOARD",
 } as const;

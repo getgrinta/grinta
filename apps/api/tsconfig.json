@@ -1,16 +1,16 @@
 {
-	"compilerOptions": {
-		"strict": true,
-		"declaration": true,
-		"outDir": "./dist",
-		"jsx": "react-jsx",
-		"jsxImportSource": "hono/jsx",
-		"esModuleInterop": true,
-		"module": "NodeNext",
-		"moduleResolution": "NodeNext",
-		"target": "ESNext",
-		"skipLibCheck": true
-	},
-	"include": ["src/index.ts"],
-	"exclude": ["node_modules", "dist"]
+  "compilerOptions": {
+    "strict": true,
+    "declaration": true,
+    "outDir": "./dist",
+    "jsx": "react-jsx",
+    "jsxImportSource": "hono/jsx",
+    "esModuleInterop": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ESNext",
+    "skipLibCheck": true
+  },
+  "include": ["src/index.ts"],
+  "exclude": ["node_modules", "dist"]
 }

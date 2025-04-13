@@ -55,6 +55,7 @@
 			"accentColor": "Akzentfarbe",
 			"dangerZone": "Gefahrenzone",
 			"defaultSearchEngine": "Standard-Suchmaschine",
+			"clearCommandHistory": "Befehlsverlauf löschen",
 			"wipeAllLocalData": "Alle lokalen Daten löschen",
 			"notesDirectory": "Notizverzeichnis",
 			"checkForUpdate": "Nach Updates suchen",
@@ -79,7 +80,8 @@
 		"language": "Sprache",
 		"showWidgetLabels": "Widget-Beschriftungen anzeigen",
 		"web": "Web",
-		"file": "Datei"
+		"file": "Datei",
+		"commandHistoryCleared": "Befehlsverlauf gelöscht"
 	},
 	"search": {
 		"grintai": "GrintAI"

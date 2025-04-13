@@ -55,6 +55,7 @@
 			"accentColor": "Accent Color",
 			"defaultSearchEngine": "Default Search Engine",
 			"dangerZone": "Danger Zone",
+			"clearCommandHistory": "Clear Command History",
 			"wipeAllLocalData": "Wipe All Local Data",
 			"changeShortcut": "Change",
 			"recordShortcut": "Press to record",
@@ -79,7 +80,8 @@
 		"language": "Language",
 		"showWidgetLabels": "Show Widget Labels",
 		"web": "Web",
-		"file": "File"
+		"file": "File",
+		"commandHistoryCleared": "Command history cleared"
 	},
 	"search": {
 		"grintai": "GrintAI"

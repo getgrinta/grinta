@@ -1,0 +1,169 @@
+<script lang="ts">
+  import { appStore } from "$lib/store/app.svelte";
+  import Sidebar from "./sidebar.svelte";
+  import {
+    ArrowRightIcon,
+    ChevronRightIcon,
+    ClipboardIcon,
+    CogIcon,
+    HelpCircleIcon,
+    LogOutIcon,
+    UserIcon,
+  } from "lucide-svelte";
+  import { shortcut } from "@svelte-put/shortcut";
+  import { goto } from "$app/navigation";
+  import { APP_MODE } from "@getgrinta/core";
+  import { exit } from "@tauri-apps/plugin-process";
+  import Shortcut from "./shortcut.svelte";
+
+  let { children } = $props<{
+    children: () => void;
+  }>();
+
+  let helpLink = $state<HTMLAnchorElement>();
+  const userId = $derived(appStore.user?.id);
+
+  function closeMenu() {
+    return appStore.setMenuOpen(false);
+  }
+
+  function handleMenuToggle() {
+    return appStore.setMenuOpen(!appStore.menuOpen);
+  }
+
+  async function handleClipboard() {
+    closeMenu();
+    await goto("/commands/CLIPBOARD");
+    appStore.switchMode(APP_MODE.CLIPBOARD);
+  }
+
+  function handleHelp() {
+    closeMenu();
+    setTimeout(() => {
+      appStore.setQuery("");
+    }, 100);
+    return helpLink?.click();
+  }
+
+  function handleSettings() {
+    closeMenu();
+    setTimeout(() => {
+      appStore.setQuery("");
+    }, 100);
+    return goto("/settings");
+  }
+
+  function handleProfile() {
+    closeMenu();
+    appStore.setQuery("");
+    return goto("/profile");
+  }
+
+  function handleExit() {
+    closeMenu();
+    return exit();
+  }
+</script>
+
+<a
+  bind:this={helpLink}
+  href="https://getgrinta.com/guides"
+  target="_blank"
+  class="hidden">Help</a
+>
+
+<svelte:window
+  use:shortcut={{
+    trigger: [
+      {
+        key: "k",
+        modifier: ["ctrl", "meta"],
+        callback: handleMenuToggle,
+      },
+    ],
+  }}
+/>
+
+{#if appStore.menuOpen}
+  <Shortcut keys={["c"]} callback={handleClipboard} />
+  <Shortcut keys={["h"]} callback={handleHelp} />
+  <Shortcut keys={["s"]} callback={handleSettings} />
+  <Shortcut keys={["q"]} callback={handleExit} />
+  <Shortcut keys={["p"]} callback={handleProfile} />
+{/if}
+
+<Sidebar id="menuSidebar" bind:sidebarOpened={appStore.menuOpen}>
+  {@render children()}
+  {#snippet sidebar()}
+    <div class="flex justify-between items-center mb-4">
+      <label for="menuSidebar" class="btn btn-sm btn-square">
+        <ChevronRightIcon size={16} />
+      </label>
+      {#if userId}
+        <a href="/profile" onclick={closeMenu} class="gap-4">
+          <div class="avatar">
+            <div class="w-8 rounded-full">
+              <img
+                src={`https://meshy.studio/api/mesh/${userId}?noise=8&sharpen=1&negate=false&gammaIn=2.1&gammaOut=2.2&brightness=100&saturation=100&hue=0&lightness=0&blur=0`}
+                alt="Avatar"
+              />
+            </div>
+          </div>
+        </a>
+      {/if}
+    </div>
+    <ul class="menu menu-lg w-full p-0">
+      <li>
+        <button onclick={handleClipboard} class="gap-4">
+          <ClipboardIcon size={20} />
+          <span>Clipboard</span>
+          <kbd class="kbd">c</kbd>
+        </button>
+      </li>
+      <li>
+        <button onclick={handleHelp} class="gap-4">
+          <HelpCircleIcon size={20} />
+          <span>Help</span>
+          <kbd class="kbd">h</kbd>
+        </button>
+      </li>
+      <li>
+        <a href="/settings" onclick={closeMenu} class="gap-4">
+          <CogIcon size={20} />
+          <span>Settings</span>
+          <kbd class="kbd">s</kbd>
+        </a>
+      </li>
+      <li>
+        <a href="/" onclick={closeMenu} class="gap-4">
+          <LogOutIcon size={20} />
+          <span>Exit</span>
+          <kbd class="kbd">q</kbd>
+        </a>
+      </li>
+    </ul>
+    <div class="mt-auto">
+      {#if !userId}
+        <a
+          href="/sign-in"
+          onclick={closeMenu}
+          class="btn w-full justify-between"
+        >
+          <UserIcon size={16} />
+          <div class="flex gap-2 items-center">
+            <span>Sign In</span>
+            <ArrowRightIcon size={16} />
+          </div>
+        </a>
+      {:else if !appStore.hasPro}
+        <button class="btn btn-primary w-full justify-between">
+          <img src="/pro.svg" width="32" height="32" alt="Get Pro" />
+          <div class="flex gap-2 items-center">
+            <span>Upgrade to Pro</span>
+            <ArrowRightIcon size={16} />
+          </div>
+        </button>
+      {/if}
+    </div>
+  {/snippet}
+</Sidebar>

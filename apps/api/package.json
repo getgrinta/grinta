@@ -1,44 +1,46 @@
 {
-	"name": "@getgrinta/api",
-	"type": "module",
-	"module": "dist/index.js",
-	"types": "dist/index.d.ts",
-	"version": "0.1.2",
-	"exports": {
-		".": {
-			"types": "./dist/index.d.ts",
-			"default": "./dist/index.js"
-		}
-	},
-	"files": ["dist"],
-	"scripts": {
-		"dev": "bun run --hot src/index.ts",
-		"build": "tsc --emitDeclarationOnly && bun build src/index.ts --outdir ./dist --target bun",
-		"start": "bun run --bun dist/index.js",
-		"db:push": "drizzle-kit push",
-		"db:generate": "drizzle-kit generate",
-		"db:migrate": "drizzle-kit migrate",
-		"script:notify": "bun ./scripts/notify-deployed.ts"
-	},
-	"dependencies": {
-		"@ai-sdk/openai-compatible": "0.2.5",
-		"@better-auth/stripe": "1.2.5",
-		"@hono/zod-openapi": "0.19.2",
-		"@open-draft/until": "^2.1.0",
-		"@scalar/hono-api-reference": "0.7.5",
-		"ai": "4.2.10",
-		"better-auth": "1.2.5",
-		"dedent": "1.5.3",
-		"drizzle-orm": "0.41.0",
-		"drizzle-zod": "0.7.1",
-		"hono": "4.7.5",
-		"postgres": "3.4.5",
-		"resend": "4.2.0",
-		"stripe": "17.7.0",
-		"ts-pattern": "5.7.0",
-		"zod": "3.24.2"
-	},
-	"devDependencies": {
-		"drizzle-kit": "0.30.6"
-	}
+  "name": "@getgrinta/api",
+  "type": "module",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "version": "0.1.2",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "bun run --hot src/index.ts",
+    "build": "tsc --emitDeclarationOnly && bun build src/index.ts --outdir ./dist --target bun",
+    "start": "bun run --bun dist/index.js",
+    "db:push": "drizzle-kit push",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "script:notify": "bun ./scripts/notify-deployed.ts"
+  },
+  "dependencies": {
+    "@ai-sdk/openai-compatible": "0.2.5",
+    "@better-auth/stripe": "1.2.5",
+    "@hono/zod-openapi": "0.19.2",
+    "@open-draft/until": "^2.1.0",
+    "@scalar/hono-api-reference": "0.7.5",
+    "ai": "4.2.10",
+    "better-auth": "1.2.5",
+    "dedent": "1.5.3",
+    "drizzle-orm": "0.41.0",
+    "drizzle-zod": "0.7.1",
+    "hono": "4.7.5",
+    "postgres": "3.4.5",
+    "resend": "4.2.0",
+    "stripe": "17.7.0",
+    "ts-pattern": "5.7.0",
+    "zod": "3.24.2"
+  },
+  "devDependencies": {
+    "drizzle-kit": "0.30.6"
+  }
 }

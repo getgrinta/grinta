@@ -30,6 +30,7 @@
 			"notesDirectory": "Lokalizacja notatek",
 			"proAutocompleteEnabled": "Automatyczne uzupełnianie",
 			"checkUpdate": "Sprawdź aktualizacje",
+			"clearCommandHistory": "Wyczyść historię poleceń",
 			"wipeAllLocalData": "Wyczyść wszystkie dane lokalne",
 			"changeShortcut": "Naciśnij, aby zmienić",
 			"recordShortcut": "Naciśnij, aby zapisać",
@@ -55,7 +56,8 @@
 		"clipboardRecordingEnabled": "Rejestruj historię schowka",
 		"language": "Język",
 		"web": "Sieć",
-		"file": "Pliki"
+		"file": "Pliki",
+		"commandHistoryCleared": "Historia poleceń wyczyszczona"
 	},
 	"auth": {
 		"signIn": "Zaloguj się",
