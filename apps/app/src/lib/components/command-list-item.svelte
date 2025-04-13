@@ -101,7 +101,7 @@
   >
     <button
       type="button"
-      onclick={() => commandsStore.handleCommand(props.item)}
+      onclick={() => commandsStore.handleCommand({ command: props.item })}
       data-testid={`command-list-item.${props.index}`}
       class="flex flex-1 h-full gap-4 py-[0.5rem] items-center cursor-pointer"
     >
@@ -136,7 +136,7 @@
       {#if appStore.appMode === APP_MODE.INITIAL}
         <button
           type="button"
-          onclick={() => commandsStore.handleCommand(props.item)}
+          onclick={() => commandsStore.handleCommand({ command: props.item })}
           class={clsx(
             "btn btn-ghost hover:bg-transparent border-0 shadow-none",
             props.active && "!text-primary-content !border-primary-content/50",

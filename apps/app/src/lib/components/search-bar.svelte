@@ -54,7 +54,9 @@
 
   const { form } = createForm({
     async onSubmit() {
-      return commandsStore.handleCommand(commandsStore.currentCommand);
+      return commandsStore.handleCommand({
+        command: commandsStore.currentCommand,
+      });
     },
   });
 

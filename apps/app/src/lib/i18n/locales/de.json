@@ -130,6 +130,7 @@
 		"contextMenu": {
 			"pin": "Anheften",
 			"remove": "Löschen",
+			"remove_from_history": "Löschen aus der Geschichte",
 			"open": "Öffnen",
 			"showInFinder": "Im Finder anzeigen",
 			"quickLook": "Schnellansicht",
