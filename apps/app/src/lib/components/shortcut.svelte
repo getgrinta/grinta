@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { PressedKeys } from "runed";
+  import { PressedKeys, Debounced } from "runed";
 
   let { keys, callback } = $props<{ keys: string[]; callback: () => void }>();
 

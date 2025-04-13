@@ -63,7 +63,7 @@
 
   async function initTrayIcon(
     didFinishOnboarding: boolean,
-    isClipboardEnabled = true
+    isClipboardEnabled = true,
   ) {
     let menuItems = [
       {
@@ -259,7 +259,7 @@
   });
 
   const accentLower = $derived(
-    settingsStore?.data?.accentColor?.toLowerCase() ?? "mare"
+    settingsStore?.data?.accentColor?.toLowerCase() ?? "mare",
   );
 
   const themeName = new ColorModeValue("grinta-light", "grinta-dark");
@@ -330,7 +330,7 @@
   class={clsx(
     "flex-1 flex flex-col accent-mare",
     bgClass.value,
-    widgetsStore.showWidgets && "widgets-visible"
+    widgetsStore.showWidgets && "widgets-visible",
   )}
   data-theme={themeName.value}
   data-accent={accentLower}

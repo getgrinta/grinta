@@ -29,6 +29,7 @@
     THEME,
   } from "@getgrinta/core";
   import { commandsStore } from "$lib/store/commands.svelte";
+  import Shortcut from "$lib/components/shortcut.svelte";
 
   const pressedKeys = new PressedKeys();
 
@@ -41,13 +42,6 @@
       hotkey: "⌘3",
     },
   ];
-
-  const proTabs = [
-    ...baseTabs,
-    { label: $_("settings.tabs.pro"), value: "pro", hotkey: "⌘4" },
-  ];
-
-  const tabs = $derived(appStore.subscriptions.length > 0 ? proTabs : baseTabs);
 
   let extensionInput = $state<HTMLInputElement | null>(null);
   let newToggleShortcut = $state<string[]>([]);
@@ -70,13 +64,13 @@
   const toggleShortcut = $derived(
     newToggleShortcut.length > 1
       ? newToggleShortcut.join("+")
-      : settingsStore.data.toggleShortcut
+      : settingsStore.data.toggleShortcut,
   );
 
   const recordShortcutLabel = $derived(
     recordingShortcut
       ? $_("settings.fields.recordShortcut")
-      : $_("settings.fields.changeShortcut")
+      : $_("settings.fields.changeShortcut"),
   );
 
   function processShortcut(keys: string[]) {
@@ -168,7 +162,7 @@
         clipboardStore.clearClipboardHistory();
         settingsStore.persist();
       }
-    }
+    },
   );
 
   onMount(initialize);
@@ -176,13 +170,13 @@
   const isCmdPressed = $derived(pressedKeys.has("Meta"));
 
   const controls = $derived(
-    tabs.map((tab, i) => ({
+    baseTabs.map((tab, i) => ({
       text: $_(tab.label),
       onClick: () => changeTab(tab.value),
       active: currentTab === tab.value,
       shortcut: isCmdPressed ? tab.hotkey : undefined,
       hotkey: `Mod+${i + 1}`,
-    }))
+    })),
   );
 
   function addExtension(e?: Event) {
@@ -221,6 +215,10 @@
     extensionInput?.focus();
   }
 </script>
+
+<Shortcut keys={["meta", "1"]} callback={() => changeTab("general")} />
+<Shortcut keys={["meta", "2"]} callback={() => changeTab("search")} />
+<Shortcut keys={["meta", "3"]} callback={() => changeTab("permissions")} />
 
 <div class="flex flex-1 flex-col gap-4 p-4">
   <TopBar>
@@ -303,7 +301,7 @@
           >{$_("settings.clipboardRecordingEnabled")}</label
         >
         <input
-          class="toggle toggle-primary"
+          class="toggle toggle-lg toggle-primary"
           id="clipboardChoice"
           name="clipboardRecordingEnabled"
           type="checkbox"
@@ -313,7 +311,7 @@
           >{$_("settings.showWidgetLabels")}</label
         >
         <input
-          class="toggle toggle-primary"
+          class="toggle toggle-lg toggle-primary"
           id="showWidgetLabelsChoice"
           name="showWidgetLabels"
           type="checkbox"
@@ -426,17 +424,6 @@
             >
           </div>
         </div>
-      </form>
-    {:else if currentTab === "pro"}
-      <form class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center">
-        <label class="text-sm"
-          >{$_("settings.fields.proAutocompleteEnabled")}</label
-        >
-        <input
-          type="checkbox"
-          bind:checked={settingsStore.data.proAutocompleteEnabled}
-          class="toggle toggle-lg"
-        />
       </form>
     {:else if currentTab === "permissions"}
       <form class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center">

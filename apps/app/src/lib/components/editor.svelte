@@ -15,9 +15,6 @@
   import TurndownService from "turndown";
   import NoteBubbleMenu from "./editor/note-bubble-menu.svelte";
   import FloatingMenu from "./editor/floating-menu.svelte";
-  import { shortcut } from "@svelte-put/shortcut";
-
-  const hasPro = appStore.subscriptions.length > 0;
 
   const turndownService = new TurndownService({ headingStyle: "atx" });
 
@@ -36,8 +33,6 @@
     content,
     onUpdate,
     editable = true,
-    toggleSidebar,
-    sidebarOpened,
     onStartGenerating,
     onStopGenerating,
   } = $props();
@@ -58,7 +53,7 @@
     const nextHeightCalc = 160 + (size?.height ?? 28);
     const nextHeight = nextHeightCalc > maxHeight ? maxHeight : nextHeightCalc;
     return appStore.appWindow?.setSize(
-      new LogicalSize(800, Math.max(nextHeight, 400))
+      new LogicalSize(800, Math.max(nextHeight, 400)),
     );
   }
 
@@ -95,7 +90,7 @@
                 ? (currentEditor.state.doc.textBetween(
                     blockStart,
                     from?.pos,
-                    " "
+                    " ",
                   ) ?? "")
                 : "";
             if (blockEnd && blockContent.length > 0) {
@@ -133,7 +128,7 @@
       }),
     ];
 
-    if (hasPro && settingsStore.data.proAutocompleteEnabled) {
+    if (appStore.hasPro && settingsStore.data.proAutocompleteEnabled) {
       extensions.push(
         TextSuggestion.configure({
           async fetchAutocompletion({ query }: Record<string, string>) {
@@ -148,7 +143,7 @@
             const { text } = await result.json();
             return text;
           },
-        })
+        }),
       );
     }
 
@@ -214,15 +209,6 @@
     }
   }
 
-  function handleJ() {
-    if (sidebarOpened) {
-      editor?.view.dom.focus();
-      return toggleSidebar();
-    }
-    editor?.view.dom.blur();
-    return toggleSidebar();
-  }
-
   // Use only one initialization method - the effect
   // Remove the onMount call to prevent duplicate initialization
   onDestroy(() => {
@@ -275,7 +261,7 @@
 
       // Signal this is an external update to prevent suggestion reset
       editor.view.dispatch(
-        editor.state.tr.setMeta("preventSuggestionReset", true)
+        editor.state.tr.setMeta("preventSuggestionReset", true),
       );
 
       // Convert markdown to HTML before setting content (only once, not twice)
@@ -328,16 +314,6 @@
     }
   });
 </script>
-
-<svelte:window
-  use:shortcut={{
-    trigger: {
-      key: "j",
-      modifier: ["ctrl", "meta"],
-      callback: handleJ,
-    },
-  }}
-/>
 
 <div bind:this={floatingMenuTooltip}>
   <FloatingMenu

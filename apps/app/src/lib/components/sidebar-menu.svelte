@@ -8,6 +8,7 @@
     CogIcon,
     HelpCircleIcon,
     LogOutIcon,
+    UserIcon,
   } from "lucide-svelte";
   import { shortcut } from "@svelte-put/shortcut";
   import { goto } from "$app/navigation";
@@ -46,7 +47,9 @@
 
   function handleSettings() {
     closeMenu();
-    appStore.setQuery("");
+    setTimeout(() => {
+      appStore.setQuery("");
+    }, 100);
     return goto("/settings");
   }
 
@@ -96,16 +99,18 @@
       <label for="menuSidebar" class="btn btn-sm btn-square">
         <ChevronRightIcon size={16} />
       </label>
-      <a href="/profile" onclick={closeMenu} class="gap-4">
-        <div class="avatar">
-          <div class="w-8 rounded-full">
-            <img
-              src={`https://meshy.studio/api/mesh/${userId}?noise=8&sharpen=1&negate=false&gammaIn=2.1&gammaOut=2.2&brightness=100&saturation=100&hue=0&lightness=0&blur=0`}
-              alt="Avatar"
-            />
+      {#if userId}
+        <a href="/profile" onclick={closeMenu} class="gap-4">
+          <div class="avatar">
+            <div class="w-8 rounded-full">
+              <img
+                src={`https://meshy.studio/api/mesh/${userId}?noise=8&sharpen=1&negate=false&gammaIn=2.1&gammaOut=2.2&brightness=100&saturation=100&hue=0&lightness=0&blur=0`}
+                alt="Avatar"
+              />
+            </div>
           </div>
-        </div>
-      </a>
+        </a>
+      {/if}
     </div>
     <ul class="menu menu-lg w-full p-0">
       <li>
@@ -138,13 +143,27 @@
       </li>
     </ul>
     <div class="mt-auto">
-      <button class="btn btn-primary w-full justify-between">
-        <img src="/pro.svg" width="32" height="32" alt="Get Pro" />
-        <div class="flex gap-2 items-center">
-          <span>Upgrade to Pro</span>
-          <ArrowRightIcon size={16} />
-        </div>
-      </button>
+      {#if !userId}
+        <a
+          href="/sign-in"
+          onclick={closeMenu}
+          class="btn w-full justify-between"
+        >
+          <UserIcon size={16} />
+          <div class="flex gap-2 items-center">
+            <span>Sign In</span>
+            <ArrowRightIcon size={16} />
+          </div>
+        </a>
+      {:else if !appStore.hasPro}
+        <button class="btn btn-primary w-full justify-between">
+          <img src="/pro.svg" width="32" height="32" alt="Get Pro" />
+          <div class="flex gap-2 items-center">
+            <span>Upgrade to Pro</span>
+            <ArrowRightIcon size={16} />
+          </div>
+        </button>
+      {/if}
     </div>
   {/snippet}
 </Sidebar>

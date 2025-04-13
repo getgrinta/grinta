@@ -9,9 +9,9 @@ import { CONTENT_TYPE, type ContentType } from "../routers/ai.router.js";
 const RESPONSE_REGEX = /<response>(.*?)<\/response>/;
 
 export const ModelSchema = z.object({
-	label: z.string(),
-	provider: z.string(),
-	model: z.string(),
+  label: z.string(),
+  provider: z.string(),
+  model: z.string(),
 });
 
 export const AUTOCOMPLETE_SYSTEM_PROMPT = dedent`
@@ -54,23 +54,23 @@ export const GRINTAI_SYSTEM_PROMPT = dedent`
 `;
 
 export class AiService {
-	createModel({ provider, model }: { provider: AiProvider; model: string }) {
-		return createOpenAICompatible({
-			name: "Grinta",
-			apiKey: AI_PROVIDERS_CONFIG[provider].apiKey,
-			baseURL: AI_PROVIDERS_CONFIG[provider].url,
-		})(model);
-	}
+  createModel({ provider, model }: { provider: AiProvider; model: string }) {
+    return createOpenAICompatible({
+      name: "Grinta",
+      apiKey: AI_PROVIDERS_CONFIG[provider].apiKey,
+      baseURL: AI_PROVIDERS_CONFIG[provider].url,
+    })(model);
+  }
 
-	formatPrompt({ context, request }: { context: string; request: string }) {
-		return dedent`
+  formatPrompt({ context, request }: { context: string; request: string }) {
+    return dedent`
             <request>${request}</request>
             <context>${context}</context>
         `;
-	}
+  }
 
-	getGenerateNoteSystemPrompt({ context }: { context: string }) {
-		return dedent`
+  getGenerateNoteSystemPrompt({ context }: { context: string }) {
+    return dedent`
             You are a highly intelligent note-taking AI assistant.
             Your task is to create a note based on the user's query provided in the <request></request> tag.
     
@@ -87,34 +87,34 @@ export class AiService {
             Example Output:
             <response>Your response here</response>
         `;
-	}
+  }
 
-	async generateResponse(params: {
-		prompt: string;
-		context: string;
-		provider: AiProvider;
-		model: string;
-		contentType: ContentType;
-	}) {
-		const model = this.createModel({
-			provider: params.provider,
-			model: params.model,
-		});
-		const prompt = this.formatPrompt({
-			context: params.context,
-			request: params.prompt,
-		});
-		const system = match(params.contentType)
-			.with(CONTENT_TYPE.AUTOCOMPLETION, () => AUTOCOMPLETE_SYSTEM_PROMPT)
-			.with(CONTENT_TYPE.INLINE_AI, () => INLINE_SYSTEM_PROMPT)
-			.with(CONTENT_TYPE.REPHRASE, () => REPHRASE_SYSTEM_PROMPT)
-			.with(CONTENT_TYPE.GRINTAI, () => GRINTAI_SYSTEM_PROMPT)
-			.exhaustive();
-		const { text } = await generateText({
-			prompt,
-			system,
-			model,
-		});
-		return text.match(RESPONSE_REGEX)?.[1] ?? "";
-	}
+  async generateResponse(params: {
+    prompt: string;
+    context: string;
+    provider: AiProvider;
+    model: string;
+    contentType: ContentType;
+  }) {
+    const model = this.createModel({
+      provider: params.provider,
+      model: params.model,
+    });
+    const prompt = this.formatPrompt({
+      context: params.context,
+      request: params.prompt,
+    });
+    const system = match(params.contentType)
+      .with(CONTENT_TYPE.AUTOCOMPLETION, () => AUTOCOMPLETE_SYSTEM_PROMPT)
+      .with(CONTENT_TYPE.INLINE_AI, () => INLINE_SYSTEM_PROMPT)
+      .with(CONTENT_TYPE.REPHRASE, () => REPHRASE_SYSTEM_PROMPT)
+      .with(CONTENT_TYPE.GRINTAI, () => GRINTAI_SYSTEM_PROMPT)
+      .exhaustive();
+    const { text } = await generateText({
+      prompt,
+      system,
+      model,
+    });
+    return text.match(RESPONSE_REGEX)?.[1] ?? "";
+  }
 }

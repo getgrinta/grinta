@@ -13,7 +13,7 @@
 
   async function createNote() {
     const filename = await notesStore.createNote(
-      appStore.query.length > 0 ? appStore.query : undefined
+      appStore.query.length > 0 ? appStore.query : undefined,
     );
     return goto(`/notes/${filename}`);
   }

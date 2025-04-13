@@ -2,21 +2,16 @@
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
   import NoteEditor from "$lib/components/editor.svelte";
+  import SegmentedControl from "$lib/components/segmented-control.svelte";
   import Shortcut from "$lib/components/shortcut.svelte";
-  import Sidebar from "$lib/components/sidebar.svelte";
   import TopBar from "$lib/components/top-bar.svelte";
   import { type ExtendedNote, notesStore } from "$lib/store/notes.svelte";
   import { APP_MODE } from "@getgrinta/core";
   import { BaseDirectory, type UnwatchFn, watch } from "@tauri-apps/plugin-fs";
-  import clsx from "clsx";
-  import { MoreVerticalIcon } from "lucide-svelte";
-  import { PressedKeys } from "runed";
+  import { CopyIcon, DeleteIcon, TrashIcon } from "lucide-svelte";
   import { onMount } from "svelte";
   import { _ } from "svelte-i18n";
   import { toast } from "svelte-sonner";
-
-  const pressedKeys = new PressedKeys();
-  const isCmdPressed = $derived(pressedKeys.has("Meta"));
 
   // Initialize state
 
@@ -26,14 +21,8 @@
   let noteTitle = $state<string>();
   let generatingNote = $state<boolean>(false);
   let unsubWatcher = $state<UnwatchFn>();
-  let sidebarOpened = $state(false);
   let generatingContent = $state<boolean>(false);
   let editorContent = $state<string>(""); // Track editor's raw markdown content
-
-  function toggleSidebar() {
-    sidebarOpened = !sidebarOpened;
-    deleteConfirmationMode = false;
-  }
 
   function onStartGenerating() {
     generatingContent = true;
@@ -103,21 +92,13 @@
   async function copyMarkdown() {
     if (!note) return;
     await navigator.clipboard.writeText(note.content);
-    toast.success($_("notes.markdownCopied"));
-    return toggleSidebar();
+    return toast.success($_("notes.markdownCopied"));
   }
 
   function handleNavigation(event: KeyboardEvent) {
     if (event.key === "Escape") {
       return (event.target as HTMLElement)?.blur();
     }
-  }
-
-  function goBack() {
-    if (sidebarOpened) {
-      return toggleSidebar();
-    }
-    return window.history.back();
   }
 
   async function deleteNote() {
@@ -144,15 +125,30 @@
       unsubWatcher?.();
     };
   });
+
+  const viewControls = [
+    {
+      text: $_("notes.copyMarkdown"),
+      onClick: copyMarkdown,
+      icon: CopyIcon,
+      shortcut: "⌘⇧C",
+      hotkey: "Mod+Shift+C",
+    },
+    {
+      text: $_("notes.deleteNote"),
+      onClick: deleteNote,
+      icon: TrashIcon,
+      shortcut: "⌘⇧D",
+      hotkey: "Mod+Shift+D",
+    },
+  ];
 </script>
 
-{#if sidebarOpened}
-  <Shortcut keys={["c"]} callback={copyMarkdown} />
-  <Shortcut keys={["d"]} callback={deleteNote} />
-{/if}
+<Shortcut keys={["c"]} callback={copyMarkdown} />
+<Shortcut keys={["d"]} callback={deleteNote} />
 
-<Sidebar id="noteSidebar" bind:sidebarOpened>
-  <TopBar {goBack}>
+<div class="flex flex-col">
+  <TopBar>
     <input
       bind:value={noteTitle}
       slot="input"
@@ -161,12 +157,9 @@
       onchange={onNameUpdate}
       placeholder={$_("notes.noteName")}
     />
-    <label class="btn btn-sm" for="noteSidebar" slot="addon">
-      <MoreVerticalIcon size={16} />
-      {#if isCmdPressed}
-        <span>⌘J</span>
-      {/if}
-    </label>
+    <div slot="addon">
+      <SegmentedControl items={viewControls} showLabelOnHover />
+    </div>
   </TopBar>
   <div class="mt-20 px-8 pb-8">
     {#if note}
@@ -174,8 +167,6 @@
         content={editorContent}
         editable={!generatingNote}
         onUpdate={onContentUpdate}
-        {sidebarOpened}
-        {toggleSidebar}
         {onStartGenerating}
         {onStopGenerating}
       />
@@ -187,31 +178,4 @@
       ></span>
     </div>
   {/if}
-  {#snippet sidebar()}
-    <ul class="menu menu-lg w-full">
-      <li>
-        <button type="button" class="justify-between" onclick={copyMarkdown}>
-          <span>{$_("notes.copyMarkdown")}</span>
-          <kbd class="kbd">c</kbd>
-        </button>
-      </li>
-      <li class="text-red-300">
-        <button
-          type="button"
-          class={clsx(
-            "justify-between",
-            deleteConfirmationMode && "btn btn-soft btn-error"
-          )}
-          onclick={deleteNote}
-        >
-          <span
-            >{deleteConfirmationMode
-              ? $_("notes.confirmDelete")
-              : $_("notes.deleteNote")}</span
-          >
-          <kbd class="kbd">d</kbd>
-        </button>
-      </li>
-    </ul>
-  {/snippet}
-</Sidebar>
+</div>

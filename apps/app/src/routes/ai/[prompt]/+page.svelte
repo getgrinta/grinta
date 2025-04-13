@@ -20,7 +20,7 @@
   async function createNote() {
     const filename = await notesStore.createNote(
       appStore.query,
-      aiStore.grintAiResult ?? ""
+      aiStore.grintAiResult ?? "",
     );
     const encodedFilename = encodeURIComponent(filename);
     return goto(`/notes/${encodedFilename}`, { replaceState: true });
@@ -63,7 +63,7 @@
       {appStore.query}
     </div>
     <div slot="addon">
-      <SegmentedControl items={viewControls} />
+      <SegmentedControl items={viewControls} showLabelOnHover />
     </div>
   </TopBar>
   <div class="mt-16">

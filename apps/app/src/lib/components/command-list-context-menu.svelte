@@ -31,7 +31,7 @@
 
   export function createContextMenuItems(
     command: ExecutableCommand,
-    isWidget: boolean
+    isWidget: boolean,
   ) {
     const menuItems: MenuItem[] = [];
 
@@ -74,7 +74,7 @@
           const fullPath = await PathApi.join(
             homePath,
             ...settingsStore.data.notesDir,
-            command.value
+            command.value,
           );
 
           Command.create("open", ["-R", fullPath]).execute();

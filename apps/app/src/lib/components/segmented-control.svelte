@@ -19,10 +19,12 @@
     items,
     hidingLabels = false,
     alwaysShowLabels = false,
+    showLabelOnHover = false,
   } = $props<{
     items: Item[];
     hidingLabels?: boolean;
     alwaysShowLabels?: boolean;
+    showLabelOnHover?: boolean;
   }>();
 </script>
 
@@ -33,8 +35,8 @@
     <button
       type="button"
       class={clsx(
-        "btn btn-sm join-item py-4 px-3",
-        item.active && "btn-primary"
+        "btn btn-sm join-item py-4 px-3 group",
+        item.active && "btn-primary",
       )}
       onclick={item.onClick}
       data-testid={item.testId}
@@ -42,8 +44,13 @@
       {#if item.icon}
         <item.icon size={16} />
       {/if}
-      {#if alwaysShowLabels || (item.text && item.active && !hidingLabels)}
-        <span>{item.text}</span>
+      {#if alwaysShowLabels || showLabelOnHover || (item.text && item.active && !hidingLabels)}
+        <span
+          class={clsx(
+            "transition",
+            showLabelOnHover && "group-hover:block hidden overflow-hidden",
+          )}>{item.text}</span
+        >
       {/if}
       {#if item.shortcut && isCmdPressed && !item.active}
         <span>{item.shortcut}</span>

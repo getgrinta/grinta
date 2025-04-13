@@ -5,11 +5,11 @@ import { env } from "./env.utils.js";
 export const resend = new Resend(env.RESEND_API_KEY);
 
 export function sendOtp({ to, code }: { to: string; code: string }) {
-    return resend.emails.send({
-        from: "no-reply@getgrinta.com",
-        to,
-        subject: "Grinta sign in code",
-        html: dedent`
+  return resend.emails.send({
+    from: "no-reply@getgrinta.com",
+    to,
+    subject: "Grinta sign in code",
+    html: dedent`
             <!DOCTYPE html>
             <html lang="en">
             <head>
@@ -40,5 +40,5 @@ export function sendOtp({ to, code }: { to: string; code: string }) {
             </body>
             </html>
         `,
-    });
+  });
 }

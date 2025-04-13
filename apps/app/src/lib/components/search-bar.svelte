@@ -99,7 +99,7 @@
 
   async function createNote() {
     const filename = await notesStore.createNote(
-      appStore.query.length > 0 ? appStore.query : undefined
+      appStore.query.length > 0 ? appStore.query : undefined,
     );
     return goto(`/notes/${filename}`);
   }
@@ -151,7 +151,7 @@
       setTimeout(() => {
         queryInput?.focus();
       }, 50);
-    }
+    },
   );
 
   watch(
@@ -162,7 +162,7 @@
       if (prev !== next) {
         buildAppCommandsAndAppIcons();
       }
-    }
+    },
   );
 
   const inputProps = $derived(
@@ -179,7 +179,7 @@
         icon: ClipboardIcon,
         placeholder: $_("searchBar.placeholder.clipboard"),
       }))
-      .exhaustive()
+      .exhaustive(),
   );
 
   const indicatorButton = $derived(
@@ -202,14 +202,14 @@
                 onClick: () => settingsStore.toggleIncognito(),
                 active: false,
                 hotkey: "Mod+p",
-              }
+              },
       )
       .otherwise(() => ({
         icon: ChevronLeftIcon,
         onClick: () => goto("/commands/INITIAL"),
         active: false,
         hotkey: "Mod+p",
-      }))
+      })),
   );
 </script>
 

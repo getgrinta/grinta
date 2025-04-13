@@ -22,7 +22,7 @@
   }
 
   function stopSubscriptionCheck() {
-    clearInterval(subscriptionCheckInterval);
+    clearInterval(subscriptionCheckInterval as number);
     subscribingModalRef?.close();
   }
 
