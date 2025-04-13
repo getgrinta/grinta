@@ -350,7 +350,8 @@ pub fn create_spotlight_predicate(query_text: &str, allowed_extensions: Vec<Stri
         // Create predicates for each allowed extension
         let mut allow_predicates: Vec<id> = Vec::with_capacity(allowed_extensions.len());
         for (_i, ext) in allowed_extensions.iter().enumerate() {
-            let format_str = format!("kMDItemDisplayName LIKE[c] '{}'", ext);
+            let escaped_ext = ext.replace("'", "\\'").replace("\"", "\\\""); // Escape quotes
+            let format_str = format!("kMDItemDisplayName LIKE[c] '{}'", escaped_ext);
             allow_predicates.push(create_predicate(&format_str));
         }
 
@@ -366,7 +367,8 @@ pub fn create_spotlight_predicate(query_text: &str, allowed_extensions: Vec<Stri
         ];
 
         // Create search predicate based on query text
-        let search_format = format!("kMDItemDisplayName CONTAINS[cd] '{}'", query_text);
+        let escaped_query = query_text.replace("'", "\\'").replace("\"", "\\\""); // Escape quotes
+        let search_format = format!("kMDItemDisplayName CONTAINS[cd] '{}'", escaped_query);
         let search_predicate: id = create_predicate(&search_format);
 
         // If we found a folder, it can't have dots
