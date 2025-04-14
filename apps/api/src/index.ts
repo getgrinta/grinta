@@ -12,7 +12,6 @@ import {
   databaseContext,
 } from "./utils/router.utils.js";
 import { sendWebhook } from "./utils/webhook.utils.js";
-import { rateLimitMiddleware } from "./utils/rate-limit.utils.js";
 
 const app = createRouter()
   .doc("/openapi.json", {
@@ -23,7 +22,6 @@ const app = createRouter()
     },
   })
   .use(logger())
-  .use(rateLimitMiddleware)
   .onError(async (error, c) => {
     await sendWebhook({
       type: "logs",
