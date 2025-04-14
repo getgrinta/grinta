@@ -1,192 +1,201 @@
 {
-	"common": {
-		"next": "Dalej"
-	},
-	"welcome": {
-		"title": "Witaj w Grincie",
-		"subtitle": "Przed rozpoczęciem, możesz dostosować te ustawienia."
-	},
-	"barMode": {
-		"initial": "Szukaj",
-		"notes": "Notatki",
-		"menu": "Menu"
-	},
-	"settings": {
-		"title": "Ustawienia",
-		"tabs": {
-			"general": "Ogólne",
-			"search": "Wyszukiwanie",
-			"pro": "Pro",
-			"permissions": "Uprawnienia"
-		},
-		"fields": {
-			"shortcut": "Skrót",
-			"add": "Dodaj",
-			"version": "Wersja",
-			"theme": "Motyw",
-			"accentColor": "Akcent",
-			"dangerZone": "Strefa zagrożenia",
-			"defaultSearchEngine": "Domyślna wyszukiwarka",
-			"notesDirectory": "Lokalizacja notatek",
-			"proAutocompleteEnabled": "Automatyczne uzupełnianie",
-			"checkUpdate": "Sprawdź aktualizacje",
-			"clearCommandHistory": "Wyczyść historię poleceń",
-			"wipeAllLocalData": "Wyczyść wszystkie dane lokalne",
-			"changeShortcut": "Naciśnij, aby zmienić",
-			"recordShortcut": "Naciśnij, aby zapisać",
-			"baseCurrency": "Waluta bazowa",
-			"fsSearchOnlyInHome": "Szukaj tylko w katalogu domowym",
-			"additional_extensions": "Dodatkowe rozszerzenia",
-			"accessibilityPermissions": "Uprawnienia dostępności",
-			"requestAccessibilityPermissions": "Zapytaj o uprawnienia dostępności",
-			"fsPermissions": "Uprawnienia systemu plików",
-			"requestFsPermissions": "Zapytaj o uprawnienia systemu plików",
-			"granted": "Zezwolono",
-			"autostart": "Autostart",
-			"requestAutostart": "Zezwól na autostart",
-			"extension_invalid_format": "Rozszerzenie może zawierać tylko litery i cyfry.",
-			"clipboardRecordingEnabled": "Nagrywaj historię schowka",
-			"language": "Język",
-			"showWidgetLabels": "Pokaż etykiety widżetów",
-			"web": "Sieć",
-			"file": "Plik"
-		},
-		"extension_already_added": "To rozszerzenie jest już dodane.",
-		"extension_supported_by_default": "To rozszerzenie jest obsługiwane domyślnie.",
-		"clipboardRecordingEnabled": "Rejestruj historię schowka",
-		"language": "Język",
-		"web": "Sieć",
-		"file": "Pliki",
-		"commandHistoryCleared": "Historia poleceń wyczyszczona"
-	},
-	"auth": {
-		"signIn": "Zaloguj się",
-		"verifyCode": "Zweryfikuj kod",
-		"sendOneTimeCode": "Wyślij kod jednorazowy",
-		"oneTimePasswordInfo": "Kod jednorazowy zostanie wysłany na Twój adres e-mail.",
-		"oneTimeCode": "Kod jednorazowy",
-		"email": "E-mail",
-		"emailPlaceholder": "Adres E-Mail",
-		"checkEmailForCode": "Sprawdź swoją skrzynkę e-mail, aby znaleźć kod jednorazowy.",
-		"invalidCode": "Nieprawidłowy kod. Sprawdź kod wysłany na Twój adres e-mail.",
-		"invalidEmail": "Nieprawidłowy adres e-mail",
-		"help": "Pomoc"
-	},
-	"search": {
-		"grintai": "GrintAI"
-	},
-	"ai": {
-		"copy": "Kopiuj",
-		"copySuccess": "Skopiowano do schowka",
-		"createNote": "Utwórz notatkę"
-	},
-	"notes": {
-		"placeholder": "Nazwa notatki",
-		"regenerateWithAI": "Wygeneruj ponownie z AI",
-		"copyMarkdown": "Kopiuj Markdown",
-		"deleteNote": "Usuń notatkę",
-		"confirmDelete": "Potwierdź usunięcie",
-		"noteDeleted": "Notatka usunięta",
-		"markdownCopied": "Markdown został skopiowany.",
-		"failedToRename": "Nie udało się zmienić nazwy notatki",
-		"noteName": "Nazwa notatki",
-		"closeSidebar": "zamknij panel boczny",
-		"createNote": "Utwórz notatkę",
-		"retry": "Ponów",
-		"rephrase": "Przepisz",
-		"longer": "Dłużej",
-		"shorter": "Krócej",
-		"grammar": "Popraw gramatykę",
-		"professional": "Profesjonalnie",
-		"askAi": "Zapytaj AI",
-		"translate": "Przetłumacz"
-	},
-	"commands": {
-		"helperText": {
-			"app": "Aplikacja",
-			"file": "Plik",
-			"folder": "Folder",
-			"web": "Sieć",
-			"barCommand": "Polecenie paska",
-			"changeMode": "Zmień tryb",
-			"copyToClipboard": "Kopiuj do schowka",
-			"openNote": "Otwórz notatkę",
-			"createNote": "Utwórz notatkę",
-			"createSmartNote": "Utwórz smart notatkę",
-			"askAI": "Zapytaj AI",
-			"runShortcut": "Uruchom skrót"
-		},
-		"contextMenu": {
-			"pin": "Przypnij",
-			"remove": "Usuń",
-			"remove_from_history": "Usuń z historii",
-			"open": "Otwórz",
-			"showInFinder": "Pokaż w Finderze",
-			"quickLook": "Szybki podgląd",
-			"getInfo": "Informacje",
-			"copyName": "Kopiuj nazwę",
-			"copyPath": "Kopiuj ścieżkę",
-			"search": "Szukaj...",
-			"translate": "Przetłumacz"
-		},
-		"menuItems": {
-			"clearNotes": "Wyczyść notatki",
-			"clearHistory": "Wyczyść historię poleceń",
-			"help": "Pomoc",
-			"open": "Otwórz",
-			"settings": "Ustawienia",
-			"exit": "Wyjdź",
-			"signIn": "Zaloguj",
-			"profile": "Profil",
-			"clipboardHistory": "Historia schowka",
-			"checkForUpdates": "Sprawdź aktualizacje..."
-		},
-		"actions": {
-			"search": "Szukaj \"{query}\"",
-			"smartNote": "Smart notatka \"{query}\"",
-			"ask": "Zapytaj \"{query}\"",
-			"createNote": "Utwórz notatkę \"{query}\""
-		}
-	},
-	"searchBar": {
-		"placeholder": {
-			"initial": "Szukaj w sieci lub aplikacjach",
-			"menu": "Menu",
-			"notes": "Szukaj lub twórz notatki",
-			"clipboard": "Szukaj i kopiuj ze schowka"
-		},
-		"actions": {
-			"menu": "Menu",
-			"exitMenu": "Wyjdź z menu",
-			"createNote": "Utwórz notatkę"
-		}
-	},
-	"editor": {
-		"floatingMenu": {
-			"askAI": "Zapytaj AI"
-		}
-	},
-	"widgets": {
-		"contextMenu": {
-			"moveLeft": "Przesuń w lewo",
-			"moveRight": "Przesuń w prawo",
-			"remove": "Usuń"
-		}
-	},
-	"additionalContextPlaceholder": "Dodatkowy kontekst dla generowania notatek.\r\nnp. \"Odpowiadaj w profesjonalnym stylu. Bądź zwięzły\".",
-	"profile": {
-		"title": "Profil",
-		"account": "Konto",
-		"emailAddress": "Adres e-mail",
-		"subscription": "Subskrypcja",
-		"grintaPro": "Grinta Pro",
-		"upgrade": "Przejdź na Pro",
-		"cancel": "Anuluj",
-		"signOut": "Wyloguj się",
-		"subscriptionModal": {
-			"title": "Kontynuuj w przeglądarce",
-			"description": "Kontynuuj proces subskrypcji w przeglądarce.",
-			"cancel": "Anuluj"
-		}
-	}
+  "common": {
+    "next": "Dalej"
+  },
+  "welcome": {
+    "title": "Witaj w Grincie",
+    "subtitle": "Przed rozpoczęciem, możesz dostosować te ustawienia."
+  },
+  "barMode": {
+    "initial": "Szukaj",
+    "notes": "Notatki",
+    "menu": "Menu"
+  },
+  "settings": {
+    "title": "Ustawienia",
+    "tabs": {
+      "general": "Ogólne",
+      "search": "Wyszukiwanie",
+      "pro": "Pro",
+      "permissions": "Uprawnienia"
+    },
+    "fields": {
+      "shortcut": "Skrót",
+      "add": "Dodaj",
+      "version": "Wersja",
+      "theme": "Motyw",
+      "accentColor": "Akcent",
+      "dangerZone": "Strefa zagrożenia",
+      "defaultSearchEngine": "Domyślna wyszukiwarka",
+      "notesDirectory": "Lokalizacja notatek",
+      "proAutocompleteEnabled": "Automatyczne uzupełnianie",
+      "checkUpdate": "Sprawdź aktualizacje",
+      "clearCommandHistory": "Wyczyść historię poleceń",
+      "wipeAllLocalData": "Wyczyść wszystkie dane lokalne",
+      "changeShortcut": "Naciśnij, aby zmienić",
+      "recordShortcut": "Naciśnij, aby zapisać",
+      "baseCurrency": "Waluta bazowa",
+      "fsSearchOnlyInHome": "Szukaj tylko w katalogu domowym",
+      "additional_extensions": "Dodatkowe rozszerzenia",
+      "accessibilityPermissions": "Uprawnienia dostępności",
+      "requestAccessibilityPermissions": "Zapytaj o uprawnienia dostępności",
+      "fsPermissions": "Uprawnienia systemu plików",
+      "requestFsPermissions": "Zapytaj o uprawnienia systemu plików",
+      "granted": "Zezwolono",
+      "autostart": "Autostart",
+      "requestAutostart": "Zezwól na autostart",
+      "extension_invalid_format": "Rozszerzenie może zawierać tylko litery i cyfry.",
+      "clipboardRecordingEnabled": "Nagrywaj historię schowka",
+      "language": "Język",
+      "showWidgetLabels": "Pokaż etykiety widżetów",
+      "web": "Sieć",
+      "file": "Plik"
+    },
+    "extension_already_added": "To rozszerzenie jest już dodane.",
+    "extension_supported_by_default": "To rozszerzenie jest obsługiwane domyślnie.",
+    "clipboardRecordingEnabled": "Rejestruj historię schowka",
+    "language": "Język",
+    "web": "Sieć",
+    "file": "Pliki",
+    "commandHistoryCleared": "Historia poleceń wyczyszczona"
+  },
+  "auth": {
+    "signIn": "Zaloguj się",
+    "verifyCode": "Zweryfikuj kod",
+    "sendOneTimeCode": "Wyślij kod jednorazowy",
+    "oneTimePasswordInfo": "Kod jednorazowy zostanie wysłany na Twój adres e-mail.",
+    "oneTimeCode": "Kod jednorazowy",
+    "email": "E-mail",
+    "emailPlaceholder": "Adres E-Mail",
+    "checkEmailForCode": "Sprawdź swoją skrzynkę e-mail, aby znaleźć kod jednorazowy.",
+    "invalidCode": "Nieprawidłowy kod. Sprawdź kod wysłany na Twój adres e-mail.",
+    "invalidEmail": "Nieprawidłowy adres e-mail",
+    "help": "Pomoc"
+  },
+  "search": {
+    "grintai": "GrintAI"
+  },
+  "ai": {
+    "copy": "Kopiuj",
+    "copySuccess": "Skopiowano do schowka",
+    "createNote": "Utwórz notatkę"
+  },
+  "notes": {
+    "placeholder": "Nazwa notatki",
+    "regenerateWithAI": "Wygeneruj ponownie z AI",
+    "copyMarkdown": "Kopiuj Markdown",
+    "deleteNote": "Usuń notatkę",
+    "confirmDelete": "Potwierdź usunięcie",
+    "noteDeleted": "Notatka usunięta",
+    "markdownCopied": "Markdown został skopiowany.",
+    "failedToRename": "Nie udało się zmienić nazwy notatki",
+    "noteName": "Nazwa notatki",
+    "closeSidebar": "zamknij panel boczny",
+    "createNote": "Utwórz notatkę",
+    "retry": "Ponów",
+    "rephrase": "Przepisz",
+    "longer": "Dłużej",
+    "shorter": "Krócej",
+    "grammar": "Popraw gramatykę",
+    "professional": "Profesjonalnie",
+    "askAi": "Zapytaj AI",
+    "translate": "Przetłumacz"
+  },
+  "commands": {
+    "helperText": {
+      "app": "Aplikacja",
+      "file": "Plik",
+      "folder": "Folder",
+      "web": "Sieć",
+      "barCommand": "Polecenie paska",
+      "changeMode": "Zmień tryb",
+      "copyToClipboard": "Kopiuj do schowka",
+      "openNote": "Otwórz notatkę",
+      "createNote": "Utwórz notatkę",
+      "createSmartNote": "Utwórz smart notatkę",
+      "askAI": "Zapytaj AI",
+      "runShortcut": "Uruchom skrót"
+    },
+    "contextMenu": {
+      "pin": "Przypnij",
+      "remove": "Usuń",
+      "remove_from_history": "Usuń z historii",
+      "open": "Otwórz",
+      "showInFinder": "Pokaż w Finderze",
+      "quickLook": "Szybki podgląd",
+      "getInfo": "Informacje",
+      "copyName": "Kopiuj nazwę",
+      "copyPath": "Kopiuj ścieżkę",
+      "search": "Szukaj...",
+      "translate": "Przetłumacz"
+    },
+    "menuItems": {
+      "clearNotes": "Wyczyść notatki",
+      "clearHistory": "Wyczyść historię poleceń",
+      "help": "Pomoc",
+      "open": "Otwórz",
+      "settings": "Ustawienia",
+      "exit": "Wyjdź",
+      "signIn": "Zaloguj",
+      "profile": "Profil",
+      "clipboardHistory": "Historia schowka",
+      "checkForUpdates": "Sprawdź aktualizacje..."
+    },
+    "actions": {
+      "search": "Szukaj \"{query}\"",
+      "smartNote": "Smart notatka \"{query}\"",
+      "ask": "Zapytaj \"{query}\"",
+      "createNote": "Utwórz notatkę \"{query}\""
+    }
+  },
+  "searchBar": {
+    "placeholder": {
+      "initial": "Szukaj w sieci lub aplikacjach",
+      "menu": "Menu",
+      "notes": "Szukaj lub twórz notatki",
+      "clipboard": "Szukaj i kopiuj ze schowka"
+    },
+    "actions": {
+      "menu": "Menu",
+      "exitMenu": "Wyjdź z menu",
+      "createNote": "Utwórz notatkę"
+    }
+  },
+  "editor": {
+    "floatingMenu": {
+      "askAI": "Zapytaj AI"
+    }
+  },
+  "widgets": {
+    "contextMenu": {
+      "moveLeft": "Przesuń w lewo",
+      "moveRight": "Przesuń w prawo",
+      "remove": "Usuń"
+    }
+  },
+  "additionalContextPlaceholder": "Dodatkowy kontekst dla generowania notatek.\r\nnp. \"Odpowiadaj w profesjonalnym stylu. Bądź zwięzły\".",
+  "profile": {
+    "title": "Profil",
+    "account": "Konto",
+    "emailAddress": "Adres e-mail",
+    "subscription": "Subskrypcja",
+    "grintaPro": "Grinta Pro",
+    "upgrade": "Przejdź na Pro",
+    "cancel": "Anuluj",
+    "signOut": "Wyloguj się",
+    "subscriptionModal": {
+      "title": "Kontynuuj w przeglądarce",
+      "description": "Kontynuuj proces subskrypcji w przeglądarce.",
+      "cancel": "Anuluj"
+    }
+  },
+  "menu": {
+    "clipboard": "Schowek",
+    "signIn": "Zaloguj się",
+    "upgrade": "Przejdź na Pro",
+    "exit": "Wyjdź",
+    "settings": "Ustawienia",
+    "help": "Pomoc",
+    "profile": "Profil"
+  }
 }
