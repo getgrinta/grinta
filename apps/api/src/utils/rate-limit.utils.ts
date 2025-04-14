@@ -3,7 +3,7 @@ import { MiddlewareHandler } from "hono";
 
 const rlimit = new RateLimit({
   namespace: "grinta",
-  maximum: 5,
+  maximum: 20,
   interval: "10s",
 });
 
