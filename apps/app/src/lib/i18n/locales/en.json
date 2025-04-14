@@ -81,7 +81,11 @@
   "ai": {
     "copy": "Copy",
     "copySuccess": "Copied to clipboard",
-    "createNote": "Create Note"
+    "createNote": "Create Note",
+    "aiRateLimitedTitle": "No AI credits left.",
+    "aiRateLimitedDescription": "You've used up your daily quota of AI usage credits. If you want to increase the limit, consider subscribing to our Grinta Pro plan, which offers 10x more daily credits.",
+    "aiRateLimitedButton": "Upgrade to Pro",
+    "error": "No more AI credits left. Please upgrade to Pro to continue using AI features."
   },
   "notes": {
     "placeholder": "Note name",

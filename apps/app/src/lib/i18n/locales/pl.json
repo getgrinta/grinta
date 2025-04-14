@@ -78,7 +78,11 @@
   "ai": {
     "copy": "Kopiuj",
     "copySuccess": "Skopiowano do schowka",
-    "createNote": "Utwórz notatkę"
+    "createNote": "Utwórz notatkę",
+    "aiRateLimitedTitle": "Brak kredytów AI.",
+    "aiRateLimitedDescription": "Wykorzystałeś swój limit codziennych kredytów AI. Jeśli chcesz zwiększyć limit, rozważ zakup naszego planu Grinta Pro, który oferuje 10 razy więcej codziennych kredytów.",
+    "aiRateLimitedButton": "Zasubskrybuj Pro",
+    "error": "Brak kredytów AI. Uaktualnij do wersji Pro, aby nadal korzystać z funkcji AI."
   },
   "notes": {
     "placeholder": "Nazwa notatki",
