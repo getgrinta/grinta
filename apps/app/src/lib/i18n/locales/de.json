@@ -89,7 +89,11 @@
   "ai": {
     "copy": "Kopieren",
     "copySuccess": "Kopiert in die Zwischenablage",
-    "createNote": "Notiz erstellen"
+    "createNote": "Notiz erstellen",
+    "aiRateLimitedTitle": "Keine KI-Credits mehr übrig.",
+    "aiRateLimitedDescription": "Sie haben Ihr tägliches Kontingent an KI-Nutzungskrediten aufgebraucht. Wenn Sie Ihr Kontingent erhöhen möchten, sollten Sie unseren Grinta Pro-Tarif abonnieren, der 10x mehr tägliche Credits bietet.",
+    "aiRateLimitedButton": "Upgrade auf Pro",
+    "error": "Keine AI-Credits mehr übrig. Bitte wechseln Sie zu Pro, um die AI-Funktionen weiterhin nutzen zu können."
   },
   "notes": {
     "placeholder": "Notizname",

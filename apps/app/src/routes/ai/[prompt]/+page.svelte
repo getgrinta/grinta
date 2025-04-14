@@ -76,10 +76,10 @@
       <div class="skeleton w-full h-24"></div>
     {:else if aiStore.rateLimited}
       <div class="prose mx-auto text-justify">
-        <h2>{$_("ai.rateLimitedTitle")}</h2>
-        <p>{$_("ai.rateLimitedDescription")}</p>
+        <h2>{$_("ai.aiRateLimitedTitle")}</h2>
+        <p>{$_("ai.aiRateLimitedDescription")}</p>
         <a class="btn" href="/profile?upgrade=true">
-          {$_("ai.rateLimitedButton")}
+          {$_("ai.aiRateLimitedButton")}
         </a>
       </div>
     {:else}
