@@ -308,7 +308,7 @@
           bind:checked={settingsStore.data.clipboardRecordingEnabled}
         />
         <label class="text-sm" for="showWidgetLabelsChoice"
-          >{$_("settings.showWidgetLabels")}</label
+          >{$_("settings.fields.showWidgetLabels")}</label
         >
         <input
           class="toggle toggle-lg toggle-primary"

@@ -1,197 +1,206 @@
 {
-	"common": {
-		"next": "Weiter"
-	},
-	"auth": {
-		"signIn": "Anmelden",
-		"verifyCode": "Code bestätigen",
-		"sendOneTimeCode": "Einmalcode senden",
-		"oneTimePasswordInfo": "Ein Einmalpasswort wird an Ihre E-Mail-Adresse gesendet.",
-		"oneTimeCode": "Einmalcode",
-		"email": "E-mail",
-		"emailPlaceholder": "E-Mail-Adresse",
-		"checkEmailForCode": "Bitte überprüfen Sie Ihren E-Mail-Posteingang für den Einmalcode.",
-		"invalidCode": "Ungültiger Code. Bitte überprüfen Sie den an Ihre E-Mail gesendeten Code.",
-		"invalidEmail": "Ungültige E-Mail-Adresse",
-		"help": "Hilfe"
-	},
-	"profile": {
-		"title": "Profil",
-		"account": "Konto",
-		"emailAddress": "E-Mail-Adresse",
-		"subscription": "Abonnement",
-		"grintaPro": "Grinta Pro",
-		"upgrade": "Auf Pro upgraden",
-		"cancel": "Abbrechen",
-		"signOut": "Abmelden",
-		"subscriptionModal": {
-			"title": "Im Browser fortfahren",
-			"description": "Fahren Sie mit dem Abonnementprozess im Browser fort.",
-			"cancel": "Abbrechen"
-		}
-	},
-	"welcome": {
-		"title": "Willkommen bei Grinta",
-		"subtitle": "Bevor du losmachst, möchtest du vielleicht diese Einstellungen anpassen?"
-	},
-	"barMode": {
-		"initial": "Suche",
-		"notes": "Notizen",
-		"menu": "Menü"
-	},
-	"settings": {
-		"title": "Einstellungen",
-		"tabs": {
-			"general": "Allgemein",
-			"search": "Suche",
-			"pro": "Pro",
-			"permissions": "Berechtigungen"
-		},
-		"fields": {
-			"shortcut": "Tastenkürzel",
-			"add": "Hinzufügen",
-			"version": "Version",
-			"theme": "Thema",
-			"accentColor": "Akzentfarbe",
-			"dangerZone": "Gefahrenzone",
-			"defaultSearchEngine": "Standard-Suchmaschine",
-			"clearCommandHistory": "Befehlsverlauf löschen",
-			"wipeAllLocalData": "Alle lokalen Daten löschen",
-			"notesDirectory": "Notizverzeichnis",
-			"checkForUpdate": "Nach Updates suchen",
-			"proAutocompleteEnabled": "Pro Autocomplete aktiviert",
-			"recordShortcut": "Drücken zum Speichern",
-			"changeShortcut": "Drücken zum Ändern",
-			"baseCurrency": "Basis-Währung",
-			"fsSearchOnlyInHome": "Nur im Home-Verzeichnis suchen",
-			"additional_extensions": "Zusätzliche Erweiterungen",
-			"accessibilityPermissions": "Erreichbarkeitsberechtigungen",
-			"requestAccessibilityPermissions": "Erlaubnis zur Barrierefreiheit beantragen",
-			"fsPermissions": "Dateisystemberechtigungen",
-			"requestFsPermissions": "Dateisystemberechtigungen beantragen",
-			"granted": "Erlaubt",
-			"autostart": "Autostart",
-			"requestAutostart": "Autostart-Erlaubnis anfordern"
-		},
-		"extension_already_added": "Diese Erweiterung wurde bereits hinzugefügt.",
-		"extension_supported_by_default": "Diese Erweiterung wird bereits unterstützt.",
-		"extension_invalid_format": "Die Erweiterung darf nur Buchstaben und Zahlen enthalten.",
-		"clipboardRecordingEnabled": "Zwischenablage-Verlauf aufzeichnen",
-		"language": "Sprache",
-		"showWidgetLabels": "Widget-Beschriftungen anzeigen",
-		"web": "Web",
-		"file": "Datei",
-		"commandHistoryCleared": "Befehlsverlauf gelöscht"
-	},
-	"search": {
-		"grintai": "GrintAI"
-	},
-	"ai": {
-		"copy": "Kopieren",
-		"copySuccess": "Kopiert in die Zwischenablage",
-		"createNote": "Notiz erstellen"
-	},
-	"notes": {
-		"placeholder": "Notizname",
-		"regenerateWithAI": "Mit KI neu generieren",
-		"copyMarkdown": "Markdown kopieren",
-		"deleteNote": "Notiz löschen",
-		"confirmDelete": "Löschen bestätigen",
-		"noteDeleted": "Notiz gelöscht",
-		"markdownCopied": "Markdown wurde kopiert.",
-		"failedToRename": "Umbenennen der Notiz fehlgeschlagen",
-		"noteName": "Notizname",
-		"closeSidebar": "Seitenleiste schließen",
-		"createNote": "Notiz erstellen",
-		"retry": "Wiederholen",
-		"rephrase": "Erneut formulieren",
-		"longer": "Länger",
-		"shorter": "Kürzer",
-		"grammar": "Grammatik verbessern",
-		"professional": "Professionell",
-		"askAi": "KI fragen",
-		"translate": "Übersetzen"
-	},
-	"commands": {
-		"helperText": {
-			"app": "App",
-			"file": "Datei",
-			"folder": "Ordner",
-			"web": "Netz",
-			"barCommand": "Befehlsleiste",
-			"changeMode": "Modus ändern",
-			"copyToClipboard": "In die Zwischenablage kopieren",
-			"openNote": "Notiz öffnen",
-			"createNote": "Notiz erstellen",
-			"createSmartNote": "Smart-Notiz erstellen",
-			"askAI": "KI fragen",
-			"runShortcut": "Tastenkürzel ausführen"
-		},
-		"contextMenu": {
-			"pin": "Anheften",
-			"remove": "Löschen",
-			"remove_from_history": "Löschen aus der Geschichte",
-			"open": "Öffnen",
-			"showInFinder": "Im Finder anzeigen",
-			"quickLook": "Schnellansicht",
-			"getInfo": "Informationen",
-			"copyName": "Name kopieren",
-			"copyPath": "Pfad kopieren",
-			"search": "Suchen..."
-		},
-		"menuItems": {
-			"clearNotes": "Notizen löschen",
-			"clearHistory": "Befehlsverlauf löschen",
-			"help": "Hilfe",
-			"open": "Öffnen",
-			"settings": "Einstellungen",
-			"exit": "Beenden",
-			"signIn": "Anmelden",
-			"profile": "Profil",
-			"clipboardHistory": "Zwischenablage",
-			"checkForUpdates": "Updates prüfen..."
-		},
-		"actions": {
-			"search": "Nach \"{query}\" suchen",
-			"smartNote": "Smart-Notiz \"{query}\" erstellen",
-			"ask": "\"{query}\" fragen",
-			"createNote": "Notiz \"{query}\" erstellen"
-		}
-	},
-	"searchBar": {
-		"placeholder": {
-			"initial": "Web oder Apps durchsuchen",
-			"menu": "Menü",
-			"notes": "Notizen suchen oder erstellen",
-			"clipboard": "Zwischenablage durchsuchen und kopieren"
-		},
-		"actions": {
-			"menu": "Menü",
-			"exitMenu": "Menü verlassen",
-			"createNote": "Notiz erstellen"
-		}
-	},
-	"editor": {
-		"floatingMenu": {
-			"askAI": "KI fragen"
-		}
-	},
-	"widgets": {
-		"contextMenu": {
-			"moveLeft": "Nach links verschieben",
-			"moveRight": "Nach rechts verschieben",
-			"remove": "Entfernen"
-		}
-	},
-	"additionalContextPlaceholder": "Zusätzlicher Kontext für die Notizgenerierung.\r\nz.B. \"Antworte im professionellen Stil. Sei präzise\".",
-	"toast": {
-		"copiedToClipboard": "In die Zwischenablage kopiert",
-		"noteCreated": "Notiz erstellt",
-		"noteDeleted": "Notiz gelöscht",
-		"noteUpdated": "Notiz aktualisiert",
-		"searchResults": "Suchergebnisse",
-		"noResults": "Keine Ergebnisse gefunden",
-		"error": "Fehler",
-		"success": "Erfolg"
-	}
+  "common": {
+    "next": "Weiter"
+  },
+  "auth": {
+    "signIn": "Anmelden",
+    "verifyCode": "Code bestätigen",
+    "sendOneTimeCode": "Einmalcode senden",
+    "oneTimePasswordInfo": "Ein Einmalpasswort wird an Ihre E-Mail-Adresse gesendet.",
+    "oneTimeCode": "Einmalcode",
+    "email": "E-mail",
+    "emailPlaceholder": "E-Mail-Adresse",
+    "checkEmailForCode": "Bitte überprüfen Sie Ihren E-Mail-Posteingang für den Einmalcode.",
+    "invalidCode": "Ungültiger Code. Bitte überprüfen Sie den an Ihre E-Mail gesendeten Code.",
+    "invalidEmail": "Ungültige E-Mail-Adresse",
+    "help": "Hilfe"
+  },
+  "profile": {
+    "title": "Profil",
+    "account": "Konto",
+    "emailAddress": "E-Mail-Adresse",
+    "subscription": "Abonnement",
+    "grintaPro": "Grinta Pro",
+    "upgrade": "Auf Pro upgraden",
+    "cancel": "Abbrechen",
+    "signOut": "Abmelden",
+    "subscriptionModal": {
+      "title": "Im Browser fortfahren",
+      "description": "Fahren Sie mit dem Abonnementprozess im Browser fort.",
+      "cancel": "Abbrechen"
+    }
+  },
+  "welcome": {
+    "title": "Willkommen bei Grinta",
+    "subtitle": "Bevor du losmachst, möchtest du vielleicht diese Einstellungen anpassen?"
+  },
+  "barMode": {
+    "initial": "Suche",
+    "notes": "Notizen",
+    "menu": "Menü"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "tabs": {
+      "general": "Allgemein",
+      "search": "Suche",
+      "pro": "Pro",
+      "permissions": "Berechtigungen"
+    },
+    "fields": {
+      "shortcut": "Tastenkürzel",
+      "add": "Hinzufügen",
+      "version": "Version",
+      "theme": "Thema",
+      "accentColor": "Akzentfarbe",
+      "dangerZone": "Gefahrenzone",
+      "defaultSearchEngine": "Standard-Suchmaschine",
+      "clearCommandHistory": "Befehlsverlauf löschen",
+      "wipeAllLocalData": "Alle lokalen Daten löschen",
+      "notesDirectory": "Notizverzeichnis",
+      "checkForUpdate": "Nach Updates suchen",
+      "proAutocompleteEnabled": "Pro Autocomplete aktiviert",
+      "recordShortcut": "Drücken zum Speichern",
+      "changeShortcut": "Drücken zum Ändern",
+      "baseCurrency": "Basis-Währung",
+      "fsSearchOnlyInHome": "Nur im Home-Verzeichnis suchen",
+      "additional_extensions": "Zusätzliche Erweiterungen",
+      "accessibilityPermissions": "Erreichbarkeitsberechtigungen",
+      "requestAccessibilityPermissions": "Erlaubnis zur Barrierefreiheit beantragen",
+      "fsPermissions": "Dateisystemberechtigungen",
+      "requestFsPermissions": "Dateisystemberechtigungen beantragen",
+      "granted": "Erlaubt",
+      "autostart": "Autostart",
+      "requestAutostart": "Autostart-Erlaubnis anfordern"
+    },
+    "extension_already_added": "Diese Erweiterung wurde bereits hinzugefügt.",
+    "extension_supported_by_default": "Diese Erweiterung wird bereits unterstützt.",
+    "extension_invalid_format": "Die Erweiterung darf nur Buchstaben und Zahlen enthalten.",
+    "clipboardRecordingEnabled": "Zwischenablage-Verlauf aufzeichnen",
+    "language": "Sprache",
+    "showWidgetLabels": "Widget-Beschriftungen anzeigen",
+    "web": "Web",
+    "file": "Datei",
+    "commandHistoryCleared": "Befehlsverlauf gelöscht"
+  },
+  "search": {
+    "grintai": "GrintAI"
+  },
+  "ai": {
+    "copy": "Kopieren",
+    "copySuccess": "Kopiert in die Zwischenablage",
+    "createNote": "Notiz erstellen"
+  },
+  "notes": {
+    "placeholder": "Notizname",
+    "regenerateWithAI": "Mit KI neu generieren",
+    "copyMarkdown": "Markdown kopieren",
+    "deleteNote": "Notiz löschen",
+    "confirmDelete": "Löschen bestätigen",
+    "noteDeleted": "Notiz gelöscht",
+    "markdownCopied": "Markdown wurde kopiert.",
+    "failedToRename": "Umbenennen der Notiz fehlgeschlagen",
+    "noteName": "Notizname",
+    "closeSidebar": "Seitenleiste schließen",
+    "createNote": "Notiz erstellen",
+    "retry": "Wiederholen",
+    "rephrase": "Erneut formulieren",
+    "longer": "Länger",
+    "shorter": "Kürzer",
+    "grammar": "Grammatik verbessern",
+    "professional": "Professionell",
+    "askAi": "KI fragen",
+    "translate": "Übersetzen"
+  },
+  "commands": {
+    "helperText": {
+      "app": "App",
+      "file": "Datei",
+      "folder": "Ordner",
+      "web": "Netz",
+      "barCommand": "Befehlsleiste",
+      "changeMode": "Modus ändern",
+      "copyToClipboard": "In die Zwischenablage kopieren",
+      "openNote": "Notiz öffnen",
+      "createNote": "Notiz erstellen",
+      "createSmartNote": "Smart-Notiz erstellen",
+      "askAI": "KI fragen",
+      "runShortcut": "Tastenkürzel ausführen"
+    },
+    "contextMenu": {
+      "pin": "Anheften",
+      "remove": "Löschen",
+      "remove_from_history": "Löschen aus der Geschichte",
+      "open": "Öffnen",
+      "showInFinder": "Im Finder anzeigen",
+      "quickLook": "Schnellansicht",
+      "getInfo": "Informationen",
+      "copyName": "Name kopieren",
+      "copyPath": "Pfad kopieren",
+      "search": "Suchen..."
+    },
+    "menuItems": {
+      "clearNotes": "Notizen löschen",
+      "clearHistory": "Befehlsverlauf löschen",
+      "help": "Hilfe",
+      "open": "Öffnen",
+      "settings": "Einstellungen",
+      "exit": "Beenden",
+      "signIn": "Anmelden",
+      "profile": "Profil",
+      "clipboardHistory": "Zwischenablage",
+      "checkForUpdates": "Updates prüfen..."
+    },
+    "actions": {
+      "search": "Nach \"{query}\" suchen",
+      "smartNote": "Smart-Notiz \"{query}\" erstellen",
+      "ask": "\"{query}\" fragen",
+      "createNote": "Notiz \"{query}\" erstellen"
+    }
+  },
+  "searchBar": {
+    "placeholder": {
+      "initial": "Web oder Apps durchsuchen",
+      "menu": "Menü",
+      "notes": "Notizen suchen oder erstellen",
+      "clipboard": "Zwischenablage durchsuchen und kopieren"
+    },
+    "actions": {
+      "menu": "Menü",
+      "exitMenu": "Menü verlassen",
+      "createNote": "Notiz erstellen"
+    }
+  },
+  "editor": {
+    "floatingMenu": {
+      "askAI": "KI fragen"
+    }
+  },
+  "widgets": {
+    "contextMenu": {
+      "moveLeft": "Nach links verschieben",
+      "moveRight": "Nach rechts verschieben",
+      "remove": "Entfernen"
+    }
+  },
+  "additionalContextPlaceholder": "Zusätzlicher Kontext für die Notizgenerierung.\r\nz.B. \"Antworte im professionellen Stil. Sei präzise\".",
+  "toast": {
+    "copiedToClipboard": "In die Zwischenablage kopiert",
+    "noteCreated": "Notiz erstellt",
+    "noteDeleted": "Notiz gelöscht",
+    "noteUpdated": "Notiz aktualisiert",
+    "searchResults": "Suchergebnisse",
+    "noResults": "Keine Ergebnisse gefunden",
+    "error": "Fehler",
+    "success": "Erfolg"
+  },
+  "menu": {
+    "clipboard": "Schwachkasten",
+    "signIn": "Anmelden",
+    "upgrade": "Auf Pro upgraden",
+    "exit": "Beenden",
+    "settings": "Einstellungen",
+    "help": "Hilfe",
+    "profile": "Profile"
+  }
 }

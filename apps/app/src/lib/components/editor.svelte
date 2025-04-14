@@ -128,20 +128,20 @@
       }),
     ];
 
-    if (appStore.hasPro && settingsStore.data.proAutocompleteEnabled) {
+    if (appStore.user?.id) {
       extensions.push(
         TextSuggestion.configure({
           async fetchAutocompletion({ query }: Record<string, string>) {
             // Safely access editor without self-referencing
             const currentEditor = editor;
             const context = currentEditor?.getText() ?? "";
-            const result = await aiStore.generateText({
+            const maybeJson = await aiStore.generateText({
               prompt: query,
               context,
               contentType: "AUTOCOMPLETION",
             });
-            const { text } = await result.json();
-            return text;
+            if (!maybeJson) return;
+            return maybeJson.text;
           },
         }),
       );

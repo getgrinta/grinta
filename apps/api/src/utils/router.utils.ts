@@ -2,7 +2,7 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { createMiddleware } from "hono/factory";
 import { auth } from "../auth/index.js";
 import { db } from "../db/index.js";
-import { eq } from "drizzle-orm";
+import { and, eq, or } from "drizzle-orm";
 import { schema } from "../db/schema.js";
 
 export function createRouter() {
@@ -33,7 +33,13 @@ export const authSession = createMiddleware(async (c, next) => {
   c.set("user", session.user);
   c.set("session", session.session);
   const subscriptions = await db.query.subscription.findMany({
-    where: eq(schema.subscription.referenceId, session.user.id),
+    where: and(
+      eq(schema.subscription.referenceId, session.user.id),
+      or(
+        eq(schema.subscription.status, "active"),
+        eq(schema.subscription.status, "trialing"),
+      ),
+    ),
   });
   c.set("subscriptions", subscriptions);
   return next();

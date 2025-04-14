@@ -126,7 +126,7 @@
     };
   });
 
-  const viewControls = [
+  const viewControls = $derived([
     {
       text: $_("notes.copyMarkdown"),
       onClick: copyMarkdown,
@@ -135,17 +135,19 @@
       hotkey: "Mod+Shift+C",
     },
     {
-      text: $_("notes.deleteNote"),
+      text: deleteConfirmationMode
+        ? $_("notes.confirmDelete")
+        : $_("notes.deleteNote"),
       onClick: deleteNote,
       icon: TrashIcon,
       shortcut: "⌘⇧D",
       hotkey: "Mod+Shift+D",
     },
-  ];
+  ]);
 </script>
 
-<Shortcut keys={["c"]} callback={copyMarkdown} />
-<Shortcut keys={["d"]} callback={deleteNote} />
+<Shortcut keys={["meta", "shift", "c"]} callback={copyMarkdown} />
+<Shortcut keys={["meta", "shift", "d"]} callback={deleteNote} />
 
 <div class="flex flex-col">
   <TopBar>

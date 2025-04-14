@@ -323,7 +323,12 @@
   }}
 />
 
-<Toaster richColors position="bottom-center" theme={toasterTheme.value} />
+<Toaster
+  richColors
+  position="bottom-center"
+  theme={toasterTheme.value}
+  closeButton
+/>
 
 <main
   id="mainLayout"
