@@ -1,191 +1,188 @@
 {
-	"common": {
-		"next": "Next"
-	},
-	"auth": {
-		"signIn": "Sign In",
-		"verifyCode": "Verify Code",
-		"sendOneTimeCode": "Send One-Time Code",
-		"oneTimePasswordInfo": "A one-time password will be sent to your email address",
-		"oneTimeCode": "One-time code",
-		"email": "E-mail",
-		"emailPlaceholder": "E-mail Address",
-		"checkEmailForCode": "Please check your email inbox for the one-time code.",
-		"invalidCode": "Invalid code. Please verify the code sent to your e-mail.",
-		"invalidEmail": "Invalid email address",
-		"help": "Help"
-	},
-	"profile": {
-		"title": "Profile",
-		"account": "Account",
-		"emailAddress": "Email Address",
-		"subscription": "Subscription",
-		"grintaPro": "Grinta Pro",
-		"upgrade": "Upgrade to Pro",
-		"cancel": "Cancel",
-		"signOut": "Sign out",
-		"subscriptionModal": {
-			"title": "Continue in the browser",
-			"description": "Continue the subscription process in the browser.",
-			"cancel": "Cancel"
-		}
-	},
-	"welcome": {
-		"title": "Welcome to Grinta",
-		"subtitle": "Before you start, you may want to adjust these settings."
-	},
-	"barMode": {
-		"initial": "Search",
-		"notes": "Notes",
-		"menu": "Menu"
-	},
-	"settings": {
-		"title": "Settings",
-		"tabs": {
-			"general": "General",
-			"search": "Search",
-			"pro": "Pro",
-			"permissions": "Permissions"
-		},
-		"fields": {
-			"shortcut": "Shortcut",
-			"add": "Add",
-			"version": "Version",
-			"theme": "Theme",
-			"accentColor": "Accent Color",
-			"defaultSearchEngine": "Default Search Engine",
-			"dangerZone": "Danger Zone",
-			"clearCommandHistory": "Clear Command History",
-			"wipeAllLocalData": "Wipe All Local Data",
-			"changeShortcut": "Change",
-			"recordShortcut": "Press to record",
-			"proAutocompleteEnabled": "Pro Autocomplete Enabled",
-			"notesDirectory": "Notes Directory",
-			"checkForUpdate": "Check for update",
-			"baseCurrency": "Base Currency",
-			"fsSearchOnlyInHome": "Search only in home directory",
-			"additional_extensions": "Additional searchable extensions",
-			"accessibilityPermissions": "Accessibility Permissions",
-			"requestAccessibilityPermissions": "Request Accessibility Permissions",
-			"fsPermissions": "File System Permissions",
-			"requestFsPermissions": "Request File System Permissions",
-			"granted": "Granted",
-			"autostart": "Autostart",
-			"requestAutostart": "Request Autostart"
-		},
-		"extension_already_added": "This extension is already added.",
-		"extension_supported_by_default": "This extension is already supported by default.",
-		"extension_invalid_format": "Extension must contain only letters and numbers.",
-		"clipboardRecordingEnabled": "Record Clipboard History",
-		"language": "Language",
-		"showWidgetLabels": "Show Widget Labels",
-		"web": "Web",
-		"file": "File",
-		"commandHistoryCleared": "Command history cleared"
-	},
-	"search": {
-		"grintai": "GrintAI"
-	},
-	"ai": {
-		"copy": "Copy",
-		"copySuccess": "Copied to clipboard",
-		"createNote": "Create Note"
-	},
-	"notes": {
-		"placeholder": "Note name",
-		"regenerateWithAI": "Regenerate with AI",
-		"copyMarkdown": "Copy Markdown",
-		"deleteNote": "Delete Note",
-		"confirmDelete": "Confirm Delete",
-		"noteDeleted": "Note deleted",
-		"markdownCopied": "Markdown was copied.",
-		"failedToRename": "Failed to rename note",
-		"noteName": "Note name",
-		"closeSidebar": "close sidebar",
-		"createNote": "Create Note",
-		"retry": "Retry",
-		"rephrase": "Rephrase",
-		"longer": "Longer",
-		"shorter": "Shorter",
-		"grammar": "Improve grammar",
-		"professional": "Professional",
-		"askAi": "Ask AI",
-		"translate": "Translate"
-	},
-	"commands": {
-		"helperText": {
-			"app": "App",
-			"file": "File",
-			"folder": "Folder",
-			"web": "Web",
-			"barCommand": "Bar Command",
-			"changeMode": "Change Mode",
-			"copyToClipboard": "Copy to clipboard",
-			"openNote": "Open Note",
-			"createNote": "Create Note",
-			"createSmartNote": "Create Smart Note",
-			"askAI": "Ask AI",
-			"runShortcut": "Run Shortcut"
-		},
-		"contextMenu": {
-			"pin": "Pin",
-			"remove": "Remove",
-			"remove_from_history": "Remove from history",
-			"open": "Open",
-			"showInFinder": "Show in Finder",
-			"quickLook": "Quick Look",
-			"getInfo": "Get Info",
-			"copyName": "Copy Name",
-			"copyPath": "Copy Path",
-			"search": "Search..."
-		},
-		"menuItems": {
-			"clearNotes": "Clear notes",
-			"clearHistory": "Clear commands history",
-			"help": "Help",
-			"open": "Open",
-			"settings": "Settings",
-			"exit": "Exit",
-			"signIn": "Sign In",
-			"profile": "Profile",
-			"clipboardHistory": "Clipboard History",
-			"checkForUpdates": "Check for Updates..."
-		},
-		"actions": {
-			"search": "Search for \"{query}\"",
-			"smartNote": "Smart Note \"{query}\"",
-			"ask": "Ask \"{query}\"",
-			"createNote": "Create \"{query}\" note"
-		}
-	},
-	"widgets": {
-		"contextMenu": {
-			"moveLeft": "Move Left",
-			"moveRight": "Move Right",
-			"remove": "Remove"
-		}
-	},
-	"searchBar": {
-		"placeholder": {
-			"initial": "Search web or apps",
-			"menu": "Menu",
-			"notes": "Search or create notes",
-			"clipboard": "Search and copy from clipboard"
-		},
-		"actions": {
-			"menu": "Menu",
-			"exitMenu": "Exit Menu",
-			"createNote": "Create Note"
-		}
-	},
-	"editor": {
-		"floatingMenu": {
-			"askAI": "Ask AI"
-		}
-	},
-	"additionalContextPlaceholder": "Additional context for note generation.\r\ne.g. \"Respond in professional style. Be concise\".",
-	"toast": {
-		"checkEmailForCode": "Please check your email inbox for the one-time code.",
-		"invalidCode": "Invalid code. Please verify the code sent to your e-mail."
-	}
+  "common": { "next": "Next" },
+  "auth": {
+    "signIn": "Sign In",
+    "verifyCode": "Verify Code",
+    "sendOneTimeCode": "Send One-Time Code",
+    "oneTimePasswordInfo": "A one-time password will be sent to your email address",
+    "oneTimeCode": "One-time code",
+    "email": "E-mail",
+    "emailPlaceholder": "E-mail Address",
+    "checkEmailForCode": "Please check your email inbox for the one-time code.",
+    "invalidCode": "Invalid code. Please verify the code sent to your e-mail.",
+    "invalidEmail": "Invalid email address",
+    "help": "Help"
+  },
+  "profile": {
+    "title": "Profile",
+    "account": "Account",
+    "emailAddress": "Email Address",
+    "subscription": "Subscription",
+    "grintaPro": "Grinta Pro",
+    "upgrade": "Upgrade to Pro",
+    "cancel": "Cancel",
+    "signOut": "Sign out",
+    "subscriptionModal": {
+      "title": "Continue in the browser",
+      "description": "Continue the subscription process in the browser.",
+      "cancel": "Cancel"
+    }
+  },
+  "welcome": {
+    "title": "Welcome to Grinta",
+    "subtitle": "Before you start, you may want to adjust these settings."
+  },
+  "barMode": { "initial": "Search", "notes": "Notes", "menu": "Menu" },
+  "settings": {
+    "title": "Settings",
+    "tabs": {
+      "general": "General",
+      "search": "Search",
+      "pro": "Pro",
+      "permissions": "Permissions"
+    },
+    "fields": {
+      "shortcut": "Shortcut",
+      "add": "Add",
+      "version": "Version",
+      "theme": "Theme",
+      "accentColor": "Accent Color",
+      "defaultSearchEngine": "Default Search Engine",
+      "dangerZone": "Danger Zone",
+      "clearCommandHistory": "Clear Command History",
+      "wipeAllLocalData": "Wipe All Local Data",
+      "changeShortcut": "Change",
+      "recordShortcut": "Press to record",
+      "proAutocompleteEnabled": "Pro Autocomplete Enabled",
+      "notesDirectory": "Notes Directory",
+      "checkForUpdate": "Check for update",
+      "baseCurrency": "Base Currency",
+      "fsSearchOnlyInHome": "Search only in home directory",
+      "additional_extensions": "Additional searchable extensions",
+      "accessibilityPermissions": "Accessibility Permissions",
+      "requestAccessibilityPermissions": "Request Accessibility Permissions",
+      "fsPermissions": "File System Permissions",
+      "requestFsPermissions": "Request File System Permissions",
+      "granted": "Granted",
+      "autostart": "Autostart",
+      "requestAutostart": "Request Autostart"
+    },
+    "extension_already_added": "This extension is already added.",
+    "extension_supported_by_default": "This extension is already supported by default.",
+    "extension_invalid_format": "Extension must contain only letters and numbers.",
+    "clipboardRecordingEnabled": "Record Clipboard History",
+    "language": "Language",
+    "showWidgetLabels": "Show Widget Labels",
+    "web": "Web",
+    "file": "File",
+    "commandHistoryCleared": "Command history cleared"
+  },
+  "search": { "grintai": "GrintAI" },
+  "ai": {
+    "copy": "Copy",
+    "copySuccess": "Copied to clipboard",
+    "createNote": "Create Note"
+  },
+  "notes": {
+    "placeholder": "Note name",
+    "regenerateWithAI": "Regenerate with AI",
+    "copyMarkdown": "Copy Markdown",
+    "deleteNote": "Delete Note",
+    "confirmDelete": "Confirm Delete",
+    "noteDeleted": "Note deleted",
+    "markdownCopied": "Markdown was copied.",
+    "failedToRename": "Failed to rename note",
+    "noteName": "Note name",
+    "closeSidebar": "close sidebar",
+    "createNote": "Create Note",
+    "retry": "Retry",
+    "rephrase": "Rephrase",
+    "longer": "Longer",
+    "shorter": "Shorter",
+    "grammar": "Improve grammar",
+    "professional": "Professional",
+    "askAi": "Ask AI",
+    "translate": "Translate"
+  },
+  "commands": {
+    "helperText": {
+      "app": "App",
+      "file": "File",
+      "folder": "Folder",
+      "web": "Web",
+      "barCommand": "Bar Command",
+      "changeMode": "Change Mode",
+      "copyToClipboard": "Copy to clipboard",
+      "openNote": "Open Note",
+      "createNote": "Create Note",
+      "createSmartNote": "Create Smart Note",
+      "askAI": "Ask AI",
+      "runShortcut": "Run Shortcut"
+    },
+    "contextMenu": {
+      "pin": "Pin",
+      "remove": "Remove",
+      "remove_from_history": "Remove from history",
+      "open": "Open",
+      "showInFinder": "Show in Finder",
+      "quickLook": "Quick Look",
+      "getInfo": "Get Info",
+      "copyName": "Copy Name",
+      "copyPath": "Copy Path",
+      "search": "Search..."
+    },
+    "menuItems": {
+      "clearNotes": "Clear notes",
+      "clearHistory": "Clear commands history",
+      "help": "Help",
+      "open": "Open",
+      "settings": "Settings",
+      "exit": "Exit",
+      "signIn": "Sign In",
+      "profile": "Profile",
+      "clipboardHistory": "Clipboard History",
+      "checkForUpdates": "Check for Updates..."
+    },
+    "actions": {
+      "search": "Search for \"{query}\"",
+      "smartNote": "Smart Note \"{query}\"",
+      "ask": "Ask \"{query}\"",
+      "createNote": "Create \"{query}\" note"
+    }
+  },
+  "widgets": {
+    "contextMenu": {
+      "moveLeft": "Move Left",
+      "moveRight": "Move Right",
+      "remove": "Remove"
+    }
+  },
+  "searchBar": {
+    "placeholder": {
+      "initial": "Search web or apps",
+      "menu": "Menu",
+      "notes": "Search or create notes",
+      "clipboard": "Search and copy from clipboard"
+    },
+    "actions": {
+      "menu": "Menu",
+      "exitMenu": "Exit Menu",
+      "createNote": "Create Note"
+    }
+  },
+  "editor": { "floatingMenu": { "askAI": "Ask AI" } },
+  "additionalContextPlaceholder": "Additional context for note generation.\r\ne.g. \"Respond in professional style. Be concise\".",
+  "toast": {
+    "checkEmailForCode": "Please check your email inbox for the one-time code.",
+    "invalidCode": "Invalid code. Please verify the code sent to your e-mail."
+  },
+  "menu": {
+    "clipboard": "Clipboard",
+    "signIn": "Sign In",
+    "upgrade": "Upgrade to Pro",
+    "exit": "Exit",
+    "settings": "Settings",
+    "help": "Help",
+    "profile": "Profile"
+  }
 }

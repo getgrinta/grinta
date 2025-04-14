@@ -14,6 +14,7 @@
   import { goto } from "$app/navigation";
   import { APP_MODE } from "@getgrinta/core";
   import { exit } from "@tauri-apps/plugin-process";
+  import { _ } from "svelte-i18n";
   import Shortcut from "./shortcut.svelte";
 
   let { children } = $props<{
@@ -100,44 +101,49 @@
         <ChevronRightIcon size={16} />
       </label>
       {#if userId}
-        <a href="/profile" onclick={closeMenu} class="gap-4">
-          <div class="avatar">
-            <div class="w-8 rounded-full">
-              <img
-                src={`https://meshy.studio/api/mesh/${userId}?noise=8&sharpen=1&negate=false&gammaIn=2.1&gammaOut=2.2&brightness=100&saturation=100&hue=0&lightness=0&blur=0`}
-                alt="Avatar"
-              />
+        <div
+          class="tooltip tooltip-primary tooltip-left"
+          data-tip={$_("menu.profile")}
+        >
+          <a href="/profile" onclick={closeMenu} class="gap-4">
+            <div class="avatar">
+              <div class="w-8 rounded-full">
+                <img
+                  src={`https://meshy.studio/api/mesh/${userId}?noise=8&sharpen=1&negate=false&gammaIn=2.1&gammaOut=2.2&brightness=100&saturation=100&hue=0&lightness=0&blur=0`}
+                  alt="Avatar"
+                />
+              </div>
             </div>
-          </div>
-        </a>
+          </a>
+        </div>
       {/if}
     </div>
     <ul class="menu menu-lg w-full p-0">
       <li>
         <button onclick={handleClipboard} class="gap-4">
           <ClipboardIcon size={20} />
-          <span>Clipboard</span>
+          <span>{$_("menu.clipboard")}</span>
           <kbd class="kbd">c</kbd>
         </button>
       </li>
       <li>
         <button onclick={handleHelp} class="gap-4">
           <HelpCircleIcon size={20} />
-          <span>Help</span>
+          <span>{$_("menu.help")}</span>
           <kbd class="kbd">h</kbd>
         </button>
       </li>
       <li>
         <a href="/settings" onclick={closeMenu} class="gap-4">
           <CogIcon size={20} />
-          <span>Settings</span>
+          <span>{$_("menu.settings")}</span>
           <kbd class="kbd">s</kbd>
         </a>
       </li>
       <li>
         <a href="/" onclick={closeMenu} class="gap-4">
           <LogOutIcon size={20} />
-          <span>Exit</span>
+          <span>{$_("menu.exit")}</span>
           <kbd class="kbd">q</kbd>
         </a>
       </li>
@@ -151,18 +157,22 @@
         >
           <UserIcon size={16} />
           <div class="flex gap-2 items-center">
-            <span>Sign In</span>
+            <span>{$_("menu.signIn")}</span>
             <ArrowRightIcon size={16} />
           </div>
         </a>
       {:else if !appStore.hasPro}
-        <button class="btn btn-primary w-full justify-between">
+        <a
+          href="/profile?upgrade=true"
+          onclick={closeMenu}
+          class="btn btn-primary w-full justify-between"
+        >
           <img src="/pro.svg" width="32" height="32" alt="Get Pro" />
           <div class="flex gap-2 items-center">
-            <span>Upgrade to Pro</span>
+            <span>{$_("menu.upgrade")}</span>
             <ArrowRightIcon size={16} />
           </div>
-        </button>
+        </a>
       {/if}
     </div>
   {/snippet}

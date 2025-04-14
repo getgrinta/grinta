@@ -44,9 +44,7 @@
     Object.values(TRANSLATE_LANGUAGE).map((lang) => ({
       label: lang.display,
       onClick: () => {
-        translate({
-          targetLanguage: lang.code,
-        });
+        translate({ targetLanguage: lang.code });
       },
     })),
   );
@@ -134,11 +132,7 @@
     onStartGenerating();
     isVisible = false;
     const response = await apiClient.api.ai.generate.$post({
-      json: {
-        prompt: selectedText,
-        context: prompt,
-        contentType: "REPHRASE",
-      },
+      json: { prompt: selectedText, context: prompt, contentType: "REPHRASE" },
     });
     const { text } = await response.json();
     editor?.chain().focus().deleteRange(editor.state.selection).run();
@@ -162,11 +156,7 @@
     onStartGenerating();
     isVisible = false;
     const response = await apiClient.api.ai.generate.$post({
-      json: {
-        prompt: selectedText,
-        context: prompt,
-        contentType: "REPHRASE",
-      },
+      json: { prompt: selectedText, context: prompt, contentType: "REPHRASE" },
     });
     const { text } = await response.json();
     editor?.chain().focus().deleteRange(editor.state.selection).run();
@@ -229,7 +219,7 @@
           class="btn btn-sm join-item items-center text-primary-content"
           onclick={() => toggleHeader(3)}>H3</button
         >
-        {#if appStore.hasPro}
+        {#if appStore.user?.id}
           <button
             type="button"
             class="btn btn-sm join-item items-center text-primary-content"
@@ -245,11 +235,7 @@
               setMenuMode(MENU_MODE.IDLE);
               isVisible = false;
 
-              emit("show-context-menu", {
-                x: 100,
-                y: 100,
-                name: "translate",
-              });
+              emit("show-context-menu", { x: 100, y: 100, name: "translate" });
             }}
           >
             <LanguagesIcon size={16} />

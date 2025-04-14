@@ -59,7 +59,7 @@
   }
 </script>
 
-{#if appStore.hasPro}
+{#if appStore.user?.id}
   <form use:form class="join">
     {#if menuState === "idle"}
       <button

@@ -9,9 +9,13 @@
   import { _ } from "$lib/i18n";
   import { vaultStore } from "$lib/store/vault.svelte";
   import { toast } from "svelte-sonner";
+  import { page } from "$app/state";
 
   let subscribingModalRef = $state<HTMLDialogElement>();
   let subscriptionCheckInterval = $state<number | NodeJS.Timer>();
+  const startUpgrade = $derived(
+    page.url.searchParams.get("upgrade") === "true",
+  );
   const authClient = getAuthClient();
 
   function startSubscriptionCheck() {
@@ -80,6 +84,12 @@
     if ((appStore.subscriptions?.length ?? 0) > 0) {
       stopSubscriptionCheck();
     }
+  });
+
+  $effect(() => {
+    if (!startUpgrade) return;
+    subscribingModalRef?.showModal();
+    upgradeToPro();
   });
 </script>
 

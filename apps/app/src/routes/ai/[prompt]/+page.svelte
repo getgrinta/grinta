@@ -51,9 +51,14 @@
       return;
     }
     loading = true;
-    aiStore.fetchGrintAiResult(appStore.query).then(() => {
-      loading = false;
-    });
+    aiStore
+      .fetchGrintAiResult(appStore.query)
+      .then(() => {
+        loading = false;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   });
 </script>
 
@@ -69,6 +74,14 @@
   <div class="mt-16">
     {#if loading}
       <div class="skeleton w-full h-24"></div>
+    {:else if aiStore.rateLimited}
+      <div class="prose mx-auto text-justify">
+        <h2>{$_("ai.rateLimitedTitle")}</h2>
+        <p>{$_("ai.rateLimitedDescription")}</p>
+        <a class="btn" href="/profile?upgrade=true">
+          {$_("ai.rateLimitedButton")}
+        </a>
+      </div>
     {:else}
       <div class="prose mx-auto text-justify">
         {aiStore.grintAiResult}

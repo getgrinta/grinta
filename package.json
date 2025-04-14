@@ -1,38 +1,40 @@
 {
-	"name": "getgrintacom",
-	"private": true,
-	"scripts": {
-		"build": "turbo build",
-		"build:deps": "turbo build --filter @getgrinta/core --filter @getgrinta/plugin* --filter @getgrinta/api",
-		"watch:deps": "turbo watch build --filter @getgrinta/core --filter @getgrinta/plugin* --filter @getgrinta/api",
-		"dev": "turbo dev",
-		"test": "turbo test",
-		"lint": "oxlint",
-		"format": "bunx --bun oxlint --fix --fix-suggestions && bunx --bun prettier --write \"**/*.svelte\"",
-		"cleanup": "turbo cleanup && rimraf node_modules bun.lock",
-		"prepare": "husky"
-	},
-	"devDependencies": {
-		"@tsconfig/bun": "^1.0.7",
-		"@types/bun": "1.2.8",
-		"husky": "9.1.7",
-		"lint-staged": "15.5.0",
-		"oxlint": "0.16.4",
-		"prettier": "^3.5.3",
-		"prettier-plugin-svelte": "^3.3.3",
-		"rimraf": "6.0.1",
-		"turbo": "2.4.4",
-		"typescript": "5.8.2"
-	},
-	"engines": {
-		"node": ">=22"
-	},
-	"packageManager": "bun@1.2.5",
-	"workspaces": [
-		"apps/*",
-		"packages/*"
-	],
-	"lint-staged": {
-		"**/*.{js,mjs,cjs,ts,astro,svelte}": ["bun run format"]
-	}
+  "name": "getgrintacom",
+  "private": true,
+  "scripts": {
+    "build": "turbo build",
+    "build:deps": "turbo build --filter @getgrinta/core --filter @getgrinta/plugin* --filter @getgrinta/api",
+    "watch:deps": "turbo watch build --filter @getgrinta/core --filter @getgrinta/plugin* --filter @getgrinta/api",
+    "dev": "turbo dev",
+    "test": "turbo test",
+    "lint": "oxlint",
+    "format": "bunx --bun oxlint --fix --fix-suggestions && bunx --bun prettier --write \"**/*.svelte\"",
+    "cleanup": "turbo cleanup && rimraf node_modules bun.lock",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@tsconfig/bun": "^1.0.7",
+    "@types/bun": "1.2.8",
+    "husky": "9.1.7",
+    "lint-staged": "15.5.0",
+    "oxlint": "0.16.4",
+    "prettier": "^3.5.3",
+    "prettier-plugin-svelte": "^3.3.3",
+    "rimraf": "6.0.1",
+    "turbo": "2.4.4",
+    "typescript": "5.8.2"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "bun@1.2.5",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "lint-staged": {
+    "**/*.{js,mjs,cjs,ts,astro,svelte}": [
+      "bun run format"
+    ]
+  }
 }

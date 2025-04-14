@@ -25,12 +25,12 @@
   import { match } from "ts-pattern";
   import ViewActions from "./view-actions.svelte";
   import SidebarMenuButton from "./sidebar-menu-button.svelte";
-  import { shortcut } from "@svelte-put/shortcut";
+  import { shortcut, type ShortcutTrigger } from "@svelte-put/shortcut";
 
   let queryInput: HTMLInputElement;
 
   async function handleGrintAi() {
-    return goto("/ai");
+    return goto(`/ai/${appStore.query}`);
   }
 
   const INDICATOR_MODES = [
@@ -48,9 +48,54 @@
     },
   ];
 
-  const searchViewActions = [
-    { label: $_("search.grintai"), onclick: handleGrintAi, shortcut: "⌘L" },
+  const baseShortcuts: ShortcutTrigger[] = [
+    {
+      key: "1",
+      modifier: ["ctrl", "meta"],
+      callback: () => switchMode(APP_MODE.INITIAL),
+    },
+    {
+      key: "2",
+      modifier: ["ctrl", "meta"],
+      callback: () => switchMode(APP_MODE.NOTES),
+    },
+    {
+      key: "p",
+      modifier: ["ctrl", "meta"],
+      callback: () => settingsStore.toggleIncognito(),
+    },
+    {
+      key: "n",
+      modifier: ["ctrl", "meta"],
+      callback: createNote,
+    },
   ];
+
+  const authenticatedShortcuts: ShortcutTrigger[] = [
+    ...baseShortcuts,
+    {
+      key: "l",
+      modifier: ["ctrl", "meta"],
+      callback: () => {
+        if (appStore.query.length < 4) return;
+        return goto(`/ai/${appStore.query}`);
+      },
+    },
+  ];
+
+  const shortcuts: ShortcutTrigger[] = appStore.user?.id
+    ? authenticatedShortcuts
+    : baseShortcuts;
+
+  const searchViewActions = appStore.user?.id
+    ? [
+        {
+          label: $_("search.grintai"),
+          onclick: handleGrintAi,
+          shortcut: "⌘L",
+        },
+      ]
+    : [];
 
   const { form } = createForm({
     async onSubmit() {
@@ -217,36 +262,7 @@
 
 <svelte:window
   use:shortcut={{
-    trigger: [
-      {
-        key: "1",
-        modifier: ["ctrl", "meta"],
-        callback: () => switchMode(APP_MODE.INITIAL),
-      },
-      {
-        key: "2",
-        modifier: ["ctrl", "meta"],
-        callback: () => switchMode(APP_MODE.NOTES),
-      },
-      {
-        key: "p",
-        modifier: ["ctrl", "meta"],
-        callback: () => settingsStore.toggleIncognito(),
-      },
-      {
-        key: "l",
-        modifier: ["ctrl", "meta"],
-        callback: () => {
-          if (appStore.query.length < 4) return;
-          return goto(`/ai/${appStore.query}`);
-        },
-      },
-      {
-        key: "n",
-        modifier: ["ctrl", "meta"],
-        callback: createNote,
-      },
-    ],
+    trigger: shortcuts,
   }}
 />
 
@@ -277,7 +293,7 @@
     <div slot="addon" class="flex items-center gap-1">
       {#if appStore.appMode === APP_MODE.INITIAL && appStore.query.length >= 3}
         <ViewActions actions={searchViewActions} size="sm" />
-      {:else}
+      {:else if appStore.query.length === 0}
         <SegmentedControl
           items={INDICATOR_MODES.map((mode) => ({
             text: $_(`barMode.${mode.value.toLowerCase()}`),
@@ -288,7 +304,7 @@
             testId: `search-bar-mode-${mode.value.toLowerCase()}`,
             onClick: () => switchMode(mode.value),
           }))}
-          hidingLabels
+          showLabelOnHover
         />
       {/if}
       <SidebarMenuButton />

@@ -7,6 +7,7 @@ import { schema } from "../db/schema.js";
 import { and, count, eq, gte } from "drizzle-orm";
 import { until } from "@open-draft/until";
 import type { Database } from "../db/index.js";
+import { env } from "../utils/env.utils.js";
 
 const aiService = new AiService();
 
@@ -89,6 +90,7 @@ async function getUsages({
     .where(
       and(
         eq(schema.aiUsage.userId, userId),
+        eq(schema.aiUsage.state, "success"),
         gte(schema.aiUsage.createdAt, dateFrom),
       ),
     );
@@ -103,8 +105,8 @@ export const aiRouter = createRouter()
     const user = c.get("user");
     if (!user) return c.text("Unauthorized", 401);
     const subscriptions = c.get("subscriptions");
-    const dailyUsages = subscriptions.length > 0 ? 500 : 50;
-    const hourlyUsages = subscriptions.length > 0 ? 64 : 10;
+    const dailyUsages =
+      subscriptions.length > 0 ? env.AI_DAILY_LIMIT_PRO : env.AI_DAILY_LIMIT;
     const db = c.get("db");
     const [usagesLastDay] = await getUsages({
       db,
@@ -114,16 +116,6 @@ export const aiRouter = createRouter()
     if (usagesLastDay.count >= dailyUsages)
       return c.text(
         `You have reached the daily limit of ${dailyUsages} AI usages`,
-        403,
-      );
-    const [usagesLastHour] = await getUsages({
-      db,
-      userId: user.id,
-      dateFrom: new Date(Date.now() - 60 * 60 * 1000),
-    });
-    if (usagesLastHour.count >= hourlyUsages)
-      return c.text(
-        `You have reached the hourly limit of ${hourlyUsages} AI usages`,
         403,
       );
     const [aiUsage] = await db

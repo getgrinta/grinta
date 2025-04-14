@@ -11,7 +11,6 @@ import { matchSorter } from "match-sorter";
 import { sortBy, uniq } from "rambda";
 import { _ } from "svelte-i18n";
 import { toast } from "svelte-sonner";
-import { get } from "svelte/store";
 import { P, match } from "ts-pattern";
 import { z } from "zod";
 import {
@@ -36,6 +35,7 @@ import {
   type FileEntry,
   findApps,
   generateCancellationToken,
+  t,
 } from "../utils.svelte";
 import { appStore } from "./app.svelte";
 import { clipboardStore } from "./clipboard.svelte";
@@ -46,15 +46,6 @@ import debounce from "debounce";
 
 nlp.extend(dates);
 nlp.extend(numbers);
-
-function t(key: string, params: Record<string, string> = {}) {
-  try {
-    const translationFn = get(_);
-    return translationFn(key, { values: params });
-  } catch {
-    return key;
-  }
-}
 
 export const SYSTEM_COMMAND = {
   SIGN_IN: "SIGN_IN",
