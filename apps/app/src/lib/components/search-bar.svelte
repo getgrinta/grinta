@@ -304,7 +304,6 @@
             testId: `search-bar-mode-${mode.value.toLowerCase()}`,
             onClick: () => switchMode(mode.value),
           }))}
-          showLabelOnHover
         />
       {/if}
       <SidebarMenuButton />

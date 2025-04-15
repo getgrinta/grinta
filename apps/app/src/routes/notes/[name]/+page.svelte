@@ -160,7 +160,7 @@
       placeholder={$_("notes.noteName")}
     />
     <div slot="addon">
-      <SegmentedControl items={viewControls} showLabelOnHover />
+      <SegmentedControl items={viewControls} />
     </div>
   </TopBar>
   <div class="mt-20 px-8 pb-8">
