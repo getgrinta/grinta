@@ -1,27 +1,29 @@
 {
-	"name": "@getgrinta/plugin-search",
-	"description": "Search commands plugin.",
-	"type": "module",
-	"version": "0.1.0",
-	"module": "dist/index.js",
-	"types": "dist/index.d.ts",
-	"exports": {
-		".": {
-			"types": "./dist/index.d.ts",
-			"default": "./dist/index.js"
-		}
-	},
-	"files": ["dist"],
-	"scripts": {
-		"build": "tsc && bun build src/index.ts --outdir ./dist",
-		"test": "bun test"
-	},
-	"dependencies": {
-		"@getgrinta/core": "workspace:*",
-		"@getgrinta/plugin": "workspace:*",
-		"@open-draft/until": "2.1.0",
-		"dayjs": "^1.11.13",
-		"rambda": "^10.0.0-beta.3",
-		"ts-pattern": "5.7.0"
-	}
+  "name": "@getgrinta/plugin-search",
+  "description": "Search commands plugin.",
+  "type": "module",
+  "version": "0.1.0",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc && bun build src/index.ts --outdir ./dist",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@getgrinta/core": "workspace:*",
+    "@getgrinta/plugin": "workspace:*",
+    "@open-draft/until": "2.1.0",
+    "dayjs": "1.11.13",
+    "rambda": "10.0.0-beta.3",
+    "ts-pattern": "5.7.0"
+  }
 }

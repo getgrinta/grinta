@@ -114,6 +114,9 @@
           {#each highlightedText as chunk}
             {@const last =
               chunk === highlightedText[highlightedText.length - 1]}
+            {@const sanitizedText = DOMPurify.sanitize(
+              chunk.text.replace(/\s+/g, " "),
+            )}
             <span
               class={clsx(
                 "whitespace-pre",
@@ -122,7 +125,7 @@
                 props.active && "!text-primary-content",
               )}
             >
-              {chunk.text.replace(/\s+/g, " ")}
+              {sanitizedText}
             </span>
           {/each}
         </h2>
