@@ -1,68 +1,68 @@
 {
-	"$schema": "https://schema.tauri.app/config/2",
-	"productName": "Grinta Dev",
-	"version": "0.3.0",
-	"identifier": "com.getgrinta.desktop-dev",
-	"build": {
-		"beforeDevCommand": "bun run dev",
-		"devUrl": "http://localhost:1420",
-		"beforeBuildCommand": "bun run build",
-		"frontendDist": "../build"
-	},
-	"app": {
-		"macOSPrivateApi": true,
-		"windows": [
-			{
-				"title": "Grinta",
-				"titleBarStyle": "Overlay",
-				"hiddenTitle": true,
-				"width": 800,
-				"minHeight": 200,
-				"height": 400,
-				"maxHeight": 400,
-				"transparent": true,
-				"center": true,
-				"decorations": false,
-				"maximizable": false,
-				"minimizable": false,
-				"alwaysOnTop": true,
-				"resizable": false,
-				"visibleOnAllWorkspaces": true,
-				"closable": false,
-				"visible": false,
-				"windowEffects": {
-					"effects": ["blur"],
-					"state": "active"
-				}
-			}
-		],
-		"security": {
-			"csp": null
-		}
-	},
-	"bundle": {
-		"active": true,
-		"targets": "all",
-		"createUpdaterArtifacts": true,
-		"icon": [
-			"icons/32x32.png",
-			"icons/128x128.png",
-			"icons/128x128@2x.png",
-			"icons/icon.icns",
-			"icons/icon.ico"
-		]
-	},
-	"plugins": {
-		"updater": {
-			"pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDYyM0U0RkM4RUI0NzQyRjEKUldUeFFrZnJ5RTgrWWp5R1ZjMVBESHlPSjc0czFuM1NEYjlYRi8yaXg2Y3J0UHdJNGZLZE5makEK",
-			"endpoints": [
-				"https://github.com/getgrinta/grinta/releases/latest/download/latest.json"
-			]
-		},
-		"deep-link": {
-			"desktop": {
-				"schemes": ["grinta"]
-			}
-		}
-	}
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Grinta Dev",
+  "version": "0.3.1",
+  "identifier": "com.getgrinta.desktop-dev",
+  "build": {
+    "beforeDevCommand": "bun run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "bun run build",
+    "frontendDist": "../build"
+  },
+  "app": {
+    "macOSPrivateApi": true,
+    "windows": [
+      {
+        "title": "Grinta",
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
+        "width": 800,
+        "minHeight": 200,
+        "height": 400,
+        "maxHeight": 400,
+        "transparent": true,
+        "center": true,
+        "decorations": false,
+        "maximizable": false,
+        "minimizable": false,
+        "alwaysOnTop": true,
+        "resizable": false,
+        "visibleOnAllWorkspaces": true,
+        "closable": false,
+        "visible": false,
+        "windowEffects": {
+          "effects": ["blur"],
+          "state": "active"
+        }
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "createUpdaterArtifacts": true,
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDYyM0U0RkM4RUI0NzQyRjEKUldUeFFrZnJ5RTgrWWp5R1ZjMVBESHlPSjc0czFuM1NEYjlYRi8yaXg2Y3J0UHdJNGZLZE5makEK",
+      "endpoints": [
+        "https://github.com/getgrinta/grinta/releases/latest/download/latest.json"
+      ]
+    },
+    "deep-link": {
+      "desktop": {
+        "schemes": ["grinta"]
+      }
+    }
+  }
 }
