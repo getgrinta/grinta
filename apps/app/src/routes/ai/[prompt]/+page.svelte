@@ -68,7 +68,7 @@
       {appStore.query}
     </div>
     <div slot="addon">
-      <SegmentedControl items={viewControls} showLabelOnHover />
+      <SegmentedControl items={viewControls} />
     </div>
   </TopBar>
   <div class="mt-16">
