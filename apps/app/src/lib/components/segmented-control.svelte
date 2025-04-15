@@ -17,12 +17,10 @@
 
   const {
     items,
-    hidingLabels = false,
     alwaysShowLabels = false,
     showLabelOnHover = false,
   } = $props<{
     items: Item[];
-    hidingLabels?: boolean;
     alwaysShowLabels?: boolean;
     showLabelOnHover?: boolean;
   }>();
@@ -44,7 +42,7 @@
       {#if item.icon}
         <item.icon size={16} />
       {/if}
-      {#if alwaysShowLabels || showLabelOnHover || (item.text && item.active && !hidingLabels)}
+      {#if alwaysShowLabels || showLabelOnHover}
         <span
           class={clsx(
             "transition",
@@ -52,7 +50,7 @@
           )}>{item.text}</span
         >
       {/if}
-      {#if item.shortcut && isCmdPressed && !item.active}
+      {#if item.shortcut && isCmdPressed}
         <span>{item.shortcut}</span>
       {/if}
     </button>

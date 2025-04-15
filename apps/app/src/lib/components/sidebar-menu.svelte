@@ -60,9 +60,12 @@
     return goto("/profile");
   }
 
-  function handleExit() {
+  async function handleExit() {
     closeMenu();
-    return exit();
+
+    setTimeout(() => {
+      exit(0);
+    }, 0);
   }
 </script>
 
