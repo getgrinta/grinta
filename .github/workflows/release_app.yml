@@ -45,6 +45,8 @@ jobs:
           xcode-version: latest-stable
       - name: Install dependenties
         run: bun install
+      - name: Build dependencies
+        run: bun run build:deps
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
