@@ -226,7 +226,7 @@
       {$_("settings.title")}
     </div>
     <div slot="addon" role="tablist">
-      <SegmentedControl items={controls} />
+      <SegmentedControl items={controls} alwaysShowLabels />
     </div>
   </TopBar>
   <div class="flex flex-1 flex-col mt-20 mb-8 mx-8">
