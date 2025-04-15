@@ -65,14 +65,14 @@
       "requestFsPermissions": "Request File System Permissions",
       "granted": "Granted",
       "autostart": "Autostart",
-      "requestAutostart": "Request Autostart"
+      "requestAutostart": "Request Autostart",
+      "showWidgetLabels": "Show Widget Labels"
     },
     "extension_already_added": "This extension is already added.",
     "extension_supported_by_default": "This extension is already supported by default.",
     "extension_invalid_format": "Extension must contain only letters and numbers.",
     "clipboardRecordingEnabled": "Record Clipboard History",
     "language": "Language",
-    "showWidgetLabels": "Show Widget Labels",
     "web": "Web",
     "file": "File",
     "commandHistoryCleared": "Command history cleared"

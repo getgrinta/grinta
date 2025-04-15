@@ -17,6 +17,7 @@
     type CommandHandler,
     type MetadataSchema,
   } from "@getgrinta/core";
+  import DOMPurify from "dompurify";
 
   const props = $props();
 
@@ -70,12 +71,6 @@
       commandsStore.selectedIndex === 0 &&
       props.item.smartMatch,
   );
-
-  function renderChunkSpaces(text: string): string {
-    return text
-      .replace(/^(\s+)/, (match) => "&nbsp;".repeat(match.length))
-      .replace(/(\s+)$/, (match) => "&nbsp;".repeat(match.length));
-  }
 </script>
 
 <li
@@ -121,12 +116,13 @@
               chunk === highlightedText[highlightedText.length - 1]}
             <span
               class={clsx(
+                "whitespace-pre",
                 chunk.highlight ? "text-base-content" : "text-primary-content",
                 last && "truncate",
                 props.active && "!text-primary-content",
               )}
             >
-              {@html renderChunkSpaces(chunk.text)}
+              {chunk.text.replace(/\s+/g, " ")}
             </span>
           {/each}
         </h2>

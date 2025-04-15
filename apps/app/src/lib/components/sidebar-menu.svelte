@@ -120,32 +120,32 @@
     </div>
     <ul class="menu menu-lg w-full p-0">
       <li>
-        <button onclick={handleClipboard} class="gap-4">
+        <button onclick={handleClipboard} class="gap-4 items-center">
           <ClipboardIcon size={20} />
           <span>{$_("menu.clipboard")}</span>
           <kbd class="kbd">c</kbd>
         </button>
       </li>
       <li>
-        <button onclick={handleHelp} class="gap-4">
+        <button onclick={handleHelp} class="gap-4 items-center">
           <HelpCircleIcon size={20} />
           <span>{$_("menu.help")}</span>
           <kbd class="kbd">h</kbd>
         </button>
       </li>
       <li>
-        <a href="/settings" onclick={closeMenu} class="gap-4">
+        <a href="/settings" onclick={closeMenu} class="gap-4 items-center">
           <CogIcon size={20} />
           <span>{$_("menu.settings")}</span>
           <kbd class="kbd">s</kbd>
         </a>
       </li>
       <li>
-        <a href="/" onclick={closeMenu} class="gap-4">
+        <button onclick={handleExit} class="gap-4 items-center">
           <LogOutIcon size={20} />
           <span>{$_("menu.exit")}</span>
           <kbd class="kbd">q</kbd>
-        </a>
+        </button>
       </li>
     </ul>
     <div class="mt-auto">
@@ -153,7 +153,7 @@
         <a
           href="/sign-in"
           onclick={closeMenu}
-          class="btn w-full justify-between"
+          class="btn w-full justify-between items-center"
         >
           <UserIcon size={16} />
           <div class="flex gap-2 items-center">
@@ -165,7 +165,7 @@
         <a
           href="/profile?upgrade=true"
           onclick={closeMenu}
-          class="btn btn-primary w-full justify-between"
+          class="btn btn-primary w-full justify-between items-center"
         >
           <img src="/pro.svg" width="32" height="32" alt="Get Pro" />
           <div class="flex gap-2 items-center">
