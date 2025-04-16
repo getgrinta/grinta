@@ -16,7 +16,6 @@
   $effect(clickListener);
 
   export function handleWidgetShortcut(index: number) {
-    console.log("quack internal", index);
     const widget = widgets[index];
 
     if (!widget) {
