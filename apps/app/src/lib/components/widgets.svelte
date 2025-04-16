@@ -6,6 +6,7 @@
   import WidgetsContextMenu from "./widgets-context-menu.svelte";
   import CommandListIcon from "./command-list-icon.svelte";
   import { settingsStore } from "$lib/store/settings.svelte";
+  import { shortcut } from "@svelte-put/shortcut";
 
   let widgetsContextMenu = $state<WidgetsContextMenu>();
   const widgets = $derived(widgetsStore.data.widgets ?? []);
@@ -13,6 +14,20 @@
   const widgetsScale = $derived(1 - commandsStore.scrollTop / 1000);
   const showWidgets = $derived(widgetsStore.showWidgets && widgetsOpacity > 0);
   $effect(clickListener);
+
+  export function handleWidgetShortcut(index: number) {
+    console.log("quack internal", index);
+    const widget = widgets[index];
+
+    if (!widget) {
+      return;
+    }
+
+    commandsStore.handleCommand({
+      command: widget.data,
+      recordingEnabled: false,
+    });
+  }
 </script>
 
 <WidgetsContextMenu bind:this={widgetsContextMenu} />

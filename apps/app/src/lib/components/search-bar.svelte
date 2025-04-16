@@ -48,15 +48,15 @@
     },
   ];
 
-  const baseShortcuts: ShortcutTrigger[] = [
+  let baseShortcuts: ShortcutTrigger[] = [
     {
       key: "1",
-      modifier: ["ctrl", "meta"],
+      modifier: ["meta"],
       callback: () => switchMode(APP_MODE.INITIAL),
     },
     {
       key: "2",
-      modifier: ["ctrl", "meta"],
+      modifier: ["meta"],
       callback: () => switchMode(APP_MODE.NOTES),
     },
     {
@@ -70,6 +70,17 @@
       callback: createNote,
     },
   ];
+
+  // Widget shortcuts in a loop
+  for (let i = 0; i <= 9; i++) {
+    baseShortcuts.push({
+      key: `${i}`,
+      modifier: ["ctrl"],
+      callback: () => {
+        onWidgetShortcut?.(i);
+      },
+    });
+  }
 
   const authenticatedShortcuts: ShortcutTrigger[] = [
     ...baseShortcuts,
@@ -139,6 +150,10 @@
       switchMode(APP_MODE.INITIAL);
     }
   });
+
+  const { onWidgetShortcut } = $props<{
+    onWidgetShortcut?: (index: number) => void;
+  }>();
 
   function switchMode(mode: AppMode) {
     return goto(`/commands/${mode}`);
