@@ -15,9 +15,10 @@
 
   $effect(() => {
     const selectedIndex = commandsStore.selectedIndex;
-
-    if (selectedIndex >= 0) {
-      virtualizer?.scrollToIndex(selectedIndex, { align: "start" });
+    if (selectedIndex === 0) {
+      virtualizer?.scrollToIndex(0, { align: "start" });
+    } else {
+      virtualizer?.scrollToIndex(selectedIndex, { align: "nearest" });
     }
   });
 
