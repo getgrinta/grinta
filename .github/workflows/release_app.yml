@@ -11,9 +11,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: macos-latest
+          - platform: macos-latest # for Apple Silicon macs
             target: aarch64-apple-darwin
             args: "--target aarch64-apple-darwin"
+          - platform: 'macos-latest' # for Intel based macs
+            target: x86_64-apple-darwin
+            args: '--target x86_64-apple-darwin'
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Mask multiline env
@@ -38,7 +41,7 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.target }}
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
