@@ -22,6 +22,11 @@
     { label: $_("notes.createNote"), onclick: createNote, shortcut: "⌘N" },
   ];
 
+  function handleWidgetShortcut(widgetNumber: number) {
+    widgetBar.handleWidgetShortcut(widgetNumber - 1);
+  }
+
+  let widgetBar: Widgets;
   $effect(() => {
     appStore.switchMode(page.params.mode);
     commandsStore.scrollTop = 0;
@@ -29,9 +34,9 @@
 </script>
 
 <div class="flex flex-1 flex-col gap-1">
-  <SearchBar />
+  <SearchBar onWidgetShortcut={handleWidgetShortcut} />
   <div class="flex flex-col relative">
-    <Widgets />
+    <Widgets bind:this={widgetBar} />
     <CommandList />
   </div>
   <div
