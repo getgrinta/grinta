@@ -94,6 +94,7 @@
 
   async function wipeLocalData() {
     await settingsStore.wipeLocalData();
+    toast.success($_("settings.fields.localDataWiped"));
     return goto("/");
   }
 
