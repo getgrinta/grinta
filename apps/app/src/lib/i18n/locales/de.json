@@ -13,7 +13,14 @@
     "checkEmailForCode": "Bitte überprüfen Sie Ihren E-Mail-Posteingang für den Einmalcode.",
     "invalidCode": "Ungültiger Code. Bitte überprüfen Sie den an Ihre E-Mail gesendeten Code.",
     "invalidEmail": "Ungültige E-Mail-Adresse",
-    "help": "Hilfe"
+    "help": "Hilfe",
+    "notesDir": {
+      "label": "Notizverzeichnis",
+      "description": "Wählen Sie das Verzeichnis aus, in dem Ihre Notizen gespeichert sind."
+    },
+    "localDataWiped": "Lokale Daten erfolgreich gelöscht.",
+    "shortcut_cmd_space": "⌘ + Leertaste",
+    "shortcut_opt_space": "⌥ + Leertaste"
   },
   "profile": {
     "title": "Profil",
@@ -60,8 +67,6 @@
       "notesDirectory": "Notizverzeichnis",
       "checkForUpdate": "Nach Updates suchen",
       "proAutocompleteEnabled": "Pro Autocomplete aktiviert",
-      "recordShortcut": "Drücken zum Speichern",
-      "changeShortcut": "Drücken zum Ändern",
       "baseCurrency": "Basis-Währung",
       "fsSearchOnlyInHome": "Nur im Home-Verzeichnis suchen",
       "additional_extensions": "Zusätzliche Erweiterungen",
@@ -71,7 +76,10 @@
       "requestFsPermissions": "Dateisystemberechtigungen beantragen",
       "granted": "Erlaubt",
       "autostart": "Autostart",
-      "requestAutostart": "Autostart-Erlaubnis anfordern"
+      "requestAutostart": "Autostart-Erlaubnis anfordern",
+      "localDataWiped": "Lokale Daten erfolgreich gelöscht.",
+      "shortcut_cmd_space": "⌘ + Leertaste",
+      "shortcut_opt_space": "⌥ + Leertaste"
     },
     "extension_already_added": "Diese Erweiterung wurde bereits hinzugefügt.",
     "extension_supported_by_default": "Diese Erweiterung wird bereits unterstützt.",

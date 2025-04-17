@@ -32,8 +32,6 @@
       "checkUpdate": "Sprawdź aktualizacje",
       "clearCommandHistory": "Wyczyść historię poleceń",
       "wipeAllLocalData": "Wyczyść wszystkie dane lokalne",
-      "changeShortcut": "Naciśnij, aby zmienić",
-      "recordShortcut": "Naciśnij, aby zapisać",
       "baseCurrency": "Waluta bazowa",
       "fsSearchOnlyInHome": "Szukaj tylko w katalogu domowym",
       "additional_extensions": "Dodatkowe rozszerzenia",
@@ -49,7 +47,10 @@
       "language": "Język",
       "showWidgetLabels": "Pokaż etykiety widżetów",
       "web": "Sieć",
-      "file": "Plik"
+      "file": "Plik",
+      "localDataWiped": "Lokalne dane zostały pomyślnie wyczyszczone.",
+      "shortcut_cmd_space": "⌘ + Spacja",
+      "shortcut_opt_space": "⌥ + Spacja"
     },
     "extension_already_added": "To rozszerzenie jest już dodane.",
     "extension_supported_by_default": "To rozszerzenie jest obsługiwane domyślnie.",
@@ -70,7 +71,11 @@
     "checkEmailForCode": "Sprawdź swoją skrzynkę e-mail, aby znaleźć kod jednorazowy.",
     "invalidCode": "Nieprawidłowy kod. Sprawdź kod wysłany na Twój adres e-mail.",
     "invalidEmail": "Nieprawidłowy adres e-mail",
-    "help": "Pomoc"
+    "help": "Pomoc",
+    "notesDir": {
+      "label": "Katalog Notatek",
+      "description": "Wybierz katalog, w którym przechowywane są Twoje notatki."
+    }
   },
   "search": {
     "grintai": "GrintAI"

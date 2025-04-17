@@ -1,5 +1,7 @@
 {
-  "common": { "next": "Next" },
+  "common": {
+    "next": "Next"
+  },
   "auth": {
     "signIn": "Sign In",
     "verifyCode": "Verify Code",
@@ -11,7 +13,12 @@
     "checkEmailForCode": "Please check your email inbox for the one-time code.",
     "invalidCode": "Invalid code. Please verify the code sent to your e-mail.",
     "invalidEmail": "Invalid email address",
-    "help": "Help"
+    "help": "Help",
+    "notesDir": {
+      "label": "Notes Directory",
+      "description": "Select the directory where your notes are stored."
+    },
+    "localDataWiped": "Local data wiped successfully."
   },
   "profile": {
     "title": "Profile",
@@ -32,7 +39,11 @@
     "title": "Welcome to Grinta",
     "subtitle": "Before you start, you may want to adjust these settings."
   },
-  "barMode": { "initial": "Search", "notes": "Notes", "menu": "Menu" },
+  "barMode": {
+    "initial": "Search",
+    "notes": "Notes",
+    "menu": "Menu"
+  },
   "settings": {
     "title": "Settings",
     "tabs": {
@@ -51,8 +62,6 @@
       "dangerZone": "Danger Zone",
       "clearCommandHistory": "Clear Command History",
       "wipeAllLocalData": "Wipe All Local Data",
-      "changeShortcut": "Change",
-      "recordShortcut": "Press to record",
       "proAutocompleteEnabled": "Pro Autocomplete Enabled",
       "notesDirectory": "Notes Directory",
       "checkForUpdate": "Check for update",
@@ -66,7 +75,10 @@
       "granted": "Granted",
       "autostart": "Autostart",
       "requestAutostart": "Request Autostart",
-      "showWidgetLabels": "Show Widget Labels"
+      "showWidgetLabels": "Show Widget Labels",
+      "localDataWiped": "Local data wiped successfully.",
+      "shortcut_cmd_space": "⌘ + Space",
+      "shortcut_opt_space": "⌥ + Space"
     },
     "extension_already_added": "This extension is already added.",
     "extension_supported_by_default": "This extension is already supported by default.",
@@ -77,7 +89,9 @@
     "file": "File",
     "commandHistoryCleared": "Command history cleared"
   },
-  "search": { "grintai": "GrintAI" },
+  "search": {
+    "grintai": "GrintAI"
+  },
   "ai": {
     "copy": "Copy",
     "copySuccess": "Copied to clipboard",
@@ -174,7 +188,11 @@
       "createNote": "Create Note"
     }
   },
-  "editor": { "floatingMenu": { "askAI": "Ask AI" } },
+  "editor": {
+    "floatingMenu": {
+      "askAI": "Ask AI"
+    }
+  },
   "additionalContextPlaceholder": "Additional context for note generation.\r\ne.g. \"Respond in professional style. Be concise\".",
   "toast": {
     "checkEmailForCode": "Please check your email inbox for the one-time code.",

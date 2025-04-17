@@ -44,46 +44,41 @@
   ];
 
   let extensionInput = $state<HTMLInputElement | null>(null);
-  let newToggleShortcut = $state<string[]>([]);
-  let recordingShortcut = $state(false);
   let currentTab = $state("general");
   let extensionValue = $state("");
   let isAutostartEnabled = $state(false);
   const themes = Object.keys(THEME);
   const accentColors = Object.keys(ACCENT_COLOR);
 
+  // Use $derived.by to make options reactive to language changes via $_()
+  const shortcutOptions = $derived.by(() => {
+    const __ = settingsStore.data.language;
+
+    return [
+      {
+        value: "CommandOrControl+Space",
+        label: $_("settings.fields.shortcut_cmd_space"),
+      },
+      {
+        value: "Option+Space",
+        label: $_("settings.fields.shortcut_opt_space"),
+      },
+    ];
+  });
+
+  let selectedShortcut = $state(settingsStore.data.toggleShortcut);
+
+  // Persist new shortcut
+  $effect(() => {
+    if (selectedShortcut === settingsStore.data.toggleShortcut) {
+      return;
+    }
+    settingsStore.setToggleShortcut(selectedShortcut);
+    settingsStore.persist();
+  });
+
   function changeTab(tab: string) {
     currentTab = tab;
-  }
-
-  function toggleShortcutRecording() {
-    newToggleShortcut = [];
-    recordingShortcut = !recordingShortcut;
-  }
-
-  const toggleShortcut = $derived(
-    newToggleShortcut.length > 1
-      ? newToggleShortcut.join("+")
-      : settingsStore.data.toggleShortcut,
-  );
-
-  const recordShortcutLabel = $derived(
-    recordingShortcut
-      ? $_("settings.fields.recordShortcut")
-      : $_("settings.fields.changeShortcut"),
-  );
-
-  function processShortcut(keys: string[]) {
-    return keys
-      .map((key) => {
-        if (key === "meta") return "CommandOrControl";
-        if (key === "space") return "Space";
-        if (key === " ") return "Space";
-        if (key === "alt") return "Alt";
-        if (key === "shift") return "Shift";
-        return key;
-      })
-      .join("+");
   }
 
   function updateNotesDir(event: Event) {
@@ -123,25 +118,7 @@
   }
 
   $effect(() => {
-    if (!recordingShortcut) return;
-    const newShortcut = pressedKeys.all;
-    if (newShortcut.length <= newToggleShortcut.length) return;
-    newToggleShortcut = newShortcut;
-  });
-
-  $effect(() => {
     settingsStore.syncPermissions();
-  });
-
-  $effect(() => {
-    // Save new shortcut when theres a new toggle combo and user lifted up all keys
-    if (!recordingShortcut) return;
-    if (newToggleShortcut.length < 1) return;
-    if (pressedKeys.all.length !== 0) return;
-    const processedShortcut = processShortcut(newToggleShortcut);
-    settingsStore.setToggleShortcut(processedShortcut);
-    settingsStore.persist();
-    toggleShortcutRecording();
   });
 
   $effect(() => {
@@ -235,17 +212,16 @@
         <label for="toggleShortcut" class="text-sm"
           >{$_("settings.fields.shortcut")}</label
         >
-        <div class="flex gap-2 items-center">
-          <input type="hidden" name="toggleShortcut" value={toggleShortcut} />
-          <button type="button" id="toggleShortcut" class="btn flex-1" disabled
-            >{toggleShortcut}</button
-          >
-          <button
-            type="button"
-            class="btn flex-1"
-            onclick={toggleShortcutRecording}>{recordShortcutLabel}</button
-          >
-        </div>
+        <select
+          id="toggleShortcutChoice"
+          name="toggleShortcut"
+          class="select select-bordered w-full"
+          bind:value={selectedShortcut}
+        >
+          {#each shortcutOptions as option (option.value)}
+            <option value={option.value}>{option.label}</option>
+          {/each}
+        </select>
         <label for="appVersion" class="text-sm"
           >{$_("settings.fields.version")}</label
         >
