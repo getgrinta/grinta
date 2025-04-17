@@ -201,5 +201,13 @@
     "settings": "Ustawienia",
     "help": "Pomoc",
     "profile": "Profil"
+  },
+  "update": {
+    "checking": "Sprawdzanie aktualizacji...",
+    "check_failed": "Nie udało się sprawdzić aktualizacji.",
+    "no_update": "Masz najnowszą wersję aplikacji.",
+    "installing": "Instalowanie aktualizacji...",
+    "install_failed": "Nie udało się zainstalować aktualizacji.",
+    "install_success": "Aktualizacja zainstalowana pomyślnie. Ponowne uruchamianie..."
   }
 }

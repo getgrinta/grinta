@@ -206,5 +206,13 @@
     "settings": "Einstellungen",
     "help": "Hilfe",
     "profile": "Profile"
+  },
+  "update": {
+    "checking": "Auf Updates prüfen...",
+    "check_failed": "Fehler beim Prüfen auf Updates.",
+    "no_update": "Sie sind auf dem neuesten Stand.",
+    "installing": "Update wird installiert...",
+    "install_failed": "Fehler beim Installieren des Updates.",
+    "install_success": "Update erfolgreich installiert. Neustart wird durchgeführt..."
   }
 }

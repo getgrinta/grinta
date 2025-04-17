@@ -188,5 +188,13 @@
     "settings": "Settings",
     "help": "Help",
     "profile": "Profile"
+  },
+  "update": {
+    "checking": "Checking for updates...",
+    "check_failed": "Failed to check for updates.",
+    "no_update": "You are on the newest app version.",
+    "installing": "Installing update...",
+    "install_failed": "Failed to install update.",
+    "install_success": "Update installed successfully. Relaunching..."
   }
 }
