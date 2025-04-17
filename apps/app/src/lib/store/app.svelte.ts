@@ -17,6 +17,8 @@ import { APP_MODE, appModeEnum, type AppMode } from "@getgrinta/core";
 import { toggleVisibility } from "../grinta-invoke";
 import { page } from "$app/state";
 import { goto } from "$app/navigation";
+import { _ } from "svelte-i18n";
+import { get } from "svelte/store";
 
 export class AppStore {
   query = $state("");
@@ -120,23 +122,38 @@ export class AppStore {
   }
 
   async updateApp() {
+    function t(key: string, params: Record<string, string> = {}) {
+      try {
+        const translationFn = get(_);
+        return translationFn(key, { values: params });
+      } catch {
+        return key;
+      }
+    }
+
     let finished = false;
     await this.appWindow?.show();
     const updateCheckPromise = checkUpdate();
     toast.promise(updateCheckPromise, {
-      loading: "Checking for updates...",
-      error: "Failed to check for updates.",
+      loading: t("update.checking"),
+      error: t("update.check_failed"),
     });
     const update = await updateCheckPromise;
-    if (!update) return toast.info("No update available.");
+    if (!update || update.version === "") {
+      return toast.success(t("update.no_update"));
+    }
+
     const installPromise = update.downloadAndInstall(({ event }) => {
       if (event === "Finished") {
         finished = true;
       }
     });
     toast.promise(installPromise, {
-      loading: "Installing update...",
-      error: "Failed to install update.",
+      loading: t("update.installing"),
+      error: t("update.install_failed"),
+      success: () => {
+        return t("update.install_success");
+      },
     });
     await installPromise;
     if (!finished) return;
