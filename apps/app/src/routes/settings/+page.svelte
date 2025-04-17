@@ -50,7 +50,6 @@
   const themes = Object.keys(THEME);
   const accentColors = Object.keys(ACCENT_COLOR);
 
-  // Use $derived.by to make options reactive to language changes via $_()
   const shortcutOptions = $derived.by(() => {
     const __ = settingsStore.data.language;
 
