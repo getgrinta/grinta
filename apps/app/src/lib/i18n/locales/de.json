@@ -71,7 +71,8 @@
       "requestFsPermissions": "Dateisystemberechtigungen beantragen",
       "granted": "Erlaubt",
       "autostart": "Autostart",
-      "requestAutostart": "Autostart-Erlaubnis anfordern"
+      "requestAutostart": "Autostart-Erlaubnis anfordern",
+      "localDataWiped": "Lokale Daten erfolgreich gelöscht."
     },
     "extension_already_added": "Diese Erweiterung wurde bereits hinzugefügt.",
     "extension_supported_by_default": "Diese Erweiterung wird bereits unterstützt.",
