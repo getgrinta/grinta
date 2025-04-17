@@ -66,7 +66,8 @@
       "granted": "Granted",
       "autostart": "Autostart",
       "requestAutostart": "Request Autostart",
-      "showWidgetLabels": "Show Widget Labels"
+      "showWidgetLabels": "Show Widget Labels",
+      "localDataWiped": "Local data wiped successfully."
     },
     "extension_already_added": "This extension is already added.",
     "extension_supported_by_default": "This extension is already supported by default.",
