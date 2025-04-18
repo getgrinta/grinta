@@ -50,7 +50,8 @@
       "general": "General",
       "search": "Search",
       "pro": "Pro",
-      "permissions": "Permissions"
+      "permissions": "Permissions",
+      "calendar": "Calendar"
     },
     "fields": {
       "shortcut": "Shortcut",
@@ -79,6 +80,11 @@
       "localDataWiped": "Local data wiped successfully.",
       "shortcut_cmd_space": "⌘ + Space",
       "shortcut_opt_space": "⌥ + Space"
+    },
+    "calendar": {
+      "title": "Calendars",
+      "description": "Choose calendars you want to see events from",
+      "noCalendars": "No calendars found. Please check permissions or add accounts in System Settings."
     },
     "extension_already_added": "This extension is already added.",
     "extension_supported_by_default": "This extension is already supported by default.",

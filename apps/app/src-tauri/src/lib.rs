@@ -15,6 +15,7 @@ mod toggle_visibility;
 mod workspace_utils;
 mod favicon_utils;
 mod keyring_utils;
+mod calendar_utils;
 
 pub const MAIN_WINDOW_LABEL: &str = "main";
 
@@ -121,6 +122,10 @@ pub fn run() {
             keyring_utils::set_secret,
             keyring_utils::get_secret,
             keyring_utils::delete_secret,
+            calendar_utils::get_calendar_authorization_status,
+            calendar_utils::request_calendar_access,
+            calendar_utils::get_calendars,
+            calendar_utils::get_calendar_events,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

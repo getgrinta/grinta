@@ -3,6 +3,7 @@
   import Sidebar from "./sidebar.svelte";
   import {
     ArrowRightIcon,
+    CalendarIcon,
     ChevronRightIcon,
     ClipboardIcon,
     CogIcon,
@@ -16,6 +17,8 @@
   import { exit } from "@tauri-apps/plugin-process";
   import { _ } from "svelte-i18n";
   import Shortcut from "./shortcut.svelte";
+  import { calendarStore } from "$lib/store/calendar.svelte"; // Import calendarStore instance
+  import { CalendarAuthorizationStatus } from "$lib/types/calendar"; // Import Enum
 
   let { children } = $props<{
     children: () => void;
@@ -36,6 +39,12 @@
     closeMenu();
     await goto("/commands/CLIPBOARD");
     appStore.switchMode(APP_MODE.CLIPBOARD);
+  }
+
+  async function handleCalendar() {
+    closeMenu();
+    await goto("/commands/CALENDAR");
+    appStore.switchMode(APP_MODE.CALENDAR);
   }
 
   function handleHelp() {
@@ -86,6 +95,7 @@
 />
 
 {#if appStore.menuOpen}
+  <Shortcut keys={["k"]} callback={handleCalendar} />
   <Shortcut keys={["c"]} callback={handleClipboard} />
   <Shortcut keys={["h"]} callback={handleHelp} />
   <Shortcut keys={["s"]} callback={handleSettings} />
@@ -119,6 +129,15 @@
       {/if}
     </div>
     <ul class="menu menu-lg w-full p-0">
+      {#if calendarStore.authorizationStatus === CalendarAuthorizationStatus.Authorized}
+        <li>
+          <button onclick={handleCalendar} class="gap-4 items-center">
+            <CalendarIcon size={20} />
+            <span>{$_("menu.calendar")}</span>
+            <kbd class="kbd">k</kbd>
+          </button>
+        </li>
+      {/if}
       <li>
         <button onclick={handleClipboard} class="gap-4 items-center">
           <ClipboardIcon size={20} />

@@ -43,6 +43,8 @@ import { notesStore } from "./notes.svelte";
 import { SecureStore } from "./secure.svelte";
 import { settingsStore } from "./settings.svelte";
 import debounce from "debounce";
+import { calendarStore } from "$lib/store/calendar.svelte";
+import type { EventInfo } from "$lib/types/calendar";
 
 nlp.extend(dates);
 nlp.extend(numbers);
@@ -247,7 +249,43 @@ export class CommandsStore extends SecureStore<Commands> {
           )) ?? [];
         return noteCommands;
       })
+      .with(APP_MODE.CALENDAR, async () => {
+        const events = calendarStore.events;
+
+        const colorByCalendarId = calendarStore.availableCalendars.reduce(
+          (acc, calendar) => {
+            acc[calendar.identifier] = calendar.color;
+            return acc;
+          },
+          {} as Record<string, string>,
+        );
+
+        console.log("[CommandsStore] Colors:", colorByCalendarId);
+
+        console.log("[CommandsStore] Raw dummy events:", events);
+        const mappedCommands = events.map((event: EventInfo) => {
+          console.log("Event calendar id:", event.calendar_id);
+          return ExecutableCommandSchema.parse({
+            label: event.title,
+            localizedLabel: event.title,
+            value: event.identifier,
+            handler: COMMAND_HANDLER.CALENDAR,
+            metadata: {
+              calendarSchema: {
+                backgroundColor: colorByCalendarId[event.calendar_id],
+              },
+            },
+            priority: COMMAND_PRIORITY.HIGH,
+            appModes: [APP_MODE.CALENDAR],
+          });
+        });
+
+        console.log("[CommandsStore] Mapped dummy commands:", mappedCommands);
+        return mappedCommands;
+      })
       .exhaustive();
+
+    console.log("[CommandsStore] Commands after match block:", commands);
 
     if (appStore.query.length === 0 && appStore.appMode === APP_MODE.INITIAL) {
       this.commands = sortBy(
@@ -259,6 +297,12 @@ export class CommandsStore extends SecureStore<Commands> {
     const filteredCommands = matchSorter(commands, appStore.query, {
       keys: ["localizedLabel", "label"],
     });
+    console.log(
+      "[CommandsStore] Commands after matchSorter:",
+      filteredCommands,
+      "Query:",
+      appStore.query,
+    );
 
     // Prevent overriding commands
     if (newCommandsToken !== this.buildCommandsToken) {
@@ -286,6 +330,8 @@ export class CommandsStore extends SecureStore<Commands> {
     this.commands = uniq([...formulaCommands, ...filteredCommands]).sort(
       (a, b) => this.sortCommands({ prev: a, next: b }),
     );
+
+    console.log("[CommandsStore] Final this.commands:", this.commands);
 
     if (
       appStore.appMode === APP_MODE.INITIAL &&
@@ -504,6 +550,9 @@ export class CommandsStore extends SecureStore<Commands> {
         const encodedValue = encodeURIComponent(value);
         return goto(`/web/${encodedValue}`);
       })
+      .with({ handler: COMMAND_HANDLER.CALENDAR }, async ({ value }) => {
+        return goto(`/calendar/${value}`);
+      })
       .otherwise(() => {
         console.log("Run custom plugin handlers");
       });
@@ -512,7 +561,7 @@ export class CommandsStore extends SecureStore<Commands> {
   buildPluginContext(): PluginContext {
     return {
       fetch,
-      exec: this.handleCommand,
+      exec: (command) => this.handleCommand({ command }),
       t,
       fail: toast.error,
       app: {

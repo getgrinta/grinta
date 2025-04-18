@@ -51,8 +51,9 @@
     "tabs": {
       "general": "Allgemein",
       "search": "Suche",
-      "pro": "Pro",
-      "permissions": "Berechtigungen"
+      "hotkeys": "Tastenkürzel",
+      "permissions": "Berechtigungen",
+      "calendar": "Kalendar"
     },
     "fields": {
       "shortcut": "Tastenkürzel",
@@ -81,8 +82,18 @@
       "shortcut_cmd_space": "⌘ + Leertaste",
       "shortcut_opt_space": "⌥ + Leertaste"
     },
+    "calendar": {
+      "title": "Kalender",
+      "description": "Wählen Sie Kalender aus, von denen Sie Ereignisse sehen möchten.",
+      "noCalendars": "Keine Kalender gefunden. Bitte Berechtigungen prüfen oder Konten in den Systemeinstellungen hinzufügen.",
+      "requestAuthButton": "Kalenderzugriff anfordern",
+      "checkingAccess": "Zugriff wird geprüft...",
+      "accessGrantedOrAlreadyHad": "Zugriff gewährt oder bereits vorhanden.",
+      "noCalendarsFoundAfterRequest": "Keine Kalender nach Anfrage gefunden. Zugriff verweigert?",
+      "requestError": "Fehler bei der Zugriffsanfrage."
+    },
     "extension_already_added": "Diese Erweiterung wurde bereits hinzugefügt.",
-    "extension_supported_by_default": "Diese Erweiterung wird bereits unterstützt.",
+    "extension_supported_by_default": "Diese Erweiterung wird bereits standardmäßig unterstützt.",
     "extension_invalid_format": "Die Erweiterung darf nur Buchstaben und Zahlen enthalten.",
     "clipboardRecordingEnabled": "Zwischenablage-Verlauf aufzeichnen",
     "language": "Sprache",

@@ -12,6 +12,7 @@
   import { clsx } from "clsx";
   import { createForm } from "felte";
   import {
+    CalendarIcon,
     ChevronLeftIcon,
     ClipboardIcon,
     EyeIcon,
@@ -240,6 +241,10 @@
       .with(APP_MODE.CLIPBOARD, () => ({
         icon: ClipboardIcon,
         placeholder: $_("searchBar.placeholder.clipboard"),
+      }))
+      .with(APP_MODE.CALENDAR, () => ({
+        icon: CalendarIcon,
+        placeholder: $_("searchBar.placeholder.calendar"),
       }))
       .exhaustive(),
   );

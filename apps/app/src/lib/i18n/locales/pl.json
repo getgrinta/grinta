@@ -16,8 +16,9 @@
     "tabs": {
       "general": "Ogólne",
       "search": "Wyszukiwanie",
-      "pro": "Pro",
-      "permissions": "Uprawnienia"
+      "hotkeys": "Skróty klawiszowe",
+      "permissions": "Uprawnienia",
+      "calendar": "Kalendarz"
     },
     "fields": {
       "shortcut": "Skrót",
@@ -51,6 +52,11 @@
       "localDataWiped": "Lokalne dane zostały pomyślnie wyczyszczone.",
       "shortcut_cmd_space": "⌘ + Spacja",
       "shortcut_opt_space": "⌥ + Spacja"
+    },
+    "calendar": {
+      "title": "Kalendarze",
+      "description": "Wybierz kalendarze, z których chcesz wyświetlać wydarzenia",
+      "noCalendars": "Nie znaleziono kalendarzy. Sprawdź uprawnienia lub dodaj konta w Ustawieniach systemu."
     },
     "extension_already_added": "To rozszerzenie jest już dodane.",
     "extension_supported_by_default": "To rozszerzenie jest obsługiwane domyślnie.",
