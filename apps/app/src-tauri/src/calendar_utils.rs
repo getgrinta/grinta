@@ -1,19 +1,19 @@
 // apps/app/src-tauri/src/calendar_utils.rs
 
-use block::{Block, ConcreteBlock};
-use chrono::{DateTime, FixedOffset, Local, NaiveDateTime, Utc};
-use cocoa::base::{id, nil, BOOL, YES};
-use cocoa::foundation::{NSArray, NSAutoreleasePool, NSComparisonResult, NSDate, NSDictionary, NSInteger, NSString, NSUInteger};
-use cocoa::appkit::{NSColor, NSColorSpace, CGFloat};
-use core_foundation::base::TCFType;
-use core_foundation::string::CFString;
-use objc::runtime::{Class, Object, Sel, BOOL as ObjcBOOL};
+use block::{ConcreteBlock};
+use chrono::{DateTime, NaiveDateTime, Utc};
+use cocoa::base::{id, nil, YES};
+use cocoa::foundation::{NSArray, NSAutoreleasePool, NSUInteger};
+use cocoa::appkit::{CGFloat};
+use objc::runtime::{Class, Object, BOOL as ObjcBOOL};
 use objc::{class, msg_send, sel, sel_impl};
 use serde::{Deserialize, Serialize};
 use std::ffi::CStr;
 use std::sync::mpsc;
 use tokio::task; // For spawn_blocking
 use tauri::command;
+use tauri::State; 
+use crate::state::CalendarState;
 
 // Define the authorization status enum matching EKAuthorizationStatus
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
@@ -52,15 +52,18 @@ fn event_store_class() -> &'static Class {
     Class::get("EKEventStore").expect("EKEventStore class not found")
 }
 
-// Helper function to get the shared EKEventStore instance
-fn get_event_store_instance() -> id {
-    let store_class = event_store_class();
-    let store: id = unsafe { msg_send![store_class, new] }; // Create a new instance
-    // Note: EKEventStore doesn't have a shared instance like NSWorkspace.
-    // Each interaction typically uses a new instance or retains one.
-    // For simplicity in Tauri commands, we create a new one each time.
-    // Consider managing a shared instance in Tauri state if performance becomes an issue.
-    store
+
+// Helper function to get the event store pointer from state safely
+fn get_store_ptr(state: &State<CalendarState>) -> Result<id, String> {
+    let guard = state.event_store.lock().map_err(|e| format!("Failed to lock event store mutex: {}", e))?;
+    // Dereference the guard to get &Object, then get a const pointer, then cast to *mut Object (id)
+    let obj_ref: &Object = &*guard;
+    let ptr = obj_ref as *const Object as id; // Cast &Object -> *const Object -> *mut Object (id)
+    if ptr.is_null() { // Use is_null() for raw pointers
+        Err("Event store instance in state is nil".to_string())
+    } else {
+        Ok(ptr)
+    }
 }
 
 // Helper to convert NSString to Rust String
@@ -78,28 +81,22 @@ unsafe fn nsstring_to_string(ns_string: id) -> String {
 // Helper to convert NSColor directly to Hex String using components
 // NSColor -> NSColor (RGB space) -> RGBA components -> Hex
 unsafe fn nscolor_to_hex(ns_color: id) -> String {
-    println!("[nscolor_to_hex v2] Received ns_color: {:?}", ns_color); // Debug log
     if ns_color == nil {
-        println!("[nscolor_to_hex v2] ns_color is nil, returning default."); // Debug log
         return "#000000".to_string(); // Default color: Black
     }
 
     // Get the device RGB color space
     // Use class method deviceRGBColorSpace which is simpler
     let device_rgb_space: id = msg_send![class!(NSColorSpace), deviceRGBColorSpace];
-    println!("[nscolor_to_hex v2] Got device RGB space: {:?}", device_rgb_space); // Debug log
 
     if device_rgb_space == nil {
-        println!("[nscolor_to_hex v2] Failed to get device RGB color space, returning fallback.");
         return "#808080".to_string(); // Fallback: Gray
     }
 
     // Convert the original color to the device RGB color space
     let color_rgb: id = msg_send![ns_color, colorUsingColorSpace: device_rgb_space];
-    println!("[nscolor_to_hex v2] Result of colorUsingColorSpace: {:?}", color_rgb); // Debug log
 
     if color_rgb == nil {
-        println!("[nscolor_to_hex v2] Conversion to RGB space failed, returning fallback."); // Debug log
         // This can happen with pattern colors, etc.
         return "#808080".to_string(); // Fallback: Gray
     }
@@ -110,25 +107,13 @@ unsafe fn nscolor_to_hex(ns_color: id) -> String {
     let blue: CGFloat = msg_send![color_rgb, blueComponent];
     // let alpha: CGFloat = msg_send![color_rgb, alphaComponent]; // We don't need alpha for #RRGGBB
 
-    println!(
-        "[nscolor_to_hex v2] Components: R={}, G={}, B={}",
-        red, green, blue
-    ); // Debug log
-
     // Convert CGFloat (0.0-1.0) to u8 (0-255), clamping values
     let r_u8 = (red.max(0.0).min(1.0) * 255.0).round() as u8;
     let g_u8 = (green.max(0.0).min(1.0) * 255.0).round() as u8;
     let b_u8 = (blue.max(0.0).min(1.0) * 255.0).round() as u8;
 
-    println!(
-        "[nscolor_to_hex v2] Components u8: R={}, G={}, B={}",
-        r_u8, g_u8, b_u8
-    ); // Debug log
-
     // Format as hex string
-    let hex = format!("#{:02X}{:02X}{:02X}", r_u8, g_u8, b_u8);
-    println!("[nscolor_to_hex v2] Formatted hex: {}", hex);
-    hex
+    format!("#{:02X}{:02X}{:02X}", r_u8, g_u8, b_u8)
 }
 
 // Helper to convert Rust chrono DateTime<Utc> to NSDate
@@ -167,13 +152,10 @@ unsafe fn iso_string_to_nsdate(iso_string: &str) -> Option<id> {
 
 // Helper to get EKCalendar objects by identifiers
 unsafe fn get_calendars_by_ids(store: id, calendar_ids: &[String]) -> Vec<id> {
-    println!("Fetching calendars by IDs... ENTER"); // 1. Entry point
-    println!("Fetching calendars by IDs... Checking calendar IDs: {:?}", calendar_ids); // 2. Before checking IDs
     // calendarsWithIdentifiers: is not a standard EKEventStore method.
     // We need to fetch all calendars and filter.
     const EK_ENTITY_TYPE_EVENT: i64 = 0;
     let all_calendars_nsarray: id = msg_send![store, calendarsForEntityType: EK_ENTITY_TYPE_EVENT];
-    println!("Fetching calendars by IDs... calendarsForEntityType result: {:?}", all_calendars_nsarray); // 3. After msg_send for calendars
     if all_calendars_nsarray == nil {
         println!("Fetching calendars by IDs... Resulting NSArray is nil, returning empty vec."); // 4a. Array is nil
         return Vec::new();
@@ -181,28 +163,20 @@ unsafe fn get_calendars_by_ids(store: id, calendar_ids: &[String]) -> Vec<id> {
 
     let mut matching_calendars = Vec::new();
     let count: NSUInteger = NSArray::count(all_calendars_nsarray);
-    println!("Fetching calendars by IDs... Calendar count: {}", count); // 5. After getting count
 
     for i in 0..count {
-        println!("Fetching calendars by IDs... LOOP START: Index {}", i); // 6. Loop start
         let calendar: id = NSArray::objectAtIndex(all_calendars_nsarray, i);
-        println!("Fetching calendars by IDs... Calendar object: {:?}", calendar); // 7. After objectAtIndex
         if calendar == nil {
             println!("Fetching calendars by IDs... WARNING: Calendar object at index {} is nil, skipping.", i); // 8a. Calendar object is nil
             continue;
         }
 
         let identifier_nsstring: id = msg_send![calendar, calendarIdentifier];
-        println!("Fetching calendars by IDs... Identifier object: {:?}", identifier_nsstring); // 9. After identifier msg_send
         let identifier_str = nsstring_to_string(identifier_nsstring);
-        println!("Fetching calendars by IDs... Identifier string: {}", identifier_str); // 10. After id conversion
         if calendar_ids.contains(&identifier_str) {
-            println!("Fetching calendars by IDs... Matching calendar found: {}", identifier_str); // 11. Matching calendar found
             matching_calendars.push(calendar);
         }
     }
-    println!("Fetching calendars by IDs... Exiting loop successfully."); // 12. After loop finished
-    println!("Fetching calendars by IDs... Matching calendars: {:?}", matching_calendars); // 13. After loop finished
     matching_calendars
 }
 
@@ -234,9 +208,11 @@ pub fn get_calendar_authorization_status() -> Result<CalendarAuthorizationStatus
 }
 
 #[command]
-pub async fn request_calendar_access() -> Result<bool, String> {
+pub async fn request_calendar_access(state: State<'_, CalendarState>) -> Result<bool, String> {
     println!("Requesting calendar access...");
     const EK_ENTITY_TYPE_EVENT: i64 = 0;
+
+    let store = get_store_ptr(&state)?;
 
     // Check current status first (optional but good practice)
     let current_status = get_calendar_authorization_status()?;
@@ -254,7 +230,6 @@ pub async fn request_calendar_access() -> Result<bool, String> {
         return Ok(false);
     }
 
-    let store = get_event_store_instance();
     let (tx, rx) = mpsc::channel::<bool>(); // Use mpsc channel
 
     // Create the completion handler block
@@ -300,6 +275,7 @@ pub async fn request_calendar_access() -> Result<bool, String> {
 
 #[command]
 pub fn get_calendar_events(
+    state: State<CalendarState>,
     calendar_ids: Vec<String>,
     start_date_iso: String,
     end_date_iso: String,
@@ -318,7 +294,7 @@ pub fn get_calendar_events(
         _ => return Err("Calendar access not authorized.".to_string()),
     }
 
-    let store = get_event_store_instance();
+    let store = get_store_ptr(&state)?;
 
     unsafe {
         // Convert dates
@@ -396,12 +372,10 @@ pub fn get_calendar_events(
 }
 
 #[command]
-pub fn get_calendars() -> Result<Vec<CalendarInfo>, String> {
-    println!("Fetching calendars... ENTER"); // 1. Entry point
+pub fn get_calendars(state: State<CalendarState>) -> Result<Vec<CalendarInfo>, String> {
     let _pool = unsafe { NSAutoreleasePool::new(nil) }; // Manage memory
     const EK_ENTITY_TYPE_EVENT: i64 = 0;
 
-    println!("Fetching calendars... Checking auth status"); // 2. Before auth check
     // Check auth status first
     match get_calendar_authorization_status()? {
         CalendarAuthorizationStatus::Authorized => println!("Fetching calendars... Auth status: Authorized"), // 3a. Auth OK
@@ -411,58 +385,34 @@ pub fn get_calendars() -> Result<Vec<CalendarInfo>, String> {
         }
     }
 
-    println!("Fetching calendars... Getting event store instance"); // 4. Before getting store
-    let store = get_event_store_instance();
-    if store == nil {
-        println!("Fetching calendars... ERROR: Event store instance is nil"); // 5a. Store is nil
-        return Err("Failed to get EKEventStore instance.".to_string());
-    }
-    println!("Fetching calendars... Event store instance: {:?}", store); // 5b. Store obtained
+    let store = get_store_ptr(&state)?;
 
-    // Equivalent to: [store calendarsForEntityType:EKEntityTypeEvent];
-    println!("Fetching calendars... Calling calendarsForEntityType"); // 6. Before msg_send for calendars
     let calendars_nsarray: id = unsafe { msg_send![store, calendarsForEntityType: EK_ENTITY_TYPE_EVENT] };
-    println!("Fetching calendars... calendarsForEntityType result: {:?}", calendars_nsarray); // 7. After msg_send
+    println!("Fetching calendars... calendarsForEntityType result: {:?}", calendars_nsarray);
 
     if calendars_nsarray == nil {
-        println!("Fetching calendars... Resulting NSArray is nil, returning empty vec."); // 8a. Array is nil
+        println!("Fetching calendars... Resulting NSArray is nil, returning empty vec.");
         return Ok(Vec::new()); // No calendars found or error
     }
 
     let mut calendars_vec = Vec::new();
-    println!("Fetching calendars... Getting calendar count"); // 8b. Before getting count
     let count: NSUInteger = unsafe { NSArray::count(calendars_nsarray) };
-    println!("Fetching calendars... Calendar count: {}", count); // 9. After getting count
+    println!("Fetching calendars... Calendar count: {}", count);
 
     for i in 0..count {
-        println!("Fetching calendars... LOOP START: Index {}", i); // 10. Loop start
         unsafe {
-            println!("Fetching calendars... Getting calendar object at index: {}", i); // 11. Before objectAtIndex
             let calendar: id = NSArray::objectAtIndex(calendars_nsarray, i);
             if calendar == nil {
-                println!("Fetching calendars... WARNING: Calendar object at index {} is nil, skipping.", i); // 12a. Calendar object is nil
                 continue;
             }
-            println!("Fetching calendars... Calendar object: {:?}", calendar); // 12b. Calendar object obtained
 
             // Get properties
-            println!("Fetching calendars... Getting identifier for calendar index: {}", i); // 13. Before identifier msg_send
             let identifier: id = msg_send![calendar, calendarIdentifier];
-            println!("Fetching calendars... Identifier object: {:?}", identifier); // 14. After identifier msg_send
-
-            println!("Fetching calendars... Getting title for calendar index: {}", i); // 15. Before title msg_send
             let title: id = msg_send![calendar, title];
-            println!("Fetching calendars... Title object: {:?}", title); // 16. After title msg_send
-
-            println!("Fetching calendars... Getting color for calendar index: {}", i); // 17. Before color msg_send
             let color: id = msg_send![calendar, color]; // This is NSColor
-            println!("Fetching calendars... Color object: {:?}", color); // 18. After color msg_send
 
-            println!("Fetching calendars... Converting identifier to string for index: {}", i); // 19. Before id conversion
             let identifier_str = nsstring_to_string(identifier);
-            println!("Fetching calendars... Converting title to string for index: {}", i); // 20. Before title conversion
             let title_str = nsstring_to_string(title);
-            println!("Fetching calendars... Converting color to hex for index: {}", i); // 21. Before color conversion
             let color_hex = nscolor_to_hex(color);
 
             let calendar_info = CalendarInfo {
@@ -470,13 +420,8 @@ pub fn get_calendars() -> Result<Vec<CalendarInfo>, String> {
                 title: title_str,
                 color: color_hex,
             };
-
-            println!("Fetching calendars... Parsed CalendarInfo: {:?}", calendar_info); // 22. After parsing
             calendars_vec.push(calendar_info);
-            println!("Fetching calendars... LOOP END: Successfully processed calendar index: {}", i); // 23. Loop end for index i
         }
     }
-    println!("Fetching calendars... Exiting loop successfully."); // 24. After loop finished
-
-    Ok(calendars_vec) // 25. Returning Ok
+    Ok(calendars_vec)
 }

@@ -5,6 +5,8 @@
   import { VList } from "virtua/svelte";
   import CommandListContextMenu from "./command-list-context-menu.svelte";
   import CommandListItem from "./command-list-item.svelte";
+  import CommandListCalendarItem from "./command-list-calendar-item.svelte";
+  import { COMMAND_HANDLER } from "@getgrinta/core";
 
   let contextMenu = $state<CommandListContextMenu>();
   let virtualizer = $state<VList<any>>();
@@ -41,7 +43,11 @@
   >
     {#snippet children(item, index)}
       {@const active = commandsStore.selectedIndex === index}
-      <CommandListItem {item} {index} {active} {contextMenu} />
+      {#if item.handler === COMMAND_HANDLER.CALENDAR}
+        <CommandListCalendarItem {item} {index} {active} />
+      {:else}
+        <CommandListItem {item} {index} {active} {contextMenu} />
+      {/if}
     {/snippet}
   </VList>
 </ul>

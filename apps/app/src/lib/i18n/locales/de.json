@@ -53,7 +53,7 @@
       "search": "Suche",
       "hotkeys": "Tastenkürzel",
       "permissions": "Berechtigungen",
-      "calendar": "Kalendar"
+      "calendar": "Kalender"
     },
     "fields": {
       "shortcut": "Tastenkürzel",
@@ -183,6 +183,7 @@
   },
   "searchBar": {
     "placeholder": {
+      "calendar": "Kalender",
       "initial": "Web oder Apps durchsuchen",
       "menu": "Menü",
       "notes": "Notizen suchen oder erstellen",
@@ -224,7 +225,8 @@
     "exit": "Beenden",
     "settings": "Einstellungen",
     "help": "Hilfe",
-    "profile": "Profile"
+    "profile": "Profile",
+    "calendar": "Kalender"
   },
   "update": {
     "checking": "Auf Updates prüfen...",

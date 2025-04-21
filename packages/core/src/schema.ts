@@ -41,6 +41,10 @@ export const MetadataSchema = z.object({
   calendarSchema: z
     .object({
       backgroundColor: z.string().optional(),
+      startTime: z.string().optional(),
+      endTime: z.string().optional(),
+      location: z.string().optional(),
+      notes: z.string().optional(),
     })
     .optional(),
 });

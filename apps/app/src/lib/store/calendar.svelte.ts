@@ -6,6 +6,7 @@ import {
 } from "$lib/grinta-invoke";
 import type { CalendarInfo, EventInfo } from "$lib/types/calendar";
 import { CalendarAuthorizationStatus } from "$lib/types/calendar";
+import { settingsStore } from "./settings.svelte";
 // import { settings } from './settings-store.svelte'; // Import later when needed
 
 // State properties are defined directly in the class with $state
@@ -21,8 +22,7 @@ export class CalendarStore {
   selectedCalendarIdentifiers = $state<string[]>([]); // TODO: Load from settings later
 
   constructor() {
-    console.log("CalendarStore initializing...");
-    this.#checkAuthAndFetchCalendars(); // Initial check and fetch on instantiation
+    console.log("CalendarStore initializing..."); // Initial check and fetch on instantiation
     // TODO: Effect to load selectedCalendarIdentifiers from settings store once
     // TODO: Effect to persist selectedCalendarIdentifiers to settings store when it changes
     // $effect(() => { persist(this.selectedCalendarIdentifiers) }) // Example Svelte 5 effect
@@ -30,7 +30,7 @@ export class CalendarStore {
 
   // --- Private Methods ---
 
-  async #checkAuthAndFetchCalendars() {
+  async checkAuthAndFetchCalendars() {
     try {
       this.isLoading = true;
       this.error = null;
@@ -49,7 +49,7 @@ export class CalendarStore {
           this.selectedCalendarIdentifiers = calendars.map((c) => c.identifier);
         }
 
-        this.fetchEventsForToday();
+        this.refetchEventsIfAuthorized();
         // If already authorized, don't clear events here, let fetch handle it
       } else if (status === CalendarAuthorizationStatus.NotDetermined) {
         // If status is not determined, try to request access.
@@ -115,9 +115,28 @@ export class CalendarStore {
 
   // --- Public API Methods ---
 
+  initialize({
+    selectedCalendarIdentifiers,
+  }: {
+    selectedCalendarIdentifiers: string[];
+  }) {
+    this.selectedCalendarIdentifiers = selectedCalendarIdentifiers;
+    this.checkAuthAndFetchCalendars();
+  }
+
+  async refetchEventsIfAuthorized() {
+    if (this.authorizationStatus !== CalendarAuthorizationStatus.Authorized) {
+      return;
+    }
+
+    await this.fetchEventsForDateRange(
+      new Date(),
+      new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+    );
+  }
+
   async refreshAuthorization() {
-    console.log("Refreshing calendar authorization...");
-    await this.#checkAuthAndFetchCalendars();
+    await this.checkAuthAndFetchCalendars();
   }
 
   async tryRequestAccess() {
@@ -131,7 +150,7 @@ export class CalendarStore {
         console.log("Calendar access granted:", granted);
         // No need to set status directly, re-check auth handles it
         if (granted) {
-          await this.#checkAuthAndFetchCalendars(); // Re-fetch calendars after grant
+          await this.checkAuthAndFetchCalendars(); // Re-fetch calendars after grant
         } else {
           this.authorizationStatus = CalendarAuthorizationStatus.Denied;
         }

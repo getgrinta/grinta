@@ -35,7 +35,7 @@
     <p class="text-sm text-base-content/70 mb-4">
       {$_("settings.calendar.description")}
     </p>
-    <div class="space-y-2 pr-2">
+    <div class="grid grid-cols-2 gap-x-4 gap-y-2 pr-2">
       {#each calendarStore.availableCalendars as calendar (calendar.identifier)}
         <label
           class="flex items-center space-x-3 cursor-pointer p-2 hover:bg-base-200 rounded-md"

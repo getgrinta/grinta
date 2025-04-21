@@ -183,6 +183,7 @@
   },
   "searchBar": {
     "placeholder": {
+      "calendar": "Calendar",
       "initial": "Search web or apps",
       "menu": "Menu",
       "notes": "Search or create notes",
@@ -205,6 +206,7 @@
     "invalidCode": "Invalid code. Please verify the code sent to your e-mail."
   },
   "menu": {
+    "calendar": "Calendar",
     "clipboard": "Clipboard",
     "signIn": "Sign In",
     "upgrade": "Upgrade to Pro",

@@ -32,7 +32,9 @@
   }
 
   function handleMenuToggle() {
-    return appStore.setMenuOpen(!appStore.menuOpen);
+    const menuOpened = !appStore.menuOpen;
+
+    return appStore.setMenuOpen(menuOpened);
   }
 
   async function handleClipboard() {

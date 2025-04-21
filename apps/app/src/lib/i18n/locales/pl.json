@@ -165,6 +165,7 @@
   },
   "searchBar": {
     "placeholder": {
+      "calendar": "Kalendarz",
       "initial": "Szukaj w sieci lub aplikacjach",
       "menu": "Menu",
       "notes": "Szukaj lub twórz notatki",
@@ -211,7 +212,8 @@
     "exit": "Wyjdź",
     "settings": "Ustawienia",
     "help": "Pomoc",
-    "profile": "Profil"
+    "profile": "Profil",
+    "calendar": "Kalendarz"
   },
   "update": {
     "checking": "Sprawdzanie aktualizacji...",

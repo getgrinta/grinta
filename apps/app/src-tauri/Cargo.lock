@@ -1926,6 +1926,8 @@ dependencies = [
  "fix-path-env",
  "keyring",
  "objc",
+ "objc_id",
+ "once_cell",
  "plist",
  "png",
  "rand 0.8.5",

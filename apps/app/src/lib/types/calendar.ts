@@ -18,9 +18,9 @@ export interface EventInfo {
   identifier: string;
   title: string;
   notes: string | null;
-  startDate: string; // ISO 8601 string
-  endDate: string; // ISO 8601 string
+  start_date: string; // ISO 8601 string
+  end_date: string; // ISO 8601 string
   calendar_id: string;
   location: string | null;
-  isAllDay: boolean;
+  is_all_day: boolean;
 }

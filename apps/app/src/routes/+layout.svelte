@@ -35,6 +35,7 @@
   import { APP_MODE, COMMAND_HANDLER } from "@getgrinta/core";
   import SidebarMenu from "$lib/components/sidebar-menu.svelte";
   import { shortcut } from "@svelte-put/shortcut";
+  import { calendarStore } from "$lib/store/calendar.svelte";
   const { children } = $props();
 
   dayjs.extend(LocalizedFormat);
@@ -237,6 +238,10 @@
     }
     await commandsStore.initialize();
     await settingsStore.initialize();
+    calendarStore.initialize({
+      selectedCalendarIdentifiers:
+        settingsStore.data.selectedCalendarIdentifiers,
+    });
     await clipboardStore.initialize();
     await widgetsStore.initialize();
     await appMetadataStore.initialize();

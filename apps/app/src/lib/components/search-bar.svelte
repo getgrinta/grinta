@@ -27,6 +27,7 @@
   import ViewActions from "./view-actions.svelte";
   import SidebarMenuButton from "./sidebar-menu-button.svelte";
   import { shortcut, type ShortcutTrigger } from "@svelte-put/shortcut";
+  import { calendarStore } from "$lib/store/calendar.svelte";
 
   let queryInput: HTMLInputElement;
 
@@ -138,10 +139,13 @@
     return queryInput?.focus();
   });
 
+  // App was shown
   listen("main_panel_did_become_key", () => {
     if (clearQueryTimeoutToken) {
       clearTimeout(clearQueryTimeoutToken);
     }
+
+    calendarStore.refetchEventsIfAuthorized();
   });
 
   listen("focus", () => {

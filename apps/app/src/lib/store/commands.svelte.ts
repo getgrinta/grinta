@@ -264,7 +264,7 @@ export class CommandsStore extends SecureStore<Commands> {
 
         console.log("[CommandsStore] Raw dummy events:", events);
         const mappedCommands = events.map((event: EventInfo) => {
-          console.log("Event calendar id:", event.calendar_id);
+          console.log("Event:", event);
           return ExecutableCommandSchema.parse({
             label: event.title,
             localizedLabel: event.title,
@@ -273,6 +273,11 @@ export class CommandsStore extends SecureStore<Commands> {
             metadata: {
               calendarSchema: {
                 backgroundColor: colorByCalendarId[event.calendar_id],
+                startTime: event.start_date,
+                endTime: event.end_date,
+                location: event.location ?? undefined,
+                notes: event.notes ?? undefined,
+                isAllDay: event.is_all_day,
               },
             },
             priority: COMMAND_PRIORITY.HIGH,
@@ -316,6 +321,12 @@ export class CommandsStore extends SecureStore<Commands> {
             command.metadata?.updatedAt ?? new Date(),
         )(filteredCommands).reverse(),
       );
+      return;
+    } else if (appStore.appMode === APP_MODE.CALENDAR) {
+      this.commands = sortBy(
+        (command: ExecutableCommand) =>
+          command.metadata?.calendarSchema?.startTime ?? new Date(),
+      )(filteredCommands);
       return;
     }
 
@@ -433,15 +444,16 @@ export class CommandsStore extends SecureStore<Commands> {
     const otherThanLast =
       this.commandHistory[this.commandHistory.length - 1]?.value !==
       command.value;
-    const commandsToSkip = [
+    const commandsToSkipRecording = [
       COMMAND_HANDLER.CREATE_NOTE,
       COMMAND_HANDLER.SYSTEM,
+      COMMAND_HANDLER.CALENDAR,
     ] as string[];
 
     const shouldRecord =
       recordingEnabled &&
       !settingsStore.data.incognitoEnabled &&
-      !commandsToSkip.includes(command.handler);
+      !commandsToSkipRecording.includes(command.handler);
 
     if (otherThanLast && shouldRecord) {
       const filteredHistory = this.commandHistory
