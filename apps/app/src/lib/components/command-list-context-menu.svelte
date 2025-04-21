@@ -29,13 +29,53 @@
     }
   }
 
+  async function handleHideEvent(command: ExecutableCommand) {
+    const eventId = command.metadata?.calendarSchema?.eventId;
+    if (!eventId) {
+      console.error("Event ID missing or invalid for handleHideEvent");
+      return;
+    }
+    const currentSettings = settingsStore.data;
+    if (!Array.isArray(currentSettings.ignoredEventIds)) {
+      currentSettings.ignoredEventIds = []; // Initialize if not an array
+    }
+    if (!currentSettings.ignoredEventIds.includes(eventId)) {
+      settingsStore.data.ignoredEventIds = [
+        ...currentSettings.ignoredEventIds,
+        eventId,
+      ];
+    }
+  }
+
+  async function handleHideCalendar(command: ExecutableCommand) {
+    const calendarId = command.metadata?.calendarSchema?.calendarIdentifier;
+    if (!calendarId) {
+      console.error("Calendar ID missing or invalid for handleHideCalendar");
+      return;
+    }
+    const currentSettings = settingsStore.data;
+    if (!Array.isArray(currentSettings.selectedCalendarIdentifiers)) {
+      currentSettings.selectedCalendarIdentifiers = []; // Initialize if not an array
+    }
+    const updatedIdentifiers =
+      currentSettings.selectedCalendarIdentifiers.filter(
+        (id: string) => id !== calendarId,
+      );
+    if (
+      updatedIdentifiers.length !==
+      currentSettings.selectedCalendarIdentifiers.length
+    ) {
+      settingsStore.data.selectedCalendarIdentifiers = updatedIdentifiers;
+    }
+  }
+
   export function createContextMenuItems(
     command: ExecutableCommand,
     isWidget: boolean,
   ) {
     const menuItems: MenuItem[] = [];
 
-    if (!isWidget) {
+    if (!isWidget && command.handler !== COMMAND_HANDLER.CALENDAR) {
       menuItems.push({
         label: t("commands.contextMenu.pin"),
         icon: PinIcon as any,
@@ -189,6 +229,21 @@
         });
       }
     }
+
+    if (command.handler === COMMAND_HANDLER.CALENDAR) {
+      menuItems.push({
+        label: t("commands.contextMenu.hideEvent"),
+        icon: XIcon as any,
+        onClick: () => handleHideEvent(command),
+      });
+
+      menuItems.push({
+        label: t("commands.contextMenu.hideCalendar"),
+        icon: XIcon as any,
+        onClick: () => handleHideCalendar(command),
+      });
+    }
+
     contextMenuItems = menuItems;
   }
 </script>

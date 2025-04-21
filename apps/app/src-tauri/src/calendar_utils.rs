@@ -34,12 +34,21 @@ pub struct CalendarInfo {
     color: String, // Store color as hex string e.g., "#RRGGBB"
 }
 
+// Struct to hold participant information
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ParticipantInfo {
+    name: Option<String>, // EKParticipant.name
+    // Add other participant details if needed, e.g., email, status
+}
+
 // Struct to hold event information
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EventInfo {
     identifier: String,         // EKEvent.eventIdentifier
     title: String,              // EKEvent.title
     notes: Option<String>,      // EKEvent.notes
+    url: Option<String>,        // EKEvent.URL
+    participants: Vec<ParticipantInfo>, // EKEvent.participants
     start_date: String,         // EKEvent.startDate (ISO 8601 string)
     end_date: String,           // EKEvent.endDate (ISO 8601 string)
     calendar_id: String,        // EKEvent.calendar.calendarIdentifier
@@ -352,11 +361,38 @@ pub fn get_calendar_events(
             let calendar_id: id = msg_send![calendar, calendarIdentifier];
             let location: id = msg_send![event, location];
             let is_all_day: ObjcBOOL = msg_send![event, isAllDay];
+            let url_nsurl: id = msg_send![event, URL]; // Get NSURL
+            let participants_nsarray: id = msg_send![event, attendees];
+
+            let mut participants = Vec::new();
+            if participants_nsarray != nil {
+                let participants_count: NSUInteger = NSArray::count(participants_nsarray);
+                for j in 0..participants_count {
+                    let participant: id = NSArray::objectAtIndex(participants_nsarray, j);
+                    let name: id = msg_send![participant, name];
+                    let participant_info = ParticipantInfo {
+                        name: if name != nil { Some(nsstring_to_string(name)) } else { None },
+                    };
+                    participants.push(participant_info);
+                }
+            }
 
             let event_info = EventInfo {
                 identifier: nsstring_to_string(identifier),
                 title: nsstring_to_string(title),
                 notes: if notes != nil { Some(nsstring_to_string(notes)) } else { None },
+                // Correctly handle NSURL -> NSString -> Rust String
+                url: if url_nsurl != nil {
+                    let url_nsstring: id = msg_send![url_nsurl, absoluteString];
+                    if url_nsstring != nil {
+                         Some(nsstring_to_string(url_nsstring))
+                    } else {
+                        None // absoluteString returned nil
+                    }
+                } else {
+                    None // URL property was nil
+                },
+                participants,
                 start_date: nsdate_to_iso_string(start_date),
                 end_date: nsdate_to_iso_string(end_date),
                 calendar_id: nsstring_to_string(calendar_id),

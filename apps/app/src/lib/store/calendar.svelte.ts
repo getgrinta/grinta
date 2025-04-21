@@ -21,15 +21,6 @@ export class CalendarStore {
   lastFetchedRange = $state<{ start: Date; end: Date } | null>(null);
   selectedCalendarIdentifiers = $state<string[]>([]); // TODO: Load from settings later
 
-  constructor() {
-    console.log("CalendarStore initializing..."); // Initial check and fetch on instantiation
-    // TODO: Effect to load selectedCalendarIdentifiers from settings store once
-    // TODO: Effect to persist selectedCalendarIdentifiers to settings store when it changes
-    // $effect(() => { persist(this.selectedCalendarIdentifiers) }) // Example Svelte 5 effect
-  }
-
-  // --- Private Methods ---
-
   async checkAuthAndFetchCalendars() {
     try {
       this.isLoading = true;
@@ -128,10 +119,11 @@ export class CalendarStore {
     if (this.authorizationStatus !== CalendarAuthorizationStatus.Authorized) {
       return;
     }
+    const numberOfDaysToFetch = 30;
 
     await this.fetchEventsForDateRange(
       new Date(),
-      new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+      new Date(Date.now() + numberOfDaysToFetch * 24 * 60 * 60 * 1000),
     );
   }
 

@@ -5,14 +5,24 @@
   import { appStore } from "$lib/store/app.svelte";
   import DOMPurify from "dompurify";
   import CommandListIcon from "./command-list-icon.svelte";
+  import { handleContextMenu } from "$lib/utils.svelte";
+  import { _ } from "$lib/i18n";
+  import { ExecutableCommandSchema } from "@getgrinta/core";
+  import CommandListContextMenu from "./command-list-context-menu.svelte";
+  import { z } from "zod";
+  import { Clock, MapPin } from "lucide-svelte";
+  import { formatRelative, parseISO } from "date-fns";
 
-  const { item, index, active } = $props();
+  const { item, index, active, contextMenu } = $props<{
+    item: z.infer<typeof ExecutableCommandSchema>;
+    index: number;
+    active: boolean;
+    contextMenu: CommandListContextMenu | undefined;
+  }>();
 
   const currentLabel = $derived(item.localizedLabel ?? item.label);
-
   const highlightedText = $derived(highlightText(currentLabel, appStore.query));
 
-  // Format time - adjust format string as needed
   function formatTime(isoString: string | undefined): string {
     if (!isoString) return "";
     try {
@@ -22,7 +32,6 @@
         minute: "2-digit",
       });
     } catch (e) {
-      console.error("Error parsing date:", isoString, e);
       return "Invalid Date";
     }
   }
@@ -35,10 +44,47 @@
   const bgColor = $derived(
     item.metadata?.calendarSchema?.backgroundColor ?? "#808080",
   );
+
+  // Helper function using date-fns formatRelative
+  function getRelativeDayStringUsingDateFns(
+    startDateString: string | undefined,
+  ): string | null {
+    if (!startDateString) return null;
+
+    try {
+      const startDate = parseISO(startDateString);
+      const now = new Date();
+      // formatRelative returns strings like "today at 2:30 PM", "yesterday at 5:00 PM", "tomorrow at 10:00 AM" etc.
+      // We might want to extract just the day part later if needed.
+      return formatRelative(startDate, now).replace(/^\w/, (c) =>
+        c.toUpperCase(),
+      );
+    } catch (e) {
+      console.error(
+        "Error parsing date with date-fns formatRelative:",
+        startDateString,
+        e,
+      );
+      return null;
+    }
+  }
+
+  // Derive the relative date string using the new function
+  let relativeDate = $derived(
+    getRelativeDayStringUsingDateFns(item.metadata?.calendarSchema?.startTime),
+  );
 </script>
 
-<li class="!w-[calc(100%-2rem)] mx-4 select-none" data-command-index={index}>
+<li
+  class="!w-[calc(100%-2rem)] mx-4 select-none"
+  data-command-index={index}
+  oncontextmenu={(event) => {
+    contextMenu?.createContextMenuItems(item, false);
+    handleContextMenu({ event, name: "commandList" });
+  }}
+>
   <div
+    role="menuitem"
     class={clsx(
       "flex justify-between gap-4 border border-transparent hover:bg-primary/40 !shadow-none",
       active &&
@@ -72,14 +118,25 @@
             </span>
           {/each}
         </h2>
-        <div class="text-xs opacity-80 flex items-center gap-2 truncate">
+        <div class="flex flex-col gap-1 text-xs opacity-80">
           {#if item.metadata?.calendarSchema?.isAllDay === false && (startTime || endTime)}
-            <span class="flex-shrink-0">
-              {startTime}{startTime && endTime ? " - " : ""}{endTime}
-            </span>
+            <div class="flex items-center gap-1.5">
+              <Clock size={12} class="flex-shrink-0" />
+              {#if relativeDate}
+                <span class="truncate">{relativeDate}</span>
+              {:else if startTime || endTime}
+                <!-- Fallback to original time display if formatRelative didn't produce output or wasn't applicable -->
+                <span class="truncate">
+                  {startTime}{startTime && endTime ? " - " : ""}{endTime}
+                </span>
+              {/if}
+            </div>
           {/if}
           {#if location}
-            <span class="truncate">• {location}</span>
+            <div class="flex items-center gap-1.5">
+              <MapPin size={12} class="flex-shrink-0" />
+              <span class="truncate">{DOMPurify.sanitize(location)}</span>
+            </div>
           {/if}
         </div>
       </div>

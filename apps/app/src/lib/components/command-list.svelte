@@ -7,6 +7,8 @@
   import CommandListItem from "./command-list-item.svelte";
   import CommandListCalendarItem from "./command-list-calendar-item.svelte";
   import { COMMAND_HANDLER } from "@getgrinta/core";
+  import { settingsStore } from "$lib/store/settings.svelte";
+  import { watch } from "runed";
 
   let contextMenu = $state<CommandListContextMenu>();
   let virtualizer = $state<VList<any>>();
@@ -23,6 +25,17 @@
       virtualizer?.scrollToIndex(selectedIndex, { align: "nearest" });
     }
   });
+
+  // Watch for calendar changes
+  watch(
+    () => [
+      settingsStore.data.ignoredEventIds,
+      settingsStore.data.selectedCalendarIdentifiers,
+    ],
+    () => {
+      commandsStore.buildCommands({ isRefresh: true });
+    },
+  );
 
   // Hide context menu when clicking outside
   $effect(clickListener);
@@ -44,7 +57,7 @@
     {#snippet children(item, index)}
       {@const active = commandsStore.selectedIndex === index}
       {#if item.handler === COMMAND_HANDLER.CALENDAR}
-        <CommandListCalendarItem {item} {index} {active} />
+        <CommandListCalendarItem {item} {index} {active} {contextMenu} />
       {:else}
         <CommandListItem {item} {index} {active} {contextMenu} />
       {/if}

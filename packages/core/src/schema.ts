@@ -33,20 +33,23 @@ export const customizableCommandHandlerEnum = z.union([
   z.string(),
 ]);
 
+export const CalendarSchema = z.object({
+  backgroundColor: z.string().optional(),
+  startTime: z.string().optional(),
+  endTime: z.string().optional(),
+  location: z.string().optional(),
+  notes: z.string().optional(),
+  calendarIdentifier: z.string().optional(),
+  eventId: z.string().optional(),
+  isAllDay: z.boolean().default(false),
+});
+
 export const MetadataSchema = z.object({
   contentType: z.string().optional(),
   path: z.string().optional(),
   ranAt: z.date().optional(),
   updatedAt: z.date().optional(),
-  calendarSchema: z
-    .object({
-      backgroundColor: z.string().optional(),
-      startTime: z.string().optional(),
-      endTime: z.string().optional(),
-      location: z.string().optional(),
-      notes: z.string().optional(),
-    })
-    .optional(),
+  calendarSchema: CalendarSchema.optional(),
 });
 
 export const COMMAND_PRIORITY = {
@@ -163,4 +166,5 @@ export const SettingsSchema = z.object({
   accessibilityPermissions: z.boolean().default(false),
   fsPermissions: z.boolean().default(false),
   selectedCalendarIdentifiers: z.array(z.string()).default([]),
+  ignoredEventIds: z.array(z.string()).default([]),
 });

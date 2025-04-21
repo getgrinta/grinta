@@ -142,7 +142,9 @@
       "copyName": "Kopiuj nazwę",
       "copyPath": "Kopiuj ścieżkę",
       "search": "Szukaj...",
-      "translate": "Przetłumacz"
+      "translate": "Przetłumacz",
+      "hideEvent": "Ukryj to wydarzenie",
+      "hideCalendar": "Ukryj ten kalendarz"
     },
     "menuItems": {
       "clearNotes": "Wyczyść notatki",

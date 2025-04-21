@@ -46,6 +46,8 @@ import debounce from "debounce";
 import { calendarStore } from "$lib/store/calendar.svelte";
 import type { EventInfo } from "$lib/types/calendar";
 
+export type { ExecutableCommand };
+
 nlp.extend(dates);
 nlp.extend(numbers);
 
@@ -250,7 +252,14 @@ export class CommandsStore extends SecureStore<Commands> {
         return noteCommands;
       })
       .with(APP_MODE.CALENDAR, async () => {
-        const events = calendarStore.events;
+        const events = calendarStore.events.filter((event) => {
+          return (
+            !settingsStore.data.ignoredEventIds.includes(event.identifier) &&
+            settingsStore.data.selectedCalendarIdentifiers.includes(
+              event.calendar_id,
+            )
+          );
+        });
 
         const colorByCalendarId = calendarStore.availableCalendars.reduce(
           (acc, calendar) => {
@@ -260,9 +269,6 @@ export class CommandsStore extends SecureStore<Commands> {
           {} as Record<string, string>,
         );
 
-        console.log("[CommandsStore] Colors:", colorByCalendarId);
-
-        console.log("[CommandsStore] Raw dummy events:", events);
         const mappedCommands = events.map((event: EventInfo) => {
           console.log("Event:", event);
           return ExecutableCommandSchema.parse({
@@ -272,6 +278,8 @@ export class CommandsStore extends SecureStore<Commands> {
             handler: COMMAND_HANDLER.CALENDAR,
             metadata: {
               calendarSchema: {
+                eventId: event.identifier,
+                calendarIdentifier: event.calendar_id,
                 backgroundColor: colorByCalendarId[event.calendar_id],
                 startTime: event.start_date,
                 endTime: event.end_date,
@@ -285,12 +293,9 @@ export class CommandsStore extends SecureStore<Commands> {
           });
         });
 
-        console.log("[CommandsStore] Mapped dummy commands:", mappedCommands);
         return mappedCommands;
       })
       .exhaustive();
-
-    console.log("[CommandsStore] Commands after match block:", commands);
 
     if (appStore.query.length === 0 && appStore.appMode === APP_MODE.INITIAL) {
       this.commands = sortBy(

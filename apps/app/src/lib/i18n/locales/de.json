@@ -160,7 +160,9 @@
       "getInfo": "Informationen",
       "copyName": "Name kopieren",
       "copyPath": "Pfad kopieren",
-      "search": "Suchen..."
+      "search": "Suchen...",
+      "hideEvent": "Dieses Ereignis ausblenden",
+      "hideCalendar": "Diesen Kalender ausblenden"
     },
     "menuItems": {
       "clearNotes": "Notizen löschen",

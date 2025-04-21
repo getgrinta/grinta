@@ -43,6 +43,12 @@
           <input
             type="checkbox"
             bind:group={settingsStore.data.selectedCalendarIdentifiers}
+            onchange={() => {
+              settingsStore.persist();
+              calendarStore.selectedCalendarIdentifiers =
+                settingsStore.data.selectedCalendarIdentifiers;
+              calendarStore.refetchEventsIfAuthorized();
+            }}
             value={calendar.identifier}
             class="checkbox checkbox-primary"
           />
