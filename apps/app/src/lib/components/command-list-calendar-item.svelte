@@ -15,6 +15,7 @@
   import { enUS, de, pl } from "date-fns/locale";
   import { locale } from "svelte-i18n";
   import { get } from "svelte/store";
+  import { calendarStore } from "$lib/store/calendar.svelte";
 
   const { item, index, active, contextMenu } = $props<{
     item: z.infer<typeof ExecutableCommandSchema>;
@@ -77,6 +78,14 @@
 
   let relativeDate = $derived(
     getRelativeDayStringUsingDateFns(item.metadata?.calendarSchema?.startTime),
+  );
+
+  // Find the calendar name from the store using the identifier
+  let calendarNameForTooltip = $derived(
+    calendarStore.availableCalendars.find(
+      (cal) =>
+        cal.identifier === item.metadata?.calendarSchema?.calendarIdentifier,
+    )?.title ?? "",
   );
 </script>
 
@@ -147,7 +156,8 @@
     </button>
     <div class="flex gap-1 items-center pr-2">
       <span
-        class="block h-4 w-4 rounded-sm flex-shrink-0"
+        class="tooltip block h-4 w-4 rounded-sm flex-shrink-0 mr-6"
+        data-tip={calendarNameForTooltip}
         style="background-color: {bgColor};"
       ></span>
     </div>
