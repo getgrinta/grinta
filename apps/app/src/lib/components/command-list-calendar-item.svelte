@@ -6,7 +6,7 @@
   import DOMPurify from "dompurify";
   import CommandListIcon from "./command-list-icon.svelte";
   import { handleContextMenu } from "$lib/utils.svelte";
-  import { _ } from "$lib/i18n";
+  import { _ } from "svelte-i18n";
   import { ExecutableCommandSchema } from "@getgrinta/core";
   import CommandListContextMenu from "./command-list-context-menu.svelte";
   import { z } from "zod";
@@ -143,6 +143,11 @@
                   {startTime}{startTime && endTime ? " - " : ""}{endTime}
                 </span>
               {/if}
+            </div>
+          {:else}
+            <div class="flex items-center gap-1.5">
+              <Clock size={12} class="flex-shrink-0" />
+              <span class="truncate">{$_("settings.calendar.allDay")}</span>
             </div>
           {/if}
           {#if location}
