@@ -130,7 +130,6 @@
               {#if relativeDate}
                 <span class="truncate">{relativeDate}</span>
               {:else if startTime || endTime}
-                <!-- Fallback to original time display if formatRelative didn't produce output or wasn't applicable -->
                 <span class="truncate">
                   {startTime}{startTime && endTime ? " - " : ""}{endTime}
                 </span>

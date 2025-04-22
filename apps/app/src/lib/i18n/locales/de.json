@@ -95,7 +95,10 @@
       "saveSuccess": "Kalenderauswahl gespeichert.",
       "checkingAccess": "Zugriff wird geprüft...",
       "accessGrantedOrAlreadyHad": "Zugriff gewährt oder bereits vorhanden.",
-      "noCalendarsFoundAfterRequest": "Keine Kalender nach Anfrage gefunden. Zugriff verweigert?",
+      "noCalendarsFoundAfterRequest": "Zugriff gewährt, aber keine Kalender gefunden. Überprüfen Sie die Systemeinstellungen.",
+      "resetIgnoredEventsButton": "Alle versteckten Termine einblenden",
+      "resetIgnoredEventsSuccess": "Alle versteckten Kalendertermine sind jetzt sichtbar.",
+      "resetIgnoredEventsError": "Zurücksetzen der versteckten Termine fehlgeschlagen.",
       "requestError": "Fehler bei der Zugriffsanfrage."
     },
     "extension_already_added": "Diese Erweiterung wurde bereits hinzugefügt.",

@@ -6,24 +6,18 @@
   import { CalendarAuthorizationStatus } from "$lib/types/calendar";
   import { Command } from "@tauri-apps/plugin-shell";
 
-  // No local state or effects needed, bind directly to the store's reactive data
-
   async function handleRequestAuth() {
     try {
-      // Call the store's method which handles the request and refresh
       await calendarStore.tryRequestAccess();
-      // The store should update reactively, toast messages can indicate progress/result
-      // Toast messages might need adjustment based on how tryRequestAccess behaves
       toast.info($_("settings.calendar.checkingAccess"));
-      // Check status after a short delay as store updates might not be immediate
+
       setTimeout(() => {
         if (calendarStore.availableCalendars.length > 0) {
           toast.success($_("settings.calendar.accessGrantedOrAlreadyHad"));
         } else {
-          // If still no calendars, could be denied or no calendars configured
           toast.warning($_("settings.calendar.noCalendarsFoundAfterRequest"));
         }
-      }, 1000); // Adjust delay as needed
+      }, 1000);
     } catch (error) {
       console.log(error);
       console.error("Error during calendar access request flow:", error);
@@ -41,6 +35,17 @@
       toast.error($_("settings.calendar.openSettingsError")); // Assuming an error key exists
     }
   };
+
+  async function handleResetIgnoredEvents() {
+    try {
+      settingsStore.data.ignoredEventIds = [];
+      await settingsStore.persist();
+      toast.success($_("settings.calendar.resetIgnoredEventsSuccess"));
+    } catch (error) {
+      console.error("Failed to reset ignored events:", error);
+      toast.error($_("settings.calendar.resetIgnoredEventsError"));
+    }
+  }
 </script>
 
 <div class="">
@@ -89,6 +94,14 @@
       </p>
       <button class="btn btn-primary btn-sm" onclick={handleRequestAuth}>
         {$_("settings.calendar.requestAuthButton")}
+      </button>
+    </div>
+  {/if}
+
+  {#if settingsStore.data.ignoredEventIds?.length > 0}
+    <div class="mt-4 pt-4 border-t border-base-300 flex justify-center">
+      <button class="btn btn-warning btn-sm" onclick={handleResetIgnoredEvents}>
+        {$_("settings.calendar.resetIgnoredEventsButton")}
       </button>
     </div>
   {/if}

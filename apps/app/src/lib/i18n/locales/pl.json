@@ -63,7 +63,12 @@
       "saveButton": "Zapisz Wybór Kalendarzy",
       "openSettingsButton": "Otwórz ustawienia prywatności kalendarza",
       "openSettingsError": "Nie udało się otworzyć Ustawień Systemowych.",
-      "saveSuccess": "Wybór kalendarzy zapisany."
+      "saveSuccess": "Wybór kalendarzy zapisany.",
+      "accessGrantedOrAlreadyHad": "Przyznano dostęp do kalendarza.",
+      "noCalendarsFoundAfterRequest": "Przyznano dostęp, ale nie znaleziono kalendarzy. Sprawdź Ustawienia Systemowe.",
+      "resetIgnoredEventsButton": "Odkryj wszystkie ukryte wydarzenia",
+      "resetIgnoredEventsSuccess": "Wszystkie ukryte wydarzenia kalendarza są teraz widoczne.",
+      "resetIgnoredEventsError": "Nie udało się zresetować ukrytych wydarzeń."
     },
     "extension_already_added": "To rozszerzenie jest już dodane.",
     "extension_supported_by_default": "To rozszerzenie jest obsługiwane domyślnie.",

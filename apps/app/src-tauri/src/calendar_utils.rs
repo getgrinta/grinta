@@ -56,18 +56,14 @@ pub struct EventInfo {
     is_all_day: bool,           // EKEvent.isAllDay
 }
 
-// Helper function to get the EKEventStore class
 fn event_store_class() -> &'static Class {
     Class::get("EKEventStore").expect("EKEventStore class not found")
 }
 
-
-// Helper function to get the event store pointer from state safely
 fn get_store_ptr(state: &State<CalendarState>) -> Result<id, String> {
     let guard = state.event_store.lock().map_err(|e| format!("Failed to lock event store mutex: {}", e))?;
-    // Dereference the guard to get &Object, then get a const pointer, then cast to *mut Object (id)
     let obj_ref: &Object = &*guard;
-    let ptr = obj_ref as *const Object as id; // Cast &Object -> *const Object -> *mut Object (id)
+    let ptr = obj_ref as *const Object as id;
     if ptr.is_null() { // Use is_null() for raw pointers
         Err("Event store instance in state is nil".to_string())
     } else {
@@ -125,20 +121,16 @@ unsafe fn nscolor_to_hex(ns_color: id) -> String {
     format!("#{:02X}{:02X}{:02X}", r_u8, g_u8, b_u8)
 }
 
-// Helper to convert Rust chrono DateTime<Utc> to NSDate
 unsafe fn datetime_utc_to_nsdate(dt: DateTime<Utc>) -> id {
     let timestamp = dt.timestamp() as f64;
-    // timeIntervalSince1970 expects seconds since 1970-01-01 00:00:00 UTC
     let nsdate: id = msg_send![class!(NSDate), dateWithTimeIntervalSince1970: timestamp];
     nsdate
 }
 
-// Helper to convert NSDate to chrono DateTime<Utc>
 unsafe fn nsdate_to_datetime_utc(nsdate: id) -> Option<DateTime<Utc>> {
     if nsdate == nil {
         return None;
     }
-    // timeIntervalSince1970 returns seconds since 1970-01-01 00:00:00 UTC
     let timestamp: f64 = msg_send![nsdate, timeIntervalSince1970];
     NaiveDateTime::from_timestamp_opt(timestamp as i64, (timestamp.fract() * 1_000_000_000.0) as u32)
         .map(|naive| DateTime::<Utc>::from_naive_utc_and_offset(naive, Utc))
@@ -159,10 +151,7 @@ unsafe fn iso_string_to_nsdate(iso_string: &str) -> Option<id> {
         .map(|dt| datetime_utc_to_nsdate(dt.with_timezone(&Utc)))
 }
 
-// Helper to get EKCalendar objects by identifiers
 unsafe fn get_calendars_by_ids(store: id, calendar_ids: &[String]) -> Vec<id> {
-    // calendarsWithIdentifiers: is not a standard EKEventStore method.
-    // We need to fetch all calendars and filter.
     const EK_ENTITY_TYPE_EVENT: i64 = 0;
     let all_calendars_nsarray: id = msg_send![store, calendarsForEntityType: EK_ENTITY_TYPE_EVENT];
     if all_calendars_nsarray == nil {
@@ -192,13 +181,10 @@ unsafe fn get_calendars_by_ids(store: id, calendar_ids: &[String]) -> Vec<id> {
 #[command]
 pub fn get_calendar_authorization_status() -> Result<CalendarAuthorizationStatus, String> {
     println!("Checking calendar authorization status...");
-    // EKEntityTypeEvent = 0
     const EK_ENTITY_TYPE_EVENT: i64 = 0;
 
     let store_class = event_store_class();
 
-    // Get the authorization status
-    // Equivalent to: [EKEventStore authorizationStatusForEntityType:EKEntityTypeEvent];
     let status_raw: i64 = unsafe {
         msg_send![store_class, authorizationStatusForEntityType: EK_ENTITY_TYPE_EVENT]
     };
@@ -240,8 +226,6 @@ pub async fn request_calendar_access(state: State<'_, CalendarState>) -> Result<
 
     let (tx, rx) = mpsc::channel::<bool>(); // Use mpsc channel
 
-    // Create the completion handler block
-    // The block takes two arguments: (BOOL granted, NSError *error)
     let completion_block = ConcreteBlock::new(move |granted: objc::runtime::BOOL, error: id| -> () {
         let granted_bool = granted == objc::runtime::YES;
         let tx_clone = tx.clone(); // Clone the sender for use in the closure
@@ -253,29 +237,21 @@ pub async fn request_calendar_access(state: State<'_, CalendarState>) -> Result<
             };
             eprintln!("Error requesting calendar access: {}", description_str);
             // Send false on error
-            let _ = tx_clone.send(false); // Use the clone
+            let _ = tx_clone.send(false);
         } else {
             println!("Calendar access request completed. Granted: {}", granted_bool);
             let _ = tx_clone.send(granted_bool); // Use the clone
         }
-    }).copy(); // Add .copy() to satisfy Fn requirement
+    }).copy();
 
-    // Call requestFullAccessToEventsWithCompletion:
-    // Swift equivalent: store.requestFullAccessToEvents { granted, error in ... }
-    // Note: The selector name might vary slightly based on SDK version or specific method,
-    // ensure 'requestFullAccessToEventsWithCompletion:' is correct for your target macOS.
-    // Older versions might use `requestAccessToEntityType:completion:`
     unsafe {
         let _: () = msg_send![store,
-            requestFullAccessToEventsWithCompletion: completion_block // Pass value directly
+            requestFullAccessToEventsWithCompletion: completion_block
         ];
-        // Keep the block alive until the completion handler is called
-        // In this async context, we await the oneshot channel below, so the block scope is maintained.
     }
 
-    // Await the result from the completion handler
     match task::spawn_blocking(move || rx.recv()).await {
-        Ok(Ok(granted)) => Ok(CalendarAuthorizationStatus::Authorized), // Inner Ok from recv, Outer Ok from spawn_blocking join
+        Ok(Ok(granted)) => Ok(CalendarAuthorizationStatus::Authorized),
         Ok(Err(_)) => Err("Calendar access completion handler channel closed unexpectedly.".to_string()),
         Err(_) => Err("Failed to run blocking task for calendar access result.".to_string()),
     }

@@ -89,7 +89,12 @@
       "requestAuthButton": "Request Calendar Access (Restart app if needed)",
       "openSettingsButton": "Open Privacy Settings",
       "openSettingsError": "Failed to open System Settings.",
-      "saveSuccess": "Calendar selection saved."
+      "saveSuccess": "Calendar selection saved.",
+      "accessGrantedOrAlreadyHad": "Calendar access granted.",
+      "noCalendarsFoundAfterRequest": "Access granted, but no calendars found. Check System Settings.",
+      "resetIgnoredEventsButton": "Unhide All Hidden Events",
+      "resetIgnoredEventsSuccess": "All hidden calendar events are now visible.",
+      "resetIgnoredEventsError": "Failed to reset hidden events."
     },
     "extension_already_added": "This extension is already added.",
     "extension_supported_by_default": "This extension is already supported by default.",
