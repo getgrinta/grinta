@@ -51,8 +51,9 @@
     "tabs": {
       "general": "Allgemein",
       "search": "Suche",
-      "pro": "Pro",
-      "permissions": "Berechtigungen"
+      "hotkeys": "Tastenkürzel",
+      "permissions": "Berechtigungen",
+      "calendar": "Kalender"
     },
     "fields": {
       "shortcut": "Tastenkürzel",
@@ -81,8 +82,27 @@
       "shortcut_cmd_space": "⌘ + Leertaste",
       "shortcut_opt_space": "⌥ + Leertaste"
     },
+    "calendar": {
+      "title": "Kalenderintegration",
+      "description": "Wählen Sie Kalender aus, deren Ereignisse in der Befehlsleiste angezeigt werden sollen.",
+      "noCalendars": "Keine Kalender gefunden oder Zugriff nicht gewährt.",
+      "requestAuthButton": "Kalenderzugriff anfordern (App ggf. neu starten)",
+      "permissionDenied": "Der Kalenderzugriff wurde verweigert. Bitte aktivieren Sie ihn in den macOS Systemeinstellungen > Datenschutz & Sicherheit.",
+      "selectCalendars": "Zu verwendende Kalender auswählen:",
+      "saveButton": "Kalenderauswahl speichern",
+      "openSettingsButton": "Datenschutzeinstellungen öffnen",
+      "openSettingsError": "Systemeinstellungen konnten nicht geöffnet werden.",
+      "saveSuccess": "Kalenderauswahl gespeichert.",
+      "checkingAccess": "Zugriff wird geprüft...",
+      "accessGrantedOrAlreadyHad": "Zugriff gewährt oder bereits vorhanden.",
+      "noCalendarsFoundAfterRequest": "Zugriff gewährt, aber keine Kalender gefunden. Überprüfen Sie die Systemeinstellungen.",
+      "resetIgnoredEventsButton": "Alle versteckten Termine einblenden",
+      "resetIgnoredEventsSuccess": "Alle versteckten Kalendertermine sind jetzt sichtbar.",
+      "resetIgnoredEventsError": "Zurücksetzen der versteckten Termine fehlgeschlagen.",
+      "requestError": "Fehler bei der Zugriffsanfrage."
+    },
     "extension_already_added": "Diese Erweiterung wurde bereits hinzugefügt.",
-    "extension_supported_by_default": "Diese Erweiterung wird bereits unterstützt.",
+    "extension_supported_by_default": "Diese Erweiterung wird bereits standardmäßig unterstützt.",
     "extension_invalid_format": "Die Erweiterung darf nur Buchstaben und Zahlen enthalten.",
     "clipboardRecordingEnabled": "Zwischenablage-Verlauf aufzeichnen",
     "language": "Sprache",
@@ -149,7 +169,9 @@
       "getInfo": "Informationen",
       "copyName": "Name kopieren",
       "copyPath": "Pfad kopieren",
-      "search": "Suchen..."
+      "search": "Suchen...",
+      "hideEvent": "Dieses Ereignis ausblenden",
+      "hideCalendar": "Diesen Kalender ausblenden"
     },
     "menuItems": {
       "clearNotes": "Notizen löschen",
@@ -172,6 +194,7 @@
   },
   "searchBar": {
     "placeholder": {
+      "calendar": "Kalender",
       "initial": "Web oder Apps durchsuchen",
       "menu": "Menü",
       "notes": "Notizen suchen oder erstellen",
@@ -213,7 +236,8 @@
     "exit": "Beenden",
     "settings": "Einstellungen",
     "help": "Hilfe",
-    "profile": "Profile"
+    "profile": "Profile",
+    "calendar": "Kalender"
   },
   "update": {
     "checking": "Auf Updates prüfen...",

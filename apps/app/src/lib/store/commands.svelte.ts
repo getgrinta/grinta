@@ -43,6 +43,10 @@ import { notesStore } from "./notes.svelte";
 import { SecureStore } from "./secure.svelte";
 import { settingsStore } from "./settings.svelte";
 import debounce from "debounce";
+import { calendarStore } from "$lib/store/calendar.svelte";
+import type { EventInfo } from "$lib/types/calendar";
+
+export type { ExecutableCommand };
 
 nlp.extend(dates);
 nlp.extend(numbers);
@@ -247,6 +251,50 @@ export class CommandsStore extends SecureStore<Commands> {
           )) ?? [];
         return noteCommands;
       })
+      .with(APP_MODE.CALENDAR, async () => {
+        const events = calendarStore.events.filter((event) => {
+          return (
+            !settingsStore.data.ignoredEventIds.includes(event.identifier) &&
+            settingsStore.data.selectedCalendarIdentifiers.includes(
+              event.calendar_id,
+            )
+          );
+        });
+
+        const colorByCalendarId = calendarStore.availableCalendars.reduce(
+          (acc, calendar) => {
+            acc[calendar.identifier] = calendar.color;
+            return acc;
+          },
+          {} as Record<string, string>,
+        );
+
+        const mappedCommands = events.map((event: EventInfo) => {
+          console.log("Event:", event);
+          return ExecutableCommandSchema.parse({
+            label: event.title,
+            localizedLabel: event.title,
+            value: event.identifier,
+            handler: COMMAND_HANDLER.CALENDAR,
+            metadata: {
+              calendarSchema: {
+                eventId: event.identifier,
+                calendarIdentifier: event.calendar_id,
+                backgroundColor: colorByCalendarId[event.calendar_id],
+                startTime: event.start_date,
+                endTime: event.end_date,
+                location: event.location ?? undefined,
+                notes: event.notes ?? undefined,
+                isAllDay: event.is_all_day,
+              },
+            },
+            priority: COMMAND_PRIORITY.HIGH,
+            appModes: [APP_MODE.CALENDAR],
+          });
+        });
+
+        return mappedCommands;
+      })
       .exhaustive();
 
     if (appStore.query.length === 0 && appStore.appMode === APP_MODE.INITIAL) {
@@ -272,6 +320,12 @@ export class CommandsStore extends SecureStore<Commands> {
             command.metadata?.updatedAt ?? new Date(),
         )(filteredCommands).reverse(),
       );
+      return;
+    } else if (appStore.appMode === APP_MODE.CALENDAR) {
+      this.commands = sortBy(
+        (command: ExecutableCommand) =>
+          command.metadata?.calendarSchema?.startTime ?? new Date(),
+      )(filteredCommands);
       return;
     }
 
@@ -387,15 +441,16 @@ export class CommandsStore extends SecureStore<Commands> {
     const otherThanLast =
       this.commandHistory[this.commandHistory.length - 1]?.value !==
       command.value;
-    const commandsToSkip = [
+    const commandsToSkipRecording = [
       COMMAND_HANDLER.CREATE_NOTE,
       COMMAND_HANDLER.SYSTEM,
+      COMMAND_HANDLER.CALENDAR,
     ] as string[];
 
     const shouldRecord =
       recordingEnabled &&
       !settingsStore.data.incognitoEnabled &&
-      !commandsToSkip.includes(command.handler);
+      !commandsToSkipRecording.includes(command.handler);
 
     if (otherThanLast && shouldRecord) {
       const filteredHistory = this.commandHistory
@@ -504,6 +559,9 @@ export class CommandsStore extends SecureStore<Commands> {
         const encodedValue = encodeURIComponent(value);
         return goto(`/web/${encodedValue}`);
       })
+      .with({ handler: COMMAND_HANDLER.CALENDAR }, async ({ value }) => {
+        return goto(`/calendar/${value}`);
+      })
       .otherwise(() => {
         console.log("Run custom plugin handlers");
       });
@@ -512,7 +570,7 @@ export class CommandsStore extends SecureStore<Commands> {
   buildPluginContext(): PluginContext {
     return {
       fetch,
-      exec: this.handleCommand,
+      exec: (command) => this.handleCommand({ command }),
       t,
       fail: toast.error,
       app: {

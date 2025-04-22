@@ -1,10 +1,12 @@
 use cocoa::base::{id, YES};
 use objc::{class, msg_send, sel, sel_impl};
+use state::CalendarState;
 use tauri::{Listener as _, Manager as _};
 use tauri_nspanel::ManagerExt as _;
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_deep_link::DeepLinkExt;
-
+use objc::runtime::Object;
+use objc_id::Id;
 use window::WebviewWindowExt as _;
 mod command;
 mod icns_utils;
@@ -15,11 +17,23 @@ mod toggle_visibility;
 mod workspace_utils;
 mod favicon_utils;
 mod keyring_utils;
+mod calendar_utils;
+pub mod state;
+use std::sync::Mutex;
 
 pub const MAIN_WINDOW_LABEL: &str = "main";
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    let store_class = class!(EKEventStore);
+    let store_ptr: *mut Object = unsafe { msg_send![store_class, new] };
+    let event_store_id = unsafe { Id::from_retained_ptr(store_ptr) };
+
+    // Create the state
+    let calendar_state = CalendarState {
+        event_store: Mutex::new(event_store_id),
+    };
+
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![command::show, command::hide])
         .plugin(tauri_nspanel::init())
@@ -108,6 +122,7 @@ pub fn run() {
         })
         .manage(spotlight_utils::SpotlightState::new())
         .manage(workspace_utils::WorkspaceState::new())
+        .manage(calendar_state)
         .invoke_handler(tauri::generate_handler![
             theme_utils::set_vibrancy,
             theme_utils::set_appearance,
@@ -121,6 +136,10 @@ pub fn run() {
             keyring_utils::set_secret,
             keyring_utils::get_secret,
             keyring_utils::delete_secret,
+            calendar_utils::get_calendar_authorization_status,
+            calendar_utils::request_calendar_access,
+            calendar_utils::get_calendars,
+            calendar_utils::get_calendar_events,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

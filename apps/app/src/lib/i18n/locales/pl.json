@@ -16,8 +16,9 @@
     "tabs": {
       "general": "Ogólne",
       "search": "Wyszukiwanie",
-      "pro": "Pro",
-      "permissions": "Uprawnienia"
+      "hotkeys": "Skróty klawiszowe",
+      "permissions": "Uprawnienia",
+      "calendar": "Kalendarz"
     },
     "fields": {
       "shortcut": "Skrót",
@@ -51,6 +52,23 @@
       "localDataWiped": "Lokalne dane zostały pomyślnie wyczyszczone.",
       "shortcut_cmd_space": "⌘ + Spacja",
       "shortcut_opt_space": "⌥ + Spacja"
+    },
+    "calendar": {
+      "title": "Integracja z Kalendarzem",
+      "description": "Wybierz kalendarze, z których wydarzenia mają być wyświetlane w pasku poleceń.",
+      "noCalendars": "Nie znaleziono kalendarzy lub nie udzielono dostępu.",
+      "requestAuthButton": "Poproś o dostęp do kalendarza (Uruchom ponownie aplikację, jeśli to konieczne)",
+      "permissionDenied": "Odmowa dostępu do kalendarza. Proszę przyznać dostęp w Ustawieniach Systemowych > Prywatność i Ochrona > Kalendarze.",
+      "selectCalendars": "Wybierz kalendarze, z których mają być wyświetlane wydarzenia:",
+      "saveButton": "Zapisz Wybór Kalendarzy",
+      "openSettingsButton": "Otwórz ustawienia prywatności kalendarza",
+      "openSettingsError": "Nie udało się otworzyć Ustawień Systemowych.",
+      "saveSuccess": "Wybór kalendarzy zapisany.",
+      "accessGrantedOrAlreadyHad": "Przyznano dostęp do kalendarza.",
+      "noCalendarsFoundAfterRequest": "Przyznano dostęp, ale nie znaleziono kalendarzy. Sprawdź Ustawienia Systemowe.",
+      "resetIgnoredEventsButton": "Odkryj wszystkie ukryte wydarzenia",
+      "resetIgnoredEventsSuccess": "Wszystkie ukryte wydarzenia kalendarza są teraz widoczne.",
+      "resetIgnoredEventsError": "Nie udało się zresetować ukrytych wydarzeń."
     },
     "extension_already_added": "To rozszerzenie jest już dodane.",
     "extension_supported_by_default": "To rozszerzenie jest obsługiwane domyślnie.",
@@ -136,7 +154,9 @@
       "copyName": "Kopiuj nazwę",
       "copyPath": "Kopiuj ścieżkę",
       "search": "Szukaj...",
-      "translate": "Przetłumacz"
+      "translate": "Przetłumacz",
+      "hideEvent": "Ukryj to wydarzenie",
+      "hideCalendar": "Ukryj ten kalendarz"
     },
     "menuItems": {
       "clearNotes": "Wyczyść notatki",
@@ -159,6 +179,7 @@
   },
   "searchBar": {
     "placeholder": {
+      "calendar": "Kalendarz",
       "initial": "Szukaj w sieci lub aplikacjach",
       "menu": "Menu",
       "notes": "Szukaj lub twórz notatki",
@@ -205,7 +226,8 @@
     "exit": "Wyjdź",
     "settings": "Ustawienia",
     "help": "Pomoc",
-    "profile": "Profil"
+    "profile": "Profil",
+    "calendar": "Kalendarz"
   },
   "update": {
     "checking": "Sprawdzanie aktualizacji...",

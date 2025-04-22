@@ -45,6 +45,9 @@ plist = "1.7.1"
 favicon-picker = "1.1.0"
 rand = "0.8"
 url = "2.5"
+chrono = { version = "0.4", features = ["serde"] } # Added for date/time
+core-graphics = "0.23" # Add core-graphics dependency
+once_cell = "1.19"
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-autostart = "2"
@@ -57,6 +60,7 @@ window-vibrancy = "0.6.0"
 cocoa = "0.26.0"
 core-foundation = "0.9"
 objc = { version = "0.2.7", features = ["exception"] }
+objc_id = "0.1.1" # Add objc_id dependency
 tauri-nspanel = { git = "https://github.com/ahkohd/tauri-nspanel", branch = "v2" }
 
 # Added for Spotlight search async functionality

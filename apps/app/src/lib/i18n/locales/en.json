@@ -50,7 +50,8 @@
       "general": "General",
       "search": "Search",
       "pro": "Pro",
-      "permissions": "Permissions"
+      "permissions": "Permissions",
+      "calendar": "Calendar"
     },
     "fields": {
       "shortcut": "Shortcut",
@@ -79,6 +80,21 @@
       "localDataWiped": "Local data wiped successfully.",
       "shortcut_cmd_space": "⌘ + Space",
       "shortcut_opt_space": "⌥ + Space"
+    },
+    "calendar": {
+      "title": "Calendars",
+      "description": "Choose calendars you want to see events from",
+      "noCalendars": "No calendars found. Please check permissions or add accounts in System Settings.",
+      "permissionDenied": "Calendar access was denied. Please enable it in macOS System Settings > Privacy & Security.",
+      "requestAuthButton": "Request Calendar Access (Restart app if needed)",
+      "openSettingsButton": "Open Privacy Settings",
+      "openSettingsError": "Failed to open System Settings.",
+      "saveSuccess": "Calendar selection saved.",
+      "accessGrantedOrAlreadyHad": "Calendar access granted.",
+      "noCalendarsFoundAfterRequest": "Access granted, but no calendars found. Check System Settings.",
+      "resetIgnoredEventsButton": "Unhide All Hidden Events",
+      "resetIgnoredEventsSuccess": "All hidden calendar events are now visible.",
+      "resetIgnoredEventsError": "Failed to reset hidden events."
     },
     "extension_already_added": "This extension is already added.",
     "extension_supported_by_default": "This extension is already supported by default.",
@@ -147,7 +163,9 @@
       "getInfo": "Get Info",
       "copyName": "Copy Name",
       "copyPath": "Copy Path",
-      "search": "Search..."
+      "search": "Search...",
+      "hideEvent": "Hide this event",
+      "hideCalendar": "Hide this calendar"
     },
     "menuItems": {
       "clearNotes": "Clear notes",
@@ -177,6 +195,7 @@
   },
   "searchBar": {
     "placeholder": {
+      "calendar": "Calendar",
       "initial": "Search web or apps",
       "menu": "Menu",
       "notes": "Search or create notes",
@@ -199,6 +218,7 @@
     "invalidCode": "Invalid code. Please verify the code sent to your e-mail."
   },
   "menu": {
+    "calendar": "Calendar",
     "clipboard": "Clipboard",
     "signIn": "Sign In",
     "upgrade": "Upgrade to Pro",

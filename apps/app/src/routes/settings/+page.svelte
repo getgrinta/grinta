@@ -30,6 +30,8 @@
   } from "@getgrinta/core";
   import { commandsStore } from "$lib/store/commands.svelte";
   import Shortcut from "$lib/components/shortcut.svelte";
+  import { calendarStore } from "$lib/store/calendar.svelte";
+  import CalendarSettings from "$lib/components/settings/calendar-settings.svelte"; // Import the new component
 
   const pressedKeys = new PressedKeys();
 
@@ -41,6 +43,7 @@
       value: "permissions",
       hotkey: "⌘3",
     },
+    { label: $_("settings.tabs.calendar"), value: "calendar", hotkey: "⌘4" },
   ];
 
   let extensionInput = $state<HTMLInputElement | null>(null);
@@ -196,6 +199,7 @@
 <Shortcut keys={["meta", "1"]} callback={() => changeTab("general")} />
 <Shortcut keys={["meta", "2"]} callback={() => changeTab("search")} />
 <Shortcut keys={["meta", "3"]} callback={() => changeTab("permissions")} />
+<Shortcut keys={["meta", "4"]} callback={() => changeTab("calendar")} />
 
 <div class="flex flex-1 flex-col gap-4 p-4">
   <TopBar>
@@ -435,6 +439,8 @@
             : $_("settings.fields.requestAutostart")}
         </button>
       </form>
+    {:else if currentTab === "calendar"}
+      <CalendarSettings />
     {/if}
   </div>
 </div>
