@@ -44,6 +44,8 @@
         ...currentSettings.ignoredEventIds,
         eventId,
       ];
+
+      settingsStore.persist();
     }
   }
 
@@ -66,6 +68,7 @@
       currentSettings.selectedCalendarIdentifiers.length
     ) {
       settingsStore.data.selectedCalendarIdentifiers = updatedIdentifiers;
+      settingsStore.persist();
     }
   }
 

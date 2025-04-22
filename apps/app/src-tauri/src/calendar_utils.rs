@@ -217,7 +217,7 @@ pub fn get_calendar_authorization_status() -> Result<CalendarAuthorizationStatus
 }
 
 #[command]
-pub async fn request_calendar_access(state: State<'_, CalendarState>) -> Result<bool, String> {
+pub async fn request_calendar_access(state: State<'_, CalendarState>) -> Result<CalendarAuthorizationStatus, String> {
     println!("Requesting calendar access...");
     const EK_ENTITY_TYPE_EVENT: i64 = 0;
 
@@ -226,8 +226,7 @@ pub async fn request_calendar_access(state: State<'_, CalendarState>) -> Result<
     // Check current status first (optional but good practice)
     let current_status = get_calendar_authorization_status()?;
     if current_status == CalendarAuthorizationStatus::Authorized {
-        println!("Calendar access already authorized.");
-        return Ok(true);
+        return Ok(current_status);
     }
     if current_status != CalendarAuthorizationStatus::NotDetermined {
         println!(
@@ -236,7 +235,7 @@ pub async fn request_calendar_access(state: State<'_, CalendarState>) -> Result<
         );
         // Return Ok(false) as the request won't proceed if not NotDetermined
         // Or you could return an error, depending on desired frontend handling
-        return Ok(false);
+        return Ok(current_status);
     }
 
     let (tx, rx) = mpsc::channel::<bool>(); // Use mpsc channel
@@ -276,7 +275,7 @@ pub async fn request_calendar_access(state: State<'_, CalendarState>) -> Result<
 
     // Await the result from the completion handler
     match task::spawn_blocking(move || rx.recv()).await {
-        Ok(Ok(granted)) => Ok(granted), // Inner Ok from recv, Outer Ok from spawn_blocking join
+        Ok(Ok(granted)) => Ok(CalendarAuthorizationStatus::Authorized), // Inner Ok from recv, Outer Ok from spawn_blocking join
         Ok(Err(_)) => Err("Calendar access completion handler channel closed unexpectedly.".to_string()),
         Err(_) => Err("Failed to run blocking task for calendar access result.".to_string()),
     }

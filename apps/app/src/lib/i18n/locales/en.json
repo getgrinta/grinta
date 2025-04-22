@@ -84,7 +84,12 @@
     "calendar": {
       "title": "Calendars",
       "description": "Choose calendars you want to see events from",
-      "noCalendars": "No calendars found. Please check permissions or add accounts in System Settings."
+      "noCalendars": "No calendars found. Please check permissions or add accounts in System Settings.",
+      "permissionDenied": "Calendar access was denied. Please enable it in macOS System Settings > Privacy & Security.",
+      "requestAuthButton": "Request Calendar Access (Restart app if needed)",
+      "openSettingsButton": "Open Privacy Settings",
+      "openSettingsError": "Failed to open System Settings.",
+      "saveSuccess": "Calendar selection saved."
     },
     "extension_already_added": "This extension is already added.",
     "extension_supported_by_default": "This extension is already supported by default.",

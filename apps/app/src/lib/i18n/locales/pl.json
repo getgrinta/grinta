@@ -54,9 +54,16 @@
       "shortcut_opt_space": "⌥ + Spacja"
     },
     "calendar": {
-      "title": "Kalendarze",
-      "description": "Wybierz kalendarze, z których chcesz wyświetlać wydarzenia",
-      "noCalendars": "Nie znaleziono kalendarzy. Sprawdź uprawnienia lub dodaj konta w Ustawieniach systemu."
+      "title": "Integracja z Kalendarzem",
+      "description": "Wybierz kalendarze, z których wydarzenia mają być wyświetlane w pasku poleceń.",
+      "noCalendars": "Nie znaleziono kalendarzy lub nie udzielono dostępu.",
+      "requestAuthButton": "Poproś o dostęp do kalendarza (Uruchom ponownie aplikację, jeśli to konieczne)",
+      "permissionDenied": "Odmowa dostępu do kalendarza. Proszę przyznać dostęp w Ustawieniach Systemowych > Prywatność i Ochrona > Kalendarze.",
+      "selectCalendars": "Wybierz kalendarze, z których mają być wyświetlane wydarzenia:",
+      "saveButton": "Zapisz Wybór Kalendarzy",
+      "openSettingsButton": "Otwórz ustawienia prywatności kalendarza",
+      "openSettingsError": "Nie udało się otworzyć Ustawień Systemowych.",
+      "saveSuccess": "Wybór kalendarzy zapisany."
     },
     "extension_already_added": "To rozszerzenie jest już dodane.",
     "extension_supported_by_default": "To rozszerzenie jest obsługiwane domyślnie.",

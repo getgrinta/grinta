@@ -177,7 +177,7 @@ export async function getSecret(
   service: string,
   accountName: string,
 ): Promise<string | null> {
-  return await grintaInvoke<string | null>("get_secret", {
+  return await grintaInvoke("get_secret", {
     service,
     account: accountName,
   });
@@ -193,17 +193,15 @@ export async function deleteSecret(
 // --- Calendar Commands ---
 
 export async function getCalendarAuthorizationStatus(): Promise<CalendarAuthorizationStatus> {
-  return await grintaInvoke<CalendarAuthorizationStatus>(
-    "get_calendar_authorization_status",
-  );
+  return await grintaInvoke("get_calendar_authorization_status");
 }
 
-export async function requestCalendarAccess(): Promise<boolean> {
-  return await grintaInvoke<boolean>("request_calendar_access");
+export async function requestCalendarAccess(): Promise<CalendarAuthorizationStatus> {
+  return await grintaInvoke("request_calendar_access");
 }
 
 export async function getCalendars(): Promise<CalendarInfo[]> {
-  return await grintaInvoke<CalendarInfo[]>("get_calendars");
+  return await grintaInvoke("get_calendars");
 }
 
 export async function getCalendarEvents(
@@ -211,7 +209,7 @@ export async function getCalendarEvents(
   startDateIso: string,
   endDateIso: string,
 ): Promise<EventInfo[]> {
-  return await grintaInvoke<EventInfo[]>("get_calendar_events", {
+  return await grintaInvoke("get_calendar_events", {
     calendarIds,
     startDateIso,
     endDateIso,

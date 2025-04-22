@@ -3,6 +3,6 @@
 <plist version="1.0">
 <dict>
   <key>NSCalendarsUsageDescription</key>
-  <string>Calendar for the app</string>
+  <string>Grinta needs access to the calendar to show your events.</string>
 </dict>
 </plist>

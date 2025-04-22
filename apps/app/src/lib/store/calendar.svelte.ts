@@ -6,7 +6,6 @@ import {
 } from "$lib/grinta-invoke";
 import type { CalendarInfo, EventInfo } from "$lib/types/calendar";
 import { CalendarAuthorizationStatus } from "$lib/types/calendar";
-import { settingsStore } from "./settings.svelte";
 // import { settings } from './settings-store.svelte'; // Import later when needed
 
 // State properties are defined directly in the class with $state
@@ -138,21 +137,18 @@ export class CalendarStore {
       console.log("Requesting calendar access...");
       try {
         this.isLoading = true;
-        const granted = await requestCalendarAccess();
-        console.log("Calendar access granted:", granted);
-        // No need to set status directly, re-check auth handles it
-        if (granted) {
-          await this.checkAuthAndFetchCalendars(); // Re-fetch calendars after grant
+        const authorizationStatus = await requestCalendarAccess();
+
+        if (authorizationStatus === CalendarAuthorizationStatus.Authorized) {
+          await this.checkAuthAndFetchCalendars();
         } else {
-          this.authorizationStatus = CalendarAuthorizationStatus.Denied;
+          this.authorizationStatus = authorizationStatus;
         }
       } catch (err: any) {
         console.error("Error requesting calendar access:", err);
         this.error = err.message || "Failed to request access.";
         this.authorizationStatus = CalendarAuthorizationStatus.Denied;
       } finally {
-        // Only set loading false if access was denied immediately or error occurred
-        // Otherwise, #checkAuthAndFetchCalendars will handle it.
         if (this.authorizationStatus === CalendarAuthorizationStatus.Denied) {
           this.isLoading = false;
         }

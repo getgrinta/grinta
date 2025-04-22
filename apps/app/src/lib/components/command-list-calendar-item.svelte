@@ -12,6 +12,9 @@
   import { z } from "zod";
   import { Clock, MapPin } from "lucide-svelte";
   import { formatRelative, parseISO } from "date-fns";
+  import { enUS, de, pl } from "date-fns/locale";
+  import { locale } from "svelte-i18n";
+  import { get } from "svelte/store";
 
   const { item, index, active, contextMenu } = $props<{
     item: z.infer<typeof ExecutableCommandSchema>;
@@ -45,7 +48,12 @@
     item.metadata?.calendarSchema?.backgroundColor ?? "#808080",
   );
 
-  // Helper function using date-fns formatRelative
+  const dateFnsLocales = {
+    en: enUS,
+    de: de,
+    pl: pl,
+  };
+
   function getRelativeDayStringUsingDateFns(
     startDateString: string | undefined,
   ): string | null {
@@ -54,22 +62,19 @@
     try {
       const startDate = parseISO(startDateString);
       const now = new Date();
-      // formatRelative returns strings like "today at 2:30 PM", "yesterday at 5:00 PM", "tomorrow at 10:00 AM" etc.
-      // We might want to extract just the day part later if needed.
-      return formatRelative(startDate, now).replace(/^\w/, (c) =>
-        c.toUpperCase(),
-      );
+      const currentAppLocale = get(locale) || "en";
+      const selectedDateFnsLocale =
+        dateFnsLocales[currentAppLocale as keyof typeof dateFnsLocales] || enUS;
+
+      return formatRelative(startDate, now, {
+        locale: selectedDateFnsLocale,
+      }).replace(/^\w/, (c) => c.toUpperCase());
     } catch (e) {
-      console.error(
-        "Error parsing date with date-fns formatRelative:",
-        startDateString,
-        e,
-      );
+      console.error("Error formatting relative date:", e);
       return null;
     }
   }
 
-  // Derive the relative date string using the new function
   let relativeDate = $derived(
     getRelativeDayStringUsingDateFns(item.metadata?.calendarSchema?.startTime),
   );
