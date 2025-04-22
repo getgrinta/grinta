@@ -155,7 +155,6 @@ unsafe fn get_calendars_by_ids(store: id, calendar_ids: &[String]) -> Vec<id> {
     const EK_ENTITY_TYPE_EVENT: i64 = 0;
     let all_calendars_nsarray: id = msg_send![store, calendarsForEntityType: EK_ENTITY_TYPE_EVENT];
     if all_calendars_nsarray == nil {
-        println!("Fetching calendars by IDs... Resulting NSArray is nil, returning empty vec."); // 4a. Array is nil
         return Vec::new();
     }
 
@@ -165,7 +164,6 @@ unsafe fn get_calendars_by_ids(store: id, calendar_ids: &[String]) -> Vec<id> {
     for i in 0..count {
         let calendar: id = NSArray::objectAtIndex(all_calendars_nsarray, i);
         if calendar == nil {
-            println!("Fetching calendars by IDs... WARNING: Calendar object at index {} is nil, skipping.", i); // 8a. Calendar object is nil
             continue;
         }
 
@@ -180,7 +178,6 @@ unsafe fn get_calendars_by_ids(store: id, calendar_ids: &[String]) -> Vec<id> {
 
 #[command]
 pub fn get_calendar_authorization_status() -> Result<CalendarAuthorizationStatus, String> {
-    println!("Checking calendar authorization status...");
     const EK_ENTITY_TYPE_EVENT: i64 = 0;
 
     let store_class = event_store_class();
@@ -188,7 +185,6 @@ pub fn get_calendar_authorization_status() -> Result<CalendarAuthorizationStatus
     let status_raw: i64 = unsafe {
         msg_send![store_class, authorizationStatusForEntityType: EK_ENTITY_TYPE_EVENT]
     };
-    println!("Raw calendar status: {}", status_raw);
 
     let status = match status_raw {
         0 => CalendarAuthorizationStatus::NotDetermined,
@@ -204,7 +200,6 @@ pub fn get_calendar_authorization_status() -> Result<CalendarAuthorizationStatus
 
 #[command]
 pub async fn request_calendar_access(state: State<'_, CalendarState>) -> Result<CalendarAuthorizationStatus, String> {
-    println!("Requesting calendar access...");
     const EK_ENTITY_TYPE_EVENT: i64 = 0;
 
     let store = get_store_ptr(&state)?;
@@ -215,12 +210,6 @@ pub async fn request_calendar_access(state: State<'_, CalendarState>) -> Result<
         return Ok(current_status);
     }
     if current_status != CalendarAuthorizationStatus::NotDetermined {
-        println!(
-            "Calendar access not determinable or already denied/restricted. Status: {:?}",
-            current_status
-        );
-        // Return Ok(false) as the request won't proceed if not NotDetermined
-        // Or you could return an error, depending on desired frontend handling
         return Ok(current_status);
     }
 
@@ -235,11 +224,9 @@ pub async fn request_calendar_access(state: State<'_, CalendarState>) -> Result<
                 let c_str = cocoa::foundation::NSString::UTF8String(description);
                 std::ffi::CStr::from_ptr(c_str).to_string_lossy().into_owned()
             };
-            eprintln!("Error requesting calendar access: {}", description_str);
             // Send false on error
             let _ = tx_clone.send(false);
         } else {
-            println!("Calendar access request completed. Granted: {}", granted_bool);
             let _ = tx_clone.send(granted_bool); // Use the clone
         }
     }).copy();
@@ -264,12 +251,6 @@ pub fn get_calendar_events(
     start_date_iso: String,
     end_date_iso: String,
 ) -> Result<Vec<EventInfo>, String> {
-    println!(
-        "Fetching events for calendars: {:?}, start: {}, end: {}",
-        calendar_ids,
-        start_date_iso,
-        end_date_iso
-    );
     let _pool = unsafe { NSAutoreleasePool::new(nil) };
 
     // Check auth status
@@ -303,7 +284,6 @@ pub fn get_calendar_events(
         };
 
         if calendars_nsarray == nil || NSArray::count(calendars_nsarray) == 0 {
-            println!("No calendars specified or found for event query.");
             return Ok(Vec::new()); // No calendars to search in
         }
 
@@ -321,7 +301,6 @@ pub fn get_calendar_events(
 
         let mut events_vec = Vec::new();
         let count: NSUInteger = NSArray::count(events_nsarray);
-        println!("Found {} raw events.", count);
 
         for i in 0..count {
             let event: id = NSArray::objectAtIndex(events_nsarray, i);
@@ -374,10 +353,8 @@ pub fn get_calendar_events(
                 location: if location != nil { Some(nsstring_to_string(location)) } else { None },
                 is_all_day: is_all_day == YES,
             };
-            // println!("Processed Event: {:?}", event_info);
             events_vec.push(event_info);
         }
-        println!("Finished processing {} events.", events_vec.len());
         Ok(events_vec)
     }
 }
@@ -389,9 +366,8 @@ pub fn get_calendars(state: State<CalendarState>) -> Result<Vec<CalendarInfo>, S
 
     // Check auth status first
     match get_calendar_authorization_status()? {
-        CalendarAuthorizationStatus::Authorized => println!("Fetching calendars... Auth status: Authorized"), // 3a. Auth OK
+        CalendarAuthorizationStatus::Authorized => (),
         status => {
-            println!("Fetching calendars... Auth status: Not Authorized ({:?})", status); // 3b. Auth Failed
             return Err("Calendar access not authorized.".to_string());
         }
     }
@@ -399,16 +375,13 @@ pub fn get_calendars(state: State<CalendarState>) -> Result<Vec<CalendarInfo>, S
     let store = get_store_ptr(&state)?;
 
     let calendars_nsarray: id = unsafe { msg_send![store, calendarsForEntityType: EK_ENTITY_TYPE_EVENT] };
-    println!("Fetching calendars... calendarsForEntityType result: {:?}", calendars_nsarray);
 
     if calendars_nsarray == nil {
-        println!("Fetching calendars... Resulting NSArray is nil, returning empty vec.");
         return Ok(Vec::new()); // No calendars found or error
     }
 
     let mut calendars_vec = Vec::new();
     let count: NSUInteger = unsafe { NSArray::count(calendars_nsarray) };
-    println!("Fetching calendars... Calendar count: {}", count);
 
     for i in 0..count {
         unsafe {

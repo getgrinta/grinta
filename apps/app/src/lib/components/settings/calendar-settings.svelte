@@ -19,7 +19,6 @@
         }
       }, 1000);
     } catch (error) {
-      console.log(error);
       console.error("Error during calendar access request flow:", error);
       toast.error($_("settings.calendar.requestError"));
     }

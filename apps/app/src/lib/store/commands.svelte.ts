@@ -307,12 +307,6 @@ export class CommandsStore extends SecureStore<Commands> {
     const filteredCommands = matchSorter(commands, appStore.query, {
       keys: ["localizedLabel", "label"],
     });
-    console.log(
-      "[CommandsStore] Commands after matchSorter:",
-      filteredCommands,
-      "Query:",
-      appStore.query,
-    );
 
     // Prevent overriding commands
     if (newCommandsToken !== this.buildCommandsToken) {
@@ -346,8 +340,6 @@ export class CommandsStore extends SecureStore<Commands> {
     this.commands = uniq([...formulaCommands, ...filteredCommands]).sort(
       (a, b) => this.sortCommands({ prev: a, next: b }),
     );
-
-    console.log("[CommandsStore] Final this.commands:", this.commands);
 
     if (
       appStore.appMode === APP_MODE.INITIAL &&
