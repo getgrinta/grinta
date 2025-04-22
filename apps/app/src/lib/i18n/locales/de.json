@@ -99,7 +99,8 @@
       "resetIgnoredEventsButton": "Alle versteckten Termine einblenden",
       "resetIgnoredEventsSuccess": "Alle versteckten Kalendertermine sind jetzt sichtbar.",
       "resetIgnoredEventsError": "Zurücksetzen der versteckten Termine fehlgeschlagen.",
-      "requestError": "Fehler bei der Zugriffsanfrage."
+      "requestError": "Fehler bei der Zugriffsanfrage.",
+      "allDay": "Ganztägig"
     },
     "extension_already_added": "Diese Erweiterung wurde bereits hinzugefügt.",
     "extension_supported_by_default": "Diese Erweiterung wird bereits standardmäßig unterstützt.",
