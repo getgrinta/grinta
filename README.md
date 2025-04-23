@@ -8,6 +8,7 @@ Grinta is an open-source, AI-powered, and privacy-focused alternative to MacOS S
 
 - **Search Mode**: Quickly find installed apps, perform web searches, and more—all from a single search bar.
 - **Shortcuts Integration**: Seamlessly access and execute your existing Shortcuts directly within Grinta.
+- **Calendar Integration**: Connect your macOS Calendar to view and manage upcoming events directly in Grinta.
 - **Notes Mode**: Write notes with the help of an AI copilot. Improve readability with rephrasing tools and open your Grinta notes as Obsidian vaults for enhanced organization.
 - **Formulas and Natural Language Processing (NLP)**: Use the search bar as a calculator or process natural language queries like "45 days from now".
 - **Local LLM Support**: Bring your own OpenAI-compatible large language models (LLMs) to Grinta using tools like Ollama or LM Studio.
@@ -76,4 +77,3 @@ $ bun run tauri dev
 ├── packages
 │   ├── core - Core library for Grinta
 │   └── plugin - Plugin interface for Grinta
-```
