@@ -270,12 +270,11 @@ export class CommandsStore extends SecureStore<Commands> {
         );
 
         const mappedCommands = events.map((event: EventInfo) => {
-          console.log("Event:", event);
           return ExecutableCommandSchema.parse({
             label: event.title,
             localizedLabel: event.title,
             value: event.identifier,
-            handler: COMMAND_HANDLER.CALENDAR,
+            handler: COMMAND_HANDLER.OPEN_CALENDAR,
             metadata: {
               calendarSchema: {
                 eventId: event.identifier,
@@ -444,7 +443,7 @@ export class CommandsStore extends SecureStore<Commands> {
     const commandsToSkipRecording = [
       COMMAND_HANDLER.CREATE_NOTE,
       COMMAND_HANDLER.SYSTEM,
-      COMMAND_HANDLER.CALENDAR,
+      COMMAND_HANDLER.OPEN_CALENDAR,
     ] as string[];
 
     const shouldRecord =
@@ -543,12 +542,15 @@ export class CommandsStore extends SecureStore<Commands> {
         const filename = encodeURIComponent(value);
         return goto(`/notes/${filename}`);
       })
-      .with({ handler: COMMAND_HANDLER.CREATE_NOTE }, async ({ value }) => {
-        const filename = await notesStore.createNote(value);
+      .with({ handler: COMMAND_HANDLER.CREATE_NOTE }, async () => {
+        const filename = await notesStore.createNote(
+          appStore.query.length > 0 ? appStore.query : undefined,
+        );
         const encodedFilename = encodeURIComponent(filename);
         return goto(`/notes/${encodedFilename}`);
       })
       .with({ handler: COMMAND_HANDLER.RUN_SHORTCUT }, async ({ value }) => {
+        toggleVisibility();
         const result = await Command.create("shortcuts", [
           "run",
           value,
@@ -559,7 +561,7 @@ export class CommandsStore extends SecureStore<Commands> {
         const encodedValue = encodeURIComponent(value);
         return goto(`/web/${encodedValue}`);
       })
-      .with({ handler: COMMAND_HANDLER.CALENDAR }, async ({ value }) => {
+      .with({ handler: COMMAND_HANDLER.OPEN_CALENDAR }, async ({ value }) => {
         return goto(`/calendar/${value}`);
       })
       .otherwise(() => {

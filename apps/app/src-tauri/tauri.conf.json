@@ -4,9 +4,9 @@
   "version": "0.3.2",
   "identifier": "com.getgrinta.desktop-dev",
   "build": {
-    "beforeDevCommand": "bun run dev",
+    "beforeDevCommand": "bun run --cwd ../../ build:deps && bun run dev",
     "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "bun run build",
+    "beforeBuildCommand": "bun run --cwd ../../ build:deps && bun run build",
     "frontendDist": "../build"
   },
   "app": {

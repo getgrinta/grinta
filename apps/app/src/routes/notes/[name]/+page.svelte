@@ -142,6 +142,7 @@
       icon: TrashIcon,
       shortcut: "⌘⇧D",
       hotkey: "Mod+Shift+D",
+      class: deleteConfirmationMode ? "btn-error" : "",
     },
   ]);
 </script>

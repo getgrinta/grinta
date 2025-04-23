@@ -12,6 +12,7 @@
   import { clsx } from "clsx";
   import { createForm } from "felte";
   import {
+    ArrowRightToLineIcon,
     CalendarIcon,
     ChevronLeftIcon,
     ClipboardIcon,
@@ -33,6 +34,13 @@
 
   async function handleGrintAi() {
     return goto(`/ai/${appStore.query}`);
+  }
+
+  async function createNote() {
+    const filename = await notesStore.createNote(
+      appStore.query.length > 0 ? appStore.query : undefined,
+    );
+    return goto(`/notes/${filename}`);
   }
 
   const INDICATOR_MODES = [
@@ -63,12 +71,12 @@
     },
     {
       key: "p",
-      modifier: ["ctrl", "meta"],
+      modifier: ["meta"],
       callback: () => settingsStore.toggleIncognito(),
     },
     {
       key: "n",
-      modifier: ["ctrl", "meta"],
+      modifier: ["meta"],
       callback: createNote,
     },
   ];
@@ -76,39 +84,32 @@
   // Widget shortcuts in a loop
   for (let i = 0; i <= 9; i++) {
     baseShortcuts.push({
-      key: `${i}`,
+      key: i.toString(),
       modifier: ["ctrl"],
       callback: () => {
         onWidgetShortcut?.(i);
       },
+      preventDefault: true,
     });
   }
 
-  const authenticatedShortcuts: ShortcutTrigger[] = [
-    ...baseShortcuts,
+  const shortcuts: ShortcutTrigger[] = baseShortcuts;
+
+  const searchViewActions = [
     {
-      key: "l",
-      modifier: ["ctrl", "meta"],
-      callback: () => {
-        if (appStore.query.length < 4) return;
-        return goto(`/ai/${appStore.query}`);
-      },
+      label: $_("search.grintai"),
+      onclick: handleGrintAi,
+      icon: ArrowRightToLineIcon,
     },
   ];
 
-  const shortcuts: ShortcutTrigger[] = appStore.user?.id
-    ? authenticatedShortcuts
-    : baseShortcuts;
-
-  const searchViewActions = appStore.user?.id
-    ? [
-        {
-          label: $_("search.grintai"),
-          onclick: handleGrintAi,
-          shortcut: "⌘L",
-        },
-      ]
-    : [];
+  const notesViewActions = [
+    {
+      label: $_("notes.createNote"),
+      onclick: createNote,
+      icon: ArrowRightToLineIcon,
+    },
+  ];
 
   const { form } = createForm({
     async onSubmit() {
@@ -164,13 +165,6 @@
     return goto(`/commands/${mode}`);
   }
 
-  async function createNote() {
-    const filename = await notesStore.createNote(
-      appStore.query.length > 0 ? appStore.query : undefined,
-    );
-    return goto(`/notes/${filename}`);
-  }
-
   async function handleNavigation(event: KeyboardEvent) {
     if (event.key === "ArrowDown" || (event.key === "j" && event.ctrlKey)) {
       event.preventDefault();
@@ -195,6 +189,11 @@
     if (event.key === "Backspace" && appStore.query.length === 0) {
       appStore.appMode = APP_MODE.INITIAL;
       return;
+    }
+    if (event.key === "Tab") {
+      event.preventDefault();
+      if (appStore.query.length < 4) return;
+      return goto(`/ai/${appStore.query}`);
     }
   }
 
@@ -259,17 +258,20 @@
         appStore.query.length > 0
           ? {
               icon: XIcon,
+              tooltip: $_("common.clear"),
               onClick: () => appStore.setQuery(""),
             }
           : settingsStore.data.incognitoEnabled
             ? {
                 icon: EyeOffIcon,
+                tooltip: $_("common.incognito"),
                 onClick: () => settingsStore.toggleIncognito(),
                 active: true,
                 hotkey: "Mod+p",
               }
             : {
                 icon: EyeIcon,
+                tooltip: $_("common.incognito"),
                 onClick: () => settingsStore.toggleIncognito(),
                 active: false,
                 hotkey: "Mod+p",
@@ -277,6 +279,7 @@
       )
       .otherwise(() => ({
         icon: ChevronLeftIcon,
+        tooltip: $_("common.back"),
         onClick: () => goto("/commands/INITIAL"),
         active: false,
         hotkey: "Mod+p",
@@ -292,7 +295,11 @@
 
 <form use:form>
   <TopBar>
-    <div slot="indicator">
+    <div
+      class="tooltip tooltip-bottom tooltip-primary"
+      data-tip={indicatorButton.tooltip}
+      slot="indicator"
+    >
       <button
         type="button"
         class={clsx("btn btn-sm", indicatorButton.active && "btn-primary")}
@@ -315,9 +322,9 @@
       data-testid="search-bar"
     />
     <div slot="addon" class="flex items-center gap-1">
-      {#if appStore.appMode === APP_MODE.INITIAL && appStore.query.length >= 3}
+      {#if appStore.appMode === APP_MODE.INITIAL && appStore.query.length >= 3 && appStore.user?.id}
         <ViewActions actions={searchViewActions} size="sm" />
-      {:else if appStore.query.length === 0}
+      {:else}
         <SegmentedControl
           items={INDICATOR_MODES.map((mode) => ({
             text: $_(`barMode.${mode.value.toLowerCase()}`),

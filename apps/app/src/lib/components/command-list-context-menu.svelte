@@ -78,7 +78,7 @@
   ) {
     const menuItems: MenuItem[] = [];
 
-    if (!isWidget && command.handler !== COMMAND_HANDLER.CALENDAR) {
+    if (!isWidget && command.handler !== COMMAND_HANDLER.OPEN_CALENDAR) {
       menuItems.push({
         label: t("commands.contextMenu.pin"),
         icon: PinIcon as any,
@@ -233,7 +233,7 @@
       }
     }
 
-    if (command.handler === COMMAND_HANDLER.CALENDAR) {
+    if (command.handler === COMMAND_HANDLER.OPEN_CALENDAR) {
       menuItems.push({
         label: t("commands.contextMenu.hideEvent"),
         icon: XIcon as any,

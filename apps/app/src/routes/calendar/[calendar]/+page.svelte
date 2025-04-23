@@ -49,7 +49,7 @@
     isAllDayEvent?: boolean,
   ): string {
     if (isAllDayEvent) {
-      return $_("calendar.allDay");
+      return $_("settings.calendar.allDay");
     }
     if (!startTimeStr) {
       return $_("common.notSet");

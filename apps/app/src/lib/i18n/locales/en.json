@@ -1,6 +1,10 @@
 {
   "common": {
-    "next": "Next"
+    "next": "Next",
+    "menu": "Menu",
+    "clear": "Clear",
+    "incognito": "Incognito",
+    "back": "Back"
   },
   "auth": {
     "signIn": "Sign In",
@@ -189,7 +193,8 @@
       "search": "Search for \"{query}\"",
       "smartNote": "Smart Note \"{query}\"",
       "ask": "Ask \"{query}\"",
-      "createNote": "Create \"{query}\" note"
+      "createNote": "Create \"{query}\" note",
+      "createDailyNote": "Create daily note"
     }
   },
   "widgets": {

@@ -6,6 +6,7 @@
     label: string;
     onclick: () => void;
     shortcut?: string;
+    icon?: any;
   };
 
   const { actions, size } = $props<{ actions: Action[]; size?: "sm" | "md" }>();
@@ -21,6 +22,9 @@
       class={clsx("btn", size === "sm" && "btn-sm")}
       onclick={action.onclick}
     >
+      {#if action.icon}
+        <action.icon size={16} />
+      {/if}
       <span>{action.label}</span>
       {#if action.shortcut && isCmdPressed}
         <span class="text-sm">{action.shortcut}</span>

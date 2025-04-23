@@ -162,7 +162,7 @@ export class CalendarStore {
         new Date().toISOString(),
       );
       this.events = events;
-    } catch (error) {
+    } catch {
       this.events = [];
     }
   }

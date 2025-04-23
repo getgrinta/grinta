@@ -100,7 +100,7 @@
     "@types/dompurify": "^3.2.0",
     "bun-plugin-svelte": "0.0.6",
     "clipboardy": "4.0.0",
-    "daisyui": "5.0.18",
+    "daisyui": "5.0.27",
     "dotenv-cli": "8.0.0",
     "svelte": "5.25.6",
     "svelte-check": "4.1.5",
