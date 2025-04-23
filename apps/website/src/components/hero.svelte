@@ -2,8 +2,11 @@
   import packageJson from "../../../app/package.json";
 
   let version = $state(packageJson.version);
-  const downloadUrl = $derived(
-    `https://github.com/getgrinta/grinta/releases/download/v${packageJson.version}/Grinta_${packageJson.version}_aarch64.dmg`,
+  const downloadUrlAarch64 = $derived(
+    `https://github.com/getgrinta/grinta/releases/download/v${version}/Grinta_${version}_aarch64.dmg`,
+  );
+  const downloadUrlX64 = $derived(
+    `https://github.com/getgrinta/grinta/releases/download/v${version}/Grinta_${version}_x64.dmg`,
   );
 </script>
 
@@ -33,7 +36,7 @@
     class="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center justify-center !mt-6 sm:!mt-8 w-full max-w-md sm:max-w-none"
   >
     <a
-      href={downloadUrl}
+      href={downloadUrlAarch64}
       class="btn sm:btn-md lg:btn-lg !bg-zinc-800 border-2 !text-white rounded-full hover:border-primary shadow-2xl hover:shadow-primary/40 w-full sm:w-auto"
     >
       <img
@@ -43,13 +46,28 @@
         class="text-white hidden sm:inline"
         alt="Mac Icon"
       />
-      <span>Download for Mac</span>
+      Download for Apple Silicon
     </a>
+    <a
+      href={downloadUrlX64}
+      class="btn sm:btn-md lg:btn-lg btn-secondary bg-white !text-black rounded-full border-2 border-white hover:bg-primary hover:border-primary hover:!text-white shadow-2xl hover:shadow-primary/40 w-full sm:w-auto"
+    >
+      <img
+        src="/mac_black.svg"
+        width={30}
+        height={30}
+        class="text-black hidden sm:inline"
+        alt="Mac Icon"
+      />Download for Intel (x64)</a
+    >
+  </div>
+  <div class="flex justify-center mt-3 w-full max-w-md sm:max-w-none">
     <a
       href="/guides"
       class="btn sm:btn-md lg:btn-lg btn-secondary bg-white !text-black rounded-full border-2 border-white hover:bg-primary hover:border-primary hover:!text-white shadow-2xl hover:shadow-primary/40 w-full sm:w-auto"
-      >Read Docs</a
     >
+      Read Docs
+    </a>
   </div>
   <div
     class="flex flex-wrap justify-center items-center gap-2 !mt-3 sm:!mt-4 text-xs sm:text-sm lg:text-base text-gray-400"
