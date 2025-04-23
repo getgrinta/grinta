@@ -157,7 +157,7 @@
         >
           <ArrowDownLeftIcon size={16} />
         </button>
-      {:else if props.item.handler === COMMAND_HANDLER.CALENDAR}
+      {:else if props.item.handler === COMMAND_HANDLER.OPEN_CALENDAR}
         <span
           class="block h-4 w-4 rounded-sm"
           style="background-color: {props.item.metadata?.calendarSchema

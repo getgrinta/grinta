@@ -109,9 +109,14 @@
   {@render children()}
   {#snippet sidebar()}
     <div class="flex justify-between items-center mb-4">
-      <label for="menuSidebar" class="btn btn-sm btn-square">
-        <ChevronRightIcon size={16} />
-      </label>
+      <div
+        class="tooltip tooltip-right tooltip-primary"
+        data-tip={$_("common.back")}
+      >
+        <label for="menuSidebar" class="btn btn-sm btn-square">
+          <ChevronRightIcon size={16} />
+        </label>
+      </div>
       {#if userId}
         <div
           class="tooltip tooltip-primary tooltip-left"

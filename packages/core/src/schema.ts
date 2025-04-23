@@ -23,7 +23,7 @@ export const COMMAND_HANDLER = {
   URL: "URL",
   EMBEDDED_URL: "EMBEDDED_URL",
   FS_ITEM: "FS_ITEM",
-  CALENDAR: "CALENDAR",
+  OPEN_CALENDAR: "OPEN_CALENDAR",
 } as const;
 
 export const commandHandlerEnum = z.nativeEnum(COMMAND_HANDLER);

@@ -6,7 +6,10 @@
   import WidgetsContextMenu from "./widgets-context-menu.svelte";
   import CommandListIcon from "./command-list-icon.svelte";
   import { settingsStore } from "$lib/store/settings.svelte";
-  import { shortcut } from "@svelte-put/shortcut";
+  import { PressedKeys } from "runed";
+
+  const pressedKeys = new PressedKeys();
+  const isCtrlPressed = $derived(pressedKeys.has("Control"));
 
   let widgetsContextMenu = $state<WidgetsContextMenu>();
   const widgets = $derived(widgetsStore.data.widgets ?? []);
@@ -14,6 +17,11 @@
   const widgetsScale = $derived(1 - commandsStore.scrollTop / 1000);
   const showWidgets = $derived(widgetsStore.showWidgets && widgetsOpacity > 0);
   $effect(clickListener);
+
+  function getShortcut(index: number) {
+    if (index > 8) return;
+    return `⌃${index + 1}`;
+  }
 
   export function handleWidgetShortcut(index: number) {
     const widget = widgets[index];
@@ -39,6 +47,7 @@
     {#each widgets as widget, i}
       {@const first = i === 0}
       {@const last = i === widgets.length - 1}
+      {@const shortcut = getShortcut(i)}
       <div
         class="carousel-item select-none px-1 pb-2"
         data-widget-index={i}
@@ -58,12 +67,17 @@
               recordingEnabled: false,
             })}
         >
-          <CommandListIcon
-            item={widget.data}
-            label={widget.data.label}
-            size={24}
-          />
-
+          {#if isCtrlPressed && shortcut}
+            <div class="flex items-center justify-center w-6 h-6">
+              {shortcut}
+            </div>
+          {:else}
+            <CommandListIcon
+              item={widget.data}
+              label={widget.data.label}
+              size={24}
+            />
+          {/if}
           {#if settingsStore.data.showWidgetLabels}
             <span>{widget.data.localizedLabel ?? widget.data.label}</span>
           {/if}

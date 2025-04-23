@@ -8,14 +8,6 @@
   function defaultGoBack() {
     return window.history.back();
   }
-
-  function scrollUp() {
-    return window.scrollBy(0, -160);
-  }
-
-  function scrollDown() {
-    return window.scrollBy(0, 160);
-  }
 </script>
 
 <div class="fixed flex flex-row left-0 top-0 right-0 z-20 items-center gap-2">

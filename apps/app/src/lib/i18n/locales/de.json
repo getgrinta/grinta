@@ -1,6 +1,10 @@
 {
   "common": {
-    "next": "Weiter"
+    "next": "Weiter",
+    "menu": "Menü",
+    "clear": "Löschen",
+    "incognito": "Incognito",
+    "back": "Zurück"
   },
   "auth": {
     "signIn": "Anmelden",
@@ -204,7 +208,8 @@
     "actions": {
       "menu": "Menü",
       "exitMenu": "Menü verlassen",
-      "createNote": "Notiz erstellen"
+      "createNote": "Notiz erstellen",
+      "createDailyNote": "Tägliche Notiz erstellen"
     }
   },
   "editor": {

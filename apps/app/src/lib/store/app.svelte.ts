@@ -19,7 +19,6 @@ import { page } from "$app/state";
 import { goto } from "$app/navigation";
 import { _ } from "svelte-i18n";
 import { get } from "svelte/store";
-import { calendarStore } from "./calendar.svelte";
 
 export class AppStore {
   query = $state("");
@@ -98,6 +97,9 @@ export class AppStore {
   }
 
   handleEscape() {
+    if (page.url.pathname.includes("/calendar")) {
+      return goto("/commands/CALENDAR");
+    }
     if (this.menuOpen) return this.setMenuOpen(false);
     if (this.appMode !== APP_MODE.INITIAL) {
       return this.switchMode(APP_MODE.INITIAL);

@@ -56,7 +56,7 @@
   >
     {#snippet children(item, index)}
       {@const active = commandsStore.selectedIndex === index}
-      {#if item.handler === COMMAND_HANDLER.CALENDAR}
+      {#if item.handler === COMMAND_HANDLER.OPEN_CALENDAR}
         <CommandListCalendarItem {item} {index} {active} {contextMenu} />
       {:else}
         <CommandListItem {item} {index} {active} {contextMenu} />

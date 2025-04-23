@@ -1,6 +1,10 @@
 {
   "common": {
-    "next": "Dalej"
+    "next": "Dalej",
+    "menu": "Menu",
+    "clear": "Wyczyść",
+    "incognito": "Incognito",
+    "back": "Wstecz"
   },
   "welcome": {
     "title": "Witaj w Grincie",
@@ -192,7 +196,8 @@
     "actions": {
       "menu": "Menu",
       "exitMenu": "Wyjdź z menu",
-      "createNote": "Utwórz notatkę"
+      "createNote": "Utwórz notatkę",
+      "createDailyNote": "Utwórz notatkę dzienną"
     }
   },
   "editor": {
