@@ -77,3 +77,4 @@ $ bun run tauri dev
 ├── packages
 │   ├── core - Core library for Grinta
 │   └── plugin - Plugin interface for Grinta
+```
