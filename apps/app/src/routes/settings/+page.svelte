@@ -503,7 +503,7 @@
 
           <!-- Custom Quick Search Links -->
           <div class="space-y-3">
-            <h2 class="text-lg font-semibold">
+            <h2 class="font-semibold">
               {$_("settings.quick_search.custom_links_title")}
             </h2>
             {#if settingsStore.data.customQuickLinks.length > 0}
@@ -541,8 +541,8 @@
           </div>
 
           <!-- Add New Custom Link Form -->
-          <div class="space-y-3 pt-4 border-t">
-            <h2 class="text-lg font-semibold">
+          <div class="space-y-3">
+            <h2 class="font-semibold">
               {$_("settings.quick_search.add_new_link_title")}
             </h2>
             <form use:form class="space-y-4">
