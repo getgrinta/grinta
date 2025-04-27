@@ -6,8 +6,8 @@
   import { EyeIcon, FolderIcon, TextIcon } from "lucide-svelte";
   import { _ } from "svelte-i18n";
   import { get } from "svelte/store";
-  import ContextMenu from "./context-menu.svelte";
-  import type { MenuItem } from "./context-menu.svelte";
+  import ContextMenu from "../context-menu.svelte";
+  import type { MenuItem } from "../context-menu.svelte";
   import {
     APP_MODE,
     COMMAND_HANDLER,

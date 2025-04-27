@@ -4,7 +4,7 @@
   import { clickListener, handleContextMenu } from "$lib/utils.svelte";
   import clsx from "clsx";
   import WidgetsContextMenu from "./widgets-context-menu.svelte";
-  import CommandListIcon from "./command-list-icon.svelte";
+  import CommandListIcon from "./command-list/command-list-icon.svelte";
   import { settingsStore } from "$lib/store/settings.svelte";
   import { PressedKeys } from "runed";
 

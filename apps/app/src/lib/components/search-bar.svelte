@@ -26,7 +26,7 @@
   import { _ } from "svelte-i18n";
   import { match } from "ts-pattern";
   import ViewActions from "./view-actions.svelte";
-  import SidebarMenuButton from "./sidebar-menu-button.svelte";
+  import SidebarMenuButton from "./sidebar/sidebar-menu-button.svelte";
   import { shortcut, type ShortcutTrigger } from "@svelte-put/shortcut";
   import { calendarStore } from "$lib/store/calendar.svelte";
   import { openUrl } from "@tauri-apps/plugin-opener";
@@ -285,6 +285,14 @@
     }
 
     if (event.key === "Backspace" && appStore.query.length === 0) {
+      // Clear quick link
+      if (quickSearchMode) {
+        event.preventDefault();
+        quickSearchMode = null;
+        appStore.query = "";
+        return;
+      }
+
       appStore.appMode = APP_MODE.INITIAL;
       return;
     }
