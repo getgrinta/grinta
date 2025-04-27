@@ -16,6 +16,7 @@ Grinta is an open-source, AI-powered, and privacy-focused alternative to MacOS S
 - **Keyboard First**: Grinta is designed to be keyboard-centric, ensuring you can easily operate without relying on mouse or touch.
 - **Multi-language Support**: Enjoy Grinta in your preferred language with support for English, Polish, and German translations throughout the interface.
 - **Clipboard History**: Keep track of your clipboard history and quickly access previously copied items.
+- **Quick Search**: Use shortcuts (e.g., `G` + Tab) to instantly search specific websites like Google, YouTube, Wikipedia, Reddit, and more directly from the search bar.
 
 ### Installation
 
