@@ -49,11 +49,6 @@
       hotkey: "⌘3",
     },
     { label: $_("settings.tabs.calendar"), value: "calendar", hotkey: "⌘4" },
-    {
-      label: $_("settings.tabs.quick_search"),
-      value: "quicksearch",
-      hotkey: "⌘5",
-    },
   ];
 
   let extensionInput = $state<HTMLInputElement | null>(null);
@@ -205,8 +200,7 @@
     extensionInput?.focus();
   }
 
-  // --- Quick Search Form Logic ---
-  const { form, data, errors, reset } = createForm<CustomQuickLink>({
+  const { form, errors, reset } = createForm<CustomQuickLink>({
     extend: validator({ schema: CustomQuickLinkSchema }),
     onSubmit: async (values) => {
       // Check if shortcut conflicts with a default one (case-insensitive)
@@ -258,7 +252,6 @@
 <Shortcut keys={["meta", "2"]} callback={() => changeTab("search")} />
 <Shortcut keys={["meta", "3"]} callback={() => changeTab("permissions")} />
 <Shortcut keys={["meta", "4"]} callback={() => changeTab("calendar")} />
-<Shortcut keys={["meta", "5"]} callback={() => changeTab("quicksearch")} />
 
 <TopBar>
   <div slot="input" class="grow flex-1 truncate text-lg font-semibold">
@@ -380,7 +373,7 @@
         </div>
       </form>
     {:else if currentTab === "search"}
-      <form class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center">
+      <div class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center">
         <h2 class="font-semibold col-span-2">
           {$_("settings.web")}
         </h2>
@@ -446,12 +439,13 @@
           </div>
           <div class="flex gap-2">
             <input
-              bind:this={extensionInput}
+              id="fsSearchExtensionChoice"
               type="text"
               placeholder="e.g. .txt"
               class="input flex-2/3"
+              bind:this={extensionInput}
               bind:value={extensionValue}
-              onkeydown={(e) => {
+              onkeydown={(e: KeyboardEvent) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
                   addExtension();
@@ -464,7 +458,174 @@
             >
           </div>
         </div>
-      </form>
+
+        <h2 class="font-semibold col-span-2">Quicklinks</h2>
+        <!-- Quick Search Settings Moved Here -->
+        <div class="space-y-6 col-span-2">
+          <!-- Default Quick Search Links -->
+          <div class="space-y-3">
+            <h2 class="text-sm font-semibold">
+              {$_("settings.quick_search.default_links_title")}
+            </h2>
+            <ul class="space-y-2">
+              {#each defaultQuickSearchModes as mode (mode.shortcut)}
+                <li
+                  class="flex items-center justify-between p-2 border rounded bg-primary"
+                >
+                  <div
+                    class="flex items-center space-x-2 text-shadow-amber-200"
+                  >
+                    <span
+                      class="flex items-center justify-center w-6 h-6 text-xs font-bold rounded bg-{mode.bgColorClass} {mode.textColorClass}"
+                    >
+                      {mode.shortcut}
+                    </span>
+                    <span>{mode.name}</span>
+                  </div>
+                  <span class="text-xs font-semibold text-muted"
+                    >{$_("settings.quick_search.default")}</span
+                  >
+                </li>
+              {/each}
+            </ul>
+          </div>
+
+          <!-- Custom Quick Search Links -->
+          <div class="space-y-3">
+            <h2 class="text-lg font-semibold">
+              {$_("settings.quick_search.custom_links_title")}
+            </h2>
+            {#if settingsStore.data.customQuickLinks.length > 0}
+              <ul class="space-y-2">
+                {#each settingsStore.data.customQuickLinks as link (link.shortcut)}
+                  <li
+                    class="flex items-center justify-between p-2 border rounded bg-secondary"
+                  >
+                    <div class="flex items-center space-x-2">
+                      <span
+                        class="flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-gray-500 rounded"
+                      >
+                        {link.shortcut}
+                      </span>
+                      <span>{link.name}</span>
+                      <span class="text-xs text-muted"
+                        >({link.urlTemplate})</span
+                      >
+                    </div>
+                    <button
+                      onclick={() => removeCustomLink(link.shortcut)}
+                      class="p-1 text-red-500 rounded hover:bg-destructive/20"
+                      title={$_("settings.quick_search.remove_link_tooltip")}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </li>
+                {/each}
+              </ul>
+            {:else}
+              <p class="text-sm text-muted">
+                {$_("settings.quick_search.no_custom_links")}
+              </p>
+            {/if}
+          </div>
+
+          <!-- Add New Custom Link Form -->
+          <div class="space-y-3 pt-4 border-t">
+            <h2 class="text-lg font-semibold">
+              {$_("settings.quick_search.add_new_link_title")}
+            </h2>
+            <form use:form class="space-y-4">
+              <div class="grid grid-cols-3 gap-4">
+                <!-- Shortcut -->
+                <div>
+                  <label
+                    for="shortcut"
+                    class="block text-sm font-medium text-muted"
+                  >
+                    {$_("settings.quick_search.form_shortcut_label")}
+                  </label>
+                  <input
+                    type="text"
+                    name="shortcut"
+                    id="shortcut"
+                    maxlength="1"
+                    class="w-full input {$errors.shortcut
+                      ? 'border-destructive'
+                      : ''}"
+                    placeholder={$_(
+                      "settings.quick_search.form_shortcut_placeholder",
+                    )}
+                  />
+                  {#if $errors.shortcut}
+                    <p class="mt-1 text-xs text-destructive">
+                      {$errors.shortcut[0]}
+                    </p>
+                  {/if}
+                </div>
+
+                <!-- Name -->
+                <div class="col-span-2">
+                  <label
+                    for="name"
+                    class="block text-sm font-medium text-muted"
+                  >
+                    {$_("settings.quick_search.form_name_label")}
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    id="name"
+                    class="w-full input {$errors.name
+                      ? 'border-destructive'
+                      : ''}"
+                    placeholder={$_(
+                      "settings.quick_search.form_name_placeholder",
+                    )}
+                  />
+                  {#if $errors.name}
+                    <p class="mt-1 text-xs text-destructive">
+                      {$errors.name[0]}
+                    </p>
+                  {/if}
+                </div>
+              </div>
+
+              <!-- URL Template -->
+              <div>
+                <label
+                  for="urlTemplate"
+                  class="block text-sm font-medium text-muted"
+                >
+                  {$_("settings.quick_search.form_url_template_label")}
+                </label>
+                <input
+                  type="text"
+                  name="urlTemplate"
+                  id="urlTemplate"
+                  class="w-full input {$errors.urlTemplate
+                    ? 'border-destructive'
+                    : ''}"
+                  placeholder={$_(
+                    "settings.quick_search.form_url_template_placeholder",
+                  )}
+                />
+                <p class="mt-1 text-xs text-muted">
+                  {$_("settings.quick_search.form_url_template_hint")}
+                </p>
+                {#if $errors.urlTemplate}
+                  <p class="mt-1 text-xs text-destructive">
+                    {$errors.urlTemplate[0]}
+                  </p>
+                {/if}
+              </div>
+
+              <button type="submit" class="btn btn-primary">
+                {$_("settings.quick_search.add_button")}
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
     {:else if currentTab === "permissions"}
       <form class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center">
         <label class="text-sm"
@@ -501,162 +662,6 @@
       </form>
     {:else if currentTab === "calendar"}
       <CalendarSettings />
-    {:else if currentTab === "quicksearch"}
-      <div class="p-4 space-y-6">
-        <!-- Default Quick Search Links -->
-        <div class="space-y-3">
-          <h2 class="text-lg font-semibold">
-            {$_("settings.quick_search.default_links_title")}
-          </h2>
-          <ul class="space-y-2">
-            {#each defaultQuickSearchModes as mode (mode.shortcut)}
-              <li
-                class="flex items-center justify-between p-2 border rounded bg-secondary"
-              >
-                <div class="flex items-center space-x-2">
-                  <span
-                    class="flex items-center justify-center w-6 h-6 text-xs font-bold rounded {mode.bgColorClass} {mode.textColorClass}"
-                  >
-                    {mode.shortcut}
-                  </span>
-                  <span>{mode.name}</span>
-                </div>
-                <span class="text-sm text-muted"
-                  >({$_("settings.quick_search.default")})</span
-                >
-              </li>
-            {/each}
-          </ul>
-        </div>
-
-        <!-- Custom Quick Search Links -->
-        <div class="space-y-3">
-          <h2 class="text-lg font-semibold">
-            {$_("settings.quick_search.custom_links_title")}
-          </h2>
-          {#if settingsStore.data.customQuickLinks.length > 0}
-            <ul class="space-y-2">
-              {#each settingsStore.data.customQuickLinks as link (link.shortcut)}
-                <li
-                  class="flex items-center justify-between p-2 border rounded bg-secondary"
-                >
-                  <div class="flex items-center space-x-2">
-                    <span
-                      class="flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-gray-500 rounded"
-                    >
-                      {link.shortcut}
-                    </span>
-                    <span>{link.name}</span>
-                    <span class="text-xs text-muted">({link.urlTemplate})</span>
-                  </div>
-                  <button
-                    onclick={() => removeCustomLink(link.shortcut)}
-                    class="p-1 text-red-500 rounded hover:bg-destructive/20"
-                    title={$_("settings.quick_search.remove_link_tooltip")}
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </li>
-              {/each}
-            </ul>
-          {:else}
-            <p class="text-sm text-muted">
-              {$_("settings.quick_search.no_custom_links")}
-            </p>
-          {/if}
-        </div>
-
-        <!-- Add New Custom Link Form -->
-        <div class="space-y-3 pt-4 border-t">
-          <h2 class="text-lg font-semibold">
-            {$_("settings.quick_search.add_new_link_title")}
-          </h2>
-          <form use:form class="space-y-4">
-            <div class="grid grid-cols-3 gap-4">
-              <!-- Shortcut -->
-              <div>
-                <label
-                  for="shortcut"
-                  class="block text-sm font-medium text-muted"
-                >
-                  {$_("settings.quick_search.form_shortcut_label")}
-                </label>
-                <input
-                  type="text"
-                  name="shortcut"
-                  id="shortcut"
-                  maxlength="1"
-                  class="w-full input {$errors.shortcut
-                    ? 'border-destructive'
-                    : ''}"
-                  placeholder={$_(
-                    "settings.quick_search.form_shortcut_placeholder",
-                  )}
-                />
-                {#if $errors.shortcut}
-                  <p class="mt-1 text-xs text-destructive">
-                    {$errors.shortcut[0]}
-                  </p>
-                {/if}
-              </div>
-
-              <!-- Name -->
-              <div class="col-span-2">
-                <label for="name" class="block text-sm font-medium text-muted">
-                  {$_("settings.quick_search.form_name_label")}
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  id="name"
-                  class="w-full input {$errors.name
-                    ? 'border-destructive'
-                    : ''}"
-                  placeholder={$_(
-                    "settings.quick_search.form_name_placeholder",
-                  )}
-                />
-                {#if $errors.name}
-                  <p class="mt-1 text-xs text-destructive">{$errors.name[0]}</p>
-                {/if}
-              </div>
-            </div>
-
-            <!-- URL Template -->
-            <div>
-              <label
-                for="urlTemplate"
-                class="block text-sm font-medium text-muted"
-              >
-                {$_("settings.quick_search.form_url_template_label")}
-              </label>
-              <input
-                type="text"
-                name="urlTemplate"
-                id="urlTemplate"
-                class="w-full input {$errors.urlTemplate
-                  ? 'border-destructive'
-                  : ''}"
-                placeholder={$_(
-                  "settings.quick_search.form_url_template_placeholder",
-                )}
-              />
-              <p class="mt-1 text-xs text-muted">
-                {$_("settings.quick_search.form_url_template_hint")}
-              </p>
-              {#if $errors.urlTemplate}
-                <p class="mt-1 text-xs text-destructive">
-                  {$errors.urlTemplate[0]}
-                </p>
-              {/if}
-            </div>
-
-            <button type="submit" class="btn btn-primary">
-              {$_("settings.quick_search.add_button")}
-            </button>
-          </form>
-        </div>
-      </div>
     {/if}
   </div>
 </div>
