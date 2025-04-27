@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from "$app/state";
-  import CommandList from "$lib/components/command-list.svelte";
+  import CommandList from "$lib/components/command-list/command-list.svelte";
   import SearchBar from "$lib/components/search-bar.svelte";
   import Widgets from "$lib/components/widgets.svelte";
   import { appStore } from "$lib/store/app.svelte";

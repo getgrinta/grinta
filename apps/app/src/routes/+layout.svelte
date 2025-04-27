@@ -33,7 +33,7 @@
   import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
   import type { UnlistenFn } from "@tauri-apps/api/event";
   import { APP_MODE, COMMAND_HANDLER } from "@getgrinta/core";
-  import SidebarMenu from "$lib/components/sidebar-menu.svelte";
+  import SidebarMenu from "$lib/components/sidebar/sidebar-menu.svelte";
   import { shortcut } from "@svelte-put/shortcut";
   import { calendarStore } from "$lib/store/calendar.svelte";
   const { children } = $props();
