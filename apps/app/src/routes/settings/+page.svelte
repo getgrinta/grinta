@@ -7,6 +7,8 @@
   import humanizeString from "humanize-string";
   import { PressedKeys, watch } from "runed";
   import { _ } from "svelte-i18n";
+  import { writable } from "svelte/store";
+
   import packageJson from "../../../package.json" with { type: "json" };
   import { SUPPORTED_FILE_INDEXING_FILE_EXTENSIONS } from "$lib/grinta-invoke";
   import { toast } from "svelte-sonner";
@@ -33,7 +35,6 @@
   import { calendarStore } from "$lib/store/calendar.svelte";
   import CalendarSettings from "$lib/components/settings/calendar-settings.svelte"; // Import the new component
   import { createForm } from "felte";
-  import { validator } from "@felte/validator-zod";
   import { CustomQuickLinkSchema, type CustomQuickLink } from "@getgrinta/core";
   import { defaultQuickSearchModes } from "$lib/constants/quick-search";
   import { Trash2 } from "lucide-svelte";
@@ -200,20 +201,21 @@
     extensionInput?.focus();
   }
 
-  const { form, errors, reset } = createForm<CustomQuickLink>({
-    extend: validator({ schema: CustomQuickLinkSchema }),
-    onError: (validationErrors) => {
-      // Display a toast for each validation error
-      Object.values(validationErrors)
-        .flat()
-        .forEach((errorMsg) => {
-          if (errorMsg) {
-            // Ensure errorMsg is not null/undefined
-            toast.error(errorMsg);
-          }
-        });
-    },
-    onSubmit: async (values) => {
+  const { form, reset } = createForm<CustomQuickLink>({
+    onSubmit: (values) => {
+      if (!values.shortcut?.trim()) {
+        toast.error($_("settings.quick_search.error_shortcut_required"));
+        return;
+      }
+      if (!values.name?.trim()) {
+        toast.error($_("settings.quick_search.error_name_required"));
+        return;
+      }
+      if (!values.urlTemplate?.trim()) {
+        toast.error($_("settings.quick_search.error_url_template_required"));
+        return;
+      }
+
       // Check if shortcut conflicts with a default one (case-insensitive)
       const shortcutUpper = values.shortcut.toUpperCase();
       const defaultConflict = defaultQuickSearchModes.some(
@@ -225,11 +227,7 @@
       );
 
       if (defaultConflict || customConflict) {
-        toast.error(
-          $_("settings.quick_search.error_shortcut_conflict", {
-            values: { shortcut: values.shortcut },
-          }),
-        );
+        toast.error($_("settings.quick_search.error_shortcut_conflict"));
         return;
       }
 
@@ -242,11 +240,7 @@
       } else {
         // This case might be redundant if the conflict check above is robust,
         // but handles potential race conditions or other store-level issues.
-        toast.error(
-          $_("settings.quick_search.error_add_failed", {
-            values: { shortcut: values.shortcut },
-          }),
-        );
+        toast.error($_("settings.quick_search.error_add_failed"));
       }
     },
   });
@@ -540,14 +534,12 @@
             {/if}
           </div>
 
-          <!-- Add New Custom Link Form -->
           <div class="space-y-3">
             <h2 class="font-semibold">
               {$_("settings.quick_search.add_new_link_title")}
             </h2>
             <form use:form class="space-y-4">
               <div class="grid grid-cols-3 gap-4">
-                <!-- Shortcut -->
                 <div>
                   <label
                     for="shortcut"
@@ -587,7 +579,6 @@
                 </div>
               </div>
 
-              <!-- URL Template -->
               <div>
                 <label
                   for="urlTemplate"
