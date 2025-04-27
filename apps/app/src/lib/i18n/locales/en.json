@@ -82,7 +82,7 @@
       "autostart": "Autostart",
       "requestAutostart": "Request Autostart",
       "showWidgetLabels": "Show Widget Labels",
-      "localDataWiped": "Local data has been wiped successfully.",
+      "localDataWiped": "Local data wiped successfully.",
       "shortcut_cmd_space": "⌘ + Space",
       "shortcut_opt_space": "⌥ + Space"
     },
