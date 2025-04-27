@@ -202,6 +202,17 @@
 
   const { form, errors, reset } = createForm<CustomQuickLink>({
     extend: validator({ schema: CustomQuickLinkSchema }),
+    onError: (validationErrors) => {
+      // Display a toast for each validation error
+      Object.values(validationErrors)
+        .flat()
+        .forEach((errorMsg) => {
+          if (errorMsg) {
+            // Ensure errorMsg is not null/undefined
+            toast.error(errorMsg);
+          }
+        });
+    },
     onSubmit: async (values) => {
       // Check if shortcut conflicts with a default one (case-insensitive)
       const shortcutUpper = values.shortcut.toUpperCase();
@@ -470,7 +481,7 @@
             <ul class="space-y-2">
               {#each defaultQuickSearchModes as mode (mode.shortcut)}
                 <li
-                  class="flex items-center justify-between p-2 border rounded bg-primary"
+                  class="flex items-center justify-between p-2 border rounded bg-primary/50"
                 >
                   <div
                     class="flex items-center space-x-2 text-shadow-amber-200"
@@ -499,7 +510,7 @@
               <ul class="space-y-2">
                 {#each settingsStore.data.customQuickLinks as link (link.shortcut)}
                   <li
-                    class="flex items-center justify-between p-2 border rounded bg-secondary"
+                    class="flex items-center justify-between p-2 border rounded bg-primary/50"
                   >
                     <div class="flex items-center space-x-2">
                       <span
@@ -514,7 +525,7 @@
                     </div>
                     <button
                       onclick={() => removeCustomLink(link.shortcut)}
-                      class="p-1 text-red-500 rounded hover:bg-destructive/20"
+                      class="p-1 text-gray-700 rounded hover:bg-destructive/20"
                       title={$_("settings.quick_search.remove_link_tooltip")}
                     >
                       <Trash2 size={16} />
@@ -549,18 +560,11 @@
                     name="shortcut"
                     id="shortcut"
                     maxlength="1"
-                    class="w-full input {$errors.shortcut
-                      ? 'border-destructive'
-                      : ''}"
+                    class="w-full input"
                     placeholder={$_(
                       "settings.quick_search.form_shortcut_placeholder",
                     )}
                   />
-                  {#if $errors.shortcut}
-                    <p class="mt-1 text-xs text-destructive">
-                      {$errors.shortcut[0]}
-                    </p>
-                  {/if}
                 </div>
 
                 <!-- Name -->
@@ -575,18 +579,11 @@
                     type="text"
                     name="name"
                     id="name"
-                    class="w-full input {$errors.name
-                      ? 'border-destructive'
-                      : ''}"
+                    class="w-full input"
                     placeholder={$_(
                       "settings.quick_search.form_name_placeholder",
                     )}
                   />
-                  {#if $errors.name}
-                    <p class="mt-1 text-xs text-destructive">
-                      {$errors.name[0]}
-                    </p>
-                  {/if}
                 </div>
               </div>
 
@@ -602,9 +599,7 @@
                   type="text"
                   name="urlTemplate"
                   id="urlTemplate"
-                  class="w-full input {$errors.urlTemplate
-                    ? 'border-destructive'
-                    : ''}"
+                  class="w-full input"
                   placeholder={$_(
                     "settings.quick_search.form_url_template_placeholder",
                   )}
@@ -612,11 +607,6 @@
                 <p class="mt-1 text-xs text-muted">
                   {$_("settings.quick_search.form_url_template_hint")}
                 </p>
-                {#if $errors.urlTemplate}
-                  <p class="mt-1 text-xs text-destructive">
-                    {$errors.urlTemplate[0]}
-                  </p>
-                {/if}
               </div>
 
               <button type="submit" class="btn btn-primary">
