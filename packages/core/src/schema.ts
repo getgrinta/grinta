@@ -122,6 +122,23 @@ export type BaseCurrency = keyof typeof BASE_CURRENCY;
 
 export const baseCurrencies = Object.keys(BASE_CURRENCY);
 
+// Schema for a single custom quick link
+export const CustomQuickLinkSchema = z.object({
+  shortcut: z
+    .string()
+    .length(1, { message: "Shortcut must be exactly 1 character long" })
+    .regex(/^[a-zA-Z0-9]$/, { message: "Shortcut must be alphanumeric" }), // Ensure it's a single alphanumeric char
+  name: z.string().min(1, { message: "Name cannot be empty" }),
+  urlTemplate: z
+    .string()
+    .url({ message: "Must be a valid URL template" })
+    .refine((val) => val.includes("{query}"), {
+      message: 'URL template must include "{query}"',
+    }),
+});
+
+export type CustomQuickLink = z.infer<typeof CustomQuickLinkSchema>;
+
 // Get browser language or default to English
 const getBrowserLanguage = (): Language => {
   if (typeof window === "undefined") return LANGUAGE.EN;
@@ -167,4 +184,5 @@ export const SettingsSchema = z.object({
   fsPermissions: z.boolean().default(false),
   selectedCalendarIdentifiers: z.array(z.string()).default([]),
   ignoredEventIds: z.array(z.string()).default([]),
+  customQuickLinks: z.array(CustomQuickLinkSchema).default([]),
 });
