@@ -278,6 +278,12 @@
       return;
     }
 
+    if (quickSearchMode && event.key === "Backspace") {
+      event.preventDefault();
+      quickSearchMode = null;
+      appStore.query = "";
+    }
+
     if (event.key === "Backspace" && appStore.query.length === 0) {
       // Clear quick link
       if (quickSearchMode) {
