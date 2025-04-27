@@ -29,8 +29,99 @@
   import SidebarMenuButton from "./sidebar-menu-button.svelte";
   import { shortcut, type ShortcutTrigger } from "@svelte-put/shortcut";
   import { calendarStore } from "$lib/store/calendar.svelte";
+  import { openUrl } from "@tauri-apps/plugin-opener";
 
   let queryInput: HTMLInputElement;
+
+  type QuickSearchMode = {
+    shortcut: string;
+    name: string;
+    bgColorClass: string;
+    textColorClass: string;
+    searchUrl: (query: string) => string;
+  };
+
+  const quickSearchModes: QuickSearchMode[] = [
+    {
+      shortcut: "G",
+      name: "Google",
+      bgColorClass: "bg-blue-500",
+      textColorClass: "text-white",
+      searchUrl: (query: string) =>
+        `https://www.google.com/search?q=${encodeURIComponent(query)}`,
+    },
+    {
+      shortcut: "Y",
+      name: "YouTube",
+      bgColorClass: "bg-red-500",
+      textColorClass: "text-white",
+      searchUrl: (query: string) =>
+        `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`,
+    },
+    {
+      shortcut: "C",
+      name: "ChatGPT",
+      bgColorClass: "bg-green-600",
+      textColorClass: "text-white",
+      searchUrl: (query: string) =>
+        `https://www.google.com/search?q=site%3Achat.openai.com+${encodeURIComponent(query)}`, // Placeholder
+    },
+    {
+      shortcut: "W",
+      name: "Wikipedia",
+      bgColorClass: "bg-gray-200",
+      textColorClass: "text-black",
+      searchUrl: (query: string) =>
+        `https://en.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(query)}`,
+    },
+    {
+      shortcut: "P",
+      name: "Perplexity",
+      bgColorClass: "bg-blue-800",
+      textColorClass: "text-white",
+      searchUrl: (query: string) =>
+        `https://www.perplexity.ai/search?q=${encodeURIComponent(query)}`,
+    },
+    {
+      shortcut: "R",
+      name: "Reddit",
+      bgColorClass: "bg-orange-500",
+      textColorClass: "text-white",
+      searchUrl: (query: string) =>
+        `https://www.reddit.com/search/?q=${encodeURIComponent(query)}`,
+    },
+    {
+      shortcut: "F",
+      name: "Figma",
+      bgColorClass: "bg-purple-500",
+      textColorClass: "text-white",
+      searchUrl: (query: string) =>
+        `https://www.figma.com/community/search?query=${encodeURIComponent(query)}`,
+    },
+    {
+      shortcut: "J",
+      name: "Jira",
+      bgColorClass: "bg-sky-600",
+      textColorClass: "text-white",
+      searchUrl: (query: string) =>
+        `https://www.google.com/search?q=site%3Aatlassian.com+${encodeURIComponent(query)}`, // Placeholder
+    },
+    {
+      shortcut: "X",
+      name: "X (Twitter)",
+      bgColorClass: "bg-black",
+      textColorClass: "text-white",
+      searchUrl: (query: string) =>
+        `https://x.com/search?q=${encodeURIComponent(query)}&src=typed_query`,
+    },
+  ];
+
+  let quickSearchMode = $state<QuickSearchMode | null>(null);
+  let quickSearchBadge: HTMLDivElement | null = $state(null);
+  const leftPadding = $derived.by(() => {
+    const _ = quickSearchMode;
+    return ((quickSearchBadge?.clientWidth ?? 0) + 15).toFixed(0);
+  });
 
   async function handleGrintAi() {
     return goto(`/ai/${appStore.query}`);
@@ -190,8 +281,40 @@
       appStore.appMode = APP_MODE.INITIAL;
       return;
     }
+
+    if (event.key == "Enter") {
+      if (quickSearchMode) {
+        const url = quickSearchMode.searchUrl(appStore.query);
+        openUrl(url);
+        // Reset state after search
+        quickSearchMode = null;
+        appStore.query = "";
+        return;
+      }
+
+      if (appStore.query.length >= 3 && !quickSearchMode) {
+        event.preventDefault();
+
+        return goto(`/ai/${appStore.query}`);
+      }
+    }
+
     if (event.key === "Tab") {
       event.preventDefault();
+
+      // save special mode
+      if (appStore.query.length >= 1 && appStore.query.length <= 2) {
+        const shortcutChar = appStore.query[0].toUpperCase(); // Ensure uppercase for matching
+        const mode = quickSearchModes.find((m) => m.shortcut === shortcutChar);
+
+        if (mode) {
+          quickSearchMode = mode;
+          appStore.query = ""; // Clear query after setting mode
+        }
+
+        return;
+      }
+
       if (appStore.query.length < 4) return;
       return goto(`/ai/${appStore.query}`);
     }
@@ -308,19 +431,33 @@
         <indicatorButton.icon size={16} class={clsx("pointer-events-none")} />
       </button>
     </div>
-    <input
-      bind:this={queryInput}
-      id="searchBar"
-      slot="input"
-      class="grow font-semibold text-lg !outline-none"
-      name="query"
-      bind:value={appStore.query}
-      onkeydown={handleNavigation}
-      placeholder={inputProps.placeholder}
-      autocomplete="off"
-      spellcheck="false"
-      data-testid="search-bar"
-    />
+    <div class="relative flex grow items-center" slot="input">
+      <input
+        bind:this={queryInput}
+        id="searchBar"
+        class={clsx("grow font-semibold text-lg !outline-none")}
+        style="padding-left: {leftPadding}px;"
+        name="query"
+        bind:value={appStore.query}
+        onkeydown={handleNavigation}
+        placeholder={inputProps.placeholder}
+        autocomplete="off"
+        spellcheck="false"
+        data-testid="search-bar"
+      />
+      {#if quickSearchMode}
+        <div
+          bind:this={quickSearchBadge}
+          class={clsx(
+            "badge absolute left-2 top-1/2 -translate-y-1/2 z-10 pointer-events-none",
+            quickSearchMode.bgColorClass,
+            quickSearchMode.textColorClass,
+          )}
+        >
+          {quickSearchMode.name}
+        </div>
+      {/if}
+    </div>
     <div slot="addon" class="flex items-center gap-1">
       {#if appStore.appMode === APP_MODE.INITIAL && appStore.query.length >= 3 && appStore.user?.id}
         <ViewActions actions={searchViewActions} size="sm" />
