@@ -7,7 +7,11 @@
   import { commandsStore } from "$lib/store/commands.svelte";
   import { notesStore } from "$lib/store/notes.svelte";
   import { settingsStore } from "$lib/store/settings.svelte";
-  import { APP_MODE, type AppMode } from "@getgrinta/core";
+  import {
+    APP_MODE,
+    type AppMode,
+    type CustomQuickLink,
+  } from "@getgrinta/core";
   import { listen } from "@tauri-apps/api/event";
   import { clsx } from "clsx";
   import { createForm } from "felte";
@@ -30,93 +34,43 @@
   import { shortcut, type ShortcutTrigger } from "@svelte-put/shortcut";
   import { calendarStore } from "$lib/store/calendar.svelte";
   import { openUrl } from "@tauri-apps/plugin-opener";
+  import {
+    defaultQuickSearchModes,
+    type QuickSearchMode,
+  } from "$lib/constants/quick-search";
 
   let queryInput: HTMLInputElement;
 
-  type QuickSearchMode = {
-    shortcut: string;
-    name: string;
-    bgColorClass: string;
-    textColorClass: string;
-    searchUrl: (query: string) => string;
-  };
+  // Combine default and custom quick links, overriding defaults with customs
+  const combinedQuickSearchModes = $derived(() => {
+    const customLinksMap = new Map<string, QuickSearchMode>();
+    settingsStore.data.customQuickLinks.forEach(
+      (customLink: CustomQuickLink) => {
+        const shortcutUpper = customLink.shortcut.toUpperCase();
+        customLinksMap.set(shortcutUpper, {
+          shortcut: shortcutUpper,
+          name: customLink.name,
+          // Assign default styling for custom links
+          bgColorClass: "gray-500",
+          textColorClass: "text-white",
+          searchUrl: (query: string) =>
+            customLink.urlTemplate.replace(
+              "{query}",
+              encodeURIComponent(query),
+            ),
+        });
+      },
+    );
 
-  const quickSearchModes: QuickSearchMode[] = [
-    {
-      shortcut: "G",
-      name: "Google",
-      bgColorClass: "blue-500",
-      textColorClass: "text-white",
-      searchUrl: (query: string) =>
-        `https://www.google.com/search?q=${encodeURIComponent(query)}`,
-    },
-    {
-      shortcut: "Y",
-      name: "YouTube",
-      bgColorClass: "red-500",
-      textColorClass: "text-white",
-      searchUrl: (query: string) =>
-        `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`,
-    },
-    {
-      shortcut: "C",
-      name: "ChatGPT",
-      bgColorClass: "green-600",
-      textColorClass: "text-white",
-      searchUrl: (query: string) =>
-        `https://www.google.com/search?q=site%3Achat.openai.com+${encodeURIComponent(query)}`, // Placeholder
-    },
-    {
-      shortcut: "W",
-      name: "Wikipedia",
-      bgColorClass: "gray-200",
-      textColorClass: "text-black",
-      searchUrl: (query: string) =>
-        `https://en.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(query)}`,
-    },
-    {
-      shortcut: "P",
-      name: "Perplexity",
-      bgColorClass: "blue-800",
-      textColorClass: "text-white",
-      searchUrl: (query: string) =>
-        `https://www.perplexity.ai/search?q=${encodeURIComponent(query)}`,
-    },
-    {
-      shortcut: "R",
-      name: "Reddit",
-      bgColorClass: "orange-500",
-      textColorClass: "text-white",
-      searchUrl: (query: string) =>
-        `https://www.reddit.com/search/?q=${encodeURIComponent(query)}`,
-    },
-    {
-      shortcut: "F",
-      name: "Figma",
-      bgColorClass: "purple-500",
-      textColorClass: "text-white",
-      searchUrl: (query: string) =>
-        `https://www.figma.com/community/search?query=${encodeURIComponent(query)}`,
-    },
-    {
-      shortcut: "J",
-      name: "Jira",
-      bgColorClass: "sky-600",
-      textColorClass: "text-white",
-      searchUrl: (query: string) =>
-        `https://www.google.com/search?q=site%3Aatlassian.com+${encodeURIComponent(query)}`, // Placeholder
-    },
-    {
-      shortcut: "X",
-      name: "X (Twitter)",
-      bgColorClass: "black",
-      textColorClass: "text-white",
-      searchUrl: (query: string) =>
-        `https://x.com/search?q=${encodeURIComponent(query)}&src=typed_query`,
-    },
-  ];
+    // Add defaults only if not overridden by a custom link
+    const defaultsToAdd = defaultQuickSearchModes.filter(
+      (defaultMode) => !customLinksMap.has(defaultMode.shortcut.toUpperCase()),
+    );
 
-  let quickSearchMode = $state<QuickSearchMode | null>(null);
+    return [...defaultsToAdd, ...customLinksMap.values()];
+  });
+
+  let quickSearchMode: QuickSearchMode | null = $state(null);
   let quickSearchBadge: HTMLDivElement | null = $state(null);
   const leftPadding = $derived.by(() => {
     const _ = quickSearchMode;
@@ -320,7 +274,9 @@
       // save special mode
       if (appStore.query.length >= 1 && appStore.query.length <= 2) {
         const shortcutChar = appStore.query[0].toUpperCase(); // Ensure uppercase for matching
-        const mode = quickSearchModes.find((m) => m.shortcut === shortcutChar);
+        const mode = combinedQuickSearchModes().find(
+          (m: QuickSearchMode) => m.shortcut.toUpperCase() === shortcutChar,
+        );
 
         if (mode) {
           quickSearchMode = mode;
