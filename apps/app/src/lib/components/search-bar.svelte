@@ -45,7 +45,7 @@
     {
       shortcut: "G",
       name: "Google",
-      bgColorClass: "bg-blue-500",
+      bgColorClass: "blue-500",
       textColorClass: "text-white",
       searchUrl: (query: string) =>
         `https://www.google.com/search?q=${encodeURIComponent(query)}`,
@@ -53,7 +53,7 @@
     {
       shortcut: "Y",
       name: "YouTube",
-      bgColorClass: "bg-red-500",
+      bgColorClass: "red-500",
       textColorClass: "text-white",
       searchUrl: (query: string) =>
         `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`,
@@ -61,7 +61,7 @@
     {
       shortcut: "C",
       name: "ChatGPT",
-      bgColorClass: "bg-green-600",
+      bgColorClass: "green-600",
       textColorClass: "text-white",
       searchUrl: (query: string) =>
         `https://www.google.com/search?q=site%3Achat.openai.com+${encodeURIComponent(query)}`, // Placeholder
@@ -69,7 +69,7 @@
     {
       shortcut: "W",
       name: "Wikipedia",
-      bgColorClass: "bg-gray-200",
+      bgColorClass: "gray-200",
       textColorClass: "text-black",
       searchUrl: (query: string) =>
         `https://en.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(query)}`,
@@ -77,7 +77,7 @@
     {
       shortcut: "P",
       name: "Perplexity",
-      bgColorClass: "bg-blue-800",
+      bgColorClass: "blue-800",
       textColorClass: "text-white",
       searchUrl: (query: string) =>
         `https://www.perplexity.ai/search?q=${encodeURIComponent(query)}`,
@@ -85,7 +85,7 @@
     {
       shortcut: "R",
       name: "Reddit",
-      bgColorClass: "bg-orange-500",
+      bgColorClass: "orange-500",
       textColorClass: "text-white",
       searchUrl: (query: string) =>
         `https://www.reddit.com/search/?q=${encodeURIComponent(query)}`,
@@ -93,7 +93,7 @@
     {
       shortcut: "F",
       name: "Figma",
-      bgColorClass: "bg-purple-500",
+      bgColorClass: "purple-500",
       textColorClass: "text-white",
       searchUrl: (query: string) =>
         `https://www.figma.com/community/search?query=${encodeURIComponent(query)}`,
@@ -101,7 +101,7 @@
     {
       shortcut: "J",
       name: "Jira",
-      bgColorClass: "bg-sky-600",
+      bgColorClass: "sky-600",
       textColorClass: "text-white",
       searchUrl: (query: string) =>
         `https://www.google.com/search?q=site%3Aatlassian.com+${encodeURIComponent(query)}`, // Placeholder
@@ -109,7 +109,7 @@
     {
       shortcut: "X",
       name: "X (Twitter)",
-      bgColorClass: "bg-black",
+      bgColorClass: "black",
       textColorClass: "text-white",
       searchUrl: (query: string) =>
         `https://x.com/search?q=${encodeURIComponent(query)}&src=typed_query`,
@@ -277,6 +277,13 @@
       commandsStore.selectedIndex = commandsStore.selectedIndex - 1;
       return;
     }
+
+    if (quickSearchMode && event.key === "Backspace") {
+      event.preventDefault();
+      quickSearchMode = null;
+      appStore.query = "";
+    }
+
     if (event.key === "Backspace" && appStore.query.length === 0) {
       appStore.appMode = APP_MODE.INITIAL;
       return;
@@ -450,8 +457,9 @@
           bind:this={quickSearchBadge}
           class={clsx(
             "badge absolute left-2 top-1/2 -translate-y-1/2 z-10 pointer-events-none",
-            quickSearchMode.bgColorClass,
+            `bg-${quickSearchMode.bgColorClass}`,
             quickSearchMode.textColorClass,
+            `shadow-${quickSearchMode.bgColorClass}/50 border-0 shadow-lg`,
           )}
         >
           {quickSearchMode.name}
