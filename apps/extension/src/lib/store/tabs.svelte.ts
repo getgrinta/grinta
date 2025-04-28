@@ -1,8 +1,13 @@
+import { generateUsername } from "unique-username-generator";
 import { sendMessage } from "webext-bridge/popup";
+import { appStore } from "./app.svelte";
+import { rand } from "$lib/utils.svelte";
+import { TAB_COLOR } from "$lib/const";
 
 export class TabsStore {
   tabs = $state<chrome.tabs.Tab[]>([]);
   groups = $state<chrome.tabGroups.TabGroup[]>([]);
+  groupsCustomOrder = $state<number[]>([]);
 
   async updateTabs() {
     const updatedTabs = (await sendMessage(
@@ -10,7 +15,15 @@ export class TabsStore {
       {},
       "background",
     )) as unknown as chrome.tabs.Tab[];
-    this.tabs = updatedTabs;
+    this.tabs = updatedTabs.sort((a, b) => a.index - b.index);
+    const activeTab = this.tabs.find((tab) => tab.active);
+    if (
+      activeTab?.groupId &&
+      appStore.data.currentSpaceId !== activeTab.groupId
+    ) {
+      appStore.setCurrentSpaceId(activeTab.groupId);
+      await appStore.persist();
+    }
   }
 
   async updateGroups() {
@@ -20,6 +33,33 @@ export class TabsStore {
       "background",
     )) as unknown as chrome.tabGroups.TabGroup[];
     this.groups = updatedGroups;
+    if (this.groups.length === 0) {
+      const randomColor = rand(TAB_COLOR);
+      const groupId = (await sendMessage(
+        "grinta_newGroup",
+        {
+          color: randomColor,
+          title: generateUsername(" "),
+        },
+        "background",
+      )) as number;
+      appStore.setCurrentSpaceId(groupId);
+      await appStore.persist();
+    }
+  }
+
+  async addGroup() {
+    const randomColor = rand(TAB_COLOR);
+    const groupId = (await sendMessage("grinta_newGroup", {
+      color: randomColor,
+      title: generateUsername(" "),
+    })) as number;
+    appStore.setCurrentSpaceId(groupId);
+    await appStore.persist();
+  }
+
+  async setGroupsCustomOrder(groupIds: number[]) {
+    this.groupsCustomOrder = groupIds;
   }
 
   registerListeners() {

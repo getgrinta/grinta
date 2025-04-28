@@ -5,6 +5,10 @@
   import { createForm } from "felte";
   import { ChevronLeftIcon, PlusIcon, TrashIcon } from "lucide-svelte";
   import { useRsv } from "@ryuz/rsv";
+  import { sendMessage } from "webext-bridge/popup";
+  import { generateUsername } from "unique-username-generator";
+  import { TAB_COLOR } from "$lib/const";
+  import { rand } from "$lib/utils.svelte";
 
   const router = useRsv();
 
@@ -23,16 +27,6 @@
 
   async function onSpacesChanged() {
     // await spacesStore.persist();
-  }
-
-  function addSpace() {
-    // return spacesStore.addSpace({
-    //   id: spacesStore.data.spaces.length,
-    //   name: "Untitled",
-    //   color: "blue",
-    //   essentialTabs: [],
-    //   tabs: [],
-    // });
   }
 </script>
 
@@ -67,7 +61,10 @@
   </div>
   <div class="flex items-center justify-between mt-4">
     <h1 class="text-lg font-semibold">Spaces</h1>
-    <button class="btn btn-sm btn-ghost btn-square" onclick={addSpace}>
+    <button
+      class="btn btn-sm btn-ghost btn-square"
+      onclick={() => tabsStore.addGroup()}
+    >
       <PlusIcon size={20} />
     </button>
   </div>

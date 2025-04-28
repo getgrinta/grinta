@@ -4,6 +4,7 @@ import type { BridgeMessage } from "webext-bridge";
 
 async function getTabs() {
   const allTabs = await tabs.query({});
+  console.log(">>>ALLT", allTabs);
   return allTabs;
 }
 
@@ -14,7 +15,7 @@ async function activateTab(message: BridgeMessage<{ tabId: number }>) {
 async function swapTabs(
   message: BridgeMessage<{ fromIndex: number; toIndex: number }>,
 ) {
-  const allTabs = await tabs.query({});
+  const allTabs = await getTabs();
   const fromId = allTabs[message.data.fromIndex]?.id;
   const toId = allTabs[message.data.toIndex]?.id;
   if (!fromId || !toId) return;
@@ -27,7 +28,7 @@ async function swapTabs(
 }
 
 async function closeTab(message: BridgeMessage<{ tabId: number }>) {
-  const allTabs = await tabs.query({});
+  const allTabs = await getTabs();
   if (allTabs.length === 1) {
     await tabs.create({});
   }
@@ -74,7 +75,7 @@ async function toggleMuteTab(message: BridgeMessage<{ tabId: number }>) {
 }
 
 async function closeOtherTabs(message: BridgeMessage<{ tabId: number }>) {
-  const allTabs = await tabs.query({});
+  const allTabs = await getTabs();
   const currentTab = allTabs.find((tab) => tab.id === message.data.tabId);
   if (!currentTab) return;
   const otherTabs = allTabs.filter((tab) => tab.id !== message.data.tabId);
@@ -94,7 +95,7 @@ async function fetchPage(message: BridgeMessage<{ tabId: number }>) {
 }
 
 async function getGroups() {
-  const allGroups = chrome.tabGroups.query({});
+  const allGroups = await chrome.tabGroups.query({});
   return allGroups;
 }
 
@@ -118,11 +119,18 @@ async function deleteGroup(message: BridgeMessage<{ groupId: number }>) {
 async function newGroup(
   message: BridgeMessage<{ color: string; title: string }>,
 ) {
-  const group = await chrome.tabs.group({ tabIds: [] });
+  const blankTab = await chrome.tabs.create({});
+  const group = await chrome.tabs.group({ tabIds: [blankTab?.id ?? 0] });
   await chrome.tabGroups.update(group, {
     color: message.data.color as chrome.tabGroups.ColorEnum,
     title: message.data.title,
   });
+  const allGroups = await getGroups();
+  for (const group of allGroups) {
+    await chrome.tabGroups.update(group.id, { collapsed: true });
+  }
+  await chrome.tabGroups.update(group, { collapsed: false });
+  return group;
 }
 
 async function updateGroup(
@@ -132,6 +140,13 @@ async function updateGroup(
     color: message.data.color as chrome.tabGroups.ColorEnum,
     title: message.data.title,
   });
+}
+
+async function organizeGroups(message: BridgeMessage<{ groupIds: number[] }>) {
+  const { groupIds } = message.data;
+  for (let i = 0; i < groupIds.length; i++) {
+    await chrome.tabGroups.move(groupIds[i], { index: i });
+  }
 }
 
 onMessage("grinta_getTabs", getTabs);
@@ -150,6 +165,7 @@ onMessage("grinta_activateGroup", activateGroup);
 onMessage("grinta_deleteGroup", deleteGroup);
 onMessage("grinta_newGroup", newGroup);
 onMessage("grinta_updateGroup", updateGroup);
+onMessage("grinta_organizeGroups", organizeGroups);
 
 browser.runtime.onInstalled.addListener(() => {
   chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
