@@ -75,6 +75,38 @@ const GENERATE_ROUTE = createRoute({
   },
 });
 
+const STREAM_ROUTE = createRoute({
+  method: "post",
+  path: "/stream",
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: GenerateParamsSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "AI stream result",
+      content: { "text/plain": { schema: z.string() } },
+    },
+    401: {
+      description: "Unauthorized",
+      content: { "text/plain": { schema: z.string() } },
+    },
+    403: {
+      description: "Forbidden",
+      content: { "text/plain": { schema: z.string() } },
+    },
+    500: {
+      description: "Internal Server Error",
+      content: { "text/plain": { schema: z.string() } },
+    },
+  },
+});
+
 async function getUsages({
   db,
   userId,

@@ -1,0 +1,49 @@
+{
+  "{{chrome}}.manifest_version": 3,
+  "{{firefox}}.manifest_version": 2,
+  "icons": {
+    "16": "icon/16.png",
+    "32": "icon/32.png",
+    "48": "icon/48.png",
+    "96": "icon/96.png",
+    "128": "icon/128.png"
+  },
+  "{{chrome}}.side_panel": {
+    "default_path": "src/sidebar.html"
+  },
+  "{{chrome}}.action": {
+    "default_title": "Click to open panel"
+  },
+  "{{firefox}}.browser_action": {
+    "default_popup": "src/sidebar.html"
+  },
+  "background": {
+    "{{chrome}}.service_worker": "src/lib/background/index.ts",
+    "{{firefox}}.scripts": ["src/lib/background/index.ts"]
+  },
+  "{{chrome}}.permissions": ["sidePanel", "tabs", "storage", "tabGroups"],
+  "{{chrome}}.content_scripts": [
+    {
+      "matches": ["https://*/*", "http://*/*"],
+      "js": ["src/lib/rpc/inject.ts"],
+      "all_frames": true
+    }
+  ],
+  "{{chrome}}.web_accessible_resources": [
+    {
+      "resources": ["provider.js"],
+      "matches": ["https://*/*", "http://*/*"]
+    }
+  ],
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "windows": "Alt+G",
+        "mac": "Alt+G",
+        "chromeos": "Alt+G",
+        "linux": "Alt+G"
+      },
+      "description": "Open Grinta"
+    }
+  }
+}

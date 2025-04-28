@@ -117,4 +117,6 @@ export class AiService {
     });
     return text.match(RESPONSE_REGEX)?.[1] ?? "";
   }
+
+  async streamResponse(params: {}) {}
 }
