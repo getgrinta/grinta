@@ -28,7 +28,7 @@
       "custom_links_title": "Własne Szybkie Linki",
       "no_custom_links": "Nie zdefiniowano jeszcze własnych szybkich linków.",
       "add_new_link_title": "Dodaj Nowy Szybki Link",
-      "form_shortcut_label": "Skrót (1 znak)",
+      "form_shortcut_label": "Skrót (1 albo 2 znaki)",
       "form_shortcut_placeholder": "np., g",
       "form_name_label": "Nazwa",
       "form_name_placeholder": "np., Wyszukiwanie w Google",

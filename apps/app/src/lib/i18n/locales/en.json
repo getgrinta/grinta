@@ -61,7 +61,7 @@
       "custom_links_title": "Custom Quick Links",
       "no_custom_links": "No custom quick links defined yet.",
       "add_new_link_title": "Add New Quick Link",
-      "form_shortcut_label": "Shortcut (1 char)",
+      "form_shortcut_label": "Shortcut (1 or 2 characters)",
       "form_shortcut_placeholder": "e.g., g",
       "form_name_label": "Name",
       "form_name_placeholder": "e.g., Google Search",

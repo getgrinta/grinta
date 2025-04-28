@@ -74,6 +74,8 @@
   let quickSearchBadge: HTMLDivElement | null = $state(null);
   const leftPadding = $derived.by(() => {
     const _ = quickSearchMode;
+
+    if (!quickSearchBadge || !quickSearchMode) return "0";
     return ((quickSearchBadge?.clientWidth ?? 0) + 15).toFixed(0);
   });
 
@@ -251,21 +253,13 @@
       return;
     }
 
-    if (event.key == "Enter") {
-      if (quickSearchMode) {
-        const url = quickSearchMode.searchUrl(appStore.query);
-        openUrl(url);
-        // Reset state after search
-        quickSearchMode = null;
-        appStore.query = "";
-        return;
-      }
-
-      if (appStore.query.length >= 3 && !quickSearchMode) {
-        event.preventDefault();
-
-        return goto(`/ai/${appStore.query}`);
-      }
+    if (event.key == "Enter" && quickSearchMode) {
+      const url = quickSearchMode.searchUrl(appStore.query);
+      openUrl(url);
+      // Reset state after search
+      quickSearchMode = null;
+      appStore.query = "";
+      return;
     }
 
     if (event.key === "Tab") {
@@ -273,9 +267,11 @@
 
       // save special mode
       if (appStore.query.length >= 1 && appStore.query.length <= 2) {
-        const shortcutChar = appStore.query[0].toUpperCase(); // Ensure uppercase for matching
+        const shortcutString = appStore.query.slice(0, 2).trim().toUpperCase(); // Ensure uppercase for matching
+
+        console.log(shortcutString);
         const mode = combinedQuickSearchModes().find(
-          (m: QuickSearchMode) => m.shortcut.toUpperCase() === shortcutChar,
+          (m: QuickSearchMode) => m.shortcut.toUpperCase() === shortcutString,
         );
 
         if (mode) {
@@ -325,8 +321,17 @@
     },
   );
 
-  const inputProps = $derived(
-    match(appStore.appMode)
+  const inputProps = $derived.by(() => {
+    if (quickSearchMode) {
+      const hostname = new URL(quickSearchMode.searchUrl("")).hostname;
+      const placeholder = `Open in ${hostname}`;
+      return {
+        icon: SearchIcon,
+        placeholder: placeholder,
+      };
+    }
+
+    return match(appStore.appMode)
       .with(APP_MODE.INITIAL, () => ({
         icon: SearchIcon,
         placeholder: $_("searchBar.placeholder.initial"),
@@ -343,8 +348,8 @@
         icon: CalendarIcon,
         placeholder: $_("searchBar.placeholder.calendar"),
       }))
-      .exhaustive(),
-  );
+      .exhaustive();
+  });
 
   const indicatorButton = $derived(
     match(appStore.appMode)
@@ -420,7 +425,7 @@
         <div
           bind:this={quickSearchBadge}
           class={clsx(
-            "badge absolute left-2 top-1/2 -translate-y-1/2 z-10 pointer-events-none",
+            "badge absolute left-0 top-1/2 -translate-y-1/2 z-10 pointer-events-none",
             `bg-${quickSearchMode.bgColorClass}`,
             quickSearchMode.textColorClass,
             `shadow-${quickSearchMode.bgColorClass}/50 border-0 shadow-lg`,
