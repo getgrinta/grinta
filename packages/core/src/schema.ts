@@ -128,7 +128,7 @@ export const CustomQuickLinkSchema = z.object({
     .string()
     .min(1, { message: "Shortcut be 1 or 2 characters long" })
     .max(2, { message: "Shortcut be 1 or 2 characters long" })
-    .regex(/^[a-zA-Z0-9]{1,2}$/, { message: "Shortcut must be alphanumeric" }), // Ensure it's a single alphanumeric char
+    .regex(/^[a-zA-Z0-9]{1,2}$/, { message: "Shortcut must be alphanumeric" }),
   name: z.string().min(1, { message: "Name cannot be empty" }),
   urlTemplate: z
     .string()
