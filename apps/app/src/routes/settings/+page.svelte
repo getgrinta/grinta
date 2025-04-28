@@ -551,7 +551,7 @@
                     type="text"
                     name="shortcut"
                     id="shortcut"
-                    maxlength="1"
+                    maxlength="2"
                     class="w-full input"
                     placeholder={$_(
                       "settings.quick_search.form_shortcut_placeholder",

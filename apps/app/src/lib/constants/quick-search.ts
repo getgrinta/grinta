@@ -31,7 +31,7 @@ export const defaultQuickSearchModes: QuickSearchMode[] = [
     bgColorClass: "green-600",
     textColorClass: "text-white",
     searchUrl: (query: string) =>
-      `https://www.google.com/search?q=site%3Achat.openai.com+${encodeURIComponent(query)}`, // Placeholder
+      `https://chatgpt.com/?q=${encodeURIComponent(query)}`,
   },
   {
     shortcut: "W",

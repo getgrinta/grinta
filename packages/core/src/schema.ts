@@ -126,8 +126,9 @@ export const baseCurrencies = Object.keys(BASE_CURRENCY);
 export const CustomQuickLinkSchema = z.object({
   shortcut: z
     .string()
-    .length(1, { message: "Shortcut must be exactly 1 character long" })
-    .regex(/^[a-zA-Z0-9]$/, { message: "Shortcut must be alphanumeric" }), // Ensure it's a single alphanumeric char
+    .min(1, { message: "Shortcut be 1 or 2 characters long" })
+    .max(2, { message: "Shortcut be 1 or 2 characters long" })
+    .regex(/^[a-zA-Z0-9]{1,2}$/, { message: "Shortcut must be alphanumeric" }), // Ensure it's a single alphanumeric char
   name: z.string().min(1, { message: "Name cannot be empty" }),
   urlTemplate: z
     .string()

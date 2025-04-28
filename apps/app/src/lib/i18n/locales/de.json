@@ -63,7 +63,7 @@
       "custom_links_title": "Benutzerdefinierte Quick-Links",
       "no_custom_links": "Es sind noch keine benutzerdefinierten Quick-Links definiert.",
       "add_new_link_title": "Neuen Quick-Link hinzufügen",
-      "form_shortcut_label": "Shortcut (1 Zeichen)",
+      "form_shortcut_label": "Shortcut (1 oder 2 Zeichen)",
       "form_shortcut_placeholder": "z.B. g",
       "form_name_label": "Name",
       "form_name_placeholder": "z.B. Google-Suche",
