@@ -336,9 +336,32 @@ export class CommandsStore extends SecureStore<Commands> {
           )) ?? [])
         : [];
 
-    this.commands = uniq([...formulaCommands, ...filteredCommands]).sort(
-      (a, b) => this.sortCommands({ prev: a, next: b }),
-    );
+    let quickSearchCommand: ExecutableCommand | null = null;
+    if (appStore.appMode === APP_MODE.INITIAL && appStore.quickSearchMode) {
+      const hostname = new URL(appStore.quickSearchMode.searchUrl("")).hostname;
+      quickSearchCommand = ExecutableCommandSchema.parse({
+        value: `Open in ${hostname}`,
+        label: `Open in ${hostname}`,
+        localizedLabel: `Open in ${hostname}`,
+        metadata: {},
+        handler: COMMAND_HANDLER.URL,
+        appModes: [APP_MODE.INITIAL],
+        smartMatch: true,
+        priority: COMMAND_PRIORITY.TOP,
+      });
+    }
+
+    if (quickSearchCommand) {
+      this.commands = uniq([
+        ...formulaCommands,
+        ...filteredCommands,
+        quickSearchCommand,
+      ]).sort((a, b) => this.sortCommands({ prev: a, next: b }));
+    } else {
+      this.commands = uniq([...formulaCommands, ...filteredCommands]).sort(
+        (a, b) => this.sortCommands({ prev: a, next: b }),
+      );
+    }
 
     if (
       appStore.appMode === APP_MODE.INITIAL &&

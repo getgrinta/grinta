@@ -81,4 +81,12 @@ export const defaultQuickSearchModes: QuickSearchMode[] = [
     searchUrl: (query: string) =>
       `https://x.com/search?q=${encodeURIComponent(query)}&src=typed_query`,
   },
+  {
+    shortcut: "S",
+    name: "Scira",
+    bgColorClass: "blue-600",
+    textColorClass: "text-white",
+    searchUrl: (query: string) =>
+      `https://scira.ai/?q=${encodeURIComponent(query)}`,
+  },
 ];

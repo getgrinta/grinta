@@ -70,12 +70,11 @@
     return [...defaultsToAdd, ...customLinksMap.values()];
   });
 
-  let quickSearchMode: QuickSearchMode | null = $state(null);
   let quickSearchBadge: HTMLDivElement | null = $state(null);
   const leftPadding = $derived.by(() => {
-    const _ = quickSearchMode;
+    const _ = appStore.quickSearchMode;
 
-    if (!quickSearchBadge || !quickSearchMode) return "0";
+    if (!quickSearchBadge || !appStore.quickSearchMode) return "0";
     return ((quickSearchBadge?.clientWidth ?? 0) + 15).toFixed(0);
   });
 
@@ -234,17 +233,17 @@
       return;
     }
 
-    if (quickSearchMode && event.key === "Backspace") {
+    if (appStore.quickSearchMode && event.key === "Backspace") {
       event.preventDefault();
-      quickSearchMode = null;
+      appStore.quickSearchMode = null;
       appStore.query = "";
     }
 
     if (event.key === "Backspace" && appStore.query.length === 0) {
       // Clear quick link
-      if (quickSearchMode) {
+      if (appStore.quickSearchMode) {
         event.preventDefault();
-        quickSearchMode = null;
+        appStore.quickSearchMode = null;
         appStore.query = "";
         return;
       }
@@ -253,37 +252,41 @@
       return;
     }
 
-    if (event.key == "Enter" && quickSearchMode) {
-      const url = quickSearchMode.searchUrl(appStore.query);
-      openUrl(url);
-      // Reset state after search
-      quickSearchMode = null;
-      appStore.query = "";
-      return;
-    }
-
-    if (event.key === "Tab") {
-      event.preventDefault();
-
-      // save special mode
-      if (appStore.query.length >= 1 && appStore.query.length <= 2) {
-        const shortcutString = appStore.query.slice(0, 2).trim().toUpperCase(); // Ensure uppercase for matching
-
-        console.log(shortcutString);
-        const mode = combinedQuickSearchModes().find(
-          (m: QuickSearchMode) => m.shortcut.toUpperCase() === shortcutString,
-        );
-
-        if (mode) {
-          quickSearchMode = mode;
-          appStore.query = ""; // Clear query after setting mode
-        }
-
+    if (appStore.appMode === APP_MODE.INITIAL) {
+      if (event.key == "Enter" && appStore.quickSearchMode) {
+        const url = appStore.quickSearchMode.searchUrl(appStore.query);
+        openUrl(url);
+        // Reset state after search
+        appStore.quickSearchMode = null;
+        appStore.query = "";
         return;
       }
 
-      if (appStore.query.length < 4) return;
-      return goto(`/ai/${appStore.query}`);
+      if (event.key === "Tab") {
+        event.preventDefault();
+
+        // save special mode
+        if (appStore.query.length >= 1 && appStore.query.length <= 2) {
+          const shortcutString = appStore.query
+            .slice(0, 2)
+            .trim()
+            .toUpperCase(); // Ensure uppercase for matching
+
+          const mode = combinedQuickSearchModes().find(
+            (m: QuickSearchMode) => m.shortcut.toUpperCase() === shortcutString,
+          );
+
+          if (mode) {
+            appStore.quickSearchMode = mode;
+            appStore.query = ""; // Clear query after setting mode
+          }
+
+          return;
+        }
+
+        if (appStore.query.length < 4 || appStore.quickSearchMode) return;
+        return goto(`/ai/${appStore.query}`);
+      }
     }
   }
 
@@ -322,8 +325,8 @@
   );
 
   const inputProps = $derived.by(() => {
-    if (quickSearchMode) {
-      const hostname = new URL(quickSearchMode.searchUrl("")).hostname;
+    if (appStore.quickSearchMode && appStore.appMode === APP_MODE.INITIAL) {
+      const hostname = new URL(appStore.quickSearchMode.searchUrl("")).hostname;
       const placeholder = `Open in ${hostname}`;
       return {
         icon: SearchIcon,
@@ -421,22 +424,22 @@
         spellcheck="false"
         data-testid="search-bar"
       />
-      {#if quickSearchMode}
+      {#if appStore.quickSearchMode && appStore.appMode === APP_MODE.INITIAL}
         <div
           bind:this={quickSearchBadge}
           class={clsx(
             "badge absolute left-0 top-1/2 -translate-y-1/2 z-10 pointer-events-none",
-            `bg-${quickSearchMode.bgColorClass}`,
-            quickSearchMode.textColorClass,
-            `shadow-${quickSearchMode.bgColorClass}/50 border-0 shadow-lg`,
+            `bg-${appStore.quickSearchMode.bgColorClass}`,
+            appStore.quickSearchMode.textColorClass,
+            `shadow-${appStore.quickSearchMode.bgColorClass}/50 border-0 shadow-lg`,
           )}
         >
-          {quickSearchMode.name}
+          {appStore.quickSearchMode.name}
         </div>
       {/if}
     </div>
     <div slot="addon" class="flex items-center gap-1">
-      {#if appStore.appMode === APP_MODE.INITIAL && appStore.query.length >= 3 && appStore.user?.id}
+      {#if !appStore.quickSearchMode && appStore.appMode === APP_MODE.INITIAL && appStore.query.length >= 3 && appStore.user?.id}
         <ViewActions actions={searchViewActions} size="sm" />
       {:else}
         <SegmentedControl

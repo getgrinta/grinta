@@ -19,10 +19,12 @@ import { page } from "$app/state";
 import { goto } from "$app/navigation";
 import { _ } from "svelte-i18n";
 import { get } from "svelte/store";
+import type { QuickSearchMode } from "$lib/constants/quick-search";
 
 export class AppStore {
   query = $state("");
   appMode = $state<AppMode>(APP_MODE.INITIAL);
+  quickSearchMode = $state<QuickSearchMode | null>(null);
   appWindow = $state<Window>();
   lastFocusedWindowName = $state<string>();
   menuOpen = $state<boolean>(false);
