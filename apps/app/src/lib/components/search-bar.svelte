@@ -233,12 +233,6 @@
       return;
     }
 
-    if (appStore.quickSearchMode && event.key === "Backspace") {
-      event.preventDefault();
-      appStore.quickSearchMode = null;
-      appStore.query = "";
-    }
-
     if (event.key === "Backspace" && appStore.query.length === 0) {
       // Clear quick link
       if (appStore.quickSearchMode) {
@@ -327,7 +321,10 @@
   const inputProps = $derived.by(() => {
     if (appStore.quickSearchMode && appStore.appMode === APP_MODE.INITIAL) {
       const hostname = new URL(appStore.quickSearchMode.searchUrl("")).hostname;
-      const placeholder = `Open in ${hostname}`;
+      const placeholder = $_("settings.quick_search.openIn").replace(
+        "{hostname}",
+        hostname,
+      );
       return {
         icon: SearchIcon,
         placeholder: placeholder,

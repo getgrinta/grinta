@@ -71,7 +71,8 @@
       "add_button": "Add Link",
       "remove_link_tooltip": "Remove this link",
       "link_added": "Custom quick link added.",
-      "link_removed": "Custom quick link removed."
+      "link_removed": "Custom quick link removed.",
+      "openIn": "Open in {hostname}"
     },
     "tabs": {
       "general": "General",

@@ -339,10 +339,14 @@ export class CommandsStore extends SecureStore<Commands> {
     let quickSearchCommand: ExecutableCommand | null = null;
     if (appStore.appMode === APP_MODE.INITIAL && appStore.quickSearchMode) {
       const hostname = new URL(appStore.quickSearchMode.searchUrl("")).hostname;
+      const placeholder = t("settings.quick_search.openIn").replace(
+        "{hostname}",
+        hostname,
+      );
       quickSearchCommand = ExecutableCommandSchema.parse({
-        value: `Open in ${hostname}`,
-        label: `Open in ${hostname}`,
-        localizedLabel: `Open in ${hostname}`,
+        value: placeholder,
+        label: placeholder,
+        localizedLabel: placeholder,
         metadata: {},
         handler: COMMAND_HANDLER.URL,
         appModes: [APP_MODE.INITIAL],

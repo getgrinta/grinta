@@ -38,7 +38,8 @@
       "add_button": "Dodaj Link",
       "remove_link_tooltip": "Usuń ten link",
       "link_added": "Własny szybki link dodany.",
-      "link_removed": "Własny szybki link usunięty."
+      "link_removed": "Własny szybki link usunięty.",
+      "openIn": "Otwórz w {hostname}"
     },
     "tabs": {
       "general": "Ogólne",
