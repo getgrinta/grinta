@@ -12,6 +12,7 @@ export default {
     "bg-green-600",
     "bg-gray-200",
     "bg-blue-800",
+    "bg-blue-600",
     "bg-orange-500",
     "bg-purple-500",
     "bg-sky-600",
