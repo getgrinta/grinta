@@ -75,7 +75,7 @@
     "prosemirror-state": "1.4.3",
     "prosemirror-view": "1.38.1",
     "rambda": "10.0.0-beta.3",
-    "runed": "0.25.0",
+    "runed": "0.26.0",
     "superjson": "2.2.2",
     "svelte-i18n": "4.0.1",
     "svelte-sonner": "0.3.28",
