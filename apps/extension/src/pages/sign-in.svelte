@@ -1,6 +1,7 @@
 <script lang="ts">
   import { authClient } from "$lib/auth";
   import Layout from "$lib/components/layout.svelte";
+  import ViewTitle from "$lib/components/view-title.svelte";
   import { useRsv } from "@ryuz/rsv";
   import { createForm } from "felte";
   import { toast } from "svelte-sonner";
@@ -9,6 +10,7 @@
   const router = useRsv();
 
   let step = $state<"email" | "code">("email");
+  let loading = $state(false);
   const submitLabel = $derived(
     step === "email" ? "Send Verification Code" : "Verify Code",
   );
@@ -21,6 +23,7 @@
     async onSubmit(formData) {
       return match(step)
         .with("email", async () => {
+          loading = true;
           const { data, error } = await authClient.emailOtp.sendVerificationOtp(
             {
               email: formData.email,
@@ -31,9 +34,11 @@
             toast.error(error.message ?? "Error ocurred");
             return;
           }
+          loading = false;
           setStep("code");
         })
         .with("code", async () => {
+          loading = true;
           const { data, error } = await authClient.signIn.emailOtp({
             email: formData.email,
             otp: formData.code,
@@ -42,7 +47,8 @@
             toast.error(error.message ?? "Error ocurred");
             return;
           }
-          router?.navigate("/agent");
+          loading = false;
+          router?.navigate("/chats");
         })
         .exhaustive();
     },
@@ -54,9 +60,9 @@
 </script>
 
 <Layout>
-  <div class="flex-1 flex flex-col items-center justify-center gap-2">
+  <ViewTitle title="Sign In" />
+  <div class="flex-1 flex flex-col items-center justify-center gap-2 p-2">
     <form use:form class="flex flex-col gap-2 w-full">
-      <h1 class="text-lg font-semibold">Sign In</h1>
       <label for="email" class="label">Email Address</label>
       <input
         id="email"
@@ -75,7 +81,7 @@
           placeholder="123456"
         />
       {/if}
-      <button class="btn btn-primary">{submitLabel}</button>
+      <button class="btn btn-primary" disabled={loading}>{submitLabel}</button>
     </form>
   </div>
 </Layout>

@@ -16,7 +16,8 @@
   ],
   "scripts": {
     "build": "tsc && bun build src/index.ts --outdir ./dist",
-    "test": "bun test"
+    "test": "bun test",
+    "cleanup": "rimraf node_modules .turbo dist"
   },
   "dependencies": {
     "@getgrinta/core": "workspace:*",

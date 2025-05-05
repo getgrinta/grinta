@@ -50,15 +50,12 @@ function cleanMarkdown(md: string) {
     .replace(/[ \t]+\n/g, "\n"); // Remove trailing spaces
 }
 
-onMessage("grinta_getContent", () => {
-  const allowScraping = window.confirm("Allow GrintAI to read this page?");
-  if (!allowScraping) return;
+onMessage("grinta_getContent", (message) => {
+  if (message.sender.context !== "content-script") return;
   const clone = document.body.cloneNode(true) as HTMLElement;
   cleanDOMForLLM(clone);
-
   const rawMarkdown = turndownService.turndown(clone.innerHTML);
   const cleanedMarkdown = cleanMarkdown(rawMarkdown);
-
   return {
     content: cleanedMarkdown,
   };

@@ -44,7 +44,7 @@
     aria-label={tab.title}
   >
     <button
-      class="flex flex-1 gap-2 min-w-0 p-2 h-full cursor-pointer"
+      class="flex flex-1 min-w-0 gap-2 p-2 h-full cursor-pointer"
       onclick={handleClick}
       data-btn-activate
     >
@@ -61,7 +61,7 @@
       <span class="truncate text-left flex-1 min-w-0 h-full">{tab.title}</span>
     </button>
     <button
-      class="hidden group-hover:flex items-center justify-center cursor-pointer mr-2"
+      class="hidden min-w-0 group-hover:flex items-center justify-center cursor-pointer px-2 py-1 rounded-full"
       onclick={handleClose}
       data-btn-close
     >

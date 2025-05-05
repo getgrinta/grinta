@@ -21,7 +21,14 @@
     "{{chrome}}.service_worker": "src/lib/background/index.ts",
     "{{firefox}}.scripts": ["src/lib/background/index.ts"]
   },
-  "{{chrome}}.permissions": ["sidePanel", "tabs", "storage", "tabGroups"],
+  "{{chrome}}.permissions": [
+    "sidePanel",
+    "tabs",
+    "storage",
+    "tabGroups",
+    "bookmarks",
+    "cookies"
+  ],
   "{{chrome}}.content_scripts": [
     {
       "matches": ["https://*/*", "http://*/*"],

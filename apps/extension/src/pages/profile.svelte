@@ -1,6 +1,7 @@
 <script lang="ts">
   import { authClient } from "$lib/auth";
   import Layout from "$lib/components/layout.svelte";
+  import ViewTitle from "$lib/components/view-title.svelte";
   import { useRsv } from "@ryuz/rsv";
   import { CogIcon } from "lucide-svelte";
 
@@ -11,17 +12,18 @@
 </script>
 
 <Layout>
-  <div class="flex justify-end">
-    <button
-      class="btn btn-ghost btn-square"
-      onclick={() => router?.navigate("/settings")}
-    >
-      <CogIcon size={20} />
-    </button>
-  </div>
-  <div class="flex-1 flex flex-col items-center justify-center">
+  <ViewTitle title="Profile">
+    {#snippet addon()}
+      <button
+        class="btn btn-ghost btn-sm btn-square"
+        onclick={() => router?.navigate("/settings")}
+      >
+        <CogIcon size={20} />
+      </button>
+    {/snippet}
+  </ViewTitle>
+  <div class="flex-1 flex flex-col items-center justify-center p-2">
     <div class="w-full flex flex-col gap-2">
-      <h1 class="text-lg font-semibold">Profile</h1>
       <label for="email" class="label">Email</label>
       <input
         id="email"

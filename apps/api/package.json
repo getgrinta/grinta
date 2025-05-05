@@ -23,6 +23,7 @@
     "script:notify": "bun ./scripts/notify-deployed.ts"
   },
   "dependencies": {
+    "@getgrinta/core": "workspace:*",
     "@ai-sdk/openai-compatible": "0.2.5",
     "@better-auth/stripe": "1.2.5",
     "@hono/zod-openapi": "0.19.2",

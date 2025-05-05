@@ -1,14 +1,15 @@
 import { createRoute } from "@hono/zod-openapi";
 import { z } from "zod";
-import { AI_AUTOCOMPLETE_MODELS, AI_PROVIDER } from "../const.js";
-import { AiService, ModelSchema } from "../services/ai.service.js";
-import { createRouter } from "../utils/router.utils.js";
+import { AI_PROVIDER } from "../const.js";
+import { AiService } from "../services/ai.service.js";
+import { aiLimitGuard, createRouter } from "../utils/router.utils.js";
 import { schema } from "../db/schema.js";
-import { and, count, eq, gte } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { until } from "@open-draft/until";
-import type { Database } from "../db/index.js";
-import { env } from "../utils/env.utils.js";
+import { ChatMessageSchema } from "@getgrinta/core";
+import { stream } from "hono/streaming";
 
+const MODEL = "mistral-small-latest";
 const aiService = new AiService();
 
 export const CONTENT_TYPE = {
@@ -32,15 +33,8 @@ export const GenerateNoteResult = z.object({
   text: z.string(),
 });
 
-const MODELS_ROUTE = createRoute({
-  method: "get",
-  path: "/models",
-  responses: {
-    200: {
-      description: "List AI models",
-      content: { "application/json": { schema: z.array(ModelSchema) } },
-    },
-  },
+export const StreamParamsSchema = z.object({
+  messages: z.array(ChatMessageSchema),
 });
 
 const GENERATE_ROUTE = createRoute({
@@ -82,7 +76,7 @@ const STREAM_ROUTE = createRoute({
     body: {
       content: {
         "application/json": {
-          schema: GenerateParamsSchema,
+          schema: StreamParamsSchema,
         },
       },
     },
@@ -90,7 +84,7 @@ const STREAM_ROUTE = createRoute({
   responses: {
     200: {
       description: "AI stream result",
-      content: { "text/plain": { schema: z.string() } },
+      content: { "text/plain": { schema: z.any() } },
     },
     401: {
       description: "Unauthorized",
@@ -107,58 +101,20 @@ const STREAM_ROUTE = createRoute({
   },
 });
 
-async function getUsages({
-  db,
-  userId,
-  dateFrom,
-}: {
-  db: Database;
-  userId: string;
-  dateFrom: Date;
-}) {
-  return db
-    .select({ count: count() })
-    .from(schema.aiUsage)
-    .where(
-      and(
-        eq(schema.aiUsage.userId, userId),
-        eq(schema.aiUsage.state, "success"),
-        gte(schema.aiUsage.createdAt, dateFrom),
-      ),
-    );
-}
-
 export const aiRouter = createRouter()
-  .openapi(MODELS_ROUTE, (c) => {
-    return c.json(AI_AUTOCOMPLETE_MODELS);
-  })
   .openapi(GENERATE_ROUTE, async (c) => {
-    const model = "mistral-small-latest";
     const user = c.get("user");
     if (!user) return c.text("Unauthorized", 401);
-    const subscriptions = c.get("subscriptions");
-    const dailyUsages =
-      subscriptions.length > 0 ? env.AI_DAILY_LIMIT_PRO : env.AI_DAILY_LIMIT;
     const db = c.get("db");
-    const [usagesLastDay] = await getUsages({
-      db,
-      userId: user.id,
-      dateFrom: new Date(Date.now() - 24 * 60 * 60 * 1000),
-    });
-    if (usagesLastDay.count >= dailyUsages)
-      return c.text(
-        `You have reached the daily limit of ${dailyUsages} AI usages`,
-        403,
-      );
     const [aiUsage] = await db
       .insert(schema.aiUsage)
-      .values({ userId: user.id, model })
+      .values({ userId: user.id, model: MODEL })
       .returning();
     const params = GenerateParamsSchema.parse(await c.req.json());
     const body = {
       ...params,
       provider: AI_PROVIDER.MISTRAL,
-      model,
+      model: MODEL,
     };
     const { data, error } = await until(() => aiService.generateResponse(body));
     if (error) {
@@ -173,4 +129,16 @@ export const aiRouter = createRouter()
       .set({ state: "success" })
       .where(eq(schema.aiUsage.id, aiUsage.id));
     return c.json({ text: data }, 200);
-  });
+  })
+  .openapi(STREAM_ROUTE, async (c) => {
+    const user = c.get("user");
+    if (!user) return c.text("Unauthorized", 401);
+    const params = StreamParamsSchema.parse(await c.req.json());
+    const result = aiService.streamResponse(params);
+    return stream(c, async (stream) => {
+      c.header("X-Vercel-AI-Data-Stream", "v1");
+      c.header("Content-Type", "text/plain; charset=utf-8");
+      await stream.pipe(result.toDataStream());
+    }) as never;
+  })
+  .use(aiLimitGuard);

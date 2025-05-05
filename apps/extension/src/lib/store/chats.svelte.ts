@@ -1,61 +1,51 @@
 import { PersistedStore } from "$lib/utils.svelte";
+import { ChatMessageSchema, type ChatMessageData } from "@getgrinta/core";
 import { z } from "zod";
-
-export const AttachmentSchema = z.object({
-  name: z.string(),
-  contentType: z.string(),
-  url: z.string(),
-});
-
-export const MessageSchema = z.object({
-  id: z.string(),
-  content: z.string(),
-  experimental_attachments: z.array(AttachmentSchema).default([]),
-  role: z.enum(["system", "user", "assistant", "data"]),
-  createdAt: z.date().optional(),
-  parts: z.any(),
-});
-
-export type MessageData = z.infer<typeof MessageSchema>;
 
 export const ChatDataSchema = z.object({
   id: z.string(),
   title: z.string(),
-  messages: z.array(MessageSchema),
+  messages: z.array(ChatMessageSchema),
 });
 
 export type ChatData = z.infer<typeof ChatDataSchema>;
 
 export const ChatsSchema = z.object({
-  chats: z.array(ChatDataSchema),
+  chats: z.array(ChatDataSchema).default([]),
 });
 
 export type Chats = z.infer<typeof ChatsSchema>;
 
-export class ChatStore extends PersistedStore<Chats> {
+export class ChatsStore extends PersistedStore<Chats> {
   data = $state<Chats>(ChatsSchema.parse({}));
 
-  appendMessage(chatId: string, message: MessageData) {
+  async appendMessage(chatId: string, message: ChatMessageData) {
     const chat = this.data.chats.find((chat) => chat.id === chatId);
     if (!chat) return;
     chat.messages.push(message);
-    this.persist();
+    await this.persist();
   }
 
-  createChat(title: string) {
+  async createChat() {
     const chat = ChatDataSchema.parse({
       id: crypto.randomUUID(),
-      title,
+      title: "Untitled",
       messages: [],
     });
     this.data.chats.push(chat);
-    this.persist();
+    await this.persist();
+    return chat;
   }
 
-  generateResponse(chatId: string) {}
+  async setTitle(chatId: string, title: string) {
+    const chat = this.data.chats.find((chat) => chat.id === chatId);
+    if (!chat) return;
+    chat.title = title;
+    await this.persist();
+  }
 }
 
-export const chatStore = new ChatStore({
+export const chatsStore = new ChatsStore({
   storageKey: "chats",
   schema: ChatsSchema,
 });

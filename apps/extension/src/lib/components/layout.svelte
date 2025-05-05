@@ -17,16 +17,16 @@
 
   function openAgent() {
     if (!router) return;
-    router.navigate("/agent");
+    router.navigate("/chats");
   }
 </script>
 
 {#if router}
-  <div class="flex flex-col gap-4 p-2 min-h-screen">
-    <div class="flex-1 flex flex-col">
+  <div class="flex flex-col min-h-screen">
+    <div class="flex-1 flex flex-col pb-16">
       {@render children()}
     </div>
-    <div class="dock dock-xs static">
+    <div class="dock dock-sm">
       <button
         class={clsx({ "dock-active": router.path === "/" })}
         onclick={openTabs}
@@ -34,7 +34,7 @@
         <ListIcon size={20} />
       </button>
       <button
-        class={clsx({ "dock-active": router.path === "/agent" })}
+        class={clsx({ "dock-active": router.path?.includes("/chats") })}
         onclick={openAgent}
       >
         <SparklesIcon size={20} />

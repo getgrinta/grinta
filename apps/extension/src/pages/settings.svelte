@@ -5,10 +5,7 @@
   import { createForm } from "felte";
   import { ChevronLeftIcon, PlusIcon, TrashIcon } from "lucide-svelte";
   import { useRsv } from "@ryuz/rsv";
-  import { sendMessage } from "webext-bridge/popup";
-  import { generateUsername } from "unique-username-generator";
-  import { TAB_COLOR } from "$lib/const";
-  import { rand } from "$lib/utils.svelte";
+  import ViewTitle from "$lib/components/view-title.svelte";
 
   const router = useRsv();
 
@@ -31,17 +28,18 @@
 </script>
 
 <Layout>
-  <div class="flex flex-col">
+  <ViewTitle title="Settings">
+    {#snippet action()}
+      <button
+        class="btn btn-xs btn-ghost btn-square"
+        onclick={() => router?.navigate("/")}
+      >
+        <ChevronLeftIcon size={20} />
+      </button>
+    {/snippet}
+  </ViewTitle>
+  <div class="flex flex-col p-2">
     <form use:form class="w-full flex flex-col gap-2" onchange={formChange}>
-      <div class="flex gap-2 items-center">
-        <button
-          class="btn btn-sm btn-ghost btn-square"
-          onclick={() => router?.navigate("/")}
-        >
-          <ChevronLeftIcon size={20} />
-        </button>
-        <h1 class="text-lg font-semibold">Settings</h1>
-      </div>
       <label for="theme" class="label">Theme</label>
       <select id="theme" name="theme" class="select w-full">
         {#each Object.keys(THEME) as theme}
@@ -59,7 +57,7 @@
       />
     </form>
   </div>
-  <div class="flex items-center justify-between mt-4">
+  <div class="flex items-center justify-between p-2">
     <h1 class="text-lg font-semibold">Spaces</h1>
     <button
       class="btn btn-sm btn-ghost btn-square"
@@ -68,7 +66,7 @@
       <PlusIcon size={20} />
     </button>
   </div>
-  <form class="flex flex-col gap-2 mt-2" onchange={onSpacesChanged}>
+  <form class="flex flex-col gap-2 p-2" onchange={onSpacesChanged}>
     {#each tabsStore.groups as space}
       <div class="flex gap-2">
         <input bind:value={space.title} class="input input-sm w-full" />

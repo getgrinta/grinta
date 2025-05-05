@@ -1,10 +1,11 @@
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
-import { generateText } from "ai";
+import { generateText, streamText } from "ai";
 import dedent from "dedent";
 import { match } from "ts-pattern";
 import { z } from "zod";
 import { AI_PROVIDERS_CONFIG, type AiProvider } from "../const.js";
 import { CONTENT_TYPE, type ContentType } from "../routers/ai.router.js";
+import { type ChatMessageData } from "@getgrinta/core";
 
 const RESPONSE_REGEX = /<response>(.*?)<\/response>/;
 
@@ -48,9 +49,13 @@ export const REPHRASE_SYSTEM_PROMPT = dedent`
 `;
 
 export const GRINTAI_SYSTEM_PROMPT = dedent`
-    You are a highly intelligent AI assistant.
+  You are a highly intelligent AI assistant.
 	1. Your task is to provide concise and informative summaries for the prompts in <request></request> tag.
 	2. Output Format: Return only the continuation of the paragraph wrapped in an XML <response> tag. Do not include any additional text or explanations.
+`;
+
+export const BROWSER_AGENT_SYSTEM_PROMPT = dedent`
+  You are a highly intelligent web browsing assistant.
 `;
 
 export class AiService {
@@ -118,5 +123,14 @@ export class AiService {
     return text.match(RESPONSE_REGEX)?.[1] ?? "";
   }
 
-  async streamResponse(params: {}) {}
+  streamResponse(params: ChatMessageData) {
+    const model = this.createModel({
+      provider: "MISTRAL",
+      model: "mistral-small-latest",
+    });
+    return streamText({
+      messages: params.messages,
+      model,
+    });
+  }
 }

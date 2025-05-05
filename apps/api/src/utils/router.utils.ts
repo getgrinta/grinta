@@ -1,9 +1,10 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { createMiddleware } from "hono/factory";
 import { auth } from "../auth/index.js";
-import { db } from "../db/index.js";
-import { and, eq, or } from "drizzle-orm";
+import { db, type Database } from "../db/index.js";
+import { and, count, eq, gte, or } from "drizzle-orm";
 import { schema } from "../db/schema.js";
+import { env } from "./env.utils.ts";
 
 export function createRouter() {
   return new OpenAPIHono<{
@@ -47,5 +48,46 @@ export const authSession = createMiddleware(async (c, next) => {
 
 export const databaseContext = createMiddleware(async (c, next) => {
   c.set("db", db);
+  return next();
+});
+
+async function getUsages({
+  db,
+  userId,
+  dateFrom,
+}: {
+  db: Database;
+  userId: string;
+  dateFrom: Date;
+}) {
+  return db
+    .select({ count: count() })
+    .from(schema.aiUsage)
+    .where(
+      and(
+        eq(schema.aiUsage.userId, userId),
+        eq(schema.aiUsage.state, "success"),
+        gte(schema.aiUsage.createdAt, dateFrom),
+      ),
+    );
+}
+
+export const aiLimitGuard = createMiddleware(async (c, next) => {
+  const user = c.get("user");
+  if (!user) return c.text("Unauthorized", 401);
+  const subscriptions = c.get("subscriptions");
+  const dailyUsages =
+    subscriptions.length > 0 ? env.AI_DAILY_LIMIT_PRO : env.AI_DAILY_LIMIT;
+  const db = c.get("db");
+  const [usagesLastDay] = await getUsages({
+    db,
+    userId: user.id,
+    dateFrom: new Date(Date.now() - 24 * 60 * 60 * 1000),
+  });
+  if (usagesLastDay.count >= dailyUsages)
+    return c.text(
+      `You have reached the daily limit of ${dailyUsages} AI usages`,
+      403,
+    );
   return next();
 });

@@ -7,6 +7,7 @@
     PinIcon,
     PlusIcon,
     RefreshCwIcon,
+    StarIcon,
     VolumeOffIcon,
     XIcon,
   } from "lucide-svelte";
@@ -53,10 +54,15 @@
     sendMessage("grinta_closeOtherTabs", { tabId }, "background");
     open = false;
   }
+
+  function handleAddToEssentials() {
+    sendMessage("grinta_addToEssentials", { tabId }, "background");
+    open = false;
+  }
 </script>
 
 <ContextMenu.Root bind:open>
-  <ContextMenu.Trigger class="flex-1 w-full flex">
+  <ContextMenu.Trigger class="w-full flex">
     {@render children()}
   </ContextMenu.Trigger>
   <ContextMenu.Portal>
@@ -102,6 +108,12 @@
           <a onclick={handleCloseOtherTabs}>
             <ListXIcon size={16} />
             <span>Close Other Tabs</span>
+          </a>
+        </li>
+        <li>
+          <a onclick={handleAddToEssentials}>
+            <StarIcon size={16} />
+            <span>Add to Essential</span>
           </a>
         </li>
       </ul>
