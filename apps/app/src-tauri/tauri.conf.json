@@ -45,7 +45,11 @@
     "targets": "all",
     "createUpdaterArtifacts": true,
     "macOS": {
+<<<<<<< HEAD
+      "entitlements": "./Entitlements.plist"
+=======
       "entitlements": "entitlements.plist"
+>>>>>>> origin/main
     },
     "icon": [
       "icons/32x32.png",
