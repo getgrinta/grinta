@@ -248,6 +248,8 @@
 
     if (appStore.appMode === APP_MODE.INITIAL) {
       if (event.key == "Enter" && appStore.quickSearchMode) {
+        event.preventDefault();
+
         const url = appStore.quickSearchMode.searchUrl(appStore.query);
         openUrl(url);
         // Reset state after search
