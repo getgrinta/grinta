@@ -132,7 +132,15 @@
         {@const isXml = XMLValidator.validate(message.content) === true}
         {@const meta = isXml ? parser.parse(message.content) : {}}
         {#if isXml}
-          <div class="prose prose-sm">{JSON.stringify(meta)}</div>
+          {#if meta.context}
+            <div class="card card-xs bg-base-200 shadow-sm">
+              <div class="card-body">
+                <h2 class="card-title">Analyzed Context</h2>
+                <p>Title: {meta.context?.["@_title"]}</p>
+                <p>URL: {meta.context?.["@_url"]}</p>
+              </div>
+            </div>
+          {/if}
         {:else}
           <div class="prose prose-sm">{@html htmlContent}</div>
         {/if}
