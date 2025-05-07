@@ -4,7 +4,9 @@
     "menu": "Menu",
     "clear": "Clear",
     "incognito": "Incognito",
-    "back": "Back"
+    "back": "Back",
+    "join": "Join",
+    "tomorrow": "Tomorrow"
   },
   "auth": {
     "signIn": "Sign In",

@@ -16,6 +16,7 @@
   import { locale } from "svelte-i18n";
   import { get } from "svelte/store";
   import { calendarStore } from "$lib/store/calendar.svelte";
+  import { openUrl } from "@tauri-apps/plugin-opener";
 
   const { item, index, active, contextMenu } = $props<{
     item: z.infer<typeof ExecutableCommandSchema>;
@@ -55,7 +56,7 @@
     pl: pl,
   };
 
-  function getRelativeDayStringUsingDateFns(
+  function getRelativeDayString(
     startDateString: string | undefined,
   ): string | null {
     if (!startDateString) return null;
@@ -77,7 +78,7 @@
   }
 
   let relativeDate = $derived(
-    getRelativeDayStringUsingDateFns(item.metadata?.calendarSchema?.startTime),
+    getRelativeDayString(item.metadata?.calendarSchema?.startTime),
   );
 
   // Find the calendar name from the store using the identifier
@@ -133,9 +134,12 @@
           {/each}
         </h2>
         <div class="flex flex-col gap-1 text-xs opacity-80">
-          {#if item.metadata?.calendarSchema?.isAllDay === false && (startTime || endTime)}
+          {#if startTime || endTime}
             <div class="flex items-center gap-1.5">
               <Clock size={12} class="flex-shrink-0" />
+              {#if item.metadata?.calendarSchema.isAllDay}
+                <span class="truncate">{$_("settings.calendar.allDay")}</span>
+              {/if}
               {#if relativeDate}
                 <span class="truncate">{relativeDate}</span>
               {:else if startTime || endTime}
@@ -143,11 +147,6 @@
                   {startTime}{startTime && endTime ? " - " : ""}{endTime}
                 </span>
               {/if}
-            </div>
-          {:else}
-            <div class="flex items-center gap-1.5">
-              <Clock size={12} class="flex-shrink-0" />
-              <span class="truncate">{$_("settings.calendar.allDay")}</span>
             </div>
           {/if}
           {#if location}
@@ -160,11 +159,22 @@
       </div>
     </button>
     <div class="flex gap-1 items-center pr-2">
-      <span
-        class="tooltip block h-4 w-4 rounded-sm flex-shrink-0 mr-6"
-        data-tip={calendarNameForTooltip}
-        style="background-color: {bgColor};"
-      ></span>
+      {#if item.metadata?.calendarSchema?.meeting?.link}
+        <button
+          class="btn btn-sm btn-primary mr-2"
+          onclick={async () => {
+            await openUrl(item.metadata.calendarSchema.meeting.link);
+          }}
+        >
+          {$_("common.join")}
+        </button>
+      {:else}
+        <span
+          class="tooltip block h-4 w-4 rounded-sm flex-shrink-0 mr-6"
+          data-tip={calendarNameForTooltip}
+          style="background-color: {bgColor};"
+        ></span>
+      {/if}
     </div>
   </div>
 </li>

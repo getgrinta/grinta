@@ -308,7 +308,7 @@ pub fn get_calendar_events(
             // Extract event properties
             let identifier: id = msg_send![event, eventIdentifier];
             let title: id = msg_send![event, title];
-            let notes: id = msg_send![event, title];
+            let notes: id = msg_send![event, notes];
             let start_date: id = msg_send![event, startDate];
             let end_date: id = msg_send![event, endDate];
             let calendar: id = msg_send![event, calendar];
@@ -377,7 +377,7 @@ pub fn get_calendars(state: State<CalendarState>) -> Result<Vec<CalendarInfo>, S
     let calendars_nsarray: id = unsafe { msg_send![store, calendarsForEntityType: EK_ENTITY_TYPE_EVENT] };
 
     if calendars_nsarray == nil {
-        return Ok(Vec::new()); // No calendars found or error
+        return Err("Empty list!!!!.".to_string());
     }
 
     let mut calendars_vec = Vec::new();

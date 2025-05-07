@@ -4,7 +4,9 @@
     "menu": "Menü",
     "clear": "Löschen",
     "incognito": "Incognito",
-    "back": "Zurück"
+    "back": "Zurück",
+    "join": "Beitreten",
+    "tomorrow": "Morgen"
   },
   "auth": {
     "signIn": "Anmelden",

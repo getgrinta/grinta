@@ -13,12 +13,15 @@
     FileText,
     ExternalLink, // Import ExternalLink icon
   } from "lucide-svelte";
-  import { formatDistanceToNow, format } from "date-fns";
+  import { format, isToday, formatDistanceToNow } from "date-fns";
   import DOMPurify from "dompurify";
   import { _ } from "svelte-i18n";
+  import type { Meeting } from "@getgrinta/core";
+  import { extractMeetingInfo } from "$lib/utils.svelte";
 
   // State to hold the specific event details
   let event = $state<EventInfo | null>(null);
+  let meeting = $state<Meeting | null>(null);
 
   // Derived state to get the event ID from the page params
   const eventId = $derived(decodeURIComponent(page.params.calendar));
@@ -35,6 +38,7 @@
 
     if (foundEvent) {
       event = foundEvent;
+      meeting = extractMeetingInfo(event.notes);
     } else {
       event = null; // Set to null if not found
       console.warn(
@@ -48,9 +52,11 @@
     endTimeStr?: string,
     isAllDayEvent?: boolean,
   ): string {
-    if (isAllDayEvent) {
+    if (isAllDayEvent && startTimeStr && isToday(new Date(startTimeStr))) {
       return $_("settings.calendar.allDay");
     }
+
+    // The rest of the function handles non-all-day events
     if (!startTimeStr) {
       return $_("common.notSet");
     }
@@ -89,7 +95,6 @@
       await openUrl(mapsUrl);
     } catch (error) {
       console.error("Failed to open URL:", error);
-      // Optionally show a user-facing error message
     }
   }
 
@@ -104,7 +109,47 @@
       await openUrl(processedUrl);
     } catch (error) {
       console.error("Failed to open URL:", error);
-      // Optionally show a user-facing error message
+    }
+  }
+
+  function linkifyAndSanitize(text: string | null | undefined): string {
+    if (!text) {
+      return "";
+    }
+    const urlRegex =
+      /(\b(https?|ftp):\/\/[-A-Z0-9+&@#/%?=~_|!:,.;]*[-A-Z0-9+&@#/%=~_|])|(\bwww\.[-A-Z0-9+&@#/%?=~_|!:,.;]*[-A-Z0-9+&@#/%=~_|])/gi;
+    const linkedText = text
+      .replace(
+        "-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\n",
+        "",
+      )
+      .replace(
+        "\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-",
+        "",
+      )
+      .replace(urlRegex, (match, p1, p2, p3) => {
+        const actualUrl = p1 ? p1 : `http://${p3}`;
+        const linkText = p1 ? p1 : p3;
+
+        return `<a href="#" data-link-url="${actualUrl}" target="_blank" rel="noopener noreferrer" data-internal-link="true">${linkText}</a>`;
+      });
+
+    return DOMPurify.sanitize(linkedText);
+  }
+
+  function handleNoteLinkClick(event: MouseEvent) {
+    let target = event.target as HTMLElement | null;
+
+    while (target && target !== event.currentTarget) {
+      if (target.tagName === "A" && target.hasAttribute("data-internal-link")) {
+        event.preventDefault(); // Prevent default navigation for href="#"
+        const href = target.getAttribute("data-link-url"); // Get URL from data-attribute
+        if (href) {
+          openUrl(href);
+        }
+        return;
+      }
+      target = target.parentElement;
     }
   }
 </script>
@@ -122,6 +167,21 @@
         <span class="font-semibold text-lg py-1 grow"
           >{$_("calendar.loadingEvent")}</span
         >
+      {/if}
+    </div>
+
+    <div slot="addon">
+      {#if meeting}
+        <button
+          class="btn btn-sm btn-primary mr-2"
+          onclick={async () => {
+            if (meeting?.link) {
+              await openUrl(meeting.link);
+            }
+          }}
+        >
+          {$_("common.join")}
+        </button>
       {/if}
     </div>
   </TopBar>
@@ -206,8 +266,13 @@
               <FileText size={18} class="text-base-content/70" />
             </div>
             <!-- Render sanitized HTML notes -->
-            <div class="prose prose-sm max-w-none text-base-content">
-              {@html DOMPurify.sanitize(event.notes)}
+            <div
+              class="prose whitespace-pre prose-sm max-w-none text-base-content"
+              onclick={handleNoteLinkClick}
+              role="group"
+              tabindex="0"
+            >
+              {@html linkifyAndSanitize(event.notes)}
             </div>
           </div>
         {/if}
