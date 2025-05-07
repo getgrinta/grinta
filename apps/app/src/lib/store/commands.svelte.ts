@@ -32,6 +32,7 @@ import {
 import { searchSpotlightApps, toggleVisibility } from "../grinta-invoke";
 import { appMetadataStore } from "../store/app-metadata.svelte";
 import {
+  extractMeetingInfo,
   type FileEntry,
   findApps,
   generateCancellationToken,
@@ -218,7 +219,6 @@ export class CommandsStore extends SecureStore<Commands> {
           return commandHistory;
         }
 
-        // Filter out commands of the same url as the current query
         if (queryIsUrl) {
           commandHistory = commandHistory.filter(
             (a) =>
@@ -270,6 +270,8 @@ export class CommandsStore extends SecureStore<Commands> {
         );
 
         const mappedCommands = events.map((event: EventInfo) => {
+          const meetingInfo = extractMeetingInfo(event.notes);
+
           return ExecutableCommandSchema.parse({
             label: event.title,
             localizedLabel: event.title,
@@ -285,6 +287,7 @@ export class CommandsStore extends SecureStore<Commands> {
                 location: event.location ?? undefined,
                 notes: event.notes ?? undefined,
                 isAllDay: event.is_all_day,
+                meeting: meetingInfo,
               },
             },
             priority: COMMAND_PRIORITY.HIGH,

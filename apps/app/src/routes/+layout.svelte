@@ -15,7 +15,19 @@
   import { widgetsStore } from "$lib/store/widgets.svelte";
   import { systemThemeWatcher } from "$lib/system.utils.svelte";
   import { ColorModeValue } from "$lib/utils.svelte";
-  import { Menu } from "@tauri-apps/api/menu";
+  import {
+    CheckMenuItem,
+    IconMenuItem,
+    Menu,
+    MenuItem,
+    PredefinedMenuItem,
+    Submenu,
+    type CheckMenuItemOptions,
+    type IconMenuItemOptions,
+    type MenuItemOptions,
+    type PredefinedMenuItemOptions,
+    type SubmenuOptions,
+  } from "@tauri-apps/api/menu";
   import { TrayIcon } from "@tauri-apps/api/tray";
   import { readText } from "@tauri-apps/plugin-clipboard-manager";
   import { exit } from "@tauri-apps/plugin-process";
@@ -66,10 +78,38 @@
     didFinishOnboarding: boolean,
     isClipboardEnabled = true,
   ) {
-    let menuItems = [
+    type MenuItemType =
+      | Submenu
+      | MenuItem
+      | PredefinedMenuItem
+      | CheckMenuItem
+      | IconMenuItem
+      | MenuItemOptions
+      | SubmenuOptions
+      | IconMenuItemOptions
+      | PredefinedMenuItemOptions
+      | CheckMenuItemOptions;
+
+    let menuItems: MenuItemType[] = [
       {
         id: "help",
         text: $_("commands.menuItems.help"),
+        items: [
+          {
+            id: "openhelp",
+            text: $_("commands.menuItems.help"),
+            action() {
+              return open("https://getgrinta.com/report-problem");
+            },
+          },
+          {
+            id: "reportproblem",
+            text: `Report a problem`,
+            action() {
+              return open("https://getgrinta.com/report-problem");
+            },
+          },
+        ],
         action() {
           return open("https://getgrinta.com/guides");
         },
@@ -98,6 +138,13 @@
               return appStore.updateApp();
             },
           },
+      {
+        id: "follow",
+        text: `Follow on X`,
+        action() {
+          return open("https://twitter.com/getgrinta");
+        },
+      },
       {
         item: "Separator",
       },
@@ -176,8 +223,9 @@
     ];
 
     const TRAY_ID = "grinta";
+
     const menu = await Menu.new({
-      items: menuItems as any,
+      items: menuItems as MenuItemType[],
     });
 
     TrayIcon.getById(TRAY_ID).then((trayIcon) => {

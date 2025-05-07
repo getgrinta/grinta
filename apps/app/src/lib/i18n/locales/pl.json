@@ -4,7 +4,9 @@
     "menu": "Menu",
     "clear": "Wyczyść",
     "incognito": "Incognito",
-    "back": "Wstecz"
+    "back": "Wstecz",
+    "join": "Dołącz",
+    "tomorrow": "Jutro"
   },
   "welcome": {
     "title": "Witaj w Grincie",

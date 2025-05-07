@@ -33,6 +33,22 @@ export const customizableCommandHandlerEnum = z.union([
   z.string(),
 ]);
 
+export const MeetingTypes = [
+  "zoom",
+  "google meet",
+  "teams",
+  "webex",
+  "around",
+  "jitsi",
+] as const;
+
+export const MeetingObjectSchema = z.object({
+  type: z.enum(MeetingTypes).optional(),
+  link: z.string().url().optional(),
+});
+
+export type Meeting = z.infer<typeof MeetingObjectSchema>;
+
 export const CalendarSchema = z.object({
   backgroundColor: z.string().optional(),
   startTime: z.string().optional(),
@@ -42,6 +58,7 @@ export const CalendarSchema = z.object({
   calendarIdentifier: z.string().optional(),
   eventId: z.string().optional(),
   isAllDay: z.boolean().default(false),
+  meeting: MeetingObjectSchema.optional().nullable(),
 });
 
 export const MetadataSchema = z.object({
