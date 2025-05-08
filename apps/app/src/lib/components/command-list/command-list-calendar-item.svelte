@@ -10,7 +10,7 @@
   import { ExecutableCommandSchema } from "@getgrinta/core";
   import CommandListContextMenu from "./command-list-context-menu.svelte";
   import { z } from "zod";
-  import { Clock, MapPin } from "lucide-svelte";
+  import { Clock, MapPin, Users } from "lucide-svelte";
   import { formatRelative, parseISO } from "date-fns";
   import { enUS, de, pl } from "date-fns/locale";
   import { locale } from "svelte-i18n";
@@ -149,10 +149,22 @@
               {/if}
             </div>
           {/if}
-          {#if location}
-            <div class="flex items-center gap-1.5">
-              <MapPin size={12} class="flex-shrink-0" />
-              <span class="truncate">{DOMPurify.sanitize(location)}</span>
+          {#if location || item.metadata.calendarSchema?.participants?.length > 0}
+            <div class="flex items-center gap-1.5 text-xs">
+              {#if location}
+                <div class="flex items-center gap-1">
+                  <MapPin size={12} class="flex-shrink-0" />
+                  <span class="truncate">{DOMPurify.sanitize(location)}</span>
+                </div>
+              {/if}
+              {#if item.metadata.calendarSchema?.participants?.length > 0}
+                <div class="flex items-center gap-1">
+                  <Users size={12} class="flex-shrink-0" />
+                  <span class="truncate"
+                    >{item.metadata.calendarSchema?.participants?.length}</span
+                  >
+                </div>
+              {/if}
             </div>
           {/if}
         </div>

@@ -286,6 +286,7 @@ export class CommandsStore extends SecureStore<Commands> {
                 endTime: event.end_date,
                 location: event.location ?? undefined,
                 notes: event.notes ?? undefined,
+                participants: event.participants,
                 isAllDay: event.is_all_day,
                 meeting: meetingInfo,
               },

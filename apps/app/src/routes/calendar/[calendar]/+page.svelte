@@ -18,6 +18,9 @@
   import { _ } from "svelte-i18n";
   import type { Meeting } from "@getgrinta/core";
   import { extractMeetingInfo } from "$lib/utils.svelte";
+  import { LeafletMap, Marker, TileLayer } from "svelte-leafletjs";
+  import type { MapOptions } from "leaflet";
+  import { onMount } from "svelte";
 
   // State to hold the specific event details
   let event = $state<EventInfo | null>(null);
@@ -44,6 +47,70 @@
       console.warn(
         `Calendar event with ID ${eventId} not found in calendarStore.`,
       );
+    }
+  });
+
+  const DEFAULT_TILE_URL = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+  const DEFAULT_TILE_LAYER_OPTIONS = {
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  };
+
+  let mapKey = $state(0);
+  let mapOptions = $state<MapOptions>({
+    center: [1.364917, 103.822872],
+    zoom: 11,
+    scrollWheelZoom: false,
+  });
+
+  let isFetchingCoordinates = $state(false);
+  let mapShouldRender = $state(false);
+
+  onMount(async () => {
+    await import("leaflet/dist/leaflet.css");
+
+    const locationQuery = event?.location;
+    if (locationQuery) {
+      isFetchingCoordinates = true;
+      mapShouldRender = false;
+
+      const nominatimUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationQuery)}&limit=1`;
+
+      try {
+        const response = await fetch(nominatimUrl, {
+          headers: {
+            "User-Agent": navigator.userAgent,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            `Nominatim API request failed: ${response.status} ${response.statusText}`,
+          );
+        }
+        const data = await response.json();
+
+        if (data && data.length > 0) {
+          const place = data[0];
+          const lat = parseFloat(place.lat);
+          const lon = parseFloat(place.lon);
+
+          mapOptions.center = [lat, lon];
+          mapOptions.zoom = 14;
+          mapKey++;
+          mapShouldRender = true;
+        } else {
+          console.warn(`No coordinates found for location: "${locationQuery}"`);
+          mapShouldRender = false;
+        }
+      } catch (error) {
+        console.error("Error fetching coordinates from Nominatim:", error);
+        mapShouldRender = false;
+      } finally {
+        isFetchingCoordinates = false;
+      }
+    } else {
+      mapShouldRender = false; // No location provided
     }
   });
 
@@ -76,15 +143,29 @@
     }
   }
 
-  function formatParticipants(
-    participants?: { name?: string | null }[],
-  ): string {
-    if (!participants || participants.length === 0) {
-      return $_("common.notSet");
+  function handleSingleParticipantClick(email: string | null | undefined) {
+    if (email) {
+      openUrl(`mailto:${email}`);
     }
-    return participants
-      .map((p) => p.name || $_("calendar.unknownParticipant"))
-      .join(", ");
+  }
+
+  function handleParticipantsClick(currentEvent: EventInfo | null) {
+    if (
+      !currentEvent ||
+      !currentEvent.participants ||
+      currentEvent.participants.length === 0
+    )
+      return;
+
+    const emails = currentEvent.participants
+      .map((p) => p.name) // Placeholder for actual email property
+      .filter((email): email is string => !!email)
+      .filter((email, index, self) => self.indexOf(email) === index);
+
+    if (emails.length > 0) {
+      const mailtoLink = `mailto:${emails.join(",")}`;
+      openUrl(mailtoLink);
+    }
   }
 
   async function openLocationInMaps(location: string | null) {
@@ -160,12 +241,12 @@
       {#if event}
         <CalendarIcon size={20} class="text-base-content/70" />
         <span class="font-semibold text-lg truncate py-1"
-          >{event?.title || $_("calendar.untitledEvent")}</span
+          >{event?.title || $_("settings.calendar.untitledEvent")}</span
         >
       {:else}
         <!-- Keep the span for loading text, adjusted styling if needed -->
         <span class="font-semibold text-lg py-1 grow"
-          >{$_("calendar.loadingEvent")}</span
+          >{$_("settings.calendar.loadingEvent")}</span
         >
       {/if}
     </div>
@@ -223,7 +304,7 @@
               <button
                 onclick={() => openLocationInMaps(event?.location ?? null)}
                 class="btn btn-ghost btn-sm btn-square"
-                title={$_("calendar.openInMaps")}
+                title={$_("settings.calendar.openInMaps")}
               >
                 <ExternalLink size={16} />
               </button>
@@ -250,11 +331,53 @@
 
         <!-- Participants -->
         {#if event.participants && event.participants.length > 0}
-          <div class="flex items-start gap-3">
-            <div class="mt-1">
+          {@const participantsWithEmail = event.participants.filter(
+            (p) => p.name,
+          )}
+          <div class="flex items-center gap-3">
+            <div class="mt-2 self-start">
               <Users size={18} class="text-base-content/70" />
             </div>
-            <p class="font-medium">{formatParticipants(event.participants)}</p>
+            <div class="flex-grow">
+              <div class="flex flex-wrap items-center">
+                {#each event.participants as participant (participant.name || Math.random())}
+                  {#if participant.name}
+                    <button
+                      class="btn btn-link p-0 h-auto min-h-0 font-medium text-accent hover:underline text-left normal-case"
+                      style="line-height: normal;"
+                      onclick={() =>
+                        handleSingleParticipantClick(participant.name)}
+                      title={$_("settings.calendar.composeEmailToParticipant", {
+                        values: { name: participant.name || participant.name },
+                      })}
+                    >
+                      {participant.name}
+                    </button>
+                  {:else}
+                    <span
+                      class="p-0 h-auto min-h-0 font-medium text-base-content/70"
+                      style="line-height: normal;"
+                    >
+                      {$_("settings.calendar.unknownParticipant")}
+                    </span>
+                  {/if}
+                  {#if event.participants && participant !== event.participants[event.participants.length - 1]}
+                    <span class="text-base-content/70 last:hidden">,&nbsp;</span
+                    >
+                  {/if}
+                {/each}
+              </div>
+            </div>
+
+            {#if participantsWithEmail.length > 0}
+              <button
+                class="btn btn-primary btn-sm ml-2 self-start flex-shrink-0"
+                onclick={() => handleParticipantsClick(event)}
+                title={$_("settings.calendar.composeEmailToAllTitle")}
+              >
+                {$_("settings.calendar.messageAllCaption")}
+              </button>
+            {/if}
           </div>
         {/if}
 
@@ -276,17 +399,53 @@
             </div>
           </div>
         {/if}
+
+        <!-- Map -->
+        {#if event && event.location}
+          <div class="flex items-start gap-3">
+            {#if isFetchingCoordinates}
+              <div
+                class="flex h-72 w-full items-center justify-center rounded-md border bg-base-200/30 text-sm text-base-content/70"
+              >
+                Loading map for "{event.location}"...
+              </div>
+            {:else if mapShouldRender}
+              <div class="h-55 w-full rounded-md overflow-hidden border">
+                {#key mapKey}
+                  <!-- svelte-ignore a11y_click_events_have_key_events -->
+                  <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+                  <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+                  <LeafletMap options={mapOptions}>
+                    <TileLayer
+                      url={DEFAULT_TILE_URL}
+                      options={DEFAULT_TILE_LAYER_OPTIONS}
+                    />
+                    <Marker
+                      latLng={[mapOptions.center[0], mapOptions.center[1]]}
+                    />
+                  </LeafletMap>
+                {/key}
+              </div>
+            {:else}
+              <div
+                class="flex h-72 w-full items-center justify-center rounded-md border bg-base-200/30 text-sm text-base-content/70"
+              >
+                Could not retrieve map for "{event.location}".
+              </div>
+            {/if}
+          </div>
+        {/if}
       </div>
     {:else if !event && eventId}
       <!-- Event Not Found State -->
       <div class="text-center text-base-content/70 mt-10">
-        <p>{$_("calendar.eventNotFound", { values: { eventId } })}</p>
+        <p>{$_("settings.calendar.eventNotFound", { values: { eventId } })}</p>
         <!-- Optionally add a button to go back or refresh -->
       </div>
     {:else}
       <!-- Initial Loading State (before eventId is resolved or store checked) -->
       <div class="text-center text-base-content/70 mt-10">
-        <p>{$_("calendar.loadingEvent")}</p>
+        <p>{$_("settings.calendar.loadingEvent")}</p>
       </div>
     {/if}
   </div>
