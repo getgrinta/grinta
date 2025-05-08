@@ -104,9 +104,9 @@
           },
           {
             id: "reportproblem",
-            text: `Report a problem`,
+            text: $_("commands.menuItems.reportProblem"),
             action() {
-              return open("https://getgrinta.com/report-problem");
+              return open("https://twitter.com/getgrinta");
             },
           },
         ],
@@ -140,7 +140,7 @@
           },
       {
         id: "follow",
-        text: `Follow on X`,
+        text: $_("commands.menuItems.followOnX"),
         action() {
           return open("https://twitter.com/getgrinta");
         },
@@ -370,7 +370,10 @@
     trigger: [
       {
         key: "Escape",
-        callback: () => appStore.handleEscape(),
+        callback: (eventDetail) => {
+          eventDetail.originalEvent.preventDefault();
+          appStore.handleEscape();
+        },
       },
     ],
   }}
