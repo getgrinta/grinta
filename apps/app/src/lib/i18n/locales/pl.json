@@ -208,7 +208,9 @@
       "signIn": "Zaloguj",
       "profile": "Profil",
       "clipboardHistory": "Historia schowka",
-      "checkForUpdates": "Sprawdź aktualizacje..."
+      "checkForUpdates": "Sprawdź aktualizacje...",
+      "followOnX": "Obserwuj @getgrinta na X",
+      "reportProblem": "Zgłoś problem"
     },
     "actions": {
       "search": "Szukaj \"{query}\"",
