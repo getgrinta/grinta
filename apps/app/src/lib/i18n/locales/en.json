@@ -131,7 +131,14 @@
       "ignoreEventSuccess": "Event ignored successfully.",
       "ignoreEventError": "Failed to ignore event.",
       "allDay": "All day",
-      "saveSuccess": "Calendar selection saved."
+      "saveSuccess": "Calendar selection saved.",
+      "openInMaps": "Open in Maps",
+      "composeEmailToParticipants": "Compose email to participants",
+      "composeEmailToParticipant": "Compose email to {name}",
+      "noEmail": "no email",
+      "unknownParticipant": "Unknown participant",
+      "composeEmailToAllTitle": "Compose email to all participants",
+      "messageAllCaption": "Message all"
     },
     "extension_already_added": "This extension is already added.",
     "extension_supported_by_default": "This extension is already supported by default.",

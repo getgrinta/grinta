@@ -31,14 +31,13 @@ pub enum CalendarAuthorizationStatus {
 pub struct CalendarInfo {
     identifier: String,
     title: String,
-    color: String, // Store color as hex string e.g., "#RRGGBB"
+    color: String, //"#RRGGBB"
 }
 
 // Struct to hold participant information
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ParticipantInfo {
     name: Option<String>, // EKParticipant.name
-    // Add other participant details if needed, e.g., email, status
 }
 
 // Struct to hold event information

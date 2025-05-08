@@ -102,7 +102,13 @@
       "ignoreEventSuccess": "Pomyślnie zignorowano wydarzenie.",
       "ignoreEventError": "Nie udało się zignorować wydarzenia.",
       "allDay": "Cały dzień",
-      "saveSuccess": "Wybór kalendarzy zapisany."
+      "saveSuccess": "Wybór kalendarzy zapisany.",
+      "composeEmailToParticipants": "Napisz e-mail do uczestników",
+      "composeEmailToParticipant": "Napisz e-mail do {name}",
+      "noEmail": "brak e-maila",
+      "unknownParticipant": "Nieznany uczestnik",
+      "composeEmailToAllTitle": "Napisz e-mail do wszystkich uczestników",
+      "messageAllCaption": "Napisz do wszystkich"
     },
     "extension_already_added": "To rozszerzenie jest już dodane.",
     "extension_supported_by_default": "To rozszerzenie jest obsługiwane domyślnie.",

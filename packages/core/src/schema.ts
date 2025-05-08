@@ -49,6 +49,12 @@ export const MeetingObjectSchema = z.object({
 
 export type Meeting = z.infer<typeof MeetingObjectSchema>;
 
+export const ParticipantSchema = z.object({
+  name: z.string().optional(),
+});
+
+export type Participant = z.infer<typeof ParticipantSchema>;
+
 export const CalendarSchema = z.object({
   backgroundColor: z.string().optional(),
   startTime: z.string().optional(),
@@ -59,6 +65,7 @@ export const CalendarSchema = z.object({
   eventId: z.string().optional(),
   isAllDay: z.boolean().default(false),
   meeting: MeetingObjectSchema.optional().nullable(),
+  participants: z.array(ParticipantSchema).optional(),
 });
 
 export const MetadataSchema = z.object({

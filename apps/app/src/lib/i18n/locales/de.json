@@ -130,7 +130,13 @@
       "resetIgnoredEventsSuccess": "Alle versteckten Kalendertermine sind jetzt sichtbar.",
       "resetIgnoredEventsError": "Zurücksetzen der versteckten Termine fehlgeschlagen.",
       "requestError": "Fehler bei der Zugriffsanfrage.",
-      "allDay": "Ganztägig"
+      "allDay": "Ganztägig",
+      "composeEmailToParticipants": "E-Mail an Teilnehmer verfassen",
+      "composeEmailToParticipant": "E-Mail an {name} verfassen",
+      "noEmail": "keine E-Mail",
+      "unknownParticipant": "Unbekannter Teilnehmer",
+      "composeEmailToAllTitle": "E-Mail an alle Teilnehmer verfassen",
+      "messageAllCaption": "Allen schreiben"
     },
     "extension_already_added": "Diese Erweiterung wurde bereits hinzugefügt.",
     "extension_supported_by_default": "Diese Erweiterung wird bereits standardmäßig unterstützt.",
