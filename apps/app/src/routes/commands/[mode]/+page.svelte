@@ -17,14 +17,6 @@
   $effect(() => {
     appStore.switchMode(page.params.mode);
     commandsStore.scrollTop = 0;
-
-    accessoryStore.setMode({
-      type: "map",
-      options: {
-        latitude: 1.364917,
-        longitude: 103.822872,
-      },
-    });
   });
 </script>
 
@@ -42,9 +34,7 @@
         mode={accessoryStore.mode}
       />
     {/if}
-    - add consume method to accessoryStore - when a coordinate is passed in form
-    of lat,lon - set the mode to map - when the search query doesn't match any accessory
-    modes - clear the mode - the consume method should be triggered in search bar
+
     <CommandList
       paddingTop={accessoryStore.mode
         ? 192

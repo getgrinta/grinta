@@ -7,6 +7,7 @@
   import { commandsStore } from "$lib/store/commands.svelte";
   import { notesStore } from "$lib/store/notes.svelte";
   import { settingsStore } from "$lib/store/settings.svelte";
+  import { accessoryStore } from "$lib/store/accessory.svelte";
   import {
     APP_MODE,
     type AppMode,
@@ -184,6 +185,10 @@
       return queryInput?.blur();
     }
     return queryInput?.focus();
+  });
+
+  $effect(() => {
+    accessoryStore.consume(appStore.query);
   });
 
   // App was shown
