@@ -279,5 +279,8 @@
     "installing": "Instalowanie aktualizacji...",
     "install_failed": "Nie udało się zainstalować aktualizacji.",
     "install_success": "Aktualizacja zainstalowana pomyślnie. Ponowne uruchamianie..."
+  },
+  "accessory": {
+    "copied": "Skopiowano"
   }
 }

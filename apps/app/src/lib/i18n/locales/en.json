@@ -281,5 +281,8 @@
     "installing": "Installing update...",
     "install_failed": "Failed to install update.",
     "install_success": "Update installed successfully. Relaunching..."
+  },
+  "accessory": {
+    "copied": "Copied"
   }
 }

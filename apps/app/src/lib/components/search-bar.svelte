@@ -7,6 +7,8 @@
   import { commandsStore } from "$lib/store/commands.svelte";
   import { notesStore } from "$lib/store/notes.svelte";
   import { settingsStore } from "$lib/store/settings.svelte";
+  import { accessoryStore } from "$lib/store/accessory.svelte";
+  import AccessoryView from "./accessory-view/accessory-view.svelte"; // Add this import
   import {
     APP_MODE,
     type AppMode,
@@ -176,6 +178,8 @@
 
     clearQueryTimeoutToken = setTimeout(() => {
       appStore.setQuery("");
+      accessoryStore.clearMode();
+      appStore.quickSearchMode = null;
     }, timeout);
   });
 
@@ -302,6 +306,7 @@
   watch(
     () => [appStore.query, appStore.appMode],
     () => {
+      accessoryStore.consume(appStore.query);
       buildCommands();
       setTimeout(() => {
         queryInput?.focus();

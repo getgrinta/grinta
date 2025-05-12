@@ -13,6 +13,8 @@
   let contextMenu = $state<CommandListContextMenu>();
   let virtualizer = $state<VList<any>>();
 
+  const props = $props();
+
   function handleListScroll(offset: number) {
     commandsStore.scrollTop = offset;
   }
@@ -50,7 +52,7 @@
   <VList
     bind:this={virtualizer}
     data={commandsStore.commands}
-    style="height: 99vh;padding-top: var(--commands-padding);padding-bottom:1rem;"
+    style={`height: 99vh;padding-top: ${props.paddingTop}px;padding-bottom:1rem;`}
     getKey={(_, i) => i}
     onscroll={handleListScroll}
   >

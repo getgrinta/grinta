@@ -286,5 +286,8 @@
     "installing": "Update wird installiert...",
     "install_failed": "Fehler beim Installieren des Updates.",
     "install_success": "Update erfolgreich installiert. Neustart wird durchgeführt..."
+  },
+  "accessory": {
+    "copied": "Kopiert"
   }
 }
