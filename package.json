@@ -36,5 +36,8 @@
     "**/*.{js,mjs,cjs,ts,astro,svelte}": [
       "bun run format"
     ]
+  },
+  "dependencies": {
+    "uuidv7": "^1.0.2"
   }
 }

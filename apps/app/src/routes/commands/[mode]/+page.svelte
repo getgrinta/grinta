@@ -32,6 +32,8 @@
       <AccessoryView
         class="absolute top-13 left-0 right-0 z-50"
         mode={accessoryStore.mode}
+        isCopyable={accessoryStore.isCopyable}
+        isRefreshable={accessoryStore.isRefreshable}
       />
     {/if}
 

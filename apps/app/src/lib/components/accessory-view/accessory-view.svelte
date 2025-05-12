@@ -1,11 +1,22 @@
 <script lang="ts">
-  import type { AccessoryMode } from "$lib/store/accessory.svelte";
+  import type { AccessoryMode } from "$lib/store/accessory/types.svelte";
   import clsx from "clsx";
   import { LeafletMap, Marker, TileLayer } from "svelte-leafletjs";
   import type { MapOptions } from "leaflet";
   import { onMount } from "svelte";
+  import { Copy, RefreshCw } from "lucide-svelte"; // Import icons
+  import clipboard from "clipboardy"; // Import clipboardy
+  import { accessoryStore } from "$lib/store/accessory.svelte"; // Import store for refresh
+  import { appStore } from "$lib/store/app.svelte"; // Import appStore for query
+  import { toast } from "svelte-sonner";
+  import { t } from "svelte-i18n"; // Import translation function
 
-  const props = $props<{ class?: string; mode: AccessoryMode }>();
+  const props = $props<{
+    class?: string;
+    mode: AccessoryMode;
+    isCopyable?: boolean;
+    isRefreshable?: boolean;
+  }>();
   onMount(async () => {
     await import("leaflet/dist/leaflet.css");
   });
@@ -16,7 +27,6 @@
       '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   };
 
-  let mapKey = $state(0);
   let mapOptions = $derived.by<MapOptions | null>(() => {
     if (props.mode.type === "map") {
       return {
@@ -27,6 +37,19 @@
     }
     return null;
   });
+
+  async function copyText() {
+    try {
+      await clipboard.write(props.mode.options.text);
+      toast.success($t("accessory.copied"));
+    } catch (err) {
+      console.error("Failed to copy text:", err);
+    }
+  }
+
+  function refreshText() {
+    accessoryStore.consume(appStore.query);
+  }
 </script>
 
 <div class={clsx(props.class)}>
@@ -40,66 +63,55 @@
       </div>
     </div>
   {:else if props.mode.type === "map" && mapOptions && mapOptions.center}
-    <div class="accessory-view-single h-32">
-      <!-- svelte-ignore a11y_click_events_have_key_events -->
-      <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-      <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-      <LeafletMap options={mapOptions}>
-        <TileLayer
-          url={DEFAULT_TILE_URL}
-          options={DEFAULT_TILE_LAYER_OPTIONS}
-        />
-        <Marker latLng={[mapOptions.center[0], mapOptions.center[1]]} />
-      </LeafletMap>
-    </div>
-  {:else if props.mode.type === "single"}
-    <div class="accessory-view-multi flex-row">
-      <div class="view-item mx-2 justify-items-center align-center">
-        {props.mode.options.text}
+    {#key mapOptions.center}
+      <div class="flex w-full h-[320px]">
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+        <LeafletMap options={mapOptions}>
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          <Marker latLng={[mapOptions.center[0], mapOptions.center[1]]} />
+        </LeafletMap>
+      </div>
+    {/key}
+  {:else if props.mode?.type === "single"}
+    <div class="relative p-2 flex w-full h-[120px] items-center text-center">
+      <div
+        class="view-item mx-2 justify-items-center align-center flex-1 bg-[#e6e6e6] dark:bg-gray-700 rounded-xl h-[100px] text-xl flex border-2 border-[#ddd] dark:border-gray-600 items-center font-medium justify-center"
+      >
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <span
+          class="block cursor-pointer truncate"
+          onclick={copyText}
+          title="Click to copy"
+        >
+          {props.mode.options.text}
+        </span>
+
+        <div class="absolute bottom-3 right-6 space-x-1">
+          {#if props.isCopyable}
+            <button
+              onclick={copyText}
+              class="p-1 cursor-pointer rounded hover:bg-gray-200 dark:hover:bg-gray-700"
+              title={"Copy"}
+            >
+              <Copy class="w-4 h-4" color="#666" />
+            </button>
+          {/if}
+          {#if props.isRefreshable}
+            <button
+              onclick={refreshText}
+              class="p-1 cursor-pointer rounded hover:bg-gray-200 dark:hover:bg-gray-700"
+              title="Refresh"
+            >
+              <RefreshCw class="w-4 h-4" color="#666" />
+            </button>
+          {/if}
+        </div>
       </div>
     </div>
+  {:else}
+    <!-- Empty or unknown mode -->
   {/if}
 </div>
-
-<style>
-  .accessory-view-single {
-    width: 100%;
-  }
-
-  .accessory-view-multi {
-    display: flex;
-    width: 100%;
-    height: 120px;
-    align-items: center;
-    text-align: center;
-  }
-
-  .accessory-view-multi .view-item {
-    flex: 1;
-    background-color: #e6e6e6;
-    border-radius: 12px;
-    height: 100px;
-    font-size: 20px;
-    display: flex;
-    align-items: center;
-    font-weight: 500;
-    justify-content: center;
-  }
-
-  .accessory-view-error {
-    border: 1px dashed var(--color-error-border, #d92323);
-    padding: 0.75rem 1rem;
-    border-radius: 0.25rem;
-    background-color: var(--color-error-background, #fef2f2);
-    color: var(--color-error-text, #b91c1c);
-    font-size: 0.875rem;
-  }
-  .accessory-view-error p {
-    margin: 0.25em 0;
-  }
-  .accessory-view-error code {
-    background-color: var(--color-code-background, #fde8e8);
-    padding: 0.125rem 0.25rem;
-    border-radius: 0.125rem;
-  }
-</style>
