@@ -33,7 +33,7 @@ export async function getSearchUrl({
 }
 
 export async function fetchCompletions(query: string, context: PluginContext) {
-  type CompletionResult = string[];
+  type CompletionResult = any[];
   const encodedQuery = encodeURIComponent(query);
   const completionUrl = `https://www.startpage.com/osuggestions?q=${encodedQuery}`;
   const { data: response, error: fetchError } = await until(() =>
@@ -74,7 +74,20 @@ export const PluginWebSearch = createPlugin({
       }),
     ];
     if (query.length < 3) return queryMatchSearch;
-    const completions = await fetchCompletions(query, context);
+    const completionsResult = await fetchCompletions(query, context);
+
+    let completions: string[] = [];
+
+    if (completionsResult) {
+      // "query", ["completion1", "completion2"]
+      if (!Array.isArray(completionsResult[0])) {
+        completions = completionsResult[1];
+      } else {
+        // ["completion1", "completion2"]
+        completions = completionsResult as string[];
+      }
+    }
+
     const completionList = await Promise.all(
       completions.map(async (completion: string) => {
         return ExecutableCommandSchema.parse({
