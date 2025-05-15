@@ -20,6 +20,7 @@ Grinta is an open-source, AI-powered, and privacy-focused alternative to MacOS S
 - **Customizable Theme**: Choose between a light and dark mode, as well as a variety of color schemes to suit your style.
 - **Search Mode**: Quickly find installed apps, perform web searches, and more. All from a single search bar.
 
+
 ### Installation
 
 1. Download the [latest release](https://github.com/getgrinta/grinta/releases/latest).
@@ -79,4 +80,9 @@ $ bun run tauri dev
 │   └── website - Astro and Svelte based website
 ├── packages
 │   ├── core - Core library for Grinta
+<<<<<<< HEAD
 │   └── plugin - Plugin interface for Grinta
+=======
+│   └── plugin - Plugin interface for Grinta
+```
+>>>>>>> origin/main
