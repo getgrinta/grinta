@@ -1,7 +1,7 @@
 # Grinta
 
 <p align="center">
-  <img src="./apps/website/dist/pro.svg" alt="Grinta" width="128">
+  <img src="./apps/website/public/pro.svg" alt="Grinta" width="128">
 </p>
 
 Grinta is an open-source, AI-powered, and privacy-focused alternative to MacOS Spotlight and RayCast. It combines powerful search capabilities, productivity tools, and AI-driven features while ensuring your data stays private.
