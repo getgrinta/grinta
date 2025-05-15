@@ -1,16 +1,19 @@
-<h1 align="center">Grinta</h1>
+<h1 align="center" border="0">Grinta</h1>
 
 <p align="center">
   <img src="./apps/website/public/pro.svg" alt="Grinta Logo" width="604">
 </p>
 
-Grinta is an open-source, AI-powered, and privacy-focused alternative to MacOS Spotlight and RayCast. It combines powerful search capabilities, productivity tools, and AI-driven features while ensuring your data stays private.
+<p align="center">
+AI-powered open-source privacy-focused alternative to macOS Spotlight and Raycast.<br />
+Packed with powerful search capabilities, productivity tools and AI-driven features, keeping your data private. 
+</p>
 
 ### Features
 
 - **LLM Powers**: Use the powers of our hosted LLMs to boost your productivity.
 - **Calendar Integration**: Connect your macOS Calendar to view and manage upcoming events directly in Grinta.
-- **Quick Search**: Use shortcuts (e.g., `G` + Tab) to instantly search specific websites like Google, YouTube, Wikipedia, Reddit, and your own custom quick links directly from the search bar.
+- **Quick Links**: Use shortcuts (e.g., `G` + Tab) to instantly search specific websites like Google, YouTube, Wikipedia, Reddit, and your own custom quick links directly from the search bar.
 - **Shortcuts Integration**: Seamlessly access and execute your existing Shortcuts directly within Grinta.
 - **Notes Mode**: Write notes with the help of an AI copilot. Improve readability with rephrasing tools and open your Grinta notes as Obsidian vaults for enhanced organization.
 - **Formulas and Natural Language Processing (NLP)**: Use the search bar as a calculator or process natural language queries like "45 days from now".
