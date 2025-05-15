@@ -2,8 +2,6 @@
 
 Grinta is an open-source, AI-powered, and privacy-focused alternative to MacOS Spotlight and RayCast. It combines powerful search capabilities, productivity tools, and AI-driven features while ensuring your data stays private.
 
-## Product Overview
-
 ### Features
 
 - **Search Mode**: Quickly find installed apps, perform web searches, and more—all from a single search bar.
@@ -11,12 +9,14 @@ Grinta is an open-source, AI-powered, and privacy-focused alternative to MacOS S
 - **Calendar Integration**: Connect your macOS Calendar to view and manage upcoming events directly in Grinta.
 - **Notes Mode**: Write notes with the help of an AI copilot. Improve readability with rephrasing tools and open your Grinta notes as Obsidian vaults for enhanced organization.
 - **Formulas and Natural Language Processing (NLP)**: Use the search bar as a calculator or process natural language queries like "45 days from now".
-- **Local LLM Support**: Bring your own OpenAI-compatible large language models (LLMs) to Grinta using tools like Ollama or LM Studio.
+- **LLM Powers**: Use the powers of our hosted LLMs to boost your productivity.
 - **Customizable Theme**: Choose between a light and dark mode, as well as a variety of color schemes to suit your style.
 - **Keyboard First**: Grinta is designed to be keyboard-centric, ensuring you can easily operate without relying on mouse or touch.
 - **Multi-language Support**: Enjoy Grinta in your preferred language with support for English, Polish, and German translations throughout the interface.
 - **Clipboard History**: Keep track of your clipboard history and quickly access previously copied items.
+- **Quick Links**: Create and manage custom quick links to your favorite websites, files, or applications for instant access. Type `G` + `Tab` to search in Google.
 - **Quick Search**: Use shortcuts (e.g., `G` + Tab) to instantly search specific websites like Google, YouTube, Wikipedia, Reddit, and more directly from the search bar.
+
 
 ### Installation
 
