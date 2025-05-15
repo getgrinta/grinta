@@ -1,6 +1,7 @@
+<h1 align="center">Grinta</h1>
+
 <p align="center">
-    <h1>Grinta</h1>
-    <img src="./apps/website/public/pro.svg" alt="Grinta" width="604">
+  <img src="./apps/website/public/pro.svg" alt="Grinta Logo" width="604">
 </p>
 
 Grinta is an open-source, AI-powered, and privacy-focused alternative to MacOS Spotlight and RayCast. It combines powerful search capabilities, productivity tools, and AI-driven features while ensuring your data stays private.
@@ -79,9 +80,4 @@ $ bun run tauri dev
 │   └── website - Astro and Svelte based website
 ├── packages
 │   ├── core - Core library for Grinta
-<<<<<<< HEAD
 │   └── plugin - Plugin interface for Grinta
-=======
-│   └── plugin - Plugin interface for Grinta
-```
->>>>>>> origin/main
