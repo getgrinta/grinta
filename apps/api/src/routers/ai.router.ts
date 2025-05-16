@@ -8,6 +8,12 @@ import { eq } from "drizzle-orm";
 import { until } from "@open-draft/until";
 import { ChatMessageSchema } from "@getgrinta/core";
 import { stream } from "hono/streaming";
+import { ElevenLabsClient } from "elevenlabs";
+import { env } from "../utils/env.utils.js";
+
+const elevenLabsClient = new ElevenLabsClient({
+  apiKey: env.ELEVENLABS_API_KEY,
+});
 
 const MODEL = "mistral-small-latest";
 const aiService = new AiService();
@@ -17,6 +23,7 @@ export const CONTENT_TYPE = {
   INLINE_AI: "INLINE_AI",
   REPHRASE: "REPHRASE",
   GRINTAI: "GRINTAI",
+  CHAT_TITLE: "CHAT_TITLE",
 } as const;
 
 export const ContentTypeEnum = z.nativeEnum(CONTENT_TYPE);
@@ -33,9 +40,16 @@ export const GenerateNoteResult = z.object({
   text: z.string(),
 });
 
+export const TranscribeResult = z.object({
+  text: z.string(),
+});
+
 export const StreamParamsSchema = z.object({
+  // @ts-expect-error - won't fix
   messages: z.array(ChatMessageSchema),
 });
+
+export const SpeechParamsSchema = z.any();
 
 const GENERATE_ROUTE = createRoute({
   method: "post",
@@ -101,6 +115,38 @@ const STREAM_ROUTE = createRoute({
   },
 });
 
+const SPEECH_ROUTE = createRoute({
+  method: "post",
+  path: "/speech",
+  request: {
+    body: {
+      content: {
+        "multipart/form-data": {
+          schema: SpeechParamsSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "Speech to text",
+      content: { "application/json": { schema: TranscribeResult } },
+    },
+    401: {
+      description: "Unauthorized",
+      content: { "text/plain": { schema: z.string() } },
+    },
+    403: {
+      description: "Forbidden",
+      content: { "text/plain": { schema: z.string() } },
+    },
+    500: {
+      description: "Internal Server Error",
+      content: { "text/plain": { schema: z.string() } },
+    },
+  },
+});
+
 export const aiRouter = createRouter()
   .openapi(GENERATE_ROUTE, async (c) => {
     const user = c.get("user");
@@ -133,12 +179,52 @@ export const aiRouter = createRouter()
   .openapi(STREAM_ROUTE, async (c) => {
     const user = c.get("user");
     if (!user) return c.text("Unauthorized", 401);
-    const params = StreamParamsSchema.parse(await c.req.json());
-    const result = aiService.streamResponse(params);
-    return stream(c, async (stream) => {
-      c.header("X-Vercel-AI-Data-Stream", "v1");
-      c.header("Content-Type", "text/plain; charset=utf-8");
-      await stream.pipe(result.toDataStream());
-    }) as never;
+    const db = c.get("db");
+    const [aiUsage] = await db
+      .insert(schema.aiUsage)
+      .values({ userId: user.id, model: MODEL })
+      .returning();
+    try {
+      const params = StreamParamsSchema.parse(await c.req.json());
+      const result = aiService.streamResponse(params, async () => {
+        await db
+          .update(schema.aiUsage)
+          .set({ state: "success" })
+          .where(eq(schema.aiUsage.id, aiUsage.id));
+      });
+      return stream(c, async (stream) => {
+        c.header("X-Vercel-AI-Data-Stream", "v1");
+        c.header("Content-Type", "text/plain; charset=utf-8");
+        await stream.pipe(result.toDataStream());
+      }) as never;
+    } catch (error) {
+      console.error(error);
+      return c.text("Internal Server Error", 500);
+    }
+  })
+  .openapi(SPEECH_ROUTE, async (c) => {
+    const user = c.get("user");
+    if (!user) return c.text("Unauthorized", 401);
+    const db = c.get("db");
+    const [aiUsage] = await db
+      .insert(schema.aiUsage)
+      .values({ userId: user.id, model: MODEL })
+      .returning();
+    try {
+      const formData = await c.req.formData();
+      const transcription = await elevenLabsClient.speechToText.convert({
+        file: formData.get("speech") as File,
+        model_id: "scribe_v1",
+        diarize: false,
+      });
+      await db
+        .update(schema.aiUsage)
+        .set({ state: "success" })
+        .where(eq(schema.aiUsage.id, aiUsage.id));
+      return c.json({ text: transcription.text }, 200);
+    } catch (error) {
+      console.error(error);
+      return c.text("Internal Server Error", 500);
+    }
   })
   .use(aiLimitGuard);

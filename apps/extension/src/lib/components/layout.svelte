@@ -4,19 +4,26 @@
   import clsx from "clsx";
   import { ListIcon, SparklesIcon, UserIcon } from "lucide-svelte";
   import type { Snippet } from "svelte";
+  import { sendMessage } from "webext-bridge/popup";
 
   const { children } = $props<{ children: Snippet }>();
   const router = useRsv();
   const session = authClient.useSession();
   const user = $derived($session.data?.user);
 
-  function openTabs() {
+  function requestStateUpdate() {
+    return sendMessage("grinta_updateState", {}, "background");
+  }
+
+  async function openTabs() {
     if (!router) return;
+    await requestStateUpdate();
     router.navigate("/");
   }
 
-  function openAgent() {
+  async function openAgent() {
     if (!router) return;
+    await requestStateUpdate();
     router.navigate("/chats");
   }
 </script>

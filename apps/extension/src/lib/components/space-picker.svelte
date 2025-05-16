@@ -2,6 +2,9 @@
   import {
     CircleDashedIcon,
     CircleDotDashedIcon,
+    CircleDotIcon,
+    CircleFadingPlusIcon,
+    CircleIcon,
     PlusIcon,
   } from "lucide-svelte";
   import { draggable, droppable, type DragDropState } from "@thisux/sveltednd";
@@ -9,9 +12,17 @@
   import { sendMessage } from "webext-bridge/popup";
   import clsx from "clsx";
   import colors from "tailwindcss/colors";
+  import { rand } from "$lib/utils.svelte";
+  import { TAB_COLOR } from "$lib/const";
 
   const currentSpaceId = $derived(
     tabsStore.tabs.find((tab) => tab.active)?.groupId,
+  );
+
+  const nonRestoredGroups = $derived(
+    Object.keys(tabsStore.essentials).filter(
+      (key) => !tabsStore.groups.some((group) => group.title === key),
+    ),
   );
 
   async function activateSpace(spaceId: number) {
@@ -36,14 +47,22 @@
       "background",
     );
   }
+
+  function restoreGroup(title: string) {
+    const color = rand(TAB_COLOR);
+    return sendMessage("grinta_newGroup", { color, title }, "background");
+  }
 </script>
 
 <div
-  class="flex items-center justify-between bg-gradient-to-b from-base-100/0 to-base-100 py-2"
+  class="flex items-center justify-between bg-gradient-to-b from-base-100/0 to-base-100 py-2 relative"
 >
   <div class="flex flex-1 group items-center justify-center">
     {#each tabsStore.groups as space, index}
       {@const hex = colors[space.color as never]?.[500] ?? colors.gray[500]}
+      {@const bookmarks = space.title
+        ? tabsStore.essentials[space.title]
+        : undefined}
       <div class="tooltip tooltip-top" data-tip={space.title}>
         <button
           class={clsx(
@@ -61,7 +80,13 @@
           }}
           onclick={() => activateSpace(space.id)}
         >
-          {#if space.id === currentSpaceId}
+          {#if bookmarks}
+            {#if space.id === currentSpaceId}
+              <CircleDotIcon size={24} color={hex} />
+            {:else}
+              <CircleIcon size={24} color={hex} />
+            {/if}
+          {:else if space.id === currentSpaceId}
             <CircleDotDashedIcon size={24} color={hex} />
           {:else}
             <CircleDashedIcon size={24} color={hex} />
@@ -69,8 +94,18 @@
         </button>
       </div>
     {/each}
+    {#each nonRestoredGroups as title}
+      <div class="tooltip tooltip-top" data-tip={title}>
+        <button
+          class="btn btn-sm btn-ghost btn-square"
+          onclick={() => restoreGroup(title)}
+        >
+          <CircleFadingPlusIcon size={24} />
+        </button>
+      </div>
+    {/each}
     <button
-      class="btn btn-sm gtn-ghost btn-square hidden group-hover:flex"
+      class="btn btn-sm gtn-ghost btn-square hidden group-hover:flex absolute right-2 top-1/2 -translate-y-1/2"
       onclick={() => tabsStore.addGroup()}
     >
       <PlusIcon size={16} />

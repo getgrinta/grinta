@@ -1,10 +1,23 @@
 <script lang="ts">
+  import { colorVariant } from "$lib/const";
+  import { tabsStore } from "$lib/store/tabs.svelte";
+  import clsx from "clsx";
   import { slide } from "svelte/transition";
   import { sendMessage } from "webext-bridge/popup";
+  import SpaceEssentialContextMenu from "./space-essential-context-menu.svelte";
+  import { draggable, droppable, type DragDropState } from "@thisux/sveltednd";
 
   let { essentials } = $props<{
     essentials: chrome.bookmarks.BookmarkTreeNode[];
   }>();
+
+  const currentTab = $derived(tabsStore.tabs.find((tab) => tab.active));
+  const currentOrigin = $derived(
+    currentTab?.url ? new URL(currentTab.url).origin : undefined,
+  );
+  const currentSpace = $derived(
+    tabsStore.groups.find((group) => group.id === currentTab?.groupId),
+  );
 
   function handleClick(essential: chrome.bookmarks.BookmarkTreeNode) {
     return sendMessage(
@@ -13,18 +26,60 @@
       "background",
     );
   }
+
+  async function handleDrop(state: DragDropState<{ index: string }>) {
+    const { draggedItem, targetContainer } = state;
+    const dragIndex = parseInt(draggedItem.index);
+    const dropIndex = parseInt(targetContainer ?? "0");
+    await sendMessage(
+      "grinta_swapEssentials",
+      {
+        dragIndex,
+        dropIndex,
+        folder: currentSpace?.title ?? "",
+      },
+      "background",
+    );
+    return sendMessage("grinta_updateState", {}, "background");
+  }
+
+  function getTabByOrigin(origin: string) {
+    return tabsStore.tabs.find((tab) => {
+      if (!tab.url) return;
+      return new URL(tab.url).origin === origin;
+    });
+  }
 </script>
 
-<div class="flex gap-2" transition:slide>
-  {#each essentials as essential}
-    {@const hostname = new URL(essential.url).hostname}
-    <div class="tooltip tooltip-top" data-tip={essential.title}>
-      <button class="btn btn-square" onclick={() => handleClick(essential)}>
-        <img
-          src="https://www.google.com/s2/favicons?domain={hostname}"
-          class="w-6 h-6 rounded-full"
-        />
-      </button>
-    </div>
+<div class="grid grid-cols-8 gap-1 mb-2" transition:slide>
+  {#each essentials as essential, index}
+    {@const url = new URL(essential.url)}
+    {@const active = currentOrigin === url.origin}
+    {@const essentialTab = getTabByOrigin(url.origin)}
+    <SpaceEssentialContextMenu {index}>
+      <div class="tooltip tooltip-bottom" data-tip={essential.title}>
+        <button
+          class={clsx(
+            "btn btn-square",
+            active && colorVariant[(currentSpace?.color as never) ?? "gray"],
+          )}
+          onclick={() => handleClick(essential)}
+          use:draggable={{
+            container: index.toString(),
+            dragData: { ...essential, index },
+          }}
+          use:droppable={{
+            container: index.toString(),
+            callbacks: { onDrop: handleDrop as never },
+          }}
+        >
+          <img
+            src={essentialTab?.favIconUrl ??
+              `https://www.google.com/s2/favicons?domain=${url.hostname}`}
+            class="w-6 h-6 rounded-full bg-white pointer-events-none"
+          />
+        </button>
+      </div>
+    </SpaceEssentialContextMenu>
   {/each}
 </div>

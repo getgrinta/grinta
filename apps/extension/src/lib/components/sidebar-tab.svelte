@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { PanelLeftIcon, XIcon } from "lucide-svelte";
+  import {
+    PanelLeftIcon,
+    Volume2Icon,
+    VolumeOffIcon,
+    XIcon,
+  } from "lucide-svelte";
   import { sendMessage } from "webext-bridge/popup";
   import {
     draggable,
@@ -8,8 +13,10 @@
   } from "@thisux/sveltednd";
   import SidebarTabContextMenu from "./sidebar-tab-context-menu.svelte";
   import clsx from "clsx";
+  import { colorVariant } from "$lib/const";
 
-  let { tab, draggableConfig, droppableConfig } = $props<{
+  let { color, tab, draggableConfig, droppableConfig } = $props<{
+    color: chrome.tabGroups.Color;
     tab: chrome.tabs.Tab;
     draggableConfig: object;
     droppableConfig: DragDropOptions;
@@ -28,6 +35,10 @@
   function handleClose() {
     return sendMessage("grinta_closeTab", { tabId: tab.id }, "background");
   }
+
+  function toggleMute() {
+    return sendMessage("grinta_toggleMuteTab", { tabId: tab.id }, "background");
+  }
 </script>
 
 <SidebarTabContextMenu tabId={tab.id}>
@@ -36,7 +47,9 @@
   <li
     class={clsx(
       "flex btn w-full flex-1 flex-row items-center group border-2 flex-nowrap border-transparent cursor-pointer p-0",
-      tab.active ? "btn-primary" : "btn-ghost",
+      tab.active
+        ? `shadow-xs ${colorVariant[color as chrome.tabGroups.Color]}`
+        : "btn-ghost",
     )}
     use:draggable={draggableConfig}
     use:droppable={droppableConfig}
@@ -44,17 +57,26 @@
     aria-label={tab.title}
   >
     <button
-      class="flex flex-1 min-w-0 gap-2 p-2 h-full cursor-pointer"
+      class="flex flex-1 min-w-0 gap-2 p-2 h-full items-center cursor-pointer"
       onclick={handleClick}
       data-btn-activate
     >
+      {#if tab.audible}
+        <button class="btn btn-square btn-xs btn-ghost" onclick={toggleMute}>
+          {#if tab.mutedInfo?.muted}
+            <VolumeOffIcon size={24} class="w-6 h-6" />
+          {:else}
+            <Volume2Icon size={24} class="w-6 h-6" />
+          {/if}
+        </button>
+      {/if}
       {#if !tab.favIconUrl || showFaviconFallback}
         <PanelLeftIcon size={24} class="w-6 h-6" />
       {:else}
         <img
           src={tab.favIconUrl}
           alt={tab.title}
-          class="w-6 h-6 rounded-full"
+          class="w-6 h-6 rounded-full bg-white"
           onerror={handleFaviconError}
         />
       {/if}

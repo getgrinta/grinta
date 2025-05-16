@@ -48,7 +48,7 @@
             return;
           }
           loading = false;
-          router?.navigate("/chats");
+          router?.navigate("/chats/");
         })
         .exhaustive();
     },

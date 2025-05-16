@@ -3,27 +3,43 @@
   import { appStore, THEME, type Theme } from "$lib/store/app.svelte";
   import { tabsStore } from "$lib/store/tabs.svelte";
   import { createForm } from "felte";
-  import { ChevronLeftIcon, PlusIcon, TrashIcon } from "lucide-svelte";
+  import { ChevronLeftIcon, PlusIcon, XIcon } from "lucide-svelte";
   import { useRsv } from "@ryuz/rsv";
   import ViewTitle from "$lib/components/view-title.svelte";
+  import { sendMessage } from "webext-bridge/popup";
+  import SpaceColorPicker from "$lib/components/space-color-picker.svelte";
 
   const router = useRsv();
 
   const { form, data } = createForm({
     initialValues: {
       theme: appStore.data.theme ?? THEME.LIGHT,
-      includeCurrentPage: appStore.data.includeCurrentPage ?? false,
     },
   });
 
   async function formChange() {
     appStore.data.theme = $data.theme as Theme;
-    appStore.data.includeCurrentPage = $data.includeCurrentPage;
     await appStore.persist();
   }
 
   async function onSpacesChanged() {
     // await spacesStore.persist();
+  }
+
+  async function deleteGroup(groupId: number) {
+    await sendMessage("grinta_deleteGroup", { groupId }, "background");
+  }
+
+  function updateGroupTitle(groupId: number, title: string) {
+    if (!title) return;
+    if (title.length < 1 || title.length > 32) return;
+    const group = tabsStore.groups.find((group) => group.id === groupId);
+    if (!group) return;
+    return sendMessage(
+      "grinta_updateGroup",
+      { groupId, color: group.color, title },
+      "background",
+    );
   }
 </script>
 
@@ -46,15 +62,6 @@
           <option value={theme}>{theme.toLowerCase()}</option>
         {/each}
       </select>
-      <label for="includeCurrentPage" class="label"
-        >Include current page in every GrintAI request</label
-      >
-      <input
-        type="checkbox"
-        id="includeCurrentPage"
-        name="includeCurrentPage"
-        class="toggle"
-      />
     </form>
   </div>
   <div class="flex items-center justify-between p-2">
@@ -68,10 +75,23 @@
   </div>
   <form class="flex flex-col gap-2 p-2" onchange={onSpacesChanged}>
     {#each tabsStore.groups as space}
-      <div class="flex gap-2">
-        <input bind:value={space.title} class="input input-sm w-full" />
-        <button class="btn btn-sm btn-square">
-          <TrashIcon size={16} />
+      <div class="flex gap-2 items-center">
+        <SpaceColorPicker {space} />
+        <input
+          value={space.title}
+          oninput={(event) =>
+            updateGroupTitle(
+              space.id,
+              (event.target as HTMLInputElement)?.value ?? "",
+            )}
+          class="input w-full"
+        />
+        <button
+          type="button"
+          class="btn btn-sm btn-square"
+          onclick={() => deleteGroup(space.id)}
+        >
+          <XIcon size={16} />
         </button>
       </div>
     {/each}

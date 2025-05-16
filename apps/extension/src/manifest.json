@@ -14,22 +14,25 @@
   "{{chrome}}.action": {
     "default_title": "Click to open panel"
   },
-  "{{firefox}}.browser_action": {
-    "default_popup": "src/sidebar.html"
+  "{{firefox}}.sidebar_action": {
+    "default_title": "Click to open panel",
+    "default_panel": "src/sidebar.html"
   },
   "background": {
     "{{chrome}}.service_worker": "src/lib/background/index.ts",
-    "{{firefox}}.scripts": ["src/lib/background/index.ts"]
+    "{{firefox}}.scripts": ["src/lib/background/index.ts"],
+    "{{firefox}}.persistent": true
   },
   "{{chrome}}.permissions": [
     "sidePanel",
     "tabs",
     "storage",
     "tabGroups",
-    "bookmarks",
-    "cookies"
+    "bookmarks"
   ],
-  "{{chrome}}.content_scripts": [
+  "{{firefox}}.permissions": ["tabs", "storage", "bookmarks"],
+  "host_permissions": ["<all_urls>"],
+  "content_scripts": [
     {
       "matches": ["https://*/*", "http://*/*"],
       "js": ["src/lib/rpc/inject.ts"],
@@ -42,6 +45,7 @@
       "matches": ["https://*/*", "http://*/*"]
     }
   ],
+  "{{firefox}}.web_accessible_resources": ["provider.js"],
   "commands": {
     "_execute_action": {
       "suggested_key": {

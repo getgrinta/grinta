@@ -10,7 +10,8 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "target": "ESNext",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "incremental": true
   },
   "include": ["src/index.ts"],
   "exclude": ["node_modules", "dist"]

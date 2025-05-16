@@ -27,7 +27,6 @@ export class TabsStore {
     openers: Opener[];
     essentials: Record<string, chrome.bookmarks.BookmarkTreeNode[]>;
   }) {
-    console.log(">>>SYNC", newState);
     if (!newState?.tabs) return;
     this.tabs = newState.tabs;
     this.groups = newState.groups;

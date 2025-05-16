@@ -1,16 +1,10 @@
 <script lang="ts">
   import { Popover } from "bits-ui";
-  import { tabsStore } from "$lib/store/tabs.svelte";
-  import {
-    FilePlusIcon,
-    FileSearchIcon,
-    PaperclipIcon,
-    PlusIcon,
-    ServerIcon,
-  } from "lucide-svelte";
+  import { FilePlusIcon, FileSearchIcon, ServerIcon } from "lucide-svelte";
   import type { Snippet } from "svelte";
 
   type Props = Popover.RootProps & {
+    tabs: chrome.tabs.Tab[];
     fetchTab: (tabId: number) => Promise<void>;
     children: Snippet;
     menuWidth: number;
@@ -18,6 +12,7 @@
 
   let {
     open = $bindable(false),
+    tabs,
     fetchTab,
     children,
     menuWidth,
@@ -27,17 +22,6 @@
 
   function setMode(newMode: "menu" | "tabSelector") {
     mode = newMode;
-  }
-
-  async function fetchCurrentTab() {
-    const currentTab = await chrome.tabs.query({
-      active: true,
-      currentWindow: true,
-    });
-    const id = currentTab[0]?.id;
-    if (!id) return;
-    await fetchTab(id);
-    open = false;
   }
 
   $effect(() => {
@@ -58,24 +42,13 @@
     >
       {#if mode === "menu"}
         <li>
-          <button type="button" onclick={fetchCurrentTab}>
-            <span><FilePlusIcon size={16} /></span>Attach current tab</button
-          >
-        </li>
-        <li>
           <button type="button" onclick={() => setMode("tabSelector")}>
             <FileSearchIcon size={16} />
             <span>Attach selected tab</span></button
           >
         </li>
-        <li>
-          <button type="button">
-            <ServerIcon size={16} />
-            <span>Add MCP Server</span></button
-          >
-        </li>
       {:else}
-        {#each tabsStore.tabs as tab}
+        {#each tabs as tab}
           <li>
             <button type="button" onclick={() => fetchTab(tab.id ?? -1)}>
               <FilePlusIcon size={16} /><span class="truncate"

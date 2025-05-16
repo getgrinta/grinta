@@ -1,10 +1,18 @@
-import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
-import { generateText, streamText } from "ai";
+// import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
+import { createMistral } from "@ai-sdk/mistral";
+import {
+  convertToCoreMessages,
+  generateText,
+  smoothStream,
+  streamText,
+  tool,
+} from "ai";
 import dedent from "dedent";
 import { match } from "ts-pattern";
 import { z } from "zod";
 import { AI_PROVIDERS_CONFIG, type AiProvider } from "../const.js";
 import { CONTENT_TYPE, type ContentType } from "../routers/ai.router.js";
+// @ts-expect-error - it is exported
 import { type ChatMessageData } from "@getgrinta/core";
 
 const RESPONSE_REGEX = /<response>(.*?)<\/response>/;
@@ -54,14 +62,29 @@ export const GRINTAI_SYSTEM_PROMPT = dedent`
 	2. Output Format: Return only the continuation of the paragraph wrapped in an XML <response> tag. Do not include any additional text or explanations.
 `;
 
+export const BROWSER_AGENT_CHAT_TITLE_PROMPT = dedent`
+  Provide a concise and informative title based on the provided content.
+  1. The title should be at most 6 words long.
+  2. Output Format: Return only the title wrapped in an XML <response> tag. Do not include any additional text or explanations.
+`;
+
 export const BROWSER_AGENT_SYSTEM_PROMPT = dedent`
-  You are a highly intelligent web browsing assistant.
+  You are a browser AI agent that helps users understand and reason about web pages.
+  For every user query, ALWAYS use the "getTabContent" function to retrieve the current page content.
+
+  Core Instructions:
+  - Focus on extracting and conveying meaning, context, and insights from the page content.
+  - Disregard HTML, markdown, UI scaffolding, and other purely presentational elements. Your job is to distill information, not formatting.
+
+  Interaction Principles:
+  - Prioritize what the user wants to know—respond directly and concisely.
+  - Do not hallucinate or assume content that isn't present in the tab.
+  - Be helpful, accurate, and focused on the user's reasoning needs.
 `;
 
 export class AiService {
   createModel({ provider, model }: { provider: AiProvider; model: string }) {
-    return createOpenAICompatible({
-      name: "Grinta",
+    return createMistral({
       apiKey: AI_PROVIDERS_CONFIG[provider].apiKey,
       baseURL: AI_PROVIDERS_CONFIG[provider].url,
     })(model);
@@ -114,6 +137,7 @@ export class AiService {
       .with(CONTENT_TYPE.INLINE_AI, () => INLINE_SYSTEM_PROMPT)
       .with(CONTENT_TYPE.REPHRASE, () => REPHRASE_SYSTEM_PROMPT)
       .with(CONTENT_TYPE.GRINTAI, () => GRINTAI_SYSTEM_PROMPT)
+      .with(CONTENT_TYPE.CHAT_TITLE, () => BROWSER_AGENT_CHAT_TITLE_PROMPT)
       .exhaustive();
     const { text } = await generateText({
       prompt,
@@ -123,14 +147,62 @@ export class AiService {
     return text.match(RESPONSE_REGEX)?.[1] ?? "";
   }
 
-  streamResponse(params: ChatMessageData) {
+  streamResponse(params: ChatMessageData, onFinish: () => Promise<void>) {
     const model = this.createModel({
       provider: "MISTRAL",
       model: "mistral-small-latest",
     });
     return streamText({
-      messages: params.messages,
+      maxSteps: 5,
+      messages: convertToCoreMessages(params.messages),
+      system: BROWSER_AGENT_SYSTEM_PROMPT,
+      toolCallStreaming: true,
+      experimental_transform: smoothStream({
+        chunking: "line",
+      }),
+      onFinish,
       model,
+      tools: {
+        getTabContent: tool({
+          parameters: z.object({}),
+          description:
+            "Get the contents of the current browser tab page. The result is a markdown content of the page, title, and URL.",
+        }),
+        getElements: tool({
+          parameters: z.object({}),
+          description:
+            "Get the clickable and fillable elements of the current browser tab page. The result is a list of selectors of the clickable and fillable elements.",
+        }),
+        clickElement: tool({
+          parameters: z.object({
+            selector: z.string(),
+          }),
+          description:
+            "Click the element with the given selector. The result is a boolean value indicating whether the element was clicked.",
+        }),
+        fillElement: tool({
+          parameters: z.object({
+            selector: z.string(),
+            value: z.string(),
+          }),
+          description:
+            "Fill the element with the given selector with the given value. The result is a boolean value indicating whether the element was filled.",
+        }),
+        scrollToElement: tool({
+          parameters: z.object({
+            selector: z.string(),
+          }),
+          description:
+            "Scroll to the element of the tab page with the given selector. The result is a boolean value indicating whether the element was scrolled to.",
+        }),
+        getElement: tool({
+          parameters: z.object({
+            selector: z.string(),
+          }),
+          description:
+            "Get the content of the element of the tab page with the given selector. The result is a markdown content of the element.",
+        }),
+      },
     });
   }
 }

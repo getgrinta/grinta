@@ -1,5 +1,5 @@
 import type { z } from "zod";
-import { syncStorage } from "./storage";
+import { localStorage } from "./storage";
 import type { Opener, PageContext } from "./types";
 import {
   adjectives,
@@ -25,11 +25,11 @@ export class PersistedStore<T> {
   }
 
   async persist() {
-    return syncStorage.set(this.#storageKey, this.data);
+    return localStorage.set(this.#storageKey, this.data);
   }
 
   async restore() {
-    const data = await syncStorage.get(this.#storageKey);
+    const data = await localStorage.get(this.#storageKey);
     this.data = data ? this.#schema.parse(data) : this.#schema.parse({});
   }
 }
@@ -110,7 +110,6 @@ export function generateUsername() {
 
 export function pageContextToMessage(pageContext: PageContext) {
   return dedent`
-    Additional context:
     <page>
     ---
     title: ${pageContext.title}
@@ -118,6 +117,13 @@ export function pageContextToMessage(pageContext: PageContext) {
     ---
     ${pageContext.content}
     </page>
-    Respond with "<context title="${pageContext.title}" url="${pageContext.url}"></context>".
+  `;
+}
+
+export function userPromptToMessage(prompt: string) {
+  return dedent`
+    <user>
+    ${prompt}
+    </user>
   `;
 }

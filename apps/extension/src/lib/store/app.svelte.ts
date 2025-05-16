@@ -4,13 +4,13 @@ import { z } from "zod";
 export const THEME = {
   LIGHT: "LIGHT",
   DARK: "DARK",
+  SYSTEM: "SYSTEM",
 } as const;
 
 export type Theme = keyof typeof THEME;
 
 export const AppDataSchema = z.object({
-  theme: z.nativeEnum(THEME).default(THEME.LIGHT),
-  includeCurrentPage: z.boolean().default(false),
+  theme: z.nativeEnum(THEME).default(THEME.SYSTEM),
 });
 
 export type AppData = z.infer<typeof AppDataSchema>;
