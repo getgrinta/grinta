@@ -29,6 +29,8 @@ jobs:
   build_extension:
     runs-on: ubuntu-latest
     needs: test
+    env:
+      VITE_API_URL: ${{ secrets.VITE_API_URL }}
     steps:
       - name: Mask multiline env
         run: |
