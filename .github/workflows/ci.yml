@@ -38,13 +38,13 @@ jobs:
           do
             echo "::add-mask::${line}"
           done <<< "${{ secrets.HIDE_THIS }}"
+      - name: Check out code
+        uses: actions/checkout@v4
       - name: Set short git commit SHA
         id: vars
         run: |
           calculatedSha=$(git rev-parse --short ${{ github.sha }})
           echo "COMMIT_SHORT_SHA=$calculatedSha" >> $GITHUB_ENV
-      - name: Check out code
-        uses: actions/checkout@v4
       - name: Cache turbo build setup
         uses: actions/cache@v4
         with:
