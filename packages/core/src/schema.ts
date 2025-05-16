@@ -33,6 +33,28 @@ export const customizableCommandHandlerEnum = z.union([
   z.string(),
 ]);
 
+export const MeetingTypes = [
+  "zoom",
+  "google meet",
+  "teams",
+  "webex",
+  "around",
+  "jitsi",
+] as const;
+
+export const MeetingObjectSchema = z.object({
+  type: z.enum(MeetingTypes).optional(),
+  link: z.string().url().optional(),
+});
+
+export type Meeting = z.infer<typeof MeetingObjectSchema>;
+
+export const ParticipantSchema = z.object({
+  name: z.string().optional(),
+});
+
+export type Participant = z.infer<typeof ParticipantSchema>;
+
 export const CalendarSchema = z.object({
   backgroundColor: z.string().optional(),
   startTime: z.string().optional(),
@@ -42,6 +64,8 @@ export const CalendarSchema = z.object({
   calendarIdentifier: z.string().optional(),
   eventId: z.string().optional(),
   isAllDay: z.boolean().default(false),
+  meeting: MeetingObjectSchema.optional().nullable(),
+  participants: z.array(ParticipantSchema).optional(),
 });
 
 export const MetadataSchema = z.object({
@@ -122,6 +146,24 @@ export type BaseCurrency = keyof typeof BASE_CURRENCY;
 
 export const baseCurrencies = Object.keys(BASE_CURRENCY);
 
+// Schema for a single custom quick link
+export const CustomQuickLinkSchema = z.object({
+  shortcut: z
+    .string()
+    .min(1, { message: "Shortcut be 1 or 2 characters long" })
+    .max(2, { message: "Shortcut be 1 or 2 characters long" })
+    .regex(/^[a-zA-Z0-9]{1,2}$/, { message: "Shortcut must be alphanumeric" }),
+  name: z.string().min(1, { message: "Name cannot be empty" }),
+  urlTemplate: z
+    .string()
+    .url({ message: "Must be a valid URL template" })
+    .refine((val) => val.includes("{query}"), {
+      message: 'URL template must include "{query}"',
+    }),
+});
+
+export type CustomQuickLink = z.infer<typeof CustomQuickLinkSchema>;
+
 // Get browser language or default to English
 const getBrowserLanguage = (): Language => {
   if (typeof window === "undefined") return LANGUAGE.EN;
@@ -167,6 +209,7 @@ export const SettingsSchema = z.object({
   fsPermissions: z.boolean().default(false),
   selectedCalendarIdentifiers: z.array(z.string()).default([]),
   ignoredEventIds: z.array(z.string()).default([]),
+  customQuickLinks: z.array(CustomQuickLinkSchema).default([]),
 });
 
 export const AttachmentSchema = z.object({

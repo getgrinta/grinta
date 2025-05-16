@@ -4,7 +4,9 @@
     "menu": "Menu",
     "clear": "Clear",
     "incognito": "Incognito",
-    "back": "Back"
+    "back": "Back",
+    "join": "Join",
+    "tomorrow": "Tomorrow"
   },
   "auth": {
     "signIn": "Sign In",
@@ -50,12 +52,37 @@
   },
   "settings": {
     "title": "Settings",
+    "quick_search": {
+      "error_shortcut_required": "Shortcut is required.",
+      "error_name_required": "Name is required.",
+      "error_url_template_required": "URL Template is required.",
+      "error_shortcut_conflict": "Shortcut is already in use.",
+      "error_add_failed": "Failed to add quick link.",
+      "default_links_title": "Default Quick Links",
+      "default": "Default",
+      "custom_links_title": "Custom Quick Links",
+      "no_custom_links": "No custom quick links defined yet.",
+      "add_new_link_title": "Add New Quick Link",
+      "form_shortcut_label": "Shortcut (1 or 2 characters)",
+      "form_shortcut_placeholder": "e.g., g",
+      "form_name_label": "Name",
+      "form_name_placeholder": "e.g., Google Search",
+      "form_url_template_label": "URL Template",
+      "form_url_template_placeholder": "e.g., https://google.com/search?q={query}",
+      "form_url_template_hint": "Use {query} as a placeholder for the query.",
+      "add_button": "Add Link",
+      "remove_link_tooltip": "Remove this link",
+      "link_added": "Custom quick link added.",
+      "link_removed": "Custom quick link removed.",
+      "openIn": "Open in {hostname}"
+    },
     "tabs": {
       "general": "General",
       "search": "Search",
       "pro": "Pro",
       "permissions": "Permissions",
-      "calendar": "Calendar"
+      "calendar": "Calendar",
+      "quick_search": "Quick Search"
     },
     "fields": {
       "shortcut": "Shortcut",
@@ -104,7 +131,14 @@
       "ignoreEventSuccess": "Event ignored successfully.",
       "ignoreEventError": "Failed to ignore event.",
       "allDay": "All day",
-      "saveSuccess": "Calendar selection saved."
+      "saveSuccess": "Calendar selection saved.",
+      "openInMaps": "Open in Maps",
+      "composeEmailToParticipants": "Compose email to participants",
+      "composeEmailToParticipant": "Compose email to {name}",
+      "noEmail": "no email",
+      "unknownParticipant": "Unknown participant",
+      "composeEmailToAllTitle": "Compose email to all participants",
+      "messageAllCaption": "Message all"
     },
     "extension_already_added": "This extension is already added.",
     "extension_supported_by_default": "This extension is already supported by default.",
@@ -187,7 +221,9 @@
       "signIn": "Sign In",
       "profile": "Profile",
       "clipboardHistory": "Clipboard History",
-      "checkForUpdates": "Check for Updates..."
+      "checkForUpdates": "Check for Updates...",
+      "followOnX": "Follow @getgrinta on X",
+      "reportProblem": "Report a problem"
     },
     "actions": {
       "search": "Search for \"{query}\"",
@@ -245,5 +281,8 @@
     "installing": "Installing update...",
     "install_failed": "Failed to install update.",
     "install_success": "Update installed successfully. Relaunching..."
+  },
+  "accessory": {
+    "copied": "Copied"
   }
 }

@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Grinta Dev",
-  "version": "0.3.2",
+  "version": "0.4.1",
   "identifier": "com.getgrinta.desktop-dev",
   "build": {
     "beforeDevCommand": "bun run --cwd ../../ build:deps && bun run dev",
@@ -44,6 +44,9 @@
     "active": true,
     "targets": "all",
     "createUpdaterArtifacts": true,
+    "macOS": {
+      "entitlements": "./Entitlements.plist"
+    },
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

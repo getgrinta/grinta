@@ -7,7 +7,13 @@
   import { commandsStore } from "$lib/store/commands.svelte";
   import { notesStore } from "$lib/store/notes.svelte";
   import { settingsStore } from "$lib/store/settings.svelte";
-  import { APP_MODE, type AppMode } from "@getgrinta/core";
+  import { accessoryStore } from "$lib/store/accessory.svelte";
+  import AccessoryView from "./accessory-view/accessory-view.svelte"; // Add this import
+  import {
+    APP_MODE,
+    type AppMode,
+    type CustomQuickLink,
+  } from "@getgrinta/core";
   import { listen } from "@tauri-apps/api/event";
   import { clsx } from "clsx";
   import { createForm } from "felte";
@@ -26,11 +32,53 @@
   import { _ } from "svelte-i18n";
   import { match } from "ts-pattern";
   import ViewActions from "./view-actions.svelte";
-  import SidebarMenuButton from "./sidebar-menu-button.svelte";
+  import SidebarMenuButton from "./sidebar/sidebar-menu-button.svelte";
   import { shortcut, type ShortcutTrigger } from "@svelte-put/shortcut";
   import { calendarStore } from "$lib/store/calendar.svelte";
+  import { openUrl } from "@tauri-apps/plugin-opener";
+  import {
+    defaultQuickSearchModes,
+    type QuickSearchMode,
+  } from "$lib/constants/quick-search";
 
   let queryInput: HTMLInputElement;
+
+  // Combine default and custom quick links, overriding defaults with customs
+  const combinedQuickSearchModes = $derived(() => {
+    const customLinksMap = new Map<string, QuickSearchMode>();
+    settingsStore.data.customQuickLinks.forEach(
+      (customLink: CustomQuickLink) => {
+        const shortcutUpper = customLink.shortcut.toUpperCase();
+        customLinksMap.set(shortcutUpper, {
+          shortcut: shortcutUpper,
+          name: customLink.name,
+          // Assign default styling for custom links
+          bgColorClass: "gray-500",
+          textColorClass: "text-white",
+          searchUrl: (query: string) =>
+            customLink.urlTemplate.replace(
+              "{query}",
+              encodeURIComponent(query),
+            ),
+        });
+      },
+    );
+
+    // Add defaults only if not overridden by a custom link
+    const defaultsToAdd = defaultQuickSearchModes.filter(
+      (defaultMode) => !customLinksMap.has(defaultMode.shortcut.toUpperCase()),
+    );
+
+    return [...defaultsToAdd, ...customLinksMap.values()];
+  });
+
+  let quickSearchBadge: HTMLDivElement | null = $state(null);
+  const leftPadding = $derived.by(() => {
+    const _ = appStore.quickSearchMode;
+
+    if (!quickSearchBadge || !appStore.quickSearchMode) return "0";
+    return ((quickSearchBadge?.clientWidth ?? 0) + 15).toFixed(0);
+  });
 
   async function handleGrintAi() {
     return goto(`/ai/${appStore.query}`);
@@ -130,6 +178,8 @@
 
     clearQueryTimeoutToken = setTimeout(() => {
       appStore.setQuery("");
+      accessoryStore.clearMode();
+      appStore.quickSearchMode = null;
     }, timeout);
   });
 
@@ -186,14 +236,57 @@
       commandsStore.selectedIndex = commandsStore.selectedIndex - 1;
       return;
     }
+
     if (event.key === "Backspace" && appStore.query.length === 0) {
+      // Clear quick link
+      if (appStore.quickSearchMode) {
+        event.preventDefault();
+        appStore.quickSearchMode = null;
+        appStore.query = "";
+        return;
+      }
+
       appStore.appMode = APP_MODE.INITIAL;
       return;
     }
-    if (event.key === "Tab") {
-      event.preventDefault();
-      if (appStore.query.length < 4) return;
-      return goto(`/ai/${appStore.query}`);
+
+    if (appStore.appMode === APP_MODE.INITIAL) {
+      if (event.key == "Enter" && appStore.quickSearchMode) {
+        event.preventDefault();
+
+        const url = appStore.quickSearchMode.searchUrl(appStore.query);
+        openUrl(url);
+        // Reset state after search
+        appStore.quickSearchMode = null;
+        appStore.query = "";
+        return;
+      }
+
+      if (event.key === "Tab") {
+        event.preventDefault();
+
+        // save special mode
+        if (appStore.query.length >= 1 && appStore.query.length <= 2) {
+          const shortcutString = appStore.query
+            .slice(0, 2)
+            .trim()
+            .toUpperCase(); // Ensure uppercase for matching
+
+          const mode = combinedQuickSearchModes().find(
+            (m: QuickSearchMode) => m.shortcut.toUpperCase() === shortcutString,
+          );
+
+          if (mode) {
+            appStore.quickSearchMode = mode;
+            appStore.query = ""; // Clear query after setting mode
+          }
+
+          return;
+        }
+
+        if (appStore.query.length < 4 || appStore.quickSearchMode) return;
+        return goto(`/ai/${appStore.query}`);
+      }
     }
   }
 
@@ -213,6 +306,7 @@
   watch(
     () => [appStore.query, appStore.appMode],
     () => {
+      accessoryStore.consume(appStore.query);
       buildCommands();
       setTimeout(() => {
         queryInput?.focus();
@@ -231,8 +325,20 @@
     },
   );
 
-  const inputProps = $derived(
-    match(appStore.appMode)
+  const inputProps = $derived.by(() => {
+    if (appStore.quickSearchMode && appStore.appMode === APP_MODE.INITIAL) {
+      const hostname = new URL(appStore.quickSearchMode.searchUrl("")).hostname;
+      const placeholder = $_("settings.quick_search.openIn").replace(
+        "{hostname}",
+        hostname,
+      );
+      return {
+        icon: SearchIcon,
+        placeholder: placeholder,
+      };
+    }
+
+    return match(appStore.appMode)
       .with(APP_MODE.INITIAL, () => ({
         icon: SearchIcon,
         placeholder: $_("searchBar.placeholder.initial"),
@@ -249,8 +355,8 @@
         icon: CalendarIcon,
         placeholder: $_("searchBar.placeholder.calendar"),
       }))
-      .exhaustive(),
-  );
+      .exhaustive();
+  });
 
   const indicatorButton = $derived(
     match(appStore.appMode)
@@ -308,21 +414,36 @@
         <indicatorButton.icon size={16} class={clsx("pointer-events-none")} />
       </button>
     </div>
-    <input
-      bind:this={queryInput}
-      id="searchBar"
-      slot="input"
-      class="grow font-semibold text-lg !outline-none"
-      name="query"
-      bind:value={appStore.query}
-      onkeydown={handleNavigation}
-      placeholder={inputProps.placeholder}
-      autocomplete="off"
-      spellcheck="false"
-      data-testid="search-bar"
-    />
+    <div class="relative flex grow items-center" slot="input">
+      <input
+        bind:this={queryInput}
+        id="searchBar"
+        class={clsx("grow font-semibold text-lg !outline-none")}
+        style="padding-left: {leftPadding}px;"
+        name="query"
+        bind:value={appStore.query}
+        onkeydown={handleNavigation}
+        placeholder={inputProps.placeholder}
+        autocomplete="off"
+        spellcheck="false"
+        data-testid="search-bar"
+      />
+      {#if appStore.quickSearchMode && appStore.appMode === APP_MODE.INITIAL}
+        <div
+          bind:this={quickSearchBadge}
+          class={clsx(
+            "badge absolute left-0 top-1/2 -translate-y-1/2 z-10 pointer-events-none",
+            `bg-${appStore.quickSearchMode.bgColorClass}`,
+            appStore.quickSearchMode.textColorClass,
+            `shadow-${appStore.quickSearchMode.bgColorClass}/50 border-0 shadow-lg`,
+          )}
+        >
+          {appStore.quickSearchMode.name}
+        </div>
+      {/if}
+    </div>
     <div slot="addon" class="flex items-center gap-1">
-      {#if appStore.appMode === APP_MODE.INITIAL && appStore.query.length >= 3 && appStore.user?.id}
+      {#if !appStore.quickSearchMode && appStore.appMode === APP_MODE.INITIAL && appStore.query.length >= 3 && appStore.user?.id}
         <ViewActions actions={searchViewActions} size="sm" />
       {:else}
         <SegmentedControl

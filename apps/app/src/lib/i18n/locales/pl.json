@@ -4,7 +4,9 @@
     "menu": "Menu",
     "clear": "Wyczyść",
     "incognito": "Incognito",
-    "back": "Wstecz"
+    "back": "Wstecz",
+    "join": "Dołącz",
+    "tomorrow": "Jutro"
   },
   "welcome": {
     "title": "Witaj w Grincie",
@@ -17,6 +19,30 @@
   },
   "settings": {
     "title": "Ustawienia",
+    "quick_search": {
+      "error_shortcut_required": "Skrót jest wymagany.",
+      "error_name_required": "Nazwa jest wymagana.",
+      "error_url_template_required": "Szablon adresu URL jest wymagany.",
+      "error_shortcut_conflict": "Skrót jest już w użyciu.",
+      "error_add_failed": "Nie udało się dodać szybkiego linku.",
+      "default_links_title": "Domyślne Szybkie Linki",
+      "default": "Domyślne",
+      "custom_links_title": "Własne Szybkie Linki",
+      "no_custom_links": "Nie zdefiniowano jeszcze własnych szybkich linków.",
+      "add_new_link_title": "Dodaj Nowy Szybki Link",
+      "form_shortcut_label": "Skrót (1 albo 2 znaki)",
+      "form_shortcut_placeholder": "np., g",
+      "form_name_label": "Nazwa",
+      "form_name_placeholder": "np., Wyszukiwanie w Google",
+      "form_url_template_label": "Szablon adresu URL",
+      "form_url_template_placeholder": "np., https://google.com/search?q={query}",
+      "form_url_template_hint": "Użyj {query} jako miejsca na zapytanie.",
+      "add_button": "Dodaj Link",
+      "remove_link_tooltip": "Usuń ten link",
+      "link_added": "Własny szybki link dodany.",
+      "link_removed": "Własny szybki link usunięty.",
+      "openIn": "Otwórz w {hostname}"
+    },
     "tabs": {
       "general": "Ogólne",
       "search": "Wyszukiwanie",
@@ -76,7 +102,13 @@
       "ignoreEventSuccess": "Pomyślnie zignorowano wydarzenie.",
       "ignoreEventError": "Nie udało się zignorować wydarzenia.",
       "allDay": "Cały dzień",
-      "saveSuccess": "Wybór kalendarzy zapisany."
+      "saveSuccess": "Wybór kalendarzy zapisany.",
+      "composeEmailToParticipants": "Napisz e-mail do uczestników",
+      "composeEmailToParticipant": "Napisz e-mail do {name}",
+      "noEmail": "brak e-maila",
+      "unknownParticipant": "Nieznany uczestnik",
+      "composeEmailToAllTitle": "Napisz e-mail do wszystkich uczestników",
+      "messageAllCaption": "Napisz do wszystkich"
     },
     "extension_already_added": "To rozszerzenie jest już dodane.",
     "extension_supported_by_default": "To rozszerzenie jest obsługiwane domyślnie.",
@@ -176,7 +208,9 @@
       "signIn": "Zaloguj",
       "profile": "Profil",
       "clipboardHistory": "Historia schowka",
-      "checkForUpdates": "Sprawdź aktualizacje..."
+      "checkForUpdates": "Sprawdź aktualizacje...",
+      "followOnX": "Obserwuj @getgrinta na X",
+      "reportProblem": "Zgłoś problem"
     },
     "actions": {
       "search": "Szukaj \"{query}\"",
@@ -245,5 +279,8 @@
     "installing": "Instalowanie aktualizacji...",
     "install_failed": "Nie udało się zainstalować aktualizacji.",
     "install_success": "Aktualizacja zainstalowana pomyślnie. Ponowne uruchamianie..."
+  },
+  "accessory": {
+    "copied": "Skopiowano"
   }
 }

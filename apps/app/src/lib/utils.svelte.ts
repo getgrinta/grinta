@@ -22,6 +22,8 @@ import {
   type ExecutableCommand,
   APP_MODE,
   THEME,
+  type Meeting,
+  MeetingTypes as CoreMeetingTypes,
 } from "@getgrinta/core";
 import { vaultStore } from "./store/vault.svelte";
 import { systemThemeWatcher } from "./system.utils.svelte";
@@ -134,6 +136,60 @@ export function clickListener() {
 
   return () => {
     if (unlisten) unlisten();
+  };
+}
+
+export function extractMeetingInfo(
+  notes: string | undefined | null,
+): Meeting | null {
+  if (!notes) {
+    return null;
+  }
+
+  const urlRegex = /(https?:\/\/[^\s<>"']+|www\.[^\s<>"']+)/gi;
+  const urls = notes.match(urlRegex);
+
+  if (!urls || urls.length === 0) {
+    return null;
+  }
+
+  const firstUrl = urls[0];
+  let meetingType: (typeof CoreMeetingTypes)[number] | undefined;
+
+  const lowerUrl = firstUrl.toLowerCase();
+
+  if (CoreMeetingTypes && Array.isArray(CoreMeetingTypes)) {
+    if (lowerUrl.includes("zoom.us") || lowerUrl.includes("zoom.com")) {
+      meetingType = "zoom";
+    } else if (lowerUrl.includes("meet.google.com")) {
+      meetingType = "google meet";
+    } else if (
+      lowerUrl.includes("teams.microsoft.com") ||
+      lowerUrl.includes("teams.live.com")
+    ) {
+      meetingType = "teams";
+    } else if (lowerUrl.includes("webex.com")) {
+      meetingType = "webex";
+    } else if (lowerUrl.includes("around.co")) {
+      meetingType = "around";
+    } else if (
+      lowerUrl.includes("jitsi.org") ||
+      lowerUrl.includes("meet.jit.si")
+    ) {
+      meetingType = "jitsi";
+    }
+
+    if (
+      meetingType &&
+      !(CoreMeetingTypes as readonly string[]).includes(meetingType)
+    ) {
+      meetingType = undefined;
+    }
+  }
+
+  return {
+    link: firstUrl,
+    type: meetingType,
   };
 }
 

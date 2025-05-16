@@ -32,6 +32,7 @@ import {
 import { searchSpotlightApps, toggleVisibility } from "../grinta-invoke";
 import { appMetadataStore } from "../store/app-metadata.svelte";
 import {
+  extractMeetingInfo,
   type FileEntry,
   findApps,
   generateCancellationToken,
@@ -218,7 +219,6 @@ export class CommandsStore extends SecureStore<Commands> {
           return commandHistory;
         }
 
-        // Filter out commands of the same url as the current query
         if (queryIsUrl) {
           commandHistory = commandHistory.filter(
             (a) =>
@@ -270,6 +270,8 @@ export class CommandsStore extends SecureStore<Commands> {
         );
 
         const mappedCommands = events.map((event: EventInfo) => {
+          const meetingInfo = extractMeetingInfo(event.notes);
+
           return ExecutableCommandSchema.parse({
             label: event.title,
             localizedLabel: event.title,
@@ -284,7 +286,9 @@ export class CommandsStore extends SecureStore<Commands> {
                 endTime: event.end_date,
                 location: event.location ?? undefined,
                 notes: event.notes ?? undefined,
+                participants: event.participants,
                 isAllDay: event.is_all_day,
+                meeting: meetingInfo,
               },
             },
             priority: COMMAND_PRIORITY.HIGH,
@@ -336,9 +340,36 @@ export class CommandsStore extends SecureStore<Commands> {
           )) ?? [])
         : [];
 
-    this.commands = uniq([...formulaCommands, ...filteredCommands]).sort(
-      (a, b) => this.sortCommands({ prev: a, next: b }),
-    );
+    let quickSearchCommand: ExecutableCommand | null = null;
+    if (appStore.appMode === APP_MODE.INITIAL && appStore.quickSearchMode) {
+      const hostname = new URL(appStore.quickSearchMode.searchUrl("")).hostname;
+      const placeholder = t("settings.quick_search.openIn").replace(
+        "{hostname}",
+        hostname,
+      );
+      quickSearchCommand = ExecutableCommandSchema.parse({
+        value: placeholder,
+        label: placeholder,
+        localizedLabel: placeholder,
+        metadata: {},
+        handler: COMMAND_HANDLER.URL,
+        appModes: [APP_MODE.INITIAL],
+        smartMatch: true,
+        priority: COMMAND_PRIORITY.TOP,
+      });
+    }
+
+    if (quickSearchCommand) {
+      this.commands = uniq([
+        ...formulaCommands,
+        ...filteredCommands,
+        quickSearchCommand,
+      ]).sort((a, b) => this.sortCommands({ prev: a, next: b }));
+    } else {
+      this.commands = uniq([...formulaCommands, ...filteredCommands]).sort(
+        (a, b) => this.sortCommands({ prev: a, next: b }),
+      );
+    }
 
     if (
       appStore.appMode === APP_MODE.INITIAL &&

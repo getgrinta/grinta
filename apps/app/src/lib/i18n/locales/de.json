@@ -4,7 +4,9 @@
     "menu": "Menü",
     "clear": "Löschen",
     "incognito": "Incognito",
-    "back": "Zurück"
+    "back": "Zurück",
+    "join": "Beitreten",
+    "tomorrow": "Morgen"
   },
   "auth": {
     "signIn": "Anmelden",
@@ -52,6 +54,30 @@
   },
   "settings": {
     "title": "Einstellungen",
+    "quick_search": {
+      "error_shortcut_required": "Shortcut ist erforderlich.",
+      "error_name_required": "Name ist erforderlich.",
+      "error_url_template_required": "URL-Vorlage ist erforderlich.",
+      "error_shortcut_conflict": "Shortcut ist bereits in Verwendung.",
+      "error_add_failed": "Hinzufügen des Quick-Links fehlgeschlagen.",
+      "default_links_title": "Standard-Quick-Links",
+      "default": "Standard",
+      "custom_links_title": "Benutzerdefinierte Quick-Links",
+      "no_custom_links": "Es sind noch keine benutzerdefinierten Quick-Links definiert.",
+      "add_new_link_title": "Neuen Quick-Link hinzufügen",
+      "form_shortcut_label": "Shortcut (1 oder 2 Zeichen)",
+      "form_shortcut_placeholder": "z.B. g",
+      "form_name_label": "Name",
+      "form_name_placeholder": "z.B. Google-Suche",
+      "form_url_template_label": "URL-Vorlage",
+      "form_url_template_placeholder": "z.B. https://google.com/search?q={query}",
+      "form_url_template_hint": "Verwenden Sie {query} als Platzhalter für die Abfrage.",
+      "add_button": "Link hinzufügen",
+      "remove_link_tooltip": "Diesen Link entfernen",
+      "link_added": "Benutzerdefinierter Quick-Link hinzugefügt.",
+      "link_removed": "Benutzerdefinierter Quick-Link entfernt.",
+      "openIn": "Öffnen in {hostname}"
+    },
     "tabs": {
       "general": "Allgemein",
       "search": "Suche",
@@ -104,7 +130,13 @@
       "resetIgnoredEventsSuccess": "Alle versteckten Kalendertermine sind jetzt sichtbar.",
       "resetIgnoredEventsError": "Zurücksetzen der versteckten Termine fehlgeschlagen.",
       "requestError": "Fehler bei der Zugriffsanfrage.",
-      "allDay": "Ganztägig"
+      "allDay": "Ganztägig",
+      "composeEmailToParticipants": "E-Mail an Teilnehmer verfassen",
+      "composeEmailToParticipant": "E-Mail an {name} verfassen",
+      "noEmail": "keine E-Mail",
+      "unknownParticipant": "Unbekannter Teilnehmer",
+      "composeEmailToAllTitle": "E-Mail an alle Teilnehmer verfassen",
+      "messageAllCaption": "Allen schreiben"
     },
     "extension_already_added": "Diese Erweiterung wurde bereits hinzugefügt.",
     "extension_supported_by_default": "Diese Erweiterung wird bereits standardmäßig unterstützt.",
@@ -188,7 +220,9 @@
       "signIn": "Anmelden",
       "profile": "Profil",
       "clipboardHistory": "Zwischenablage",
-      "checkForUpdates": "Updates prüfen..."
+      "checkForUpdates": "Nach Updates suchen...",
+      "followOnX": "Folge @getgrinta auf X",
+      "reportProblem": "Problem melden"
     },
     "actions": {
       "search": "Nach \"{query}\" suchen",
@@ -252,5 +286,8 @@
     "installing": "Update wird installiert...",
     "install_failed": "Fehler beim Installieren des Updates.",
     "install_success": "Update erfolgreich installiert. Neustart wird durchgeführt..."
+  },
+  "accessory": {
+    "copied": "Kopiert"
   }
 }

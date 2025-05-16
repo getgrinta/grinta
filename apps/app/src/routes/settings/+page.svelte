@@ -7,6 +7,8 @@
   import humanizeString from "humanize-string";
   import { PressedKeys, watch } from "runed";
   import { _ } from "svelte-i18n";
+  import { writable } from "svelte/store";
+
   import packageJson from "../../../package.json" with { type: "json" };
   import { SUPPORTED_FILE_INDEXING_FILE_EXTENSIONS } from "$lib/grinta-invoke";
   import { toast } from "svelte-sonner";
@@ -32,6 +34,10 @@
   import Shortcut from "$lib/components/shortcut.svelte";
   import { calendarStore } from "$lib/store/calendar.svelte";
   import CalendarSettings from "$lib/components/settings/calendar-settings.svelte"; // Import the new component
+  import { createForm } from "felte";
+  import { CustomQuickLinkSchema, type CustomQuickLink } from "@getgrinta/core";
+  import { defaultQuickSearchModes } from "$lib/constants/quick-search";
+  import { Trash2 } from "lucide-svelte";
 
   const pressedKeys = new PressedKeys();
 
@@ -194,6 +200,57 @@
     extensionValue = "";
     extensionInput?.focus();
   }
+
+  const { form, reset } = createForm<CustomQuickLink>({
+    onSubmit: (values) => {
+      if (!values.shortcut?.trim()) {
+        toast.error($_("settings.quick_search.error_shortcut_required"));
+        return;
+      }
+      if (!values.name?.trim()) {
+        toast.error($_("settings.quick_search.error_name_required"));
+        return;
+      }
+      if (!values.urlTemplate?.trim()) {
+        toast.error($_("settings.quick_search.error_url_template_required"));
+        return;
+      }
+
+      // Check if shortcut conflicts with a default one (case-insensitive)
+      const shortcutUpper = values.shortcut.toUpperCase();
+      const defaultConflict = defaultQuickSearchModes.some(
+        (mode) => mode.shortcut.toUpperCase() === shortcutUpper,
+      );
+      // Check if shortcut conflicts with an existing custom one (already handled by store, but good practice here too)
+      const customConflict = settingsStore.data.customQuickLinks.some(
+        (link) => link.shortcut.toUpperCase() === shortcutUpper,
+      );
+
+      if (defaultConflict || customConflict) {
+        toast.error($_("settings.quick_search.error_shortcut_conflict"));
+        return;
+      }
+
+      // Attempt to add the link via the store
+      const success = settingsStore.addCustomQuickLink(values);
+      if (success) {
+        toast.success($_("settings.quick_search.link_added"));
+        reset(); // Clear the form
+        settingsStore.persist(); // Persist changes
+      } else {
+        // This case might be redundant if the conflict check above is robust,
+        // but handles potential race conditions or other store-level issues.
+        toast.error($_("settings.quick_search.error_add_failed"));
+      }
+    },
+  });
+
+  function removeCustomLink(shortcut: string) {
+    settingsStore.removeCustomQuickLinkByShortcut(shortcut);
+    settingsStore.persist();
+    toast.success($_("settings.quick_search.link_removed"));
+  }
+  // --- End Quick Search Form Logic ---
 </script>
 
 <Shortcut keys={["meta", "1"]} callback={() => changeTab("general")} />
@@ -201,15 +258,16 @@
 <Shortcut keys={["meta", "3"]} callback={() => changeTab("permissions")} />
 <Shortcut keys={["meta", "4"]} callback={() => changeTab("calendar")} />
 
+<TopBar>
+  <div slot="input" class="grow flex-1 truncate text-lg font-semibold">
+    {$_("settings.title")}
+  </div>
+  <div slot="addon" role="tablist">
+    <SegmentedControl items={controls} alwaysShowLabels />
+  </div>
+</TopBar>
+
 <div class="flex flex-1 flex-col gap-4 p-4">
-  <TopBar>
-    <div slot="input" class="grow flex-1 truncate text-lg font-semibold">
-      {$_("settings.title")}
-    </div>
-    <div slot="addon" role="tablist">
-      <SegmentedControl items={controls} alwaysShowLabels />
-    </div>
-  </TopBar>
   <div class="flex flex-1 flex-col mt-20 mb-8 mx-8">
     {#if currentTab === "general"}
       <form class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center">
@@ -320,7 +378,7 @@
         </div>
       </form>
     {:else if currentTab === "search"}
-      <form class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center">
+      <div class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center">
         <h2 class="font-semibold col-span-2">
           {$_("settings.web")}
         </h2>
@@ -386,12 +444,13 @@
           </div>
           <div class="flex gap-2">
             <input
-              bind:this={extensionInput}
+              id="fsSearchExtensionChoice"
               type="text"
               placeholder="e.g. .txt"
               class="input flex-2/3"
+              bind:this={extensionInput}
               bind:value={extensionValue}
-              onkeydown={(e) => {
+              onkeydown={(e: KeyboardEvent) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
                   addExtension();
@@ -404,7 +463,150 @@
             >
           </div>
         </div>
-      </form>
+
+        <h2 class="font-semibold col-span-2">Quicklinks</h2>
+        <!-- Quick Search Settings Moved Here -->
+        <div class="space-y-6 col-span-2">
+          <!-- Default Quick Search Links -->
+          <div class="space-y-3">
+            <h2 class="text-sm font-semibold">
+              {$_("settings.quick_search.default_links_title")}
+            </h2>
+            <ul class="space-y-2">
+              {#each defaultQuickSearchModes as mode (mode.shortcut)}
+                <li
+                  class="flex items-center justify-between p-2 border rounded bg-primary/50"
+                >
+                  <div
+                    class="flex items-center space-x-2 text-shadow-amber-200"
+                  >
+                    <span
+                      class="flex items-center justify-center w-6 h-6 text-xs font-bold rounded bg-{mode.bgColorClass} {mode.textColorClass}"
+                    >
+                      {mode.shortcut}
+                    </span>
+                    <span>{mode.name}</span>
+                  </div>
+                  <span class="text-xs font-semibold text-muted"
+                    >{$_("settings.quick_search.default")}</span
+                  >
+                </li>
+              {/each}
+            </ul>
+          </div>
+
+          <!-- Custom Quick Search Links -->
+          <div class="space-y-3">
+            <h2 class="font-semibold">
+              {$_("settings.quick_search.custom_links_title")}
+            </h2>
+            {#if settingsStore.data.customQuickLinks.length > 0}
+              <ul class="space-y-2">
+                {#each settingsStore.data.customQuickLinks as link (link.shortcut)}
+                  <li
+                    class="flex items-center justify-between p-2 border rounded bg-primary/50"
+                  >
+                    <div class="flex items-center space-x-2">
+                      <span
+                        class="flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-gray-500 rounded"
+                      >
+                        {link.shortcut}
+                      </span>
+                      <span>{link.name}</span>
+                      <span class="text-xs text-muted"
+                        >({link.urlTemplate})</span
+                      >
+                    </div>
+                    <button
+                      onclick={() => removeCustomLink(link.shortcut)}
+                      class="p-1 text-gray-700 rounded hover:bg-destructive/20"
+                      title={$_("settings.quick_search.remove_link_tooltip")}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </li>
+                {/each}
+              </ul>
+            {:else}
+              <p class="text-sm text-muted">
+                {$_("settings.quick_search.no_custom_links")}
+              </p>
+            {/if}
+          </div>
+
+          <div class="space-y-3">
+            <h2 class="font-semibold">
+              {$_("settings.quick_search.add_new_link_title")}
+            </h2>
+            <form use:form class="space-y-4">
+              <div class="grid grid-cols-3 gap-4">
+                <div>
+                  <label
+                    for="shortcut"
+                    class="block text-sm font-medium text-muted"
+                  >
+                    {$_("settings.quick_search.form_shortcut_label")}
+                  </label>
+                  <input
+                    type="text"
+                    name="shortcut"
+                    id="shortcut"
+                    maxlength="2"
+                    class="w-full input"
+                    placeholder={$_(
+                      "settings.quick_search.form_shortcut_placeholder",
+                    )}
+                  />
+                </div>
+
+                <!-- Name -->
+                <div class="col-span-2">
+                  <label
+                    for="name"
+                    class="block text-sm font-medium text-muted"
+                  >
+                    {$_("settings.quick_search.form_name_label")}
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    id="name"
+                    class="w-full input"
+                    placeholder={$_(
+                      "settings.quick_search.form_name_placeholder",
+                    )}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label
+                  for="urlTemplate"
+                  class="block text-sm font-medium text-muted"
+                >
+                  {$_("settings.quick_search.form_url_template_label")}
+                </label>
+                <input
+                  type="text"
+                  name="urlTemplate"
+                  id="urlTemplate"
+                  class="w-full input"
+                  placeholder={$_(
+                    "settings.quick_search.form_url_template_placeholder",
+                  )}
+                />
+                <p class="mt-1 text-xs text-muted">
+                  {$_("settings.quick_search.form_url_template_hint")}
+                </p>
+              </div>
+
+              <button type="submit" class="btn btn-primary">
+                {$_("settings.quick_search.add_button")}
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
     {:else if currentTab === "permissions"}
       <form class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center">
         <label class="text-sm"

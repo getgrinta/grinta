@@ -13,7 +13,12 @@ import {
   checkFullDiskAccessPermission,
 } from "tauri-plugin-macos-permissions-api";
 import { activateAppByName, getLastFocusedWindowName } from "../grinta-invoke";
-import { SettingsSchema, type Settings } from "@getgrinta/core";
+import { SettingsSchema } from "@getgrinta/core";
+import { z } from "zod";
+import type { CustomQuickLink } from "@getgrinta/core";
+
+// Infer the Settings type directly from the schema
+type Settings = z.infer<typeof SettingsSchema>;
 
 async function toggleShortcutHandler(event: ShortcutEvent) {
   if (!appStore.appWindow) return;
@@ -87,6 +92,34 @@ export class SettingsStore extends SecureStore<Settings> {
   async wipeLocalData() {
     await notesStore.clearNotes();
     await commandsStore.clearHistory();
+  }
+
+  addCustomQuickLink(link: CustomQuickLink) {
+    // Ensure shortcut doesn't already exist (case-insensitive check)
+    const shortcutUpper = link.shortcut.toUpperCase();
+    const exists = this.data.customQuickLinks.some(
+      (existingLink) => existingLink.shortcut.toUpperCase() === shortcutUpper,
+    );
+
+    if (exists) {
+      console.warn(
+        `Custom quick link with shortcut "${link.shortcut}" already exists.`,
+      );
+      // Optionally throw an error or return a status
+      return false;
+    }
+
+    const updatedLinks = [...this.data.customQuickLinks, link];
+    this.updateData({ customQuickLinks: updatedLinks });
+    return true;
+  }
+
+  removeCustomQuickLinkByShortcut(shortcutToRemove: string) {
+    const shortcutUpper = shortcutToRemove.toUpperCase();
+    const updatedLinks = this.data.customQuickLinks.filter(
+      (link) => link.shortcut.toUpperCase() !== shortcutUpper,
+    );
+    this.updateData({ customQuickLinks: updatedLinks });
   }
 }
 

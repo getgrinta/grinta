@@ -16,7 +16,7 @@
   import { APP_MODE } from "@getgrinta/core";
   import { exit } from "@tauri-apps/plugin-process";
   import { _ } from "svelte-i18n";
-  import Shortcut from "./shortcut.svelte";
+  import Shortcut from "../shortcut.svelte";
   import { calendarStore } from "$lib/store/calendar.svelte"; // Import calendarStore instance
   import { CalendarAuthorizationStatus } from "$lib/types/calendar"; // Import Enum
 
