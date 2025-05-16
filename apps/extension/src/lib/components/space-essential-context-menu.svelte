@@ -7,12 +7,13 @@
   type Props = ContextMenu.RootProps & {
     children: Snippet;
     index: number;
+    groupName: string;
   };
 
-  let { open = $bindable(false), index, children }: Props = $props();
+  let { open = $bindable(false), index, groupName, children }: Props = $props();
 
   function handleRemove() {
-    // sendMessage("grinta_removeEssential", { tabId }, "background");
+    sendMessage("grinta_removeEssential", { groupName, index }, "background");
     open = false;
   }
 </script>

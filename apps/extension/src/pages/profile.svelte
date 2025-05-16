@@ -5,7 +5,7 @@
   import { tabsStore } from "$lib/store/tabs.svelte";
   import { useRsv } from "@ryuz/rsv";
   import { SettingsIcon, PlusIcon } from "lucide-svelte";
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { toast } from "svelte-sonner";
   import { sendMessage } from "webext-bridge/popup";
 
@@ -80,6 +80,10 @@
 
   onMount(() => {
     fetchSubscriptions();
+  });
+
+  onDestroy(() => {
+    stopSubscriptionCheck();
   });
 
   $effect(() => {

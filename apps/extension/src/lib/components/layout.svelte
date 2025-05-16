@@ -37,12 +37,14 @@
       <button
         class={clsx({ "dock-active": router.path === "/" })}
         onclick={openTabs}
+        aria-label="View Tabs"
       >
         <ListIcon size={20} />
       </button>
       <button
         class={clsx({ "dock-active": router.path?.includes("/chats") })}
         onclick={openAgent}
+        aria-label="Open Agent"
       >
         <SparklesIcon size={20} />
       </button>

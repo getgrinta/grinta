@@ -45,7 +45,7 @@
 
   function getTabByOrigin(origin: string) {
     return tabsStore.tabs.find((tab) => {
-      if (!tab.url) return;
+      if (!tab.url) return false;
       return new URL(tab.url).origin === origin;
     });
   }
@@ -56,11 +56,14 @@
     {@const url = new URL(essential.url)}
     {@const active = currentOrigin === url.origin}
     {@const essentialTab = getTabByOrigin(url.origin)}
-    <SpaceEssentialContextMenu {index}>
+    {@const src =
+      essentialTab?.favIconUrl ??
+      `https://www.google.com/s2/favicons?domain=${url.hostname}`}
+    <SpaceEssentialContextMenu groupName={currentSpace?.title ?? ""} {index}>
       <div class="tooltip tooltip-bottom" data-tip={essential.title}>
         <button
           class={clsx(
-            "btn btn-square",
+            "btn btn-square relative overflow-hidden",
             active && colorVariant[(currentSpace?.color as never) ?? "gray"],
           )}
           onclick={() => handleClick(essential)}
@@ -74,8 +77,11 @@
           }}
         >
           <img
-            src={essentialTab?.favIconUrl ??
-              `https://www.google.com/s2/favicons?domain=${url.hostname}`}
+            {src}
+            class="absolute inset-0 blur-lg w-8 h-8 rounded-full bg-white pointer-events-none opacity-40"
+          />
+          <img
+            {src}
             class="w-6 h-6 rounded-full bg-white pointer-events-none"
           />
         </button>

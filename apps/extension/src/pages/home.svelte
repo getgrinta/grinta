@@ -94,7 +94,9 @@
   function handleDrop(state: DragDropState<{ index: string }>) {
     const { draggedItem, targetContainer } = state;
     const dragIndex = parseInt(draggedItem.index);
-    const dropIndex = parseInt(targetContainer ?? "0");
+    const dropIndex = Number.isFinite(Number(targetContainer))
+      ? parseInt(targetContainer!)
+      : 0;
     const fromId = spaceTabs[dragIndex].id;
     const toId = spaceTabs[dropIndex].id;
     sendMessage(
@@ -134,7 +136,6 @@
   }
 
   function handleShortcuts(event: KeyboardEvent) {
-    console.log(event);
     const spaceKeys = [
       "Digit1",
       "Digit2",

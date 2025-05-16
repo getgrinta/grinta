@@ -6,6 +6,7 @@ import { aiLimitGuard, createRouter } from "../utils/router.utils.js";
 import { schema } from "../db/schema.js";
 import { eq } from "drizzle-orm";
 import { until } from "@open-draft/until";
+// @ts-expect-error
 import { ChatMessageSchema } from "@getgrinta/core";
 import { stream } from "hono/streaming";
 import { ElevenLabsClient } from "elevenlabs";
@@ -45,7 +46,6 @@ export const TranscribeResult = z.object({
 });
 
 export const StreamParamsSchema = z.object({
-  // @ts-expect-error - won't fix
   messages: z.array(ChatMessageSchema),
 });
 
@@ -132,6 +132,10 @@ const SPEECH_ROUTE = createRoute({
       description: "Speech to text",
       content: { "application/json": { schema: TranscribeResult } },
     },
+    400: {
+      description: "Bad Request",
+      content: { "text/plain": { schema: z.string() } },
+    },
     401: {
       description: "Unauthorized",
       content: { "text/plain": { schema: z.string() } },
@@ -199,6 +203,10 @@ export const aiRouter = createRouter()
       }) as never;
     } catch (error) {
       console.error(error);
+      await db
+        .update(schema.aiUsage)
+        .set({ state: "error" })
+        .where(eq(schema.aiUsage.id, aiUsage.id));
       return c.text("Internal Server Error", 500);
     }
   })
@@ -212,18 +220,33 @@ export const aiRouter = createRouter()
       .returning();
     try {
       const formData = await c.req.formData();
-      const transcription = await elevenLabsClient.speechToText.convert({
-        file: formData.get("speech") as File,
-        model_id: "scribe_v1",
-        diarize: false,
-      });
-      await db
-        .update(schema.aiUsage)
-        .set({ state: "success" })
-        .where(eq(schema.aiUsage.id, aiUsage.id));
-      return c.json({ text: transcription.text }, 200);
+      const file = formData.get("speech");
+      if (!(file instanceof File)) return c.text("Missing audio file", 400);
+      try {
+        const transcription = await elevenLabsClient.speechToText.convert({
+          file,
+          model_id: "scribe_v1",
+          diarize: false,
+        });
+        await db
+          .update(schema.aiUsage)
+          .set({ state: "success" })
+          .where(eq(schema.aiUsage.id, aiUsage.id));
+        return c.json({ text: transcription.text }, 200);
+      } catch (error) {
+        console.error(error);
+        await db
+          .update(schema.aiUsage)
+          .set({ state: "error" })
+          .where(eq(schema.aiUsage.id, aiUsage.id));
+        return c.text("Internal Server Error", 500);
+      }
     } catch (error) {
       console.error(error);
+      await db
+        .update(schema.aiUsage)
+        .set({ state: "error" })
+        .where(eq(schema.aiUsage.id, aiUsage.id));
       return c.text("Internal Server Error", 500);
     }
   })

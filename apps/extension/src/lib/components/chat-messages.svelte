@@ -32,9 +32,13 @@
   };
   marked.use({ renderer });
 
-  function copyToClipboard(text: string) {
-    navigator.clipboard.writeText(text);
-    toast.success("Copied to clipboard");
+  async function copyToClipboard(text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success("Copied to clipboard");
+    } catch {
+      toast.error("Unable to access clipboard");
+    }
   }
 
   function getToolName(toolName: string) {
@@ -57,7 +61,7 @@
       {#if message.experimental_attachments?.length > 0}
         <div class="flex flex-row justify-end gap-2">
           {#each message.experimental_attachments as attachment}
-            <dialog id="my_modal_2" class="modal">
+            <dialog id="gallery_modal" class="modal">
               <div class="modal-box p-0">
                 {#if attachment.contentType === "image/jpeg"}
                   <img
@@ -74,7 +78,7 @@
             <button
               onclick={() => {
                 if (attachment.contentType !== "image/jpeg") return;
-                document.getElementById("my_modal_2")?.showModal();
+                document.getElementById("gallery_modal")?.showModal();
               }}
               class="avatar border border-base-300 rounded-lg cursor-pointer"
               title={attachment.name}

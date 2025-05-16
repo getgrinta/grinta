@@ -26,13 +26,12 @@ onMessage("grinta_getContent", (message) => {
 
 onMessage(
   "grinta_clickElement",
-  (message: BridgeMessage<{ selector: string }>) => {
+  async (message: BridgeMessage<{ selector: string }>) => {
     if (message.sender.context !== "content-script") return;
-    const element = document.querySelector(
-      message.data.selector,
-    ) as HTMLElement;
-    element.scrollIntoView();
-    user.click(element);
+    const element = document.querySelector(message.data.selector);
+    if (!element) return { error: "Element not found" };
+    (element as HTMLElement).scrollIntoView();
+    await user.click(element as HTMLElement);
     return true;
   },
 );

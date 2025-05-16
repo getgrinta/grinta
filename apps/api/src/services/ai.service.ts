@@ -15,7 +15,7 @@ import { CONTENT_TYPE, type ContentType } from "../routers/ai.router.js";
 // @ts-expect-error - it is exported
 import { type ChatMessageData } from "@getgrinta/core";
 
-const RESPONSE_REGEX = /<response>(.*?)<\/response>/;
+const RESPONSE_REGEX = /<response>([\s\S]*?)<\/response>/;
 
 export const ModelSchema = z.object({
   label: z.string(),

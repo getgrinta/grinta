@@ -482,6 +482,16 @@ async function swapEssentials(
   return _moveBookmark(toBookmark.id, fromBookmark.index ?? 0, folder.id);
 }
 
+async function removeEssential(
+  message: BridgeMessage<{ groupName: string; index: number }>,
+) {
+  const folder = await _findEssentialsFolder(message.data.groupName);
+  const folderChildren = await chrome.bookmarks.getChildren(folder.id);
+  const bookmark = folderChildren[message.data.index];
+  if (!bookmark) return;
+  await chrome.bookmarks.remove(bookmark.id);
+}
+
 onMessage("grinta_getTabs", getTabs);
 onMessage("grinta_activateTab", activateTab);
 onMessage("grinta_swapTabs", swapTabs);
@@ -516,6 +526,7 @@ onMessage("grinta_updateState", debouncedStateUpdate);
 onMessage("grinta_openEssential", openEssential);
 onMessage("grinta_getCurrentTab", getCurrentTab);
 onMessage("grinta_swapEssentials", swapEssentials);
+onMessage("grinta_removeEssential", removeEssential);
 
 runtime.onInstalled.addListener(() => {
   if (__BROWSER__ === "chrome") {
@@ -538,4 +549,5 @@ if (__BROWSER__ === "chrome") {
 bookmarks.onCreated.addListener(debouncedStateUpdate);
 bookmarks.onRemoved.addListener(debouncedStateUpdate);
 bookmarks.onChanged.addListener(debouncedStateUpdate);
+bookmarks.onMoved.addListener(debouncedStateUpdate);
 runtime.onConnect.addListener(debouncedStateUpdate);

@@ -77,6 +77,7 @@ export class ChatsStore extends PersistedStore<Chats> {
 
   async deleteChat(chatId: string) {
     const { index } = this.getChat(chatId);
+    if (index === -1) return; // nothing to delete
     this.data.chats.splice(index, 1);
     await this.persist();
   }

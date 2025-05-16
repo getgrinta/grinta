@@ -10,9 +10,19 @@
   }>();
 </script>
 
-<SidebarTab tab={treeNodeTab.tab} {draggableConfig} {droppableConfig} />
+<SidebarTab
+  tab={treeNodeTab.tab}
+  color="grey"
+  {draggableConfig}
+  {droppableConfig}
+/>
 <div class="flex flex-col ml-4">
   {#each treeNodeTab.children as nestedTab}
-    <SidebarTab tab={nestedTab.tab} {draggableConfig} {droppableConfig} />
+    <SidebarTab
+      tab={nestedTab.tab}
+      color="grey"
+      {draggableConfig}
+      {droppableConfig}
+    />
   {/each}
 </div>
