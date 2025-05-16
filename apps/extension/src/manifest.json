@@ -1,0 +1,60 @@
+{
+  "{{chrome}}.manifest_version": 3,
+  "{{firefox}}.manifest_version": 2,
+  "icons": {
+    "16": "icon/16.png",
+    "32": "icon/32.png",
+    "48": "icon/48.png",
+    "96": "icon/96.png",
+    "128": "icon/128.png"
+  },
+  "{{chrome}}.side_panel": {
+    "default_path": "src/sidebar.html"
+  },
+  "{{chrome}}.action": {
+    "default_title": "Click to open panel"
+  },
+  "{{firefox}}.sidebar_action": {
+    "default_title": "Click to open panel",
+    "default_panel": "src/sidebar.html"
+  },
+  "background": {
+    "{{chrome}}.service_worker": "src/lib/background/index.ts",
+    "{{firefox}}.scripts": ["src/lib/background/index.ts"],
+    "{{firefox}}.persistent": true
+  },
+  "{{chrome}}.permissions": [
+    "sidePanel",
+    "tabs",
+    "storage",
+    "tabGroups",
+    "bookmarks"
+  ],
+  "{{firefox}}.permissions": ["tabs", "storage", "bookmarks"],
+  "host_permissions": ["<all_urls>"],
+  "content_scripts": [
+    {
+      "matches": ["https://*/*", "http://*/*"],
+      "js": ["src/lib/rpc/inject.ts"],
+      "all_frames": true
+    }
+  ],
+  "{{chrome}}.web_accessible_resources": [
+    {
+      "resources": ["provider.js"],
+      "matches": ["https://*/*", "http://*/*"]
+    }
+  ],
+  "{{firefox}}.web_accessible_resources": ["provider.js"],
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "windows": "Alt+G",
+        "mac": "Alt+G",
+        "chromeos": "Alt+G",
+        "linux": "Alt+G"
+      },
+      "description": "Open Grinta"
+    }
+  }
+}

@@ -211,3 +211,18 @@ export const SettingsSchema = z.object({
   ignoredEventIds: z.array(z.string()).default([]),
   customQuickLinks: z.array(CustomQuickLinkSchema).default([]),
 });
+
+export const AttachmentSchema = z.object({
+  name: z.string(),
+  contentType: z.string(),
+  url: z.string(),
+});
+
+export const ChatMessageSchema = z.object({
+  id: z.string().optional(),
+  content: z.string(),
+  experimental_attachments: z.array(AttachmentSchema).default([]),
+  role: z.enum(["system", "user", "assistant", "data"]),
+  createdAt: z.coerce.date().optional(),
+  parts: z.any(),
+});

@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "build": "turbo build",
+    "build:extension": "turbo build --filter @getgrinta/extension",
     "build:deps": "turbo build --filter @getgrinta/core --filter @getgrinta/plugin* --filter @getgrinta/api",
     "watch:deps": "turbo watch build --filter @getgrinta/core --filter @getgrinta/plugin* --filter @getgrinta/api",
     "dev": "turbo dev",

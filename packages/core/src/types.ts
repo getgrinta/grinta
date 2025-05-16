@@ -1,11 +1,12 @@
 import type { z } from "zod";
 import type {
-	APP_MODE,
-	COMMAND_HANDLER,
-	ExecutableCommandSchema,
-	MetadataSchema,
-	SEARCH_ENGINE,
-	SettingsSchema,
+  APP_MODE,
+  COMMAND_HANDLER,
+  ExecutableCommandSchema,
+  ChatMessageSchema,
+  MetadataSchema,
+  SEARCH_ENGINE,
+  SettingsSchema,
 } from "./schema";
 
 export type AppMode = keyof typeof APP_MODE;
@@ -21,8 +22,10 @@ export type SearchEngine = keyof typeof SEARCH_ENGINE;
 export type Settings = z.infer<typeof SettingsSchema>;
 
 export type Note = {
-	title: string;
-	filename: string;
-	path: string;
-	updatedAt: string;
+  title: string;
+  filename: string;
+  path: string;
+  updatedAt: string;
 };
+
+export type ChatMessageData = z.infer<typeof ChatMessageSchema>;
