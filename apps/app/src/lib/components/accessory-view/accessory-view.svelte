@@ -69,7 +69,7 @@
         <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
         <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
         <LeafletMap options={mapOptions}>
-          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          <TileLayer url={DEFAULT_TILE_URL} />
           <Marker latLng={[mapOptions.center[0], mapOptions.center[1]]} />
         </LeafletMap>
       </div>
