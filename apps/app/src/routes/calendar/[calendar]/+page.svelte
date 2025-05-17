@@ -200,6 +200,7 @@
     const urlRegex =
       /(\b(https?|ftp):\/\/[-A-Z0-9+&@#/%?=~_|!:,.;]*[-A-Z0-9+&@#/%=~_|])|(\bwww\.[-A-Z0-9+&@#/%?=~_|!:,.;]*[-A-Z0-9+&@#/%=~_|])/gi;
     const linkedText = text
+      // Remove Google Calendar delimiters
       .replace(
         "-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\n",
         "",
@@ -208,6 +209,9 @@
         "\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-",
         "",
       )
+      // Remove Apple Calendar delimiters
+      .replace(/^----\( [a-zA-Z]+ \)----\n\[FaceTime\]\n/, "")
+      .replace("---===---", "")
       .replace(urlRegex, (match, p1, p2, p3) => {
         const actualUrl = p1 ? p1 : `http://${p3}`;
         const linkText = p1 ? p1 : p3;

@@ -77,12 +77,12 @@
   {:else if props.mode?.type === "single"}
     <div class="relative p-2 flex w-full h-[120px] items-center text-center">
       <div
-        class="view-item mx-2 justify-items-center align-center flex-1 bg-[#e6e6e6] dark:bg-gray-700 rounded-xl h-[100px] text-xl flex border-2 border-[#ddd] dark:border-gray-600 items-center font-medium justify-center"
+        class="view-item mx-2 justify-items-center align-center flex-1 bg-base-300/50 rounded-xl h-[100px] text-xl flex border-2 border-base-300 items-center font-medium justify-center"
       >
         <!-- svelte-ignore a11y_click_events_have_key_events -->
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <span
-          class="block cursor-pointer truncate"
+          class="block cursor-pointer text-base-content truncate"
           onclick={copyText}
           title="Click to copy"
         >
@@ -93,19 +93,19 @@
           {#if props.isCopyable}
             <button
               onclick={copyText}
-              class="p-1 cursor-pointer rounded hover:bg-gray-200 dark:hover:bg-gray-700"
               title={"Copy"}
+              class="btn btn-ghost btn-sm"
             >
-              <Copy class="w-4 h-4" color="#666" />
+              <Copy class="w-4 h-4 text-base-content" />
             </button>
           {/if}
           {#if props.isRefreshable}
             <button
               onclick={refreshText}
-              class="p-1 cursor-pointer rounded hover:bg-gray-200 dark:hover:bg-gray-700"
               title="Refresh"
+              class="btn btn-ghost btn-sm"
             >
-              <RefreshCw class="w-4 h-4" color="#666" />
+              <RefreshCw class="w-4 h-4 text-base-content" />
             </button>
           {/if}
         </div>
