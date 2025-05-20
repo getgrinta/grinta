@@ -1,5 +1,6 @@
 {
   "name": "@getgrinta/extension",
+  "description": "Agentic web browsing with privacy in mind.",
   "private": true,
   "version": "1.0.0",
   "type": "module",

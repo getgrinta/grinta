@@ -1,66 +1,146 @@
 @import "tailwindcss";
 @plugin "daisyui" {
-	themes: night --default;
+  themes:
+    light --default,
+    dark --prefersdark;
+}
+
+@plugin "daisyui/theme" {
+  name: "light";
+  default: false;
+  prefersdark: false;
+  color-scheme: "light";
+  --color-base-100: oklch(100% 0 0);
+  --color-base-200: oklch(98% 0 0);
+  --color-base-300: oklch(95% 0 0);
+  --color-base-content: oklch(21% 0.006 285.885);
+  --color-primary: oklch(42% 0.199 265.638);
+  --color-primary-content: oklch(93% 0.032 255.585);
+  --color-secondary: oklch(70% 0.183 293.541);
+  --color-secondary-content: oklch(94% 0.033 307.174);
+  --color-accent: oklch(51% 0.096 186.391);
+  --color-accent-content: oklch(90% 0.093 164.15);
+  --color-neutral: oklch(14% 0.005 285.823);
+  --color-neutral-content: oklch(92% 0.004 286.32);
+  --color-info: oklch(82% 0.111 230.318);
+  --color-info-content: oklch(29% 0.066 243.157);
+  --color-success: oklch(77% 0.152 181.912);
+  --color-success-content: oklch(37% 0.077 168.94);
+  --color-warning: oklch(94% 0.129 101.54);
+  --color-warning-content: oklch(27% 0.077 45.635);
+  --color-error: oklch(71% 0.194 13.428);
+  --color-error-content: oklch(27% 0.105 12.094);
+  --radius-selector: 1rem;
+  --radius-field: 1rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
+
+@plugin "daisyui/theme" {
+  name: "dark";
+  default: false;
+  prefersdark: false;
+  color-scheme: "dark";
+  --color-base-100: oklch(25.33% 0.016 252.42);
+  --color-base-200: oklch(23.26% 0.014 253.1);
+  --color-base-300: oklch(21.15% 0.012 254.09);
+  --color-base-content: oklch(97.807% 0.029 256.847);
+  --color-primary: oklch(70% 0.165 254.624);
+  --color-primary-content: oklch(28% 0.091 267.935);
+  --color-secondary: oklch(81% 0.111 293.571);
+  --color-secondary-content: oklch(28% 0.141 291.089);
+  --color-accent: oklch(85% 0.138 181.071);
+  --color-accent-content: oklch(38% 0.063 188.416);
+  --color-neutral: oklch(14% 0.005 285.823);
+  --color-neutral-content: oklch(92% 0.004 286.32);
+  --color-info: oklch(82% 0.111 230.318);
+  --color-info-content: oklch(29% 0.066 243.157);
+  --color-success: oklch(85% 0.138 181.071);
+  --color-success-content: oklch(37% 0.077 168.94);
+  --color-warning: oklch(92% 0.12 95.746);
+  --color-warning-content: oklch(41% 0.112 45.904);
+  --color-error: oklch(71% 0.194 13.428);
+  --color-error-content: oklch(27% 0.105 12.094);
+  --radius-selector: 1rem;
+  --radius-field: 1rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+html {
+  @apply scroll-smooth;
 }
 
 body {
-	--sl-color-bg-sidebar: #0c0c0e;
-	--sl-color-hairline-shade: #2d2d2d;
-	--sl-color-bg-nav: #0c0c0e;
-	@apply bg-base-100;
-}
-
-header.header {
-	@apply bg-base-100/80 backdrop-blur-lg;
+  @apply font-[Geist];
 }
 
 .hero {
-	display: none;
-}
-
-[data-open-modal] {
-	@apply !rounded-full !border-2 !border-primary;
+  display: none;
 }
 
 .blueprint {
-	background-color: #0b1130;
-	background-image: linear-gradient(rgba(41, 56, 145, 0.5) 2px, transparent 2px),
-		linear-gradient(90deg, rgba(41, 56, 145, 0.5) 2px, transparent 2px),
-		linear-gradient(rgba(41, 56, 145, 0.28) 1px, transparent 1px),
-		linear-gradient(90deg, rgba(41, 56, 145, 0.28) 1px, transparent 1px);
-	background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
-	background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
+  background-color: #0b1130;
+  background-image:
+    linear-gradient(rgba(41, 56, 145, 0.5) 2px, transparent 2px),
+    linear-gradient(90deg, rgba(41, 56, 145, 0.5) 2px, transparent 2px),
+    linear-gradient(rgba(41, 56, 145, 0.28) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(41, 56, 145, 0.28) 1px, transparent 1px);
+  background-size:
+    100px 100px,
+    100px 100px,
+    20px 20px,
+    20px 20px;
+  background-position:
+    -2px -2px,
+    -2px -2px,
+    -1px -1px,
+    -1px -1px;
 }
 
 .border-gradient::before {
-	content: "";
-	mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-	mask-composite: exclude;
-	@apply content-[''] absolute inset-0 pointer-events-none rounded-[1.5rem] p-[2px] bg-gradient-to-b from-zinc-900 to-zinc-600;
+  content: "";
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  @apply content-[''] absolute inset-0 pointer-events-none rounded-[1.5rem] p-[2px] bg-gradient-to-b from-zinc-900 to-zinc-600;
 }
 
 .border-gradient-reverse::before {
-	@apply from-zinc-600 to-zinc-900;
+  @apply from-zinc-600 to-zinc-900;
 }
 
 .border-gradient-special::before {
-	content: "";
-	mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-	mask-composite: exclude;
-	@apply content-[''] absolute inset-0 pointer-events-none rounded-[1.5rem] p-[2px] bg-gradient-to-br from-blue-600 to-indigo-300;
+  content: "";
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  @apply content-[''] absolute inset-0 pointer-events-none rounded-[1.5rem] p-[2px] bg-gradient-to-br from-blue-600 to-indigo-300;
 }
 
 .bg-lines {
-	@apply bg-zinc-900;
-	background-image: url("/lines.svg");
-	background-repeat: no-repeat;
-	background-size: 75%;
-	background-position: 220% -140%;
+  @apply bg-zinc-900;
+  background-image: url("/lines.svg");
+  background-repeat: no-repeat;
+  background-size: 75%;
+  background-position: 220% -140%;
 }
 
 .grinta-pro {
-	background-image: url("/pro.svg");
-	background-repeat: no-repeat;
-	background-position: center;
-	background-size: cover;
+  background-image: url("/pro.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
 }

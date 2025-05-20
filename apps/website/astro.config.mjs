@@ -3,7 +3,6 @@ import svelte from "@astrojs/svelte";
 import tailwindcss from "@tailwindcss/vite";
 // @ts-check
 import { defineConfig } from "astro/config";
-import starlightBlog from "starlight-blog";
 
 // https://astro.build/config
 export default defineConfig({
@@ -15,13 +14,22 @@ export default defineConfig({
     starlight({
       title: "Grinta",
       logo: {
-        src: "./public/logo.svg",
+        light: "./public/logo-dark.svg",
+        dark: "./public/logo.svg",
         replacesTitle: true,
       },
-      social: {
-        github: "https://github.com/getgrinta/grinta",
-        "x.com": "https://x.com/getgrinta",
-      },
+      social: [
+        {
+          icon: "github",
+          label: "GitHub",
+          href: "https://grnt.me/github",
+        },
+        {
+          icon: "x.com",
+          label: "X",
+          href: "https://grnt.me/x",
+        },
+      ],
       sidebar: [
         {
           label: "Guides",
@@ -90,11 +98,6 @@ export default defineConfig({
           },
         },
       ],
-      components: {
-        ThemeProvider: "./src/components/theme.astro",
-        ThemeSelect: "./src/components/theme-select.astro",
-      },
-      plugins: [starlightBlog({ title: "Changelog" })],
     }),
     svelte(),
   ],
