@@ -1,0 +1,26 @@
+---
+// eslint-disable
+import '../tailwind.css'
+import BaseLayout from "../layouts/base-layout.astro"
+import LandingNavbar from "../components/landing-navbar.astro"
+import Hero from "../components/hero.astro"
+import GrintaPreview from "../components/grinta-preview.astro"
+import DownloadGrinta from "../components/download-grinta.svelte"
+import Features from '../components/features.astro'
+import DownloadWave from "../components/download-wave.astro"
+import Pro from "../components/pro.astro"
+import Stories from "../components/stories.svelte"
+import Footer from "../components/footer.astro"
+---
+
+<BaseLayout title="Grinta">
+    <LandingNavbar />
+    <Hero />
+    <GrintaPreview />   
+    <DownloadGrinta />
+    <Features />
+    <DownloadWave />
+    <Pro />
+    <Stories client:only />
+    <Footer />
+</BaseLayout>

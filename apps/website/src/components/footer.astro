@@ -1,127 +1,88 @@
 ---
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// eslint-disable
+import TinyThemeSwitch from "./tiny-theme-switch.svelte";
 const year = new Date().getFullYear();
 ---
 
 <footer
-    class="flex flex-col lg:grid lg:grid-cols-4 gap-8 !mt-40 !pt-12 !pb-8 border-t border-zinc-800"
+    class="container p-4 xl:p-0 max-w-[80rem] mx-auto mt-32 mb-16 grid grid-cols-1 lg:grid-cols-4 gap-8"
 >
-    <div class="flex flex-col col-span-1 lg:col-span-1">
-        <img src="/logo.svg" width={128} alt="Grinta Logo" class="!mb-4" />
-        <p class="text-lg font-semibold">Spotlight redefined.</p>
-        <p class="text-gray-400">© {year} Grinta. All rights reserved.</p>
-        <p class="text-gray-400">Made in 🇪🇺 Europe</p>
+    <div class="flex flex-col col-span-1 lg:col-span-2 gap-2">
+        <img src="/logo.svg" width={128} alt="Grinta Logo" class="!mb-4 invert-100 dark:invert-0" />
+        <p>© {year} Grinta. All rights reserved.</p>
+        <p>Made in 🇪🇺 Europe</p>
+        <div class="flex gap-2 items-center">
+            <TinyThemeSwitch client:only />
+            <div class="rounded-full h-7 overflow-hidden border border-base-300">
+                <a class="github-button" href="https://github.com/getgrinta/grinta" data-color-scheme="no-preference: dark; light: dark; dark: light;" data-size="large" data-show-count="true" aria-label="Star getgrinta/grinta on GitHub">Star</a>
+            </div>
+            <a class="btn btn-sm" href="https://grinta.userjot.com/" target="_blank" rel="noopener noreferrer">Submit feedback</a>
+        </div>
     </div>
-
-    <div
-        class="flex flex-col items-start justify-between sm:flex-row sm:flex-wrap gap-8 sm:gap-x-16 lg:gap-8 col-span-3 pr-32"
-    >
-        <div class="flex flex-col !m-0">
-            <h3 class="!text-xl font-semibold !mb-4">Product</h3>
-            <ul class="space-y-2 !m-0 pl-4">
-                <li>
-                    <a
-                        href="/guides"
-                        class="text-gray-400 hover:text-white transition-colors"
-                        >Docs</a
-                    >
-                </li>
-                <li>
-                    <a
-                        href="/blog"
-                        class="text-gray-400 hover:text-white transition-colors"
-                        >Changelog</a
-                    >
-                </li>
-                <li>
-                    <a
-                        href="/privacy-policy"
-                        class="text-gray-400 hover:text-white transition-colors"
-                        >Privacy Policy</a
-                    >
-                </li>
-                <li>
-                    <a
-                        href="/terms-of-service"
-                        class="text-gray-400 hover:text-white transition-colors"
-                        >Terms of Service</a
-                    >
-                </li>
-            </ul>
-        </div>
-
-        <div class="flex flex-col !m-0">
-            <h3 class="!text-xl font-semibold !mb-4">Features</h3>
-            <ul class="space-y-2 !m-0 pl-4">
-                <li>
-                    <a
-                        href="/features/search"
-                        class="text-gray-400 hover:text-white transition-colors"
-                        >Search</a
-                    >
-                </li>
-                <li>
-                    <a
-                        href="/features/nlp"
-                        class="text-gray-400 hover:text-white transition-colors"
-                        >Natural Language</a
-                    >
-                </li>
-                <li>
-                    <a
-                        href="/features/shortcuts"
-                        class="text-gray-400 hover:text-white transition-colors"
-                        >Shortcuts</a
-                    >
-                </li>
-                <li>
-                    <a
-                        href="/features/calculator"
-                        class="text-gray-400 hover:text-white transition-colors"
-                        >Calculator</a
-                    >
-                </li>
-            </ul>
-        </div>
-
-        <div class="flex flex-col !m-0">
-            <h3 class="!text-xl font-semibold !mb-4">Connect</h3>
-            <ul class="space-y-2 !m-0 pl-4">
-                <li>
-                    <a
-                        href="https://github.com/getgrinta/grinta"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="text-gray-400 hover:text-white transition-colors"
-                        >GitHub</a
-                    >
-                </li>
-                <li>
-                    <a
-                        href="https://x.com/getgrinta"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="text-gray-400 hover:text-white transition-colors"
-                        >X / Twitter</a
-                    >
-                </li>
-                <li>
-                    <a
-                        href="mailto:team@getgrinta.com"
-                        class="text-gray-400 hover:text-white transition-colors"
-                        >Contact</a
-                    >
-                </li>
-                <li>
-                    <a
-                        href="https://status.getgrinta.com/status/grinta"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="text-gray-400 hover:text-white transition-colors"
-                        >Status</a
-                    >
-                </li>
-            </ul>
-        </div>
+    <div class="flex flex-col">
+        <h3 class="text-xl font-semibold mb-4">Product</h3>
+        <ul class="space-y-2">
+            <li>
+                <a
+                    href="/guides"
+                    >Docs</a
+                >
+            </li>
+            <li>
+                <a
+                    href="https://grinta.userjot.com/updates"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >Updates</a
+                >
+            </li>
+            <li>
+                <a
+                    href="/privacy-policy"
+                    >Privacy Policy</a
+                >
+            </li>
+            <li>
+                <a
+                    href="/terms-of-service"
+                    >Terms of Service</a
+                >
+            </li>
+        </ul>
+    </div>
+    <div class="flex flex-col">
+        <h3 class="text-xl font-semibold mb-4">Connect</h3>
+        <ul class="space-y-2">
+            <li>
+                <a
+                    href="https://grnt.me/github"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >GitHub</a
+                >
+            </li>
+            <li>
+                <a
+                    href="https://grnt.me/x"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >X / Twitter</a
+                >
+            </li>
+            <li>
+                <a
+                    href="mailto:team@getgrinta.com"
+                    >Contact</a
+                >
+            </li>
+            <li>
+                <a
+                    href="https://grnt.me/status"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >Status</a
+                >
+            </li>
+        </ul>
     </div>
 </footer>

@@ -1,0 +1,42 @@
+---
+// eslint-disable
+import { DotIcon } from "lucide-svelte";
+---
+
+<section
+  class="container mx-auto max-w-[80rem] relative flex flex-col justify-center items-center py-32 rounded-none xl:rounded-[2rem] mt-12 xl:mt-24"
+>
+  <img
+    src="/hero.gif"
+    alt="Grinta Hero"
+    class="absolute inset-0 w-full h-full object-cover rounded-none xl:rounded-[2rem]"
+  />
+  <div
+    class="hidden dark:flex absolute inset-0 w-full h-full bg-black opacity-50 rounded-none xl:rounded-[2rem]"
+  ></div>
+  <div class="flex flex-col items-center justify-center gap-8 z-10">
+    <h1 class="font-[Cal_Sans] text-5xl lg:text-7xl text-center">
+      Productivity<br />with privacy in mind
+    </h1>
+    <p class="text-xl lg:text-2xl font-semibold text-center">
+      Grinta is a new, agentic approach to computer and web interaction
+    </p>
+    <div class="flex flex-col lg:flex-row gap-4">
+      <a href="#downloadGrinta" class="btn btn-xl btn-primary rounded-3xl w-full lg:w-auto">Download Grinta</a
+      >
+      <a href="#downloadWave" class="btn btn-xl btn-neutral rounded-3xl w-full lg:w-auto">Download Wave</a>
+    </div>
+  </div>
+</section>
+
+<div class="hidden lg:flex items-center justify-center mx-auto mt-16">
+  <ul
+    class="flex items-center justify-center gap-4 border-2 rounded-full border-primary py-2 px-4"
+  >
+    <li class="text-primary font-semibold">Open Source</li>
+    <li><DotIcon class="text-primary" /></li>
+    <li class="text-primary font-semibold">Privacy-preserving</li>
+    <li><DotIcon class="text-primary" /></li>
+    <li class="text-primary font-semibold">Agentic</li>
+  </ul>
+</div>

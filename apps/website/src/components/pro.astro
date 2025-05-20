@@ -1,0 +1,51 @@
+---
+// eslint-disable
+import { CheckIcon } from "lucide-svelte";
+---
+
+<div class="bg-[url('/pro.jpg')] bg-center bg-cover py-16 mt-32">
+<section class="container px-4 xl:px-0 max-w-[80rem] mx-auto rounded-[2rem] gap-16 scroll-mt-24">
+    <div class="card bg-base-100 shadow-lg p-4">
+        <div class="card-body">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                <div class="flex flex-col gap-4">
+                    <div class="flex flex-col gap-2">
+                        <img src="/grinta_pro.svg" alt="Grinta Pro" class="w-32 h-8" />
+                        <p class="text-3xl text-primary"><span>$5</span> <span class="line-through text-gray-500">$10</span> per month</p>
+                        <div class="badge badge-soft badge-primary">Limited Time Offer</div>
+                    </div>
+                    <p class="card-text text-lg">Unlock the full potential of Grinta with our premium offering designed for users who demand more.</p>
+                    <a href="#" class="btn btn-primary btn-xl">Get Grinta Pro</a>
+                </div>
+                <div class="grid grid-cols-2 gap-4 my-auto">
+                    <div class="flex gap-2 items-center">
+                        <CheckIcon class="w-6 h-6 text-primary" />
+                        <p>10x more AI usage</p>
+                    </div>
+                    <div class="flex gap-2 items-center">
+                        <CheckIcon class="w-6 h-6 text-primary" />
+                        <p>Priority Support</p>
+                    </div>
+                    <div class="flex gap-2 items-center">
+                        <CheckIcon class="w-6 h-6 text-primary" />
+                        <p>Early access to new features</p>
+                    </div>
+                    <div class="flex gap-2 items-center">
+                        <CheckIcon class="w-6 h-6 text-primary" />
+                        <p>GrintaFI</p>
+                        <div class="badge badge-soft badge-primary">Coming Soon</div>
+                    </div>
+                    <div class="flex gap-2 items-center">
+                        <CheckIcon class="w-6 h-6 text-primary" />
+                        <p>Cross-device sync</p>
+                    </div>
+                    <div class="flex gap-2 items-center">
+                        <CheckIcon class="w-6 h-6 text-primary" />
+                        <p>Supporting open source software</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</div>

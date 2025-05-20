@@ -1,0 +1,41 @@
+---
+// eslint-disable
+import "@fontsource/cal-sans/400.css";
+import "@fontsource/geist/400.css";
+import "@fontsource/geist/600.css";
+import "@fontsource/geist/800.css";
+const { title, description } = Astro.props;
+---
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="keywords" content="Grinta, productivity, privacy, agentic, computer interaction, web interaction, open source, AI, natural language processing, zero telemetry" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={`https://meshy.studio/api/og?template=cipher&darkMode=false&branding=Grinta&title=${title}&description=${description}`} />
+    <link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <script is:inline>
+      // eslint-disable
+      (function () {
+        try {
+
+          const stored = localStorage.getItem("starlight-theme");
+          const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          const theme = stored === "dark" || (!stored && prefersDark) ? "dark" : "light";
+          document.documentElement.setAttribute("data-theme", theme);
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <slot />
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+  </body>
+</html>
+
