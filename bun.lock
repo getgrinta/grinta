@@ -2738,8 +2738,6 @@
 
     "prosemirror-gapcursor/prosemirror-view": ["prosemirror-view@1.39.3", "", { "dependencies": { "prosemirror-model": "^1.20.0", "prosemirror-state": "^1.0.0", "prosemirror-transform": "^1.1.0" } }, "sha512-bY/7kg0LzRE7ytR0zRdSMWX3sknEjw68l836ffLPMh0OG3OYnNuBDUSF3v0vjvnzgYjgY9ZH/RypbARURlcMFA=="],
 
-    "prosemirror-history/prosemirror-view": ["prosemirror-view@1.39.3", "", { "dependencies": { "prosemirror-model": "^1.20.0", "prosemirror-state": "^1.0.0", "prosemirror-transform": "^1.1.0" } }, "sha512-bY/7kg0LzRE7ytR0zRdSMWX3sknEjw68l836ffLPMh0OG3OYnNuBDUSF3v0vjvnzgYjgY9ZH/RypbARURlcMFA=="],
-
     "prosemirror-tables/prosemirror-view": ["prosemirror-view@1.39.3", "", { "dependencies": { "prosemirror-model": "^1.20.0", "prosemirror-state": "^1.0.0", "prosemirror-transform": "^1.1.0" } }, "sha512-bY/7kg0LzRE7ytR0zRdSMWX3sknEjw68l836ffLPMh0OG3OYnNuBDUSF3v0vjvnzgYjgY9ZH/RypbARURlcMFA=="],
 
     "prosemirror-trailing-node/escape-string-regexp": ["escape-string-regexp@4.0.0", "", {}, "sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA=="],
