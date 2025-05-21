@@ -1,4 +1,5 @@
 import { logger } from "hono/logger";
+import { cors } from 'hono/cors'
 import { HTTPException } from "hono/http-exception";
 import { auth } from "./auth/index.js";
 import { aiRouter } from "./routers/ai.router.js";
@@ -32,6 +33,13 @@ const app = createRouter()
     }
     return c.text("Internal Server Error", 500);
   })
+  .use(cors({
+    origin: (origin) => {
+      return origin
+    },
+    allowMethods: ["POST", "GET", "OPTIONS"],
+    credentials: true
+  }))
   .use(databaseContext)
   .use(authSession)
   .use("/api/ai/*", authenticatedGuard)

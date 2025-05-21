@@ -51,7 +51,7 @@ export const databaseContext = createMiddleware(async (c, next) => {
   return next();
 });
 
-async function getUsages({
+export async function getUsages({
   db,
   userId,
   dateFrom,
