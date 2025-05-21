@@ -29,6 +29,7 @@
         "@ai-sdk/openai-compatible": "0.2.13",
         "@better-auth/stripe": "1.2.5",
         "@getgrinta/core": "workspace:*",
+        "@hono/node-server": "^1.14.2",
         "@hono/zod-openapi": "0.19.2",
         "@open-draft/until": "2.1.0",
         "@rlimit/http": "0.0.5",
@@ -36,6 +37,7 @@
         "ai": "4.3.14",
         "better-auth": "1.2.5",
         "dedent": "1.5.3",
+        "dotenv": "^16.5.0",
         "drizzle-orm": "0.41.0",
         "drizzle-zod": "0.7.1",
         "elevenlabs": "^1.59.0",
@@ -450,6 +452,8 @@
     "@happy-dom/global-registrator": ["@happy-dom/global-registrator@17.4.4", "", { "dependencies": { "happy-dom": "^17.4.4" } }, "sha512-njrU74GrYVHO43upIJr96f7pEmUG7YLZbHCGiHALBECeVnDKpepzL9kVc7KIl8S2nQOkPA0rAA1EyC3xASb54w=="],
 
     "@hexagon/base64": ["@hexagon/base64@1.1.28", "", {}, "sha512-lhqDEAvWixy3bZ+UOYbPwUbBkwBq5C1LAJ/xPC8Oi+lL54oyakv/npbA0aU2hgCsx/1NUd4IBvV03+aUBWxerw=="],
+
+    "@hono/node-server": ["@hono/node-server@1.14.2", "", { "peerDependencies": { "hono": "^4" } }, "sha512-GHjpOeHYbr9d1vkID2sNUYkl5IxumyhDrUJB7wBp7jvqYwPFt+oNKsAPBRcdSbV7kIrXhouLE199ks1QcK4r7A=="],
 
     "@hono/zod-openapi": ["@hono/zod-openapi@0.19.2", "", { "dependencies": { "@asteasolutions/zod-to-openapi": "^7.1.0", "@hono/zod-validator": "^0.4.1" }, "peerDependencies": { "hono": ">=4.3.6", "zod": "3.*" } }, "sha512-lkFa6wdQVgY7d7/m++Ixr3hvKCF5Y+zjTIPM37fex5ylCfX53A/W28gZRDuFZx3aR+noKob7lHfwdk9dURLzxw=="],
 
