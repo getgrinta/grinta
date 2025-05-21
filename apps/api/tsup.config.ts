@@ -2,7 +2,7 @@ import { defineConfig } from "tsup";
 import dotenv from "dotenv";
 
 export default defineConfig({
-  target: "esnext",
+  target: "node22",
   outDir: "dist",
   dts: true,
   platform: "node",

@@ -1,5 +1,7 @@
+import "dotenv/config";
+import { serve } from "@hono/node-server";
 import { logger } from "hono/logger";
-import { cors } from 'hono/cors'
+import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { auth } from "./auth/index.js";
 import { aiRouter } from "./routers/ai.router.js";
@@ -33,13 +35,15 @@ const app = createRouter()
     }
     return c.text("Internal Server Error", 500);
   })
-  .use(cors({
-    origin: (origin) => {
-      return origin
-    },
-    allowMethods: ["POST", "GET", "OPTIONS"],
-    credentials: true
-  }))
+  .use(
+    cors({
+      origin: (origin) => {
+        return origin;
+      },
+      allowMethods: ["POST", "GET", "OPTIONS"],
+      credentials: true,
+    }),
+  )
   .use(databaseContext)
   .use(authSession)
   .use("/api/ai/*", authenticatedGuard)
@@ -57,7 +61,7 @@ export type AppType = typeof app;
 export type { ContentType } from "./routers/ai.router.js";
 export type { SanitizedSubscription } from "./utils/schema.utils.js";
 
-export default {
-  port: 3000,
+serve({
   fetch: app.fetch,
-};
+  port: process.env["PORT"] ? Number.parseInt(process.env["PORT"]) : 3000,
+});
