@@ -1,20 +1,18 @@
 import "dotenv/config";
 import { serve } from "@hono/node-server";
-import { logger } from "hono/logger";
 import { cors } from "hono/cors";
-import { HTTPException } from "hono/http-exception";
 import { auth } from "./auth/index.js";
 import { aiRouter } from "./routers/ai.router.js";
 import { dataRouter } from "./routers/data.router.js";
 import { docsRouter } from "./routers/docs.router.js";
 import { usersRouter } from "./routers/users.router.js";
+import { pinoLogger } from "hono-pino";
 import {
   authSession,
   authenticatedGuard,
   createRouter,
   databaseContext,
 } from "./utils/router.utils.js";
-import { sendWebhook } from "./utils/webhook.utils.js";
 
 const app = createRouter()
   .doc("/openapi.json", {
@@ -24,17 +22,11 @@ const app = createRouter()
       title: "Grinta",
     },
   })
-  .use(logger())
-  .onError(async (error, c) => {
-    await sendWebhook({
-      type: "logs",
-      message: error.message,
-    });
-    if (error instanceof HTTPException) {
-      return error.getResponse();
-    }
-    return c.text("Internal Server Error", 500);
-  })
+  .use(
+    pinoLogger({
+      pino: { level: "warn" },
+    }),
+  )
   .use(
     cors({
       origin: (origin) => {
