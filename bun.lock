@@ -9,6 +9,7 @@
       "devDependencies": {
         "@tsconfig/bun": "1.0.7",
         "@types/bun": "1.2.8",
+        "dotenv": "^16.5.0",
         "husky": "9.1.7",
         "lint-staged": "15.5.0",
         "oxlint": "0.16.4",
