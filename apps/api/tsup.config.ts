@@ -5,7 +5,7 @@ export default defineConfig({
   target: "esnext",
   outDir: "dist",
   dts: true,
-  platform: "browser",
+  platform: "node",
   clean: true,
   entry: ["src/index.ts"],
   format: "esm",
