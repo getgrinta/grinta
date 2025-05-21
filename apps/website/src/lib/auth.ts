@@ -8,10 +8,20 @@ const PUBLIC_API_URL =
   import.meta.env.PUBLIC_API_URL ?? "https://api.getgrinta.com";
 
 // @ts-expect-error
-export const apiClient = hc<AppType>(PUBLIC_API_URL);
+export const apiClient = hc<AppType>(PUBLIC_API_URL, {
+  fetch: ((input: RequestInfo, init: RequestInit) => {
+    return fetch(input, {
+      ...init,
+      credentials: "include", // Required for sending cookies cross-origin
+    });
+  }) as typeof fetch,
+});
 
 export const authClient = createAuthClient({
   baseURL: PUBLIC_API_URL,
+  fetchOptions: {
+    credentials: "include",
+  },
   plugins: [
     emailOTPClient(),
     stripeClient({
