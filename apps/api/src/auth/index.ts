@@ -10,7 +10,9 @@ import { isDisposableEmail } from "../utils/DISPOSABLE_EMAIL_DOMAINS.js";
 import { APIError } from "better-auth/api";
 import { sendWebhook } from "../utils/webhook.utils.js";
 
-const stripeClient = new Stripe(env.STRIPE_SECRET_KEY);
+const stripeClient = new Stripe(env.STRIPE_SECRET_KEY, {
+  apiVersion: "2025-02-24.acacia",
+});
 
 export const auth: ReturnType<typeof betterAuth> = betterAuth({
   basePath: "/api/auth",
