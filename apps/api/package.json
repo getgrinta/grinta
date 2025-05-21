@@ -40,6 +40,8 @@
     "drizzle-zod": "0.7.1",
     "elevenlabs": "^1.59.0",
     "hono": "4.7.5",
+    "hono-pino": "^0.8.0",
+    "pino": "^9.7.0",
     "postgres": "3.4.5",
     "resend": "4.2.0",
     "stripe": "17.7.0",
