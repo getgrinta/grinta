@@ -49,7 +49,7 @@
             return;
           }
           loading = false;
-          navigate("/account");
+          return navigate("/account");
         })
         .exhaustive();
     },
@@ -124,7 +124,7 @@
         ></progress>
       {/if}
       {#if resendRemainingSeconds === 0}
-        <button class="btn btn-lg w-full" onclick={resendCode}>
+        <button type="button" class="btn btn-lg w-full" onclick={resendCode}>
           Resend Verification Code
         </button>
       {/if}

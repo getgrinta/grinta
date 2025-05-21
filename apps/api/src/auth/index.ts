@@ -15,6 +15,22 @@ const stripeClient = new Stripe(env.STRIPE_SECRET_KEY);
 export const auth: ReturnType<typeof betterAuth> = betterAuth({
   basePath: "/api/auth",
   trustedOrigins: ["*"],
+  ...(env.NODE_ENV === "production"
+    ? {
+        advanced: {
+          crossSubDomainCookies: {
+            enabled: true,
+            domain: ".getgrinta.com",
+          },
+          defaultCookieAttributes: {
+            secure: true,
+            httpOnly: true,
+            sameSite: "none",
+            partitioned: true,
+          },
+        },
+      }
+    : {}),
   database: drizzleAdapter(db, {
     provider: "pg",
   }),
