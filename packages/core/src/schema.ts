@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v3";
 
 export const APP_MODE = {
   INITIAL: "INITIAL",
@@ -222,6 +222,7 @@ export const ChatMessageSchema = z.object({
   id: z.string().optional(),
   content: z.string(),
   experimental_attachments: z.array(AttachmentSchema).default([]),
+  messages: z.array(z.any()).optional(),
   role: z.enum(["system", "user", "assistant", "data"]),
   createdAt: z.coerce.date().optional(),
   parts: z.any(),

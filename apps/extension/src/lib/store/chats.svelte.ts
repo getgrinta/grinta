@@ -1,6 +1,6 @@
 import { PersistedStore } from "$lib/utils.svelte";
 import { ChatMessageSchema, type ChatMessageData } from "@getgrinta/core";
-import { z } from "zod";
+import { z } from "zod/v3";
 
 export const ChatDataSchema = z.object({
   id: z.string(),

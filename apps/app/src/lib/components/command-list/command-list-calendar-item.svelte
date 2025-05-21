@@ -9,7 +9,7 @@
   import { _ } from "svelte-i18n";
   import { ExecutableCommandSchema } from "@getgrinta/core";
   import CommandListContextMenu from "./command-list-context-menu.svelte";
-  import { z } from "zod";
+  import { z } from "zod/v3";
   import { Clock, MapPin, Users } from "lucide-svelte";
   import { formatRelative, parseISO } from "date-fns";
   import { enUS, de, pl } from "date-fns/locale";

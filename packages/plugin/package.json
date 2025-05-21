@@ -15,7 +15,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc && bun build src/index.ts --outdir ./dist",
+    "build": "tsup",
     "test": "bun test",
     "cleanup": "rimraf node_modules .turbo dist"
   },

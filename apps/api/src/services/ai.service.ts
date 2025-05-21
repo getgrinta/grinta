@@ -9,10 +9,9 @@ import {
 } from "ai";
 import dedent from "dedent";
 import { match } from "ts-pattern";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { AI_PROVIDERS_CONFIG, type AiProvider } from "../const.js";
 import { CONTENT_TYPE, type ContentType } from "../routers/ai.router.js";
-// @ts-expect-error - it is exported
 import { type ChatMessageData } from "@getgrinta/core";
 
 const RESPONSE_REGEX = /<response>([\s\S]*?)<\/response>/;
@@ -154,7 +153,7 @@ export class AiService {
     });
     return streamText({
       maxSteps: 5,
-      messages: convertToCoreMessages(params.messages),
+      messages: convertToCoreMessages(params.messages as never),
       system: BROWSER_AGENT_SYSTEM_PROMPT,
       toolCallStreaming: true,
       experimental_transform: smoothStream({

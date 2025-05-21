@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v3";
 
 export const EnvSchema = z.object({
   BETTER_AUTH_SECRET: z.string(),

@@ -7,7 +7,7 @@
   import { highlightText } from "$lib/utils.svelte";
   import { match, P } from "ts-pattern";
   import { _ } from "svelte-i18n";
-  import type { z } from "zod";
+  import type { z } from "zod/v3";
   import CommandListIcon from "./command-list-icon.svelte";
   import { widgetsStore } from "$lib/store/widgets.svelte";
   import { PressedKeys } from "runed";
