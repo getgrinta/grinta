@@ -1,0 +1,14 @@
+---
+// eslint-disable
+import BaseLayout from "../layouts/base-layout.astro";
+import AccountManagement from "../components/account-management.svelte";
+
+if (!Astro.locals.session) {
+    return Astro.redirect("/sign-in");
+}
+const profile = Astro.locals.profile;
+---
+
+<BaseLayout title="Account">
+    <AccountManagement client:only user={Astro.locals.user} profile={profile} />
+</BaseLayout>

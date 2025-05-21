@@ -1,7 +1,7 @@
 import { createRoute } from "@hono/zod-openapi";
 import { z } from "zod";
 import { env } from "../utils/env.utils.js";
-import { createRouter } from "../utils/router.utils.js";
+import { createRouter, getUsages } from "../utils/router.utils.js";
 import {
   sanitizedSubscriptionSchema,
   subscriptionSchema,
@@ -14,6 +14,8 @@ export const MeSchema = z.object({
   emailVerified: z.boolean(),
   image: z.string().nullable(),
   subscriptions: z.array(sanitizedSubscriptionSchema),
+  dailyAiUsage: z.number(),
+  maxDailyAiUsage: z.number(),
 });
 
 const ME_ROUTE = createRoute({
@@ -33,6 +35,8 @@ const ME_ROUTE = createRoute({
 
 export const usersRouter = createRouter().openapi(ME_ROUTE, async (c) => {
   const user = c.get("user");
+  const db = c.get("db");
+  if (!user) return c.text("Unauthorized", 401);
   const request = await fetch(
     `${env.BETTER_AUTH_URL}/api/auth/subscription/list`,
     {
@@ -52,9 +56,18 @@ export const usersRouter = createRouter().openapi(ME_ROUTE, async (c) => {
     status: subscription.status,
     periodEnd: subscription.periodEnd,
   }));
+  const [usagesLastDay] = await getUsages({
+    db,
+    userId: user.id,
+    dateFrom: new Date(Date.now() - 24 * 60 * 60 * 1000),
+  });
+  const maxDailyAiUsage =
+    subscriptions.length > 0 ? env.AI_DAILY_LIMIT_PRO : env.AI_DAILY_LIMIT;
   const sanitizedUser = MeSchema.parse({
     ...user,
     subscriptions: sanitizedSubscriptions,
+    dailyAiUsage: usagesLastDay.count,
+    maxDailyAiUsage,
   });
   return c.json(sanitizedUser, 200);
 });
