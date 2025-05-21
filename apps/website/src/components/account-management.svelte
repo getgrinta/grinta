@@ -20,8 +20,7 @@
     const { error } = await authClient.subscription.upgrade({
       plan: "pro",
       successUrl: "https://getgrinta.com/success",
-      cancelUrl: "https://getgrinta.com/",
-      disableRedirect: true,
+      cancelUrl: "https://getgrinta.com/account",
     });
     if (error) {
       return toast.error(error.message ?? "Subscription Error");
@@ -30,7 +29,7 @@
 
   async function manageSubscription() {
     const { error } = await authClient.subscription.cancel({
-      returnUrl: "https://getgrinta.com/cancelled",
+      returnUrl: "https://getgrinta.com/account",
     });
     if (error) {
       return toast.error(error.message ?? "Subscription Error");
