@@ -40,7 +40,10 @@ const app = createRouter()
       origin: (origin) => {
         return origin;
       },
+      allowHeaders: ["Content-Type", "Authorization"],
       allowMethods: ["POST", "GET", "OPTIONS"],
+      exposeHeaders: ["Content-Length"],
+      maxAge: 600,
       credentials: true,
     }),
   )
