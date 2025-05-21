@@ -1,6 +1,7 @@
 import { z } from "zod/v3";
 
 export const EnvSchema = z.object({
+  NODE_ENV: z.string().default("development"),
   BETTER_AUTH_SECRET: z.string(),
   BETTER_AUTH_URL: z.string().url(),
   DATABASE_URL: z.string().url(),
