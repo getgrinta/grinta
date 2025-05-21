@@ -11,19 +11,6 @@
     "cleanup": "rimraf node_modules .astro dist"
   },
   "dependencies": {
-<<<<<<< Updated upstream
-    "@astrojs/starlight": "0.34.3",
-    "@astrojs/starlight-tailwind": "4.0.1",
-    "@fontsource/cal-sans": "^5.2.1",
-    "@fontsource/geist": "^5.2.6",
-    "astro": "5.7.13",
-    "css-selector-tokenizer": "0.8.0",
-    "culori": "4.0.1",
-    "lucide-svelte": "0.511.0",
-    "postcss-js": "4.0.1",
-    "sharp": "0.34.1",
-    "tailwindcss": "4.1.7"
-=======
     "@getgrinta/api": "workspace:*",
     "@astrojs/node": "9.2.1",
     "@astrojs/starlight": "0.34.3",
@@ -42,7 +29,6 @@
     "tailwindcss": "4.1.7",
     "ts-pattern": "5.7.1",
     "zod": "3.25.16"
->>>>>>> Stashed changes
   },
   "devDependencies": {
     "@astrojs/svelte": "7.0.13",
