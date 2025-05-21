@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@getgrinta/core": "workspace:*",
-    "zod": "3.24.2"
+    "zod": "3.25.16"
   },
   "devDependencies": {
     "@tauri-apps/plugin-http": "2.3.0"
