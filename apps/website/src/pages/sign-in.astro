@@ -1,0 +1,15 @@
+---
+// eslint-disable
+import BaseLayout from "../layouts/base-layout.astro";
+import SignInForm from "../components/sign-in-form.svelte";
+
+if (Astro.locals.session) {
+    return Astro.redirect("/account");
+}
+---
+
+<BaseLayout title="Sign In">
+    <div class="flex flex-1 flex-col items-center justify-center">
+        <SignInForm client:only />
+    </div>
+</BaseLayout>

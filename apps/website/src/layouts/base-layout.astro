@@ -1,9 +1,13 @@
 ---
 // eslint-disable
+import '../tailwind.css'
 import "@fontsource/cal-sans/400.css";
 import "@fontsource/geist/400.css";
 import "@fontsource/geist/600.css";
 import "@fontsource/geist/800.css";
+import { Toaster } from 'svelte-sonner';
+import LandingNavbar from "../components/landing-navbar.astro";
+import Footer from "../components/footer.astro";
 const { title, description } = Astro.props;
 ---
 <html lang="en">
@@ -20,6 +24,8 @@ const { title, description } = Astro.props;
     <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap-index.xml">
+    <script is:inline defer src="https://umami.getgrinta.com/script.js" data-website-id="4cd27316-f769-454e-8ec1-46ddd469d336"></script>
     <script is:inline>
       // eslint-disable
       (function () {
@@ -33,9 +39,13 @@ const { title, description } = Astro.props;
       })();
     </script>
   </head>
-  <body>
-    <slot />
-<script async defer src="https://buttons.github.io/buttons.js"></script>
+  <body class="flex flex-col min-h-screen">
+    <LandingNavbar />
+    <div class="flex flex-col flex-1">
+        <slot />
+    </div>
+    <Footer />
+    <Toaster client:only />
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
   </body>
 </html>
-
