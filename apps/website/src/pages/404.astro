@@ -1,0 +1,15 @@
+---
+export const prerender = false;
+import BaseLayout from "../layouts/base-layout.astro";
+---
+
+<BaseLayout title="404">
+    <div class="max-w-80 w-full mx-auto mt-32 flex flex-col items-center gap-8">
+        <h1 class="text-7xl font-[Cal_Sans]">404 :(</h1>
+        <p>Page not found.</p>
+        <div class="flex flex-col gap-4 w-full">
+            <a href="/" class="btn btn-primary w-full">Go back to Home</a>
+            <a href="/guides" class="btn w-full">Go back to Docs</a>
+        </div>
+    </div>
+</BaseLayout>
