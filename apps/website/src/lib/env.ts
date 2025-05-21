@@ -1,7 +1,7 @@
-import { z } from "zod";
+import { z } from "zod/v3";
 
 export const env = z
-    .object({
-        PUBLIC_API_URL: z.string().url(),
-    })
-    .parse(import.meta.env);
+  .object({
+    PUBLIC_API_URL: z.string().url(),
+  })
+  .parse(import.meta.env);

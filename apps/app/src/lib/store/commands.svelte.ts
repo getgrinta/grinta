@@ -12,7 +12,7 @@ import { sortBy, uniq } from "rambda";
 import { _ } from "svelte-i18n";
 import { toast } from "svelte-sonner";
 import { P, match } from "ts-pattern";
-import { z } from "zod";
+import { z } from "zod/v3";
 import {
   type ExecutableCommand,
   COMMAND_HANDLER,

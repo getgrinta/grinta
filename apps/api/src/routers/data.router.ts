@@ -1,5 +1,5 @@
 import { createRoute } from "@hono/zod-openapi";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { createRouter } from "../utils/router.utils.js";
 
 const getCurrencyDataUrl = (ticker: string) =>

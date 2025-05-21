@@ -6,7 +6,7 @@
   import { vaultStore } from "$lib/store/vault.svelte";
   import { createForm } from "felte";
   import { toast } from "svelte-sonner";
-  import { ZodError, z } from "zod";
+  import { ZodError, z } from "zod/v3";
   import { _ } from "$lib/i18n";
   import { onMount } from "svelte";
 

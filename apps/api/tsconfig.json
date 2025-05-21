@@ -1,5 +1,5 @@
 {
-  "extends": "@tsconfig/bun",
+  "extends": "@tsconfig/bun/tsconfig.json",
   "compilerOptions": {
     "strict": true,
     "declaration": true,
@@ -11,7 +11,8 @@
     "moduleResolution": "NodeNext",
     "target": "ESNext",
     "skipLibCheck": true,
-    "incremental": true
+    "incremental": true,
+    "tsBuildInfoFile": ".tsbuildinfo"
   },
   "include": ["src/index.ts"],
   "exclude": ["node_modules", "dist"]

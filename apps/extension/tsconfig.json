@@ -15,6 +15,7 @@
     "noEmit": true,
     "baseUrl": ".",
     "incremental": true,
+    "tsBuildInfoFile": ".tsbuildinfo",
     "composite": true,
     "paths": {
       "$lib/*": ["src/lib/*"],

@@ -14,7 +14,7 @@ import {
 } from "tauri-plugin-macos-permissions-api";
 import { activateAppByName, getLastFocusedWindowName } from "../grinta-invoke";
 import { SettingsSchema } from "@getgrinta/core";
-import { z } from "zod";
+import { z } from "zod/v3";
 import type { CustomQuickLink } from "@getgrinta/core";
 
 // Infer the Settings type directly from the schema

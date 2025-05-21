@@ -1,4 +1,4 @@
-import type { z } from "zod";
+import type { z } from "zod/v3";
 import type { SpaceSchema, SpaceTabSchema, OpenerSchema } from "./schema";
 
 export type PageContext = { url: string; title: string; content: string };

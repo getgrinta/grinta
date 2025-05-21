@@ -1,4 +1,4 @@
-import type { z } from "zod";
+import type { z } from "zod/v3";
 import { localStorage } from "./storage";
 import type { Opener, PageContext } from "./types";
 import {

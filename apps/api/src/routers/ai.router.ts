@@ -1,12 +1,11 @@
 import { createRoute } from "@hono/zod-openapi";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { AI_PROVIDER } from "../const.js";
 import { AiService } from "../services/ai.service.js";
 import { aiLimitGuard, createRouter } from "../utils/router.utils.js";
 import { schema } from "../db/schema.js";
 import { eq } from "drizzle-orm";
 import { until } from "@open-draft/until";
-// @ts-expect-error
 import { ChatMessageSchema } from "@getgrinta/core";
 import { stream } from "hono/streaming";
 import { ElevenLabsClient } from "elevenlabs";
@@ -190,7 +189,7 @@ export const aiRouter = createRouter()
       .returning();
     try {
       const params = StreamParamsSchema.parse(await c.req.json());
-      const result = aiService.streamResponse(params, async () => {
+      const result = aiService.streamResponse(params as never, async () => {
         await db
           .update(schema.aiUsage)
           .set({ state: "success" })

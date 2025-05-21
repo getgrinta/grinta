@@ -1,5 +1,5 @@
 import { createRoute } from "@hono/zod-openapi";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { env } from "../utils/env.utils.js";
 import { createRouter, getUsages } from "../utils/router.utils.js";
 import {
