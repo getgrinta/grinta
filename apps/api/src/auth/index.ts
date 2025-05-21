@@ -28,7 +28,6 @@ export const auth: ReturnType<typeof betterAuth> = betterAuth({
             secure: true,
             httpOnly: true,
             sameSite: "none",
-            partitioned: true,
           },
         },
       }

@@ -24,7 +24,7 @@ const app = createRouter()
   })
   .use(
     pinoLogger({
-      pino: { level: "warn" },
+      pino: { level: "info" },
     }),
   )
   .use(
