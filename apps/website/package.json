@@ -11,13 +11,13 @@
     "cleanup": "rimraf node_modules .astro dist"
   },
   "dependencies": {
-    "@getgrinta/api": "workspace:*",
     "@astrojs/node": "9.2.1",
     "@astrojs/starlight": "0.34.3",
     "@astrojs/starlight-tailwind": "4.0.1",
     "@better-auth/stripe": "1.2.8",
     "@fontsource/cal-sans": "5.2.1",
     "@fontsource/geist": "5.2.6",
+    "@getgrinta/api": "workspace:*",
     "astro": "5.7.13",
     "better-auth": "1.2.8",
     "felte": "1.3.0",
