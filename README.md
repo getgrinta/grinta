@@ -1,7 +1,7 @@
 <h1 align="center" border="0">Grinta</h1>
 
 <p align="center">
-  <img src="./apps/website/public/pro.svg" alt="Grinta Logo" width="604">
+  <img src="./apps/website/public/favicon.svg" alt="Grinta Logo" width="604">
 </p>
 
 <p align="center">
@@ -22,7 +22,6 @@ Packed with powerful search capabilities, productivity tools and AI-driven featu
 - **Multi-language Support**: Enjoy Grinta in your preferred language with support for English, Polish, and German translations throughout the interface.
 - **Customizable Theme**: Choose between a light and dark mode, as well as a variety of color schemes to suit your style.
 - **Search Mode**: Quickly find installed apps, perform web searches, and more. All from a single search bar.
-
 
 ### Installation
 
@@ -84,3 +83,4 @@ $ bun run tauri dev
 ├── packages
 │   ├── core - Core library for Grinta
 │   └── plugin - Plugin interface for Grinta
+```
