@@ -25,6 +25,7 @@
   },
   "{{chrome}}.permissions": [
     "sidePanel",
+    "debugger",
     "tabs",
     "storage",
     "tabGroups",
