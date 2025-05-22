@@ -8,16 +8,6 @@ import { runtime } from "webextension-polyfill";
 
 allowWindowMessaging("grinta");
 
-async function getContent(message: BridgeMessage<{ tabId: number }>) {
-  return sendMessage(
-    "grinta_getContent",
-    { tabId: message.data.tabId },
-    "window",
-  );
-}
-
-onMessage("grinta_getContent", getContent);
-
 async function clickElement(
   message: BridgeMessage<{ selector: string; tabId: number }>,
 ) {

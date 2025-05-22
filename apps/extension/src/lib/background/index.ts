@@ -10,6 +10,9 @@ import { TAB_COLOR } from "$lib/const";
 import { sessionStorage } from "$lib/storage";
 import { uniq } from "rambda";
 import pDebounce from "p-debounce";
+import { load } from "cheerio"
+import sanitizeHtml from 'sanitize-html';
+import html2md from 'html-to-md'
 
 async function _getTabs(groupId?: number) {
   const allTabs = await tabs.query(groupId ? ({ groupId } as never) : {});
@@ -115,13 +118,26 @@ async function closeOtherTabs(message: BridgeMessage<{ tabId: number }>) {
 
 async function fetchPage(message: BridgeMessage<{ tabId: number }>) {
   const tab = await tabs.get(message.data.tabId);
-  const destination = `content-script@${message.data.tabId}`;
-  const parsed = await sendMessage(
-    "grinta_getContent",
-    { tabId: message.data.tabId },
-    destination,
-  );
-  return { url: tab.url, title: tab.title, content: parsed };
+  const debugee = {
+    tabId: message.data.tabId,
+  };
+  await chrome.debugger.attach(debugee, "1.3");
+  await chrome.debugger.sendCommand(debugee, "Accessibility.enable");
+  await chrome.debugger.sendCommand(debugee, "DOM.enable");
+  const documentInfo = await chrome.debugger.sendCommand({ tabId: message.data.tabId }, "DOM.getDocument", {}) as { root: { nodeId: number } };
+  const rootNodeId = documentInfo?.root?.nodeId;
+  const result = await chrome.debugger.sendCommand(debugee, "DOM.getOuterHTML", { nodeId: rootNodeId }) as { outerHTML: string };
+  await chrome.debugger.detach(debugee);
+  const $ = load(result.outerHTML)
+  const bodyHtml = $("body").html()
+  try {
+    const purifiedBodyHtml = sanitizeHtml(bodyHtml?.toString() ?? "")
+    const markdown = html2md(purifiedBodyHtml, { skipTags: ["iframe", "script", "style", "noscript", "object", "embed", "svg", "canvas", "link"] })
+    return { url: tab.url, title: tab.title, content: markdown }
+  } catch (error) {
+    console.error(error)
+    return { url: tab.url, title: tab.title, content: "Failed to get page content." }
+  }
 }
 
 async function getGroups() {

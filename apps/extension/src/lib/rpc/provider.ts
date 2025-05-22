@@ -18,12 +18,6 @@ onMessage("grinta_getElements", (message) => {
   return result.toJSON();
 });
 
-onMessage("grinta_getContent", (message) => {
-  if (message.sender.context !== "content-script") return;
-  const result = parse(document.body.innerHTML);
-  return result.toMarkdown();
-});
-
 onMessage(
   "grinta_clickElement",
   async (message: BridgeMessage<{ selector: string }>) => {

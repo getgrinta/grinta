@@ -38,7 +38,7 @@
 </script>
 
 <div class="flex flex-col mt-24 items-center px-4 xl:px-0">
-  <div class="card max-w-160 w-full bg-base-100 card-lg shadow-sm">
+  <div class="card lg:max-w-180 w-full bg-base-100 card-lg shadow-sm">
     <div class="card-body">
       <div class="flex gap-2 items-center justify-between">
         <h2 class="card-title">Profile</h2>
@@ -58,13 +58,13 @@
       </div>
     </div>
   </div>
-  <div class="card max-w-160 w-full bg-base-100 card-lg shadow-sm mt-8">
+  <div class="card lg:max-w-180 w-full bg-base-100 card-lg shadow-sm mt-8">
     <div class="card-body">
       <div class="flex justify-between items-center">
         <h2 class="card-title">AI Usage</h2>
         <div
-          class="tooltip"
-          data-tip="AI Usage includes GrintAI usage, note editor autocompletion, and speech to text."
+          class="tooltip tooltip-left"
+          data-tip="AI Usage includes GrintAI, editor autocompletion, and speech to text."
         >
           <button class="btn btn-ghost btn-square btn-sm"
             ><InfoIcon size={24} /></button
@@ -84,7 +84,7 @@
       ></progress>
     </div>
   </div>
-  <div class="card max-w-160 w-full bg-base-100 card-lg shadow-sm mt-8">
+  <div class="card lg:max-w-180 w-full bg-base-100 card-lg shadow-sm mt-8">
     <div class="card-body">
       <div class="flex justify-between items-center">
         <h2 class="card-title">Subscription</h2>
@@ -104,7 +104,7 @@
       </div>
     </div>
   </div>
-  <div class="card max-w-160 w-full bg-base-100 card-lg shadow-sm mt-8">
+  <div class="card lg:max-w-180 w-full bg-base-100 card-lg shadow-sm mt-8">
     <div class="card-body">
       <h2 class="card-title">Actions</h2>
       <div class="grid grid-cols-2 gap-4 items-center">
