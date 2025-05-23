@@ -4,7 +4,6 @@
   import Layout from "$lib/components/layout.svelte";
   import type { PageContext } from "$lib/types";
   import { useRsv } from "@ryuz/rsv";
-  import { authClient } from "$lib/auth";
   import ViewTitle from "$lib/components/view-title.svelte";
   import { Chat } from "@ai-sdk/svelte";
   import { type Attachment } from "ai";
@@ -22,6 +21,8 @@
   import { tabs } from "webextension-polyfill";
   import { Base64 } from "ox";
   import { tabsStore } from "$lib/store/tabs.svelte";
+  import { onMount } from "svelte";
+  import { authStore } from "$lib/store/auth.svelte";
 
   const router = useRsv();
   let chatId = $derived(router?.getParam("id"));
@@ -35,8 +36,6 @@
     tabsStore.currentTab?.url?.startsWith("chrome://"),
   );
   const lastChats = $derived(takeLast(3)(chatsStore.data.chats).reverse());
-  const session = authClient.useSession();
-  const user = $derived($session.data?.user);
   const chatUrl = $derived(env.VITE_API_URL + "/api/ai/stream");
   const chat = $derived(
     new Chat({
@@ -279,9 +278,13 @@
       chatsStore.setMessages(chatId, chat.messages);
     },
   );
+
+  onMount(() => {
+    authStore.fetchSession();
+  });
 </script>
 
-{#if !user}
+{#if !authStore.user}
   <dialog class="modal modal-open">
     <div class="modal-box">
       <h3 class="text-lg font-bold">GrintAI</h3>

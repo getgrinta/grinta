@@ -27,7 +27,6 @@
     state: DragDropState<{ index: number; type: string; id: number }>,
   ) {
     const { draggedItem, targetContainer } = state;
-    console.log(">>>DRAGGED", draggedItem);
     const dragIndex = draggedItem.index;
     const dropIndex = Number(targetContainer ?? "0");
     if (draggedItem.type === "essential") {

@@ -14,7 +14,7 @@
 
   async function signOut() {
     await authClient.signOut();
-    return navigate("/");
+    return navigate("/?fetchSession=true");
   }
 
   async function upgradeToPro() {
