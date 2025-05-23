@@ -1,7 +1,7 @@
 import { stripe } from "@better-auth/stripe";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { emailOTP, openAPI } from "better-auth/plugins";
+import { emailOTP, openAPI, oneTimeToken } from "better-auth/plugins";
 import Stripe from "stripe";
 import { db } from "../db/index.js";
 import { sendOtp } from "../utils/mail.utils.js";
@@ -19,18 +19,18 @@ export const auth: ReturnType<typeof betterAuth> = betterAuth({
   trustedOrigins: ["*"],
   ...(env.NODE_ENV === "production"
     ? {
-        advanced: {
-          crossSubDomainCookies: {
-            enabled: true,
-            domain: ".getgrinta.com",
-          },
-          defaultCookieAttributes: {
-            secure: true,
-            httpOnly: true,
-            sameSite: "none",
-          },
+      advanced: {
+        crossSubDomainCookies: {
+          enabled: true,
+          domain: ".getgrinta.com",
         },
-      }
+        defaultCookieAttributes: {
+          secure: true,
+          httpOnly: true,
+          sameSite: "none",
+        },
+      },
+    }
     : {}),
   database: drizzleAdapter(db, {
     provider: "pg",
@@ -99,5 +99,6 @@ export const auth: ReturnType<typeof betterAuth> = betterAuth({
       },
     }),
     openAPI(),
+    oneTimeToken(),
   ],
 });

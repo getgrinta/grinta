@@ -1,0 +1,14 @@
+---
+// eslint-disable
+export const prerender = false;
+import BaseLayout from "../layouts/base-layout.astro";
+import OneTimeToken from "../components/one-time-token.svelte";
+
+if (!Astro.locals.session) {
+    return Astro.redirect("/sign-in");
+}
+---
+
+<BaseLayout title="One Time Token">
+    <OneTimeToken client:load />
+</BaseLayout>

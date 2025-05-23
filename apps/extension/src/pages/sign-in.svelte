@@ -5,55 +5,25 @@
   import { useRsv } from "@ryuz/rsv";
   import { createForm } from "felte";
   import { toast } from "svelte-sonner";
-  import { match } from "ts-pattern";
 
   const router = useRsv();
 
-  let step = $state<"email" | "code">("email");
   let loading = $state(false);
-  const submitLabel = $derived(
-    step === "email" ? "Send Verification Code" : "Verify Code",
-  );
-
-  function setStep(newStep: "email" | "code") {
-    step = newStep;
-  }
 
   const { form } = createForm({
     async onSubmit(formData) {
-      return match(step)
-        .with("email", async () => {
-          loading = true;
-          const { data, error } = await authClient.emailOtp.sendVerificationOtp(
-            {
-              email: formData.email,
-              type: "sign-in",
-            },
-          );
-          if (error) {
-            toast.error(error.message ?? "Error ocurred");
-            return;
-          }
-          loading = false;
-          setStep("code");
-        })
-        .with("code", async () => {
-          loading = true;
-          const { data, error } = await authClient.signIn.emailOtp({
-            email: formData.email,
-            otp: formData.code,
-          });
-          if (error) {
-            toast.error(error.message ?? "Error ocurred");
-            return;
-          }
-          loading = false;
-          router?.navigate("/chats/");
-        })
-        .exhaustive();
+      loading = true;
+      const { error } = await authClient.oneTimeToken.verify({
+        token: formData.code,
+      });
+      if (error) {
+        toast.error(error.message ?? "Error ocurred");
+        return;
+      }
+      loading = false;
+      router?.navigate("/chats/");
     },
     initialValues: {
-      email: "",
       code: "",
     },
   });
@@ -61,27 +31,28 @@
 
 <Layout>
   <ViewTitle title="Sign In" />
-  <div class="flex-1 flex flex-col items-center justify-center gap-2 p-2">
+  <div class="flex-1 flex flex-col items-center justify-center gap-8 p-2">
+    <div class="flex flex-col gap-4 w-full">
+      <h2 class="text-lg font-semibold">1. Get One Time Token</h2>
+      <p>Sign in to your account to start using GrintAI.</p>
+      <a
+        href="https://getgrinta.com/code"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn w-full">Get One Time Token</a
+      >
+    </div>
     <form use:form class="flex flex-col gap-2 w-full">
-      <label for="email" class="label">Email Address</label>
+      <h2 class="text-lg font-semibold">2. Verify One Time Token</h2>
+      <label for="code" class="label">One Time Token</label>
       <input
-        id="email"
-        type="email"
-        name="email"
+        id="code"
+        type="text"
+        name="code"
         class="input w-full"
-        placeholder="your@email.com"
+        placeholder="Enter your one time token"
       />
-      {#if step === "code"}
-        <label for="code" class="label">Verification Code</label>
-        <input
-          id="code"
-          type="text"
-          name="code"
-          class="input w-full"
-          placeholder="123456"
-        />
-      {/if}
-      <button class="btn btn-primary" disabled={loading}>{submitLabel}</button>
+      <button class="btn btn-primary" disabled={loading}>Verify Token</button>
     </form>
   </div>
 </Layout>
