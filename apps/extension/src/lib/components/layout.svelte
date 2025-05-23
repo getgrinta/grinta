@@ -2,7 +2,12 @@
   import { authClient } from "$lib/auth";
   import { useRsv } from "@ryuz/rsv";
   import clsx from "clsx";
-  import { ListIcon, SparklesIcon, UserIcon } from "lucide-svelte";
+  import {
+    ListIcon,
+    SettingsIcon,
+    SparklesIcon,
+    UserIcon,
+  } from "lucide-svelte";
   import type { Snippet } from "svelte";
   import { sendMessage } from "webext-bridge/popup";
 
@@ -49,20 +54,11 @@
         <SparklesIcon size={20} />
       </button>
       <button
-        class={clsx({
-          "dock-active": ["/profile", "/sign-in"].includes(router.path ?? ""),
-        })}
-        onclick={() => router.navigate(user ? "/profile" : "/sign-in")}
+        class={clsx({ "dock-active": router.path?.includes("/settings") })}
+        onclick={() => router?.navigate("/settings")}
+        aria-label="Open Settings"
       >
-        {#if user}
-          <img
-            src={`https://meshy.studio/api/mesh/${user.id}?noise=8&sharpen=1&negate=false&gammaIn=2.1&gammaOut=2.2&brightness=100&saturation=100&hue=0&lightness=0&blur=0`}
-            alt="Avatar"
-            class="w-6 rounded-full"
-          />
-        {:else}
-          <UserIcon size={20} />
-        {/if}
+        <SettingsIcon size={20} />
       </button>
     </div>
   </div>

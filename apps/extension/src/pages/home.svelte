@@ -8,6 +8,7 @@
     PlusIcon,
     SearchIcon,
     SettingsIcon,
+    UserIcon,
     XIcon,
   } from "lucide-svelte";
   import Layout from "$lib/components/layout.svelte";
@@ -22,6 +23,8 @@
   import colors from "tailwindcss/colors";
   import SpaceColorPicker from "$lib/components/space-color-picker.svelte";
   import pDebounce from "p-debounce";
+  import { authClient } from "$lib/auth";
+  import clsx from "clsx";
 
   const router = useRsv();
   let mode = $state<"tabs" | "search" | "editing">("tabs");
@@ -53,6 +56,7 @@
     }, 1);
   }
 
+  const session = authClient.useSession();
   const currentTab = $derived(tabsStore.tabs.find((tab) => tab.active));
   const currentSpaceTitle = $derived(tabsStore.currentSpace?.title);
   const currentSpaceEssentials = $derived(
@@ -63,9 +67,7 @@
       (group) => group.id === tabsStore.currentSpaceId,
     ),
   );
-  const hex = $derived(
-    colors[tabsStore.currentSpace?.color as never]?.[500] ?? colors.gray[500],
-  );
+  const user = $derived($session.data?.user);
 
   const spaceTabs = $derived(
     tabsStore.tabs.filter((tab) => tab.groupId === tabsStore.currentSpaceId),
@@ -309,16 +311,28 @@
           {#if mode === "tabs"}
             <button
               class="btn btn-ghost btn-sm btn-square"
-              onclick={() => router?.navigate("/settings")}
-            >
-              <SettingsIcon size={20} />
-            </button>
-            <button
-              class="btn btn-ghost btn-sm btn-square"
               onclick={toggleMode}
             >
               <SearchIcon size={20} />
             </button>
+            <a
+              class="btn btn-ghost btn-sm btn-square"
+              href={user
+                ? "https://getgrinta.com/account"
+                : "https://getgrinta.com/sign-in"}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {#if user}
+                <img
+                  src={`https://meshy.studio/api/mesh/${user.id}?noise=8&sharpen=1&negate=false&gammaIn=2.1&gammaOut=2.2&brightness=100&saturation=100&hue=0&lightness=0&blur=0`}
+                  alt="Avatar"
+                  class="w-6 rounded-full"
+                />
+              {:else}
+                <UserIcon size={20} />
+              {/if}
+            </a>
           {:else if mode === "search"}
             <button
               class="btn btn-ghost btn-sm btn-square"

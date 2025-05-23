@@ -10,8 +10,6 @@
   import Home from "$pages/home.svelte";
   import Chats from "$pages/chats.svelte";
   import ChatsHistory from "$pages/chats-history.svelte";
-  import SignIn from "$pages/sign-in.svelte";
-  import Profile from "$pages/profile.svelte";
   import Settings from "$pages/settings.svelte";
   import { appStore } from "$lib/store/app.svelte";
   import { tabsStore } from "$lib/store/tabs.svelte";
@@ -60,8 +58,6 @@
     <Route path="/history" component={ChatsHistory} />
     <Route path="/chats" component={Chats} />
     <Route path="/chats/:id" component={Chats} />
-    <Route path="/sign-in" component={SignIn} />
-    <Route path="/profile" component={Profile} />
     <Route path="/settings" component={Settings} />
   </Router>
 </div>
