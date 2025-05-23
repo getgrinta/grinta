@@ -21,7 +21,7 @@
   import ViewTitle from "$lib/components/view-title.svelte";
   import SpaceColorPicker from "$lib/components/space-color-picker.svelte";
   import pDebounce from "p-debounce";
-  import { authClient } from "$lib/auth";
+  import { authStore } from "$lib/store/auth.svelte";
 
   const router = useRsv();
   let mode = $state<"tabs" | "search" | "editing">("tabs");
@@ -53,7 +53,6 @@
     }, 1);
   }
 
-  const session = authClient.useSession();
   const currentTab = $derived(tabsStore.tabs.find((tab) => tab.active));
   const currentSpaceTitle = $derived(tabsStore.currentSpace?.title);
   const currentSpaceEssentials = $derived(
@@ -64,7 +63,6 @@
       (group) => group.id === tabsStore.currentSpaceId,
     ),
   );
-  const user = $derived($session.data?.user);
 
   const spaceTabs = $derived(
     tabsStore.tabs.filter((tab) => tab.groupId === tabsStore.currentSpaceId),
@@ -250,6 +248,7 @@
       { wheel: { axis: "x" } },
     );
     document.body.addEventListener("keydown", handleShortcuts);
+    authStore.fetchSession();
     return () => {
       gesture.destroy();
       document.body.removeEventListener("keydown", handleShortcuts);
@@ -314,15 +313,15 @@
             </button>
             <a
               class="btn btn-ghost btn-sm btn-square"
-              href={user
+              href={authStore.user
                 ? "https://getgrinta.com/account"
                 : "https://getgrinta.com/sign-in"}
               target="_blank"
               rel="noopener noreferrer"
             >
-              {#if user}
+              {#if authStore.user}
                 <img
-                  src={`https://meshy.studio/api/mesh/${user.id}?noise=8&sharpen=1&negate=false&gammaIn=2.1&gammaOut=2.2&brightness=100&saturation=100&hue=0&lightness=0&blur=0`}
+                  src={`https://meshy.studio/api/mesh/${authStore.user.id}?noise=8&sharpen=1&negate=false&gammaIn=2.1&gammaOut=2.2&brightness=100&saturation=100&hue=0&lightness=0&blur=0`}
                   alt="Avatar"
                   class="w-6 rounded-full"
                 />

@@ -19,7 +19,6 @@
     const { draggedItem, targetContainer } = state;
     const dragIndex = parseInt(draggedItem.index);
     const dropIndex = parseInt(targetContainer ?? "0");
-    console.log("DROP1", draggedItem, targetContainer);
     if (draggedItem.type === "space") {
       if (dragIndex === dropIndex) return;
       await sendMessage(
@@ -32,7 +31,6 @@
       );
     }
     if (draggedItem.type === "tab") {
-      console.log("DROP2", draggedItem, targetContainer);
       const groupId = tabsStore.groups[dropIndex]?.id;
       if (!groupId) return;
       await sendMessage(

@@ -1,5 +1,6 @@
 <script lang="ts">
   import packageJson from "../../../app/package.json";
+  import { onMount } from "svelte";
 
   let version = $state(packageJson.version);
   const downloadUrlAarch64 = $derived(
@@ -8,6 +9,17 @@
   const downloadUrlX64 = $derived(
     `https://github.com/getgrinta/grinta/releases/download/v${version}/Grinta_${version}_x64.dmg`,
   );
+
+  onMount(() => {
+    if (typeof window === "undefined") return;
+    const searchParams = new URLSearchParams(window.location.search);
+    const fetchSession = searchParams.get("fetchSession");
+    if (fetchSession) {
+      setTimeout(() => {
+        window.grinta.fetchSession();
+      }, 1000);
+    }
+  });
 </script>
 
 <section

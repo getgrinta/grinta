@@ -1,4 +1,5 @@
 <script lang="ts">
+  import packageJson from "../../package.json";
   import Layout from "$lib/components/layout.svelte";
   import { appStore, THEME, type Theme } from "$lib/store/app.svelte";
   import { tabsStore } from "$lib/store/tabs.svelte";
@@ -101,5 +102,33 @@
     </div>
     <p>Add site specific actions</p>
     <button class="btn" disabled>Summarize</button>
+  </div>
+  <div class="flex flex-col gap-2 p-2">
+    <h2 class="text-lg font-semibold">About</h2>
+    <p>Version {packageJson.version}</p>
+    <a
+      class="link"
+      href="https://grnt.me/docs"
+      target="_blank"
+      rel="noopener noreferrer">Documentation</a
+    >
+    <a
+      class="link"
+      href="https://grnt.me/support"
+      target="_blank"
+      rel="noopener noreferrer">Support</a
+    >
+    <a
+      class="link"
+      href="https://getgrinta.com/privacy-policy"
+      target="_blank"
+      rel="noopener noreferrer">Privacy Policy</a
+    >
+    <a
+      class="link"
+      href="https://getgrinta.com/terms-of-service"
+      target="_blank"
+      rel="noopener noreferrer">Terms of Service</a
+    >
   </div>
 </Layout>

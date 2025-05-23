@@ -18,6 +18,7 @@
   import { onMessage, sendMessage } from "webext-bridge/popup";
   import { ModeWatcher, systemPrefersMode } from "mode-watcher";
   import { chatsStore } from "$lib/store/chats.svelte";
+  import { authStore } from "$lib/store/auth.svelte";
 
   dayjs.extend(relativeTime);
   dayjs.extend(localizedFormat);
@@ -44,8 +45,9 @@
     });
     requestStateUpdate();
     const unsub = onMessage("grinta_fetchSession", () => {
-      window.location.reload();
+      authStore.fetchSession();
     });
+    authStore.fetchSession();
     return () => {
       sessionStorage.unwatchAll();
       unsub();
