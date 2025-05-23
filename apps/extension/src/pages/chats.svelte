@@ -21,6 +21,7 @@
   import dayjs from "dayjs";
   import { tabs } from "webextension-polyfill";
   import { Base64 } from "ox";
+  import { tabsStore } from "$lib/store/tabs.svelte";
 
   const router = useRsv();
   let chatId = $derived(router?.getParam("id"));
@@ -30,6 +31,9 @@
   const initialInput = $derived(router?.getQueryParam("input"));
   let initialMessages = $state<any[]>([]);
   let pageContexts = $state<PageContext[]>([]);
+  const chromiumWebsite = $derived(
+    tabsStore.currentTab?.url?.startsWith("chrome://"),
+  );
   const lastChats = $derived(takeLast(3)(chatsStore.data.chats).reverse());
   const session = authClient.useSession();
   const user = $derived($session.data?.user);
@@ -358,7 +362,7 @@
   <div
     class="flex flex-col px-2 pb-2 fixed bottom-14 left-0 right-0 bg-base-100 gap-2"
   >
-    {#if !chatId}
+    {#if !chatId && !chromiumWebsite}
       <div class="flex gap-2">
         <div class="tooltip tooltip-right" data-tip="Summarize content">
           <button class="btn btn-sm" onclick={summarize}>Summarize</button>
