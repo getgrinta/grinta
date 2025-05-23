@@ -14,7 +14,6 @@
   const { children } = $props<{ children: Snippet }>();
   const router = useRsv();
   const session = authClient.useSession();
-  const user = $derived($session.data?.user);
 
   function requestStateUpdate() {
     return sendMessage("grinta_updateState", {}, "background");

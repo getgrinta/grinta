@@ -14,13 +14,19 @@
   import SidebarTabContextMenu from "./sidebar-tab-context-menu.svelte";
   import clsx from "clsx";
   import { colorVariant } from "$lib/const";
+  import type { DraggableOptions } from "$lib/types";
 
-  let { color, tab, draggableConfig, droppableConfig } = $props<{
+  let {
+    color,
+    tab,
+    draggableConfig,
+    droppableConfig,
+  }: {
     color: chrome.tabGroups.Color;
     tab: chrome.tabs.Tab;
-    draggableConfig: object;
-    droppableConfig: DragDropOptions;
-  }>();
+    draggableConfig: DraggableOptions<{ index: number; type: string }>;
+    droppableConfig: DragDropOptions<{ index: number; type: string }>;
+  } = $props();
 
   let showFaviconFallback = $state(false);
 
@@ -80,7 +86,9 @@
           onerror={handleFaviconError}
         />
       {/if}
-      <span class="truncate text-left flex-1 min-w-0 h-full">{tab.title}</span>
+      <span class="truncate text-left flex-1 min-w-0 h-full font-[400]"
+        >{tab.title}</span
+      >
     </button>
     <button
       class="hidden min-w-0 group-hover:flex items-center justify-center cursor-pointer px-2 py-1 rounded-full"

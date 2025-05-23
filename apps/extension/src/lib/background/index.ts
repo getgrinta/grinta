@@ -10,9 +10,9 @@ import { TAB_COLOR } from "$lib/const";
 import { sessionStorage } from "$lib/storage";
 import { uniq } from "rambda";
 import pDebounce from "p-debounce";
-import { load } from "cheerio"
-import sanitizeHtml from 'sanitize-html';
-import html2md from 'html-to-md'
+import { load } from "cheerio";
+import sanitizeHtml from "sanitize-html";
+import html2md from "html-to-md";
 
 async function _getTabs(groupId?: number) {
   const allTabs = await tabs.query(groupId ? ({ groupId } as never) : {});
@@ -49,12 +49,12 @@ async function swapTabs(
   return _swapTabs(message.data.fromId, message.data.toId);
 }
 
+async function _closeTab(tabId: number) {
+  await tabs.remove(tabId);
+}
+
 async function closeTab(message: BridgeMessage<{ tabId: number }>) {
-  const allTabs = await _getTabs();
-  if (allTabs.length === 1) {
-    await tabs.create({});
-  }
-  await tabs.remove(message.data.tabId);
+  await _closeTab(message.data.tabId);
 }
 
 async function newTab(
@@ -110,7 +110,10 @@ async function closeOtherTabs(message: BridgeMessage<{ tabId: number }>) {
   const allTabs = await _getTabs();
   const currentTab = allTabs.find((tab) => tab.id === message.data.tabId);
   if (!currentTab) return;
-  const otherTabs = allTabs.filter((tab) => tab.id !== message.data.tabId);
+  const otherTabs = allTabs.filter(
+    (tab) =>
+      tab.id !== message.data.tabId && tab.groupId === currentTab.groupId,
+  );
   await tabs.remove(
     otherTabs.map((tab) => tab.id).filter((id) => id !== undefined),
   );
@@ -124,19 +127,43 @@ async function fetchPage(message: BridgeMessage<{ tabId: number }>) {
   await chrome.debugger.attach(debugee, "1.3");
   await chrome.debugger.sendCommand(debugee, "Accessibility.enable");
   await chrome.debugger.sendCommand(debugee, "DOM.enable");
-  const documentInfo = await chrome.debugger.sendCommand({ tabId: message.data.tabId }, "DOM.getDocument", {}) as { root: { nodeId: number } };
+  const documentInfo = (await chrome.debugger.sendCommand(
+    { tabId: message.data.tabId },
+    "DOM.getDocument",
+    {},
+  )) as { root: { nodeId: number } };
   const rootNodeId = documentInfo?.root?.nodeId;
-  const result = await chrome.debugger.sendCommand(debugee, "DOM.getOuterHTML", { nodeId: rootNodeId }) as { outerHTML: string };
+  const result = (await chrome.debugger.sendCommand(
+    debugee,
+    "DOM.getOuterHTML",
+    { nodeId: rootNodeId },
+  )) as { outerHTML: string };
   await chrome.debugger.detach(debugee);
-  const $ = load(result.outerHTML)
-  const bodyHtml = $("body").html()
+  const $ = load(result.outerHTML);
+  const bodyHtml = $("body").html();
   try {
-    const purifiedBodyHtml = sanitizeHtml(bodyHtml?.toString() ?? "")
-    const markdown = html2md(purifiedBodyHtml, { skipTags: ["iframe", "script", "style", "noscript", "object", "embed", "svg", "canvas", "link"] })
-    return { url: tab.url, title: tab.title, content: markdown }
+    const purifiedBodyHtml = sanitizeHtml(bodyHtml?.toString() ?? "");
+    const markdown = html2md(purifiedBodyHtml, {
+      skipTags: [
+        "iframe",
+        "script",
+        "style",
+        "noscript",
+        "object",
+        "embed",
+        "svg",
+        "canvas",
+        "link",
+      ],
+    });
+    return { url: tab.url, title: tab.title, content: markdown };
   } catch (error) {
-    console.error(error)
-    return { url: tab.url, title: tab.title, content: "Failed to get page content." }
+    console.error(error);
+    return {
+      url: tab.url,
+      title: tab.title,
+      content: "Failed to get page content.",
+    };
   }
 }
 
@@ -240,6 +267,12 @@ async function addTabsToGroup(
   await _activateTab(message.data.tabIds[0]);
 }
 
+async function moveTabToGroup(
+  message: BridgeMessage<{ tabId: number; groupId: number }>,
+) {
+  await _addTabsToGroup([message.data.tabId], message.data.groupId);
+}
+
 async function swapGroups(
   message: BridgeMessage<{ fromIndex: number; toIndex: number }>,
 ) {
@@ -319,7 +352,7 @@ async function stateUpdate() {
   if (activeGroupId && activeGroupId !== -1) {
     await sessionStorage.set("currentSpaceId", activeGroupId.toString());
   }
-  const currentSpaceId = await sessionStorage.get("currentSpaceId");
+  let currentSpaceId = await sessionStorage.get("currentSpaceId");
   const rootBookmarksFolder = await _getRootBookmarksFolder();
   const updatedTabs = await _getTabs();
   const ungroupedTabs = updatedTabs
@@ -330,6 +363,7 @@ async function stateUpdate() {
     const randomColor = rand(TAB_COLOR);
     const newGroup = await _newGroup(randomColor, generateUsername());
     await sessionStorage.set("currentSpaceId", newGroup?.toString());
+    currentSpaceId = newGroup?.toString();
   }
   if (currentSpaceId && ungroupedTabs.length > 0) {
     await _addTabsToGroup(ungroupedTabs, parseInt(currentSpaceId));
@@ -339,7 +373,6 @@ async function stateUpdate() {
     });
     for (const tab of ungroupedTabs) {
       await _moveTab(tab, updatedGroupTabs[0].index);
-      await _activateTab(tab);
     }
   }
   const savedOpeners = await sessionStorage.get("openers");
@@ -532,6 +565,7 @@ onMessage("grinta_deleteGroup", deleteGroup);
 onMessage("grinta_newGroup", newGroup);
 onMessage("grinta_updateGroup", updateGroup);
 onMessage("grinta_addTabsToGroup", addTabsToGroup);
+onMessage("grinta_moveTabToGroup", moveTabToGroup);
 onMessage("grinta_swapGroups", swapGroups);
 onMessage("grinta_addToEssentials", addToEssentials);
 onMessage("grinta_createEssentialsFolder", createEssentialsFolder);

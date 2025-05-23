@@ -90,6 +90,12 @@ async function stopRecording(message: BridgeMessage<{ tabId: number }>) {
 
 onMessage("grinta_stopRecording", stopRecording);
 
+async function fetchSession() {
+  return sendMessage("grinta_fetchSession", {}, "popup");
+}
+
+onMessage("grinta_fetchSession", fetchSession);
+
 const inject = () => {
   if (typeof document === "undefined") return;
   const script = document.createElement("script");

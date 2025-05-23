@@ -23,20 +23,34 @@
     );
   }
 
-  async function handleDrop(state: DragDropState<{ index: string }>) {
+  async function handleDrop(
+    state: DragDropState<{ index: number; type: string; id: number }>,
+  ) {
     const { draggedItem, targetContainer } = state;
-    const dragIndex = parseInt(draggedItem.index);
-    const dropIndex = parseInt(targetContainer ?? "0");
-    await sendMessage(
-      "grinta_swapEssentials",
-      {
-        dragIndex,
-        dropIndex,
-        folder: tabsStore.currentSpace?.title ?? "",
-      },
-      "background",
-    );
-    return sendMessage("grinta_updateState", {}, "background");
+    console.log(">>>DRAGGED", draggedItem);
+    const dragIndex = draggedItem.index;
+    const dropIndex = Number(targetContainer ?? "0");
+    if (draggedItem.type === "essential") {
+      if (dragIndex === dropIndex) return;
+      await sendMessage(
+        "grinta_swapEssentials",
+        {
+          dragIndex,
+          dropIndex,
+          folder: tabsStore.currentSpace?.title ?? "",
+        },
+        "background",
+      );
+      return sendMessage("grinta_updateState", {}, "background");
+    }
+    if (draggedItem.type === "tab") {
+      await sendMessage(
+        "grinta_addToEssentials",
+        { tabId: draggedItem.id },
+        "background",
+      );
+      return sendMessage("grinta_updateState", {}, "background");
+    }
   }
 
   function getTabByOrigin(origin: string) {
@@ -62,33 +76,35 @@
       groupName={tabsStore.currentSpace?.title ?? ""}
       {index}
     >
-      <div class="tooltip tooltip-bottom w-full" data-tip={essential.title}>
-        <button
-          class={clsx(
-            "btn relative w-full overflow-hidden p-1",
-            active &&
-              colorVariant[(tabsStore.currentSpace?.color as never) ?? "gray"],
-          )}
-          onclick={() => handleClick(essential)}
-          use:draggable={{
-            container: index.toString(),
-            dragData: { ...essential, index },
-          }}
-          use:droppable={{
-            container: index.toString(),
-            callbacks: { onDrop: handleDrop as never },
-          }}
-        >
-          <img
-            {src}
-            class="absolute inset-0 blur-lg w-8 h-8 rounded-full bg-white pointer-events-none opacity-40"
-          />
-          <img
-            {src}
-            class="w-6 h-6 aspect-square rounded-full bg-white pointer-events-none"
-          />
-        </button>
-      </div>
+      <button
+        class={clsx(
+          "group btn relative w-full overflow-hidden p-1",
+          active
+            ? colorVariant[(tabsStore.currentSpace?.color as never) ?? "gray"]
+            : "bg-zinc-100 dark:bg-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-600",
+        )}
+        onclick={() => handleClick(essential)}
+        aria-label={essential.title}
+        use:draggable={{
+          container: index.toString(),
+          dragData: { ...essential, index, type: "essential" },
+        }}
+        use:droppable={{
+          container: index.toString(),
+          callbacks: { onDrop: handleDrop as never },
+        }}
+      >
+        <img
+          {src}
+          class="absolute inset-2 blur-lg w-8 h-8 rounded-full pointer-events-none transition-opacity opacity-40 group-hover:opacity-100"
+          alt="Essential blur"
+        />
+        <img
+          {src}
+          class="w-6 h-6 aspect-square rounded-full pointer-events-none z-10"
+          alt="Essential icon"
+        />
+      </button>
     </SpaceEssentialContextMenu>
   {/each}
 </div>

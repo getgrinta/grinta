@@ -15,13 +15,14 @@
   import { tabsStore } from "$lib/store/tabs.svelte";
   import { onMount } from "svelte";
   import { sessionStorage } from "$lib/storage";
-  import { sendMessage } from "webext-bridge/popup";
+  import { onMessage, sendMessage } from "webext-bridge/popup";
   import { ModeWatcher, systemPrefersMode } from "mode-watcher";
   import { chatsStore } from "$lib/store/chats.svelte";
 
   dayjs.extend(relativeTime);
   dayjs.extend(localizedFormat);
 
+  let refreshKey = $state(0);
   const appTheme = $derived(
     appStore.data.theme === "SYSTEM"
       ? systemPrefersMode.current
@@ -42,9 +43,14 @@
         return tabsStore.syncState(JSON.parse(newValue));
       },
     });
+    requestStateUpdate();
     return () => {
       sessionStorage.unwatchAll();
     };
+  });
+
+  onMessage("grinta_fetchSession", () => {
+    refreshKey++;
   });
 </script>
 
@@ -52,12 +58,14 @@
 
 <ModeWatcher />
 
-<div class="flex-1 flex flex-col" data-theme={appTheme}>
-  <Router mode="hash">
-    <Route path="/" component={Home} />
-    <Route path="/history" component={ChatsHistory} />
-    <Route path="/chats" component={Chats} />
-    <Route path="/chats/:id" component={Chats} />
-    <Route path="/settings" component={Settings} />
-  </Router>
-</div>
+{#key refreshKey}
+  <div class="flex-1 flex flex-col" data-theme={appTheme}>
+    <Router mode="hash">
+      <Route path="/" component={Home} />
+      <Route path="/history" component={ChatsHistory} />
+      <Route path="/chats" component={Chats} />
+      <Route path="/chats/:id" component={Chats} />
+      <Route path="/settings" component={Settings} />
+    </Router>
+  </div>
+{/key}
