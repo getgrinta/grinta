@@ -13,19 +13,37 @@
     ),
   );
 
-  async function handleDrop(state: DragDropState<{ index: number }>) {
+  async function handleDrop(
+    state: DragDropState<{ index: string; type: string; id: number }>,
+  ) {
     const { draggedItem, targetContainer } = state;
-    const dragIndex = draggedItem.index;
+    const dragIndex = parseInt(draggedItem.index);
     const dropIndex = parseInt(targetContainer ?? "0");
-    if (dragIndex === dropIndex) return;
-    await sendMessage(
-      "grinta_swapGroups",
-      {
-        fromIndex: dragIndex,
-        toIndex: dropIndex,
-      },
-      "background",
-    );
+    console.log("DROP1", draggedItem, targetContainer);
+    if (draggedItem.type === "space") {
+      if (dragIndex === dropIndex) return;
+      await sendMessage(
+        "grinta_swapGroups",
+        {
+          fromIndex: dragIndex,
+          toIndex: dropIndex,
+        },
+        "background",
+      );
+    }
+    if (draggedItem.type === "tab") {
+      console.log("DROP2", draggedItem, targetContainer);
+      const groupId = tabsStore.groups[dropIndex]?.id;
+      if (!groupId) return;
+      await sendMessage(
+        "grinta_moveTabToGroup",
+        {
+          tabId: draggedItem.id,
+          groupId,
+        },
+        "background",
+      );
+    }
   }
 
   function restoreGroup(title: string) {
@@ -34,36 +52,38 @@
   }
 </script>
 
-<div
-  class="flex items-center justify-between bg-gradient-to-b from-base-100/0 to-base-100 py-2 relative"
->
-  <div class="flex flex-1 group items-center justify-center">
-    {#each tabsStore.groups as space, index}
-      <SpaceButton
-        {space}
-        draggableConfig={{
-          container: index.toString(),
-          dragData: { ...space, index },
-          interactive: ["[data-btn-close]", "[data-btn-activate]"],
-        }}
-        droppableConfig={{
-          container: index.toString(),
-          callbacks: { onDrop: handleDrop as never },
-        }}
-      />
-    {/each}
-    {#each nonRestoredGroups as title}
-      <div class="tooltip tooltip-top" data-tip={title}>
-        <button
-          class="btn btn-sm btn-ghost btn-square"
-          onclick={() => restoreGroup(title)}
-        >
-          <CircleFadingPlusIcon size={24} />
-        </button>
-      </div>
-    {/each}
+<div class="flex items-center justify-between py-2 relative">
+  <div class="flex flex-1 items-center justify-center">
+    <div
+      class="flex bg-base-100/80 backdrop-blur border border-base-300 rounded-full pointer-events-auto"
+    >
+      {#each tabsStore.groups as space, index}
+        <SpaceButton
+          {space}
+          draggableConfig={{
+            container: index.toString(),
+            dragData: { ...space, index, type: "space" },
+            interactive: ["[data-btn-close]", "[data-btn-activate]"],
+          }}
+          droppableConfig={{
+            container: index.toString(),
+            callbacks: { onDrop: handleDrop as never },
+          }}
+        />
+      {/each}
+      {#each nonRestoredGroups as title}
+        <div class="tooltip tooltip-top" data-tip={title}>
+          <button
+            class="btn btn-sm btn-ghost btn-square"
+            onclick={() => restoreGroup(title)}
+          >
+            <CircleFadingPlusIcon size={24} />
+          </button>
+        </div>
+      {/each}
+    </div>
     <button
-      class="btn btn-sm gtn-ghost btn-square hidden group-hover:flex absolute right-2 top-2"
+      class="btn btn-sm btn-square bg-base-100/80 backdrop-blur border border-base-300 rounded-full absolute right-2 top-2 pointer-events-auto"
       onclick={() => tabsStore.addGroup()}
     >
       <PlusIcon size={16} class="pointer-events-none" />

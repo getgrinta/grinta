@@ -1,6 +1,10 @@
 <script lang="ts">
   import { tabsStore } from "$lib/store/tabs.svelte";
-  import { draggable, droppable } from "@thisux/sveltednd";
+  import {
+    draggable,
+    droppable,
+    type DragDropOptions,
+  } from "@thisux/sveltednd";
   import clsx from "clsx";
   import {
     CircleDotIcon,
@@ -14,12 +18,17 @@
   import colors from "tailwindcss/colors";
   import { sendMessage } from "webext-bridge/popup";
   import { onClickOutside } from "runed";
+  import type { DraggableOptions } from "$lib/types";
 
-  let { space, draggableConfig, droppableConfig } = $props<{
+  let {
+    space,
+    draggableConfig,
+    droppableConfig,
+  }: {
     space: chrome.tabGroups.TabGroup;
-    draggableConfig: object;
-    droppableConfig: object;
-  }>();
+    draggableConfig: DraggableOptions<{ index: number; type: string }>;
+    droppableConfig: DragDropOptions<{ index: number; type: string }>;
+  } = $props();
   let dropdownElement = $state<HTMLUListElement>();
   let contextMenuOpen = $state(false);
 
@@ -42,7 +51,17 @@
     return sendMessage("grinta_activateGroup", { groupId }, "background");
   }
 
-  const hex = colors[space.color as never]?.[500] ?? colors.gray[500];
+  const dotVariants: Record<chrome.tabGroups.Color, string> = {
+    grey: "text-gray-700 dark:text-gray-300",
+    red: "text-red-700 dark:text-red-300",
+    orange: "text-orange-700 dark:text-orange-300",
+    yellow: "text-yellow-700 dark:text-yellow-300",
+    green: "text-green-700 dark:text-green-300",
+    blue: "text-blue-700 dark:text-blue-300",
+    purple: "text-purple-700 dark:text-purple-300",
+    pink: "text-pink-700 dark:text-pink-300",
+    cyan: "text-cyan-700 dark:text-cyan-300",
+  };
 
   async function handleCloseGroup() {
     await sendMessage(
@@ -94,7 +113,7 @@
     class={clsx("dropdown dropdown-top dropdown-center")}
   >
     <summary
-      class={clsx("btn btn-sm btn-ghost btn-square", `text-${space.color}-500`)}
+      class={clsx("btn btn-sm btn-ghost btn-square", dotVariants[space.color])}
       use:draggable={draggableConfig}
       use:droppable={droppableConfig}
       onclick={(event) => activateSpace(event, space.id)}
@@ -102,14 +121,14 @@
     >
       {#if bookmarks}
         {#if space.id === tabsStore.currentSpaceId}
-          <CircleDotIcon size={24} color={hex} />
+          <CircleDotIcon size={24} />
         {:else}
-          <CircleIcon size={24} color={hex} />
+          <CircleIcon size={24} />
         {/if}
       {:else if space.id === tabsStore.currentSpaceId}
-        <CircleDotDashedIcon size={24} color={hex} />
+        <CircleDotDashedIcon size={24} />
       {:else}
-        <CircleDashedIcon size={24} color={hex} />
+        <CircleDashedIcon size={24} />
       {/if}
     </summary>
     <ul

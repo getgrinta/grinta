@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import { InfoIcon } from "lucide-svelte";
   import { authClient } from "../lib/auth";
   import { navigate } from "astro:transitions/client";
@@ -35,6 +36,17 @@
       return toast.error(error.message ?? "Subscription Error");
     }
   }
+
+  onMount(() => {
+    if (typeof window === "undefined") return;
+    const searchParams = new URLSearchParams(window.location.search);
+    const fetchSession = searchParams.get("fetchSession");
+    if (fetchSession) {
+      setTimeout(() => {
+        window.grinta.fetchSession();
+      }, 1000);
+    }
+  });
 </script>
 
 <div class="flex flex-col mt-24 items-center px-4 xl:px-0">

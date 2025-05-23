@@ -24,12 +24,10 @@
       return match(step)
         .with("email", async () => {
           loading = true;
-          const { data, error } = await authClient.emailOtp.sendVerificationOtp(
-            {
-              email: formData.email,
-              type: "sign-in",
-            },
-          );
+          const { error } = await authClient.emailOtp.sendVerificationOtp({
+            email: formData.email,
+            type: "sign-in",
+          });
           if (error) {
             toast.error(error.message ?? "Error ocurred");
             return;

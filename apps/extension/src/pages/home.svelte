@@ -7,7 +7,6 @@
     ArrowRightIcon,
     PlusIcon,
     SearchIcon,
-    SettingsIcon,
     UserIcon,
     XIcon,
   } from "lucide-svelte";
@@ -20,11 +19,9 @@
   import { onMount } from "svelte";
   import { matchSorter } from "match-sorter";
   import ViewTitle from "$lib/components/view-title.svelte";
-  import colors from "tailwindcss/colors";
   import SpaceColorPicker from "$lib/components/space-color-picker.svelte";
   import pDebounce from "p-debounce";
   import { authClient } from "$lib/auth";
-  import clsx from "clsx";
 
   const router = useRsv();
   let mode = $state<"tabs" | "search" | "editing">("tabs");
@@ -262,7 +259,7 @@
 
 <Layout>
   {#if currentSpaceTitle}
-    <div class="fixed top-0 left-0 right-0 z-10">
+    <div class="fixed top-0 left-0 right-0 z-100">
       <ViewTitle title={currentSpaceTitle}>
         {#snippet action()}
           {#if tabsStore.currentSpace}
@@ -385,7 +382,7 @@
             color={tabsStore.currentSpace?.color ?? "blue"}
             draggableConfig={{
               container: index.toString(),
-              dragData: { ...tab, index },
+              dragData: { ...tab, index, type: "tab" },
               interactive: ["[data-btn-close]", "[data-btn-activate]"],
             }}
             droppableConfig={{
@@ -400,7 +397,7 @@
       </div>
     </div>
   </div>
-  <div class="fixed bottom-14 z-10 w-full">
+  <div class="fixed bottom-14 z-100 w-full pointer-events-none">
     <SpacePicker />
   </div>
 </Layout>

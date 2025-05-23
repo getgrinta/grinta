@@ -171,6 +171,7 @@
         placeholder={recording
           ? "Listening..."
           : "Ask anything or attach context (⌘/)"}
+        autofocus
       ></textarea>
       <div class="flex items-center absolute bottom-2 left-2">
         <div class="tooltip tooltip-right" data-tip="Attach context">

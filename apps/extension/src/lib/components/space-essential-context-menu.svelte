@@ -23,7 +23,7 @@
     {@render children()}
   </ContextMenu.Trigger>
   <ContextMenu.Portal>
-    <ContextMenu.Content>
+    <ContextMenu.Content class="z-50">
       <ul class="menu menu-sm bg-base-300 rounded-box w-56">
         <li>
           <button onclick={handleRemove}>

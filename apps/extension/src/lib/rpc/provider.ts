@@ -1,4 +1,12 @@
-import { setNamespace, onMessage } from "webext-bridge/window";
+declare global {
+  interface Window {
+    grinta: {
+      fetchSession: () => Promise<void>;
+    };
+  }
+}
+
+import { setNamespace, onMessage, sendMessage } from "webext-bridge/window";
 import type { BridgeMessage } from "webext-bridge";
 import { userEvent } from "@testing-library/user-event";
 import { parse } from "@ryuz/utevo";
@@ -128,5 +136,15 @@ onMessage("grinta_stopRecording", async (message) => {
   }
   return { status: "error", error: "No recordingPromise" };
 });
+
+function injectRpc() {
+  window.grinta = {
+    fetchSession: async () => {
+      await sendMessage("grinta_fetchSession", {}, "content-script");
+    },
+  };
+}
+
+injectRpc();
 
 console.log("[Grinta] RPC initialized");
