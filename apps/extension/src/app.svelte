@@ -51,6 +51,10 @@
       unsub();
     };
   });
+
+  onMessage("grinta_fetchSession", () => {
+    window.location.reload();
+  });
 </script>
 
 <Toaster position="top-center" />
