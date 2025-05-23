@@ -22,6 +22,9 @@
   let contextMenuOpen = $state(false);
   let textareaElement = $state<HTMLElement>();
   let actualTextareaElement = $state<HTMLElement>();
+  const chromiumWebsite = $derived(
+    tabsStore.currentTab?.url?.startsWith("chrome://"),
+  );
 
   let { handleSubmit, chat, pageContexts, attachPage, removePageContext } =
     $props<{
@@ -161,6 +164,7 @@
     <div
       bind:this={textareaElement}
       class="relative flex flex-col textarea pb-10 w-full"
+      aria-disabled={chromiumWebsite}
     >
       <textarea
         bind:value={chat.input}
@@ -171,6 +175,7 @@
         placeholder={recording
           ? "Listening..."
           : "Ask anything or attach context (⌘/)"}
+        disabled={chromiumWebsite}
         autofocus
       ></textarea>
       <div class="flex items-center absolute bottom-2 left-2">
@@ -179,6 +184,7 @@
             type="button"
             class="btn btn-sm btn-outline border-[var(--input-color)] btn-square"
             onclick={forceContextMenuOpen}
+            disabled={chromiumWebsite}
           >
             <PaperclipIcon size={16} />
           </button>
@@ -220,10 +226,15 @@
             type="button"
             class="btn btn-sm btn-outline border-[var(--input-color)] btn-square"
             onclick={startRecording}
+            disabled={chromiumWebsite}
           >
             <MicIcon size={16} />
           </button>
-          <button type="submit" class="btn btn-sm btn-primary btn-square">
+          <button
+            type="submit"
+            class="btn btn-sm btn-primary btn-square"
+            disabled={chromiumWebsite}
+          >
             <CornerDownLeftIcon size={16} />
           </button>
         {:else}

@@ -47,7 +47,7 @@
             return;
           }
           loading = false;
-          return navigate("/account");
+          return navigate("/account?fetchSession=true");
         })
         .exhaustive();
     },

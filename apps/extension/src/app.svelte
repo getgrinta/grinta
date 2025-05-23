@@ -22,7 +22,6 @@
   dayjs.extend(relativeTime);
   dayjs.extend(localizedFormat);
 
-  let refreshKey = $state(0);
   const appTheme = $derived(
     appStore.data.theme === "SYSTEM"
       ? systemPrefersMode.current
@@ -44,13 +43,13 @@
       },
     });
     requestStateUpdate();
+    const unsub = onMessage("grinta_fetchSession", () => {
+      window.location.reload();
+    });
     return () => {
       sessionStorage.unwatchAll();
+      unsub();
     };
-  });
-
-  onMessage("grinta_fetchSession", () => {
-    refreshKey++;
   });
 </script>
 
@@ -58,14 +57,12 @@
 
 <ModeWatcher />
 
-{#key refreshKey}
-  <div class="flex-1 flex flex-col" data-theme={appTheme}>
-    <Router mode="hash">
-      <Route path="/" component={Home} />
-      <Route path="/history" component={ChatsHistory} />
-      <Route path="/chats" component={Chats} />
-      <Route path="/chats/:id" component={Chats} />
-      <Route path="/settings" component={Settings} />
-    </Router>
-  </div>
-{/key}
+<div class="flex-1 flex flex-col" data-theme={appTheme}>
+  <Router mode="hash">
+    <Route path="/" component={Home} />
+    <Route path="/history" component={ChatsHistory} />
+    <Route path="/chats" component={Chats} />
+    <Route path="/chats/:id" component={Chats} />
+    <Route path="/settings" component={Settings} />
+  </Router>
+</div>
