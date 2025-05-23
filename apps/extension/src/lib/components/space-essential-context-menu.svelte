@@ -19,7 +19,7 @@
 </script>
 
 <ContextMenu.Root bind:open>
-  <ContextMenu.Trigger class="w-full flex">
+  <ContextMenu.Trigger class="w-full flex flex-1">
     {@render children()}
   </ContextMenu.Trigger>
   <ContextMenu.Portal>

@@ -13,6 +13,16 @@ export class TabsStore {
   openers = $state<Opener[]>([]);
   essentials = $state<Record<string, chrome.bookmarks.BookmarkTreeNode[]>>({});
 
+  currentTab = $derived(
+    this.tabs.find((tab) => tab.active),
+  );
+  currentSpaceId = $derived(
+    this.currentTab?.groupId,
+  );
+  currentSpace = $derived(
+    this.groups.find((group) => group.id === this.currentSpaceId),
+  );
+
   async addGroup() {
     const randomColor = rand(TAB_COLOR);
     await sendMessage("grinta_newGroup", {

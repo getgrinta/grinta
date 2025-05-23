@@ -110,6 +110,8 @@
       <div class="grid grid-cols-2 gap-4 items-center">
         <p>Session</p>
         <button class="btn w-full" onclick={signOut}>Sign Out</button>
+        <p>One Time Token</p>
+        <a href="/code" class="btn w-full">Generate Token</a>
       </div>
     </div>
   </div>

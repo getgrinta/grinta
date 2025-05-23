@@ -15,10 +15,6 @@
   const currentOrigin = $derived(
     currentTab?.url ? new URL(currentTab.url).origin : undefined,
   );
-  const currentSpace = $derived(
-    tabsStore.groups.find((group) => group.id === currentTab?.groupId),
-  );
-
   function handleClick(essential: chrome.bookmarks.BookmarkTreeNode) {
     return sendMessage(
       "grinta_openEssential",
@@ -36,7 +32,7 @@
       {
         dragIndex,
         dropIndex,
-        folder: currentSpace?.title ?? "",
+        folder: tabsStore.currentSpace?.title ?? "",
       },
       "background",
     );
@@ -51,7 +47,10 @@
   }
 </script>
 
-<div class="grid grid-cols-8 gap-1 mb-2" transition:slide>
+<div
+  class="grid grid-cols-6 sm:grid-cols-8 gap-1 mb-2 place-items-stretch"
+  transition:slide
+>
   {#each essentials as essential, index}
     {@const url = new URL(essential.url)}
     {@const active = currentOrigin === url.origin}
@@ -59,12 +58,16 @@
     {@const src =
       essentialTab?.favIconUrl ??
       `https://www.google.com/s2/favicons?domain=${url.hostname}`}
-    <SpaceEssentialContextMenu groupName={currentSpace?.title ?? ""} {index}>
-      <div class="tooltip tooltip-bottom" data-tip={essential.title}>
+    <SpaceEssentialContextMenu
+      groupName={tabsStore.currentSpace?.title ?? ""}
+      {index}
+    >
+      <div class="tooltip tooltip-bottom w-full" data-tip={essential.title}>
         <button
           class={clsx(
-            "btn btn-square relative overflow-hidden",
-            active && colorVariant[(currentSpace?.color as never) ?? "gray"],
+            "btn relative w-full overflow-hidden p-1",
+            active &&
+              colorVariant[(tabsStore.currentSpace?.color as never) ?? "gray"],
           )}
           onclick={() => handleClick(essential)}
           use:draggable={{
@@ -82,7 +85,7 @@
           />
           <img
             {src}
-            class="w-6 h-6 rounded-full bg-white pointer-events-none"
+            class="w-6 h-6 aspect-square rounded-full bg-white pointer-events-none"
           />
         </button>
       </div>

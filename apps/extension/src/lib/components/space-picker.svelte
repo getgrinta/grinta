@@ -1,37 +1,17 @@
 <script lang="ts">
-  import {
-    CircleDashedIcon,
-    CircleDotDashedIcon,
-    CircleDotIcon,
-    CircleFadingPlusIcon,
-    CircleIcon,
-    PlusIcon,
-  } from "lucide-svelte";
-  import { draggable, droppable, type DragDropState } from "@thisux/sveltednd";
+  import { CircleFadingPlusIcon, PlusIcon } from "lucide-svelte";
+  import { type DragDropState } from "@thisux/sveltednd";
   import { tabsStore } from "$lib/store/tabs.svelte";
   import { sendMessage } from "webext-bridge/popup";
-  import clsx from "clsx";
-  import colors from "tailwindcss/colors";
   import { rand } from "$lib/utils.svelte";
   import { TAB_COLOR } from "$lib/const";
-
-  const currentSpaceId = $derived(
-    tabsStore.tabs.find((tab) => tab.active)?.groupId,
-  );
+  import SpaceButton from "./space-button.svelte";
 
   const nonRestoredGroups = $derived(
     Object.keys(tabsStore.essentials).filter(
       (key) => !tabsStore.groups.some((group) => group.title === key),
     ),
   );
-
-  async function activateSpace(spaceId: number) {
-    await sendMessage(
-      "grinta_activateGroup",
-      { groupId: spaceId },
-      "background",
-    );
-  }
 
   async function handleDrop(state: DragDropState<{ index: number }>) {
     const { draggedItem, targetContainer } = state;
@@ -59,40 +39,18 @@
 >
   <div class="flex flex-1 group items-center justify-center">
     {#each tabsStore.groups as space, index}
-      {@const hex = colors[space.color as never]?.[500] ?? colors.gray[500]}
-      {@const bookmarks = space.title
-        ? tabsStore.essentials[space.title]
-        : undefined}
-      <div class="tooltip tooltip-top" data-tip={space.title}>
-        <button
-          class={clsx(
-            "btn btn-sm btn-ghost btn-square",
-            `text-${space.color}-500`,
-          )}
-          use:draggable={{
-            container: index.toString(),
-            dragData: { ...space, index },
-            interactive: ["[data-btn-close]", "[data-btn-activate]"],
-          }}
-          use:droppable={{
-            container: index.toString(),
-            callbacks: { onDrop: handleDrop as never },
-          }}
-          onclick={() => activateSpace(space.id)}
-        >
-          {#if bookmarks}
-            {#if space.id === currentSpaceId}
-              <CircleDotIcon size={24} color={hex} />
-            {:else}
-              <CircleIcon size={24} color={hex} />
-            {/if}
-          {:else if space.id === currentSpaceId}
-            <CircleDotDashedIcon size={24} color={hex} />
-          {:else}
-            <CircleDashedIcon size={24} color={hex} />
-          {/if}
-        </button>
-      </div>
+      <SpaceButton
+        {space}
+        draggableConfig={{
+          container: index.toString(),
+          dragData: { ...space, index },
+          interactive: ["[data-btn-close]", "[data-btn-activate]"],
+        }}
+        droppableConfig={{
+          container: index.toString(),
+          callbacks: { onDrop: handleDrop as never },
+        }}
+      />
     {/each}
     {#each nonRestoredGroups as title}
       <div class="tooltip tooltip-top" data-tip={title}>
@@ -105,10 +63,10 @@
       </div>
     {/each}
     <button
-      class="btn btn-sm gtn-ghost btn-square hidden group-hover:flex absolute right-2 top-1/2 -translate-y-1/2"
+      class="btn btn-sm gtn-ghost btn-square hidden group-hover:flex absolute right-2 top-2"
       onclick={() => tabsStore.addGroup()}
     >
-      <PlusIcon size={16} />
+      <PlusIcon size={16} class="pointer-events-none" />
     </button>
   </div>
 </div>

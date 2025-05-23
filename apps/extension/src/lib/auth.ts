@@ -1,5 +1,5 @@
 import { stripeClient } from "@better-auth/stripe/client";
-import { emailOTPClient } from "better-auth/client/plugins";
+import { emailOTPClient, oneTimeTokenClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/svelte";
 import type { AppType } from "@getgrinta/api";
 import { hc } from "hono/client";
@@ -15,5 +15,6 @@ export const authClient = createAuthClient({
     stripeClient({
       subscription: true,
     }),
+    oneTimeTokenClient()
   ],
 });

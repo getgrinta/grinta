@@ -5,9 +5,7 @@
   import {
     ArrowLeftIcon,
     ArrowRightIcon,
-    CircleDotIcon,
     PlusIcon,
-    SaveIcon,
     SearchIcon,
     SettingsIcon,
     XIcon,
@@ -56,23 +54,21 @@
   }
 
   const currentTab = $derived(tabsStore.tabs.find((tab) => tab.active));
-  const currentSpaceId = $derived(currentTab?.groupId);
-  const currentSpace = $derived(
-    tabsStore.groups.find((group) => group.id === currentSpaceId),
-  );
-  const currentSpaceTitle = $derived(currentSpace?.title);
+  const currentSpaceTitle = $derived(tabsStore.currentSpace?.title);
   const currentSpaceEssentials = $derived(
     tabsStore.essentials?.[currentSpaceTitle ?? ""] ?? [],
   );
   const currentSpaceIndex = $derived(
-    tabsStore.groups.findIndex((group) => group.id === currentSpaceId),
+    tabsStore.groups.findIndex(
+      (group) => group.id === tabsStore.currentSpaceId,
+    ),
   );
   const hex = $derived(
-    colors[currentSpace?.color as never]?.[500] ?? colors.gray[500],
+    colors[tabsStore.currentSpace?.color as never]?.[500] ?? colors.gray[500],
   );
 
   const spaceTabs = $derived(
-    tabsStore.tabs.filter((tab) => tab.groupId === currentSpaceId),
+    tabsStore.tabs.filter((tab) => tab.groupId === tabsStore.currentSpaceId),
   );
   const currentTabIndex = $derived(
     spaceTabs.findIndex((tab) => tab.id === currentTab?.id),
@@ -112,7 +108,7 @@
   async function handleNewTab() {
     await sendMessage(
       "grinta_newTab",
-      { groupId: currentSpaceId },
+      { groupId: tabsStore.currentSpaceId },
       "background",
     );
   }
@@ -215,6 +211,9 @@
     if (event.key === "Escape") {
       spaceNameInput?.blur();
     }
+    if (event.key === "Enter") {
+      spaceNameInput?.blur();
+    }
   }
 
   function activateGroup(groupId: number) {
@@ -264,8 +263,8 @@
     <div class="fixed top-0 left-0 right-0 z-10">
       <ViewTitle title={currentSpaceTitle}>
         {#snippet action()}
-          {#if currentSpace}
-            <SpaceColorPicker space={currentSpace} />
+          {#if tabsStore.currentSpace}
+            <SpaceColorPicker space={tabsStore.currentSpace} />
           {/if}
         {/snippet}
         {#snippet titleElement()}
@@ -296,11 +295,11 @@
               onblur={toggleEditing}
               onkeydown={nameKeyDown}
               oninput={(event) => {
-                if (!currentSpaceId) return;
+                if (!tabsStore.currentSpaceId) return;
                 const value = (event.target as HTMLInputElement)?.value ?? "";
                 if (!value) return;
                 if (value.length < 1 || value.length > 32) return;
-                return updateGroupTitle(currentSpaceId, value);
+                return updateGroupTitle(tabsStore.currentSpaceId, value);
               }}
               placeholder="Space name"
             />
@@ -369,7 +368,7 @@
         {#each spaceTabsFiltered as tab, index}
           <SidebarTab
             {tab}
-            color={currentSpace?.color ?? "blue"}
+            color={tabsStore.currentSpace?.color ?? "blue"}
             draggableConfig={{
               container: index.toString(),
               dragData: { ...tab, index },

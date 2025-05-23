@@ -4,10 +4,10 @@
   import {
     CopyPlusIcon,
     ListXIcon,
-    PinIcon,
     PlusIcon,
     RefreshCwIcon,
     StarIcon,
+    Volume2Icon,
     VolumeOffIcon,
     XIcon,
   } from "lucide-svelte";
@@ -15,48 +15,43 @@
 
   type Props = ContextMenu.RootProps & {
     children: Snippet;
-    tabId: number;
+    tab: chrome.tabs.Tab;
   };
 
-  let { open = $bindable(false), tabId, children }: Props = $props();
+  let { open = $bindable(false), tab, children }: Props = $props();
 
   function handleNewTab() {
-    sendMessage("grinta_newTab", { tabId }, "background");
+    sendMessage("grinta_newTab", { tabId: tab.id }, "background");
     open = false;
   }
 
   function handleReload() {
-    sendMessage("grinta_reloadTab", { tabId }, "background");
+    sendMessage("grinta_reloadTab", { tabId: tab.id }, "background");
     open = false;
   }
 
   function handleDuplicate() {
-    sendMessage("grinta_duplicateTab", { tabId }, "background");
-    open = false;
-  }
-
-  function handlePin() {
-    sendMessage("grinta_togglePinTab", { tabId }, "background");
+    sendMessage("grinta_duplicateTab", { tabId: tab.id }, "background");
     open = false;
   }
 
   function handleMute() {
-    sendMessage("grinta_toggleMuteTab", { tabId }, "background");
+    sendMessage("grinta_toggleMuteTab", { tabId: tab.id }, "background");
     open = false;
   }
 
   function handleClose() {
-    sendMessage("grinta_closeTab", { tabId }, "background");
+    sendMessage("grinta_closeTab", { tabId: tab.id }, "background");
     open = false;
   }
 
   function handleCloseOtherTabs() {
-    sendMessage("grinta_closeOtherTabs", { tabId }, "background");
+    sendMessage("grinta_closeOtherTabs", { tabId: tab.id }, "background");
     open = false;
   }
 
   function handleAddToEssentials() {
-    sendMessage("grinta_addToEssentials", { tabId }, "background");
+    sendMessage("grinta_addToEssentials", { tabId: tab.id }, "background");
     open = false;
   }
 </script>
@@ -87,15 +82,14 @@
           </a>
         </li>
         <li>
-          <a onclick={handlePin}>
-            <PinIcon size={16} />
-            <span>Pin</span>
-          </a>
-        </li>
-        <li>
           <a onclick={handleMute}>
-            <VolumeOffIcon size={16} />
-            <span>Mute</span>
+            {#if tab.mutedInfo?.muted}
+              <Volume2Icon size={16} />
+              <span>Unmute</span>
+            {:else}
+              <VolumeOffIcon size={16} />
+              <span>Mute</span>
+            {/if}
           </a>
         </li>
         <li>
