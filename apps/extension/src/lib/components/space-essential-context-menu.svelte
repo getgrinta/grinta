@@ -24,7 +24,7 @@
   </ContextMenu.Trigger>
   <ContextMenu.Portal>
     <ContextMenu.Content>
-      <ul class="menu menu-sm bg-base-200 rounded-box w-56">
+      <ul class="menu menu-sm bg-base-300 rounded-box w-56">
         <li>
           <button onclick={handleRemove}>
             <XIcon size={16} />

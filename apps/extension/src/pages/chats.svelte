@@ -286,9 +286,11 @@
       </p>
       <div class="modal-action">
         <form method="dialog">
-          <button
+          <a
             class="btn btn-primary"
-            onclick={() => router?.navigate("/sign-in")}>Sign In</button
+            href="https://getgrinta.com/sign-in"
+            target="_blank"
+            rel="noopener noreferrer">Sign In</a
           >
           <button class="btn" onclick={() => router?.navigate("/")}
             >Go Back</button

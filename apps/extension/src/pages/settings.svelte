@@ -22,10 +22,6 @@
     await appStore.persist();
   }
 
-  async function onSpacesChanged() {
-    // await spacesStore.persist();
-  }
-
   async function deleteGroup(groupId: number) {
     await sendMessage("grinta_deleteGroup", { groupId }, "background");
   }
@@ -73,7 +69,7 @@
       <PlusIcon size={20} />
     </button>
   </div>
-  <form class="flex flex-col gap-2 p-2" onchange={onSpacesChanged}>
+  <form class="flex flex-col gap-2 p-2">
     {#each tabsStore.groups as space}
       <div class="flex gap-2 items-center">
         <SpaceColorPicker {space} />
@@ -96,4 +92,14 @@
       </div>
     {/each}
   </form>
+  <div class="flex flex-col gap-2 p-2">
+    <div class="flex justify-between items-center mt-4">
+      <h2 class="text-lg font-semibold">Smart Actions</h2>
+      <button class="btn btn-square btn-sm" disabled>
+        <PlusIcon />
+      </button>
+    </div>
+    <p>Add site specific actions</p>
+    <button class="btn" disabled>Summarize</button>
+  </div>
 </Layout>
