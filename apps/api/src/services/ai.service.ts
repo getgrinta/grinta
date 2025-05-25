@@ -212,7 +212,7 @@ export class AiService {
     });
     return streamText({
       maxSteps: 5,
-      messages: convertToCoreMessages(params.messages),
+      messages: convertToCoreMessages(params.messages as never),
       experimental_transform: smoothStream({
         chunking: "line",
       }),
