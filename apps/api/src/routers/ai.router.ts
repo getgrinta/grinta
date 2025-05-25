@@ -251,7 +251,7 @@ export const aiRouter = createRouter()
       .returning();
     try {
       const params = StreamParamsSchema.parse(await c.req.json());
-      const result = aiService.streamResponseRaw(params, async () => {
+      const result = aiService.streamResponseRaw(params as never, async () => {
         await db
           .update(schema.aiUsage)
           .set({ state: "success" })
