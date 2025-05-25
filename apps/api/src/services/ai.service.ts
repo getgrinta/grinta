@@ -204,4 +204,20 @@ export class AiService {
       },
     });
   }
+
+  streamResponseRaw(params: ChatMessageData, onFinish: () => Promise<void>) {
+    const model = this.createModel({
+      provider: "MISTRAL",
+      model: "mistral-small-latest",
+    });
+    return streamText({
+      maxSteps: 5,
+      messages: convertToCoreMessages(params.messages),
+      experimental_transform: smoothStream({
+        chunking: "line",
+      }),
+      onFinish,
+      model,
+    });
+  }
 }
