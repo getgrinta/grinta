@@ -14,7 +14,6 @@
     "cleanup": "rimraf node_modules .svelte-kit .turbo build"
   },
   "dependencies": {
-    "@ai-sdk/openai-compatible": "0.2.5",
     "@better-auth/stripe": "1.2.8",
     "@felte/validator-zod": "1.0.18",
     "@fontsource-variable/dm-sans": "5.2.5",
@@ -83,8 +82,8 @@
     "tauri-plugin-macos-permissions-api": "2.2.0",
     "ts-pattern": "5.7.0",
     "turndown": "7.2.0",
+    "uuidv7": "^1.0.2",
     "virtua": "0.40.3",
-    "zod": "3.25.16",
     "zustand": "5.0.3"
   },
   "devDependencies": {

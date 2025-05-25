@@ -1,4 +1,3 @@
-// import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { createMistral } from "@ai-sdk/mistral";
 import {
   convertToCoreMessages,

@@ -23,32 +23,30 @@
     "script:notify": "bun ./scripts/notify-deployed.ts"
   },
   "dependencies": {
-    "@ai-sdk/mistral": "^1.2.7",
-    "@ai-sdk/openai-compatible": "0.2.13",
+    "@ai-sdk/mistral": "1.2.8",
     "@better-auth/stripe": "1.2.8",
     "@getgrinta/core": "workspace:*",
-    "@hono/node-server": "^1.14.2",
-    "@hono/zod-openapi": "0.19.2",
+    "@hono/node-server": "1.14.2",
+    "@hono/zod-openapi": "0.19.6",
     "@open-draft/until": "2.1.0",
     "@rlimit/http": "0.0.5",
-    "@scalar/hono-api-reference": "0.7.5",
-    "ai": "4.3.14",
+    "@scalar/hono-api-reference": "0.9.1",
+    "ai": "4.3.16",
     "better-auth": "1.2.8",
-    "dedent": "1.5.3",
-    "dotenv": "^16.5.0",
-    "drizzle-orm": "0.41.0",
-    "drizzle-zod": "0.7.1",
-    "elevenlabs": "^1.59.0",
-    "hono": "4.7.5",
-    "hono-pino": "^0.8.0",
-    "pino": "^9.7.0",
+    "dedent": "1.6.0",
+    "dotenv": "16.5.0",
+    "drizzle-orm": "0.43.1",
+    "drizzle-zod": "0.8.2",
+    "elevenlabs": "1.59.0",
+    "hono": "4.7.10",
+    "hono-pino": "0.8.0",
+    "pino": "9.7.0",
     "postgres": "3.4.5",
     "resend": "4.2.0",
     "stripe": "17.7.0",
-    "ts-pattern": "5.7.0",
-    "zod": "3.25.16"
+    "ts-pattern": "5.7.0"
   },
   "devDependencies": {
-    "drizzle-kit": "0.30.6"
+    "drizzle-kit": "0.31.1"
   }
 }

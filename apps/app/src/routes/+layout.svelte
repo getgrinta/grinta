@@ -120,14 +120,17 @@
             text: "🧑‍💻 Development",
             action() {
               return commandsStore.handleCommand({
-                handler: COMMAND_HANDLER.URL,
-                value: "https://www.youtube.com/watch?v=AGsjA1pXajk",
-                label: "Development",
-                appModes: [APP_MODE.INITIAL],
-                localizedLabel: "Development",
-                metadata: {},
-                smartMatch: false,
-                priority: 0,
+                command: {
+                  handler: COMMAND_HANDLER.URL,
+                  value: "https://www.youtube.com/watch?v=AGsjA1pXajk",
+                  label: "Development",
+                  appModes: [APP_MODE.INITIAL],
+                  localizedLabel: "Development",
+                  metadata: {},
+                  smartMatch: false,
+                  priority: 0,
+                },
+                recordingEnabled: false,
               });
             },
           }
