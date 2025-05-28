@@ -43,7 +43,6 @@
 
   function getToolName(toolName: string) {
     return match(toolName)
-      .with("getTabContent", () => "Get Tab Content")
       .with("clickElement", () => "Click Element")
       .with("getElements", () => "Get Elements")
       .with("fillElement", () => "Fill Element")

@@ -44,8 +44,8 @@
   const filteredTabs = $derived(
     pageContexts.length === 0
       ? urlTabs
-      : urlTabs.filter((tab) =>
-          pageContexts.some((pc: PageContext) => pc.url !== tab.url),
+      : urlTabs.filter(
+          (tab) => !pageContexts.map((pc) => pc.url).includes(tab.url),
         ),
   );
 

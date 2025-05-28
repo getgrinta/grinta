@@ -20,12 +20,6 @@ let recordingResolve: ((value: string) => void) | undefined;
 
 setNamespace("grinta");
 
-onMessage("grinta_getElements", (message) => {
-  if (message.sender.context !== "content-script") return;
-  const result = parse(document.body.innerHTML);
-  return result.toJSON();
-});
-
 onMessage(
   "grinta_clickElement",
   async (message: BridgeMessage<{ selector: string }>) => {

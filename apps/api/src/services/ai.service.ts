@@ -69,7 +69,7 @@ export const BROWSER_AGENT_CHAT_TITLE_PROMPT = dedent`
 
 export const BROWSER_AGENT_SYSTEM_PROMPT = dedent`
   You are a browser AI agent that helps users understand and reason about web pages.
-  For every user query, ALWAYS use the "getTabContent" function to retrieve the current page content.
+  If your task is to navigate, call tool "getElements" to get the clickable and fillable elements of the current browser tab page.
 
   Core Instructions:
   - Focus on extracting and conveying meaning, context, and insights from the page content.
@@ -162,11 +162,6 @@ export class AiService {
       onFinish,
       model,
       tools: {
-        getTabContent: tool({
-          parameters: z.object({}),
-          description:
-            "Get the contents of the current browser tab page. The result is a markdown content of the page, title, and URL.",
-        }),
         getElements: tool({
           parameters: z.object({}),
           description:
