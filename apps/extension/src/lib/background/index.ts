@@ -13,6 +13,7 @@ import pDebounce from "p-debounce";
 import { load } from "cheerio";
 import sanitizeHtml from "sanitize-html";
 import html2md from "html-to-md";
+import { htmlToMarkdownTree } from "$lib/dom";
 
 async function _getTabs(groupId?: number) {
   const allTabs = await tabs.query(groupId ? ({ groupId } as never) : {});
@@ -119,28 +120,38 @@ async function closeOtherTabs(message: BridgeMessage<{ tabId: number }>) {
   );
 }
 
-async function fetchPage(message: BridgeMessage<{ tabId: number }>) {
-  const tab = await tabs.get(message.data.tabId);
+async function getTabBody(tabId: number) {
   const debugee = {
-    tabId: message.data.tabId,
+    tabId,
   };
   await chrome.debugger.attach(debugee, "1.3");
   await chrome.debugger.sendCommand(debugee, "Accessibility.enable");
   await chrome.debugger.sendCommand(debugee, "DOM.enable");
   const documentInfo = (await chrome.debugger.sendCommand(
-    { tabId: message.data.tabId },
+    debugee,
     "DOM.getDocument",
     {},
   )) as { root: { nodeId: number } };
   const rootNodeId = documentInfo?.root?.nodeId;
-  const result = (await chrome.debugger.sendCommand(
-    debugee,
-    "DOM.getOuterHTML",
-    { nodeId: rootNodeId },
-  )) as { outerHTML: string };
-  await chrome.debugger.detach(debugee);
-  const $ = load(result.outerHTML);
-  const bodyHtml = $("body").html();
+  try {
+    const result = (await chrome.debugger.sendCommand(
+      debugee,
+      "DOM.getOuterHTML",
+      { nodeId: rootNodeId },
+    )) as { outerHTML: string };
+    await chrome.debugger.detach(debugee);
+    const $ = load(result.outerHTML);
+    return $("body").html();
+  } catch (error) {
+    console.error(error);
+    await chrome.debugger.detach(debugee);
+    return "";
+  }
+}
+
+async function fetchPage(message: BridgeMessage<{ tabId: number }>) {
+  const tab = await tabs.get(message.data.tabId);
+  const bodyHtml = await getTabBody(message.data.tabId);
   try {
     const purifiedBodyHtml = sanitizeHtml(bodyHtml?.toString() ?? "");
     const markdown = html2md(purifiedBodyHtml, {
@@ -459,12 +470,14 @@ async function fillElement(
 }
 
 async function getElements(message: BridgeMessage<{ tabId: number }>) {
-  const destination = `content-script@${message.data.tabId}`;
-  return sendMessage(
-    "grinta_getElements",
-    { tabId: message.data.tabId },
-    destination,
-  );
+  const bodyHtml = await getTabBody(message.data.tabId);
+  if (!bodyHtml) return "";
+  try {
+    return htmlToMarkdownTree(bodyHtml);
+  } catch (error) {
+    console.error(error);
+    return "";
+  }
 }
 
 async function scrollToElement(

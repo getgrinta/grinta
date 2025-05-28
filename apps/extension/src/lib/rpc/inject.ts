@@ -36,16 +36,6 @@ async function fillElement(
 
 onMessage("grinta_fillElement", fillElement);
 
-async function getElements(message: BridgeMessage<{ tabId: number }>) {
-  return sendMessage(
-    "grinta_getElements",
-    { tabId: message.data.tabId },
-    "window",
-  );
-}
-
-onMessage("grinta_getElements", getElements);
-
 async function scrollToElement(
   message: BridgeMessage<{ selector: string; tabId: number }>,
 ) {

@@ -9,12 +9,11 @@
   import { type Attachment } from "ai";
   import { env } from "$lib/env";
   import { chatsStore } from "$lib/store/chats.svelte";
-  import { pageContextToMessage } from "$lib/utils.svelte";
   import PromptEditor from "$lib/components/prompt-editor.svelte";
   import ChatMessages from "$lib/components/chat-messages.svelte";
   import { sendMessage } from "webext-bridge/popup";
   import { GetContentSchema } from "$lib/schema";
-  import { takeLast } from "rambda";
+  import { takeLast, uniq } from "rambda";
   import { watch } from "runed";
   import pDebounce from "p-debounce";
   import dayjs from "dayjs";
@@ -66,23 +65,6 @@
       },
       initialMessages,
       async onToolCall({ toolCall }) {
-        if (toolCall.toolName === "getTabContent") {
-          const currentTab = (await sendMessage(
-            "grinta_getCurrentTab",
-            {},
-            "background",
-          )) as unknown as chrome.tabs.Tab;
-          const response = await sendMessage(
-            "grinta_fetchPage",
-            { tabId: currentTab.id },
-            "background",
-          );
-          const pageContext = GetContentSchema.parse(response);
-          await chat.addToolResult({
-            toolCallId: toolCall.toolCallId,
-            result: pageContextToMessage(pageContext),
-          });
-        }
         if (toolCall.toolName === "clickElement") {
           const currentTab = (await sendMessage(
             "grinta_getCurrentTab",
@@ -190,6 +172,11 @@
       await sessionStorage.removeItem("pageContexts");
     }
     if (chat.status !== "ready") return;
+    const currentTab = (await sendMessage(
+      "grinta_getCurrentTab",
+      {},
+      "background",
+    )) as unknown as chrome.tabs.Tab;
     const input = chat.input;
     if (!input.trim()) return;
     chat.input = "";
@@ -205,10 +192,18 @@
     }
     chat.input = input;
     let screenshot: string | undefined;
-    if (pageContexts.length === 0)
+    if (pageContexts.length === 0) {
+      const response = await sendMessage(
+        "grinta_fetchPage",
+        { tabId: currentTab.id },
+        "background",
+      );
+      const currentPageContext = GetContentSchema.parse(response);
+      attachPage(currentPageContext);
       screenshot = await tabs.captureVisibleTab(undefined, {
         quality: 10,
       });
+    }
     let attachments: Array<Attachment> = [];
     for (const pageContext of pageContexts) {
       const pathname = new URL(pageContext.url).pathname;
@@ -226,7 +221,7 @@
       });
     }
     await chat.handleSubmit(event, {
-      experimental_attachments: attachments,
+      experimental_attachments: uniq(attachments),
     });
     pageContexts = [];
   }
