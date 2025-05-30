@@ -92,26 +92,17 @@
 
     let menuItems: MenuItemType[] = [
       {
-        id: "help",
+        id: "openhelp",
         text: $_("commands.menuItems.help"),
-        items: [
-          {
-            id: "openhelp",
-            text: $_("commands.menuItems.help"),
-            action() {
-              return open("https://getgrinta.com/report-problem");
-            },
-          },
-          {
-            id: "reportproblem",
-            text: $_("commands.menuItems.reportProblem"),
-            action() {
-              return open("https://twitter.com/getgrinta");
-            },
-          },
-        ],
         action() {
           return open("https://getgrinta.com/guides");
+        },
+      },
+      {
+        id: "share_feedback",
+        text: $_("commands.menuItems.shareFeedback"),
+        action() {
+          return open("https://forms.gle/VFS4N5wcdPfq7QxH9");
         },
       },
       process.env.NODE_ENV === "development"
