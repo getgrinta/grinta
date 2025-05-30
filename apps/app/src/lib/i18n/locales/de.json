@@ -222,7 +222,7 @@
       "clipboardHistory": "Zwischenablage",
       "checkForUpdates": "Nach Updates suchen...",
       "followOnX": "Folge @getgrinta auf X",
-      "reportProblem": "Problem melden"
+      "shareFeedback": "Feedback teilen"
     },
     "actions": {
       "search": "Nach \"{query}\" suchen",
