@@ -1,5 +1,4 @@
-import { createRoute } from "@hono/zod-openapi";
-import { z } from "zod/v3";
+import { createRoute, z } from "@hono/zod-openapi";
 import { AI_PROVIDER } from "../const.js";
 import { AiService } from "../services/ai.service.js";
 import { aiLimitGuard, createRouter } from "../utils/router.utils.js";
@@ -45,7 +44,7 @@ export const TranscribeResult = z.object({
 });
 
 export const StreamParamsSchema = z.object({
-  messages: z.array(ChatMessageSchema),
+  messages: z.array(ChatMessageSchema as never),
 });
 
 export const SpeechParamsSchema = z.any();

@@ -5,10 +5,13 @@
   import {
     ArrowLeftIcon,
     ArrowRightIcon,
+    ArrowRightToLineIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
     PlusIcon,
     SearchIcon,
+    SparklesIcon,
     UserIcon,
-    XIcon,
   } from "lucide-svelte";
   import Layout from "$lib/components/layout.svelte";
   import { tabsStore } from "$lib/store/tabs.svelte";
@@ -19,29 +22,17 @@
   import { onMount } from "svelte";
   import { matchSorter } from "match-sorter";
   import ViewTitle from "$lib/components/view-title.svelte";
-  import SpaceColorPicker from "$lib/components/space-color-picker.svelte";
   import pDebounce from "p-debounce";
   import { authStore } from "$lib/store/auth.svelte";
+  import { chatsStore } from "$lib/store/chats.svelte";
 
   const router = useRsv();
-  let mode = $state<"tabs" | "search" | "editing">("tabs");
-  let searchInput = $state<HTMLInputElement>();
+  let mode = $state<"tabs" | "editing">("tabs");
   let spaceNameInput = $state<HTMLInputElement>();
   let searchQuery = $state("");
   let wheelElement = $state<HTMLDivElement>();
   let movementX = $state(0);
 
-  function toggleMode() {
-    if (mode === "tabs") {
-      setTimeout(() => {
-        searchInput?.focus();
-      }, 1);
-      mode = "search";
-      return;
-    }
-    mode = "tabs";
-    searchQuery = "";
-  }
   function toggleEditing() {
     if (mode === "editing") {
       mode = "tabs";
@@ -55,13 +46,20 @@
 
   const currentTab = $derived(tabsStore.tabs.find((tab) => tab.active));
   const currentSpaceTitle = $derived(tabsStore.currentSpace?.title);
-  const currentSpaceEssentials = $derived(
-    tabsStore.essentials?.[currentSpaceTitle ?? ""] ?? [],
-  );
+  const currentSpaceEssentials = $derived.by(() => {
+    const essentials = tabsStore.essentials?.[currentSpaceTitle ?? ""] ?? [];
+    if (searchQuery.length === 0) return essentials;
+    return matchSorter(essentials, searchQuery, {
+      keys: ["title", "url"],
+    });
+  });
   const currentSpaceIndex = $derived(
     tabsStore.groups.findIndex(
       (group) => group.id === tabsStore.currentSpaceId,
     ),
+  );
+  const chromiumWebsite = $derived(
+    tabsStore.currentTab?.url?.startsWith("chrome://"),
   );
 
   const spaceTabs = $derived(
@@ -76,6 +74,13 @@
           keys: ["title", "url"],
         })
       : spaceTabs,
+  );
+  const aiChatsFiltered = $derived(
+    searchQuery
+      ? matchSorter(chatsStore.data.chats, searchQuery, {
+          keys: ["title"],
+        })
+      : [],
   );
   const leftArrowOpacity = $derived(movementX / -32);
   const rightArrowOpacity = $derived(movementX / 32);
@@ -126,6 +131,14 @@
       mode = "tabs";
       searchQuery = "";
     }
+    if (event.key === "Tab") {
+      if (searchQuery.length === 0) return;
+      mode = "tabs";
+      if (chromiumWebsite) return;
+      return router?.navigate(
+        "/chats?input=" + encodeURIComponent(searchQuery),
+      );
+    }
   }
 
   function handleShortcuts(event: KeyboardEvent) {
@@ -140,9 +153,6 @@
       "Digit8",
       "Digit9",
     ];
-    if (event.altKey && event.code === "KeyF") {
-      return toggleMode();
-    }
     if (event.altKey && event.code === "Slash") {
       return router?.navigate("/settings");
     }
@@ -204,12 +214,12 @@
     );
   }
 
-  function nameKeyDown(event: KeyboardEvent) {
+  async function nameKeyDown(event: KeyboardEvent) {
     if (event.key === "Escape") {
-      spaceNameInput?.blur();
+      return spaceNameInput?.blur();
     }
     if (event.key === "Enter") {
-      spaceNameInput?.blur();
+      return spaceNameInput?.blur();
     }
   }
 
@@ -260,29 +270,14 @@
   {#if currentSpaceTitle}
     <div class="fixed top-0 left-0 right-0 z-100">
       <ViewTitle title={currentSpaceTitle}>
-        {#snippet action()}
-          {#if tabsStore.currentSpace}
-            <SpaceColorPicker space={tabsStore.currentSpace} />
-          {/if}
-        {/snippet}
         {#snippet titleElement()}
           {#if mode === "tabs"}
             <button
-              class="btn btn-sm btn-ghost flex-1 justify-start text-lg"
+              class="btn btn-sm btn-ghost flex-1 justify-start text-[1rem] truncate"
               onclick={toggleEditing}
             >
               {currentSpaceTitle}
             </button>
-          {/if}
-          {#if mode === "search"}
-            <input
-              type="text"
-              class="input input-sm w-full"
-              bind:value={searchQuery}
-              bind:this={searchInput}
-              onkeydown={searchKeyDown}
-              placeholder="Search..."
-            />
           {/if}
           {#if mode === "editing"}
             <input
@@ -304,20 +299,26 @@
           {/if}
         {/snippet}
         {#snippet addon()}
-          {#if mode === "tabs"}
+          <div class="flex items-center">
             <button
-              class="btn btn-ghost btn-sm btn-square"
-              onclick={toggleMode}
+              class="btn btn-sm btn-square btn-ghost"
+              onclick={() => tabsStore.prevSpace()}
             >
-              <SearchIcon size={20} />
+              <ChevronLeftIcon size={20} />
+            </button>
+            <button
+              class="btn btn-sm btn-square btn-ghost"
+              onclick={() => tabsStore.nextSpace()}
+            >
+              <ChevronRightIcon size={20} />
             </button>
             <a
-              class="btn btn-ghost btn-sm btn-square"
               href={authStore.user
                 ? "https://getgrinta.com/account"
                 : "https://getgrinta.com/sign-in"}
               target="_blank"
               rel="noopener noreferrer"
+              class="btn btn-sm btn-square rounded-full btn-ghost"
             >
               {#if authStore.user}
                 <img
@@ -329,14 +330,7 @@
                 <UserIcon size={20} />
               {/if}
             </a>
-          {:else if mode === "search"}
-            <button
-              class="btn btn-ghost btn-sm btn-square"
-              onclick={toggleMode}
-            >
-              <XIcon size={20} />
-            </button>
-          {/if}
+          </div>
         {/snippet}
       </ViewTitle>
     </div>
@@ -363,18 +357,34 @@
           </button>
         </div>
       {/if}
+      <label class="input w-full">
+        <SearchIcon size={20} />
+        <input
+          placeholder="Search or ask AI..."
+          bind:value={searchQuery}
+          onkeydown={searchKeyDown}
+        />
+        {#if !chromiumWebsite}
+          <kbd class="kbd kbd-sm gap-1">
+            <ArrowRightToLineIcon size={16} class="w-6 h-6" />
+            <span class="text-xs font-semibold">AI</span>
+          </kbd>
+        {/if}
+      </label>
       {#if currentSpaceEssentials.length > 0}
         <SpaceEssentials essentials={currentSpaceEssentials} />
       {/if}
-      <div class="flex flex-col flex-1 pb-12">
-        <button
-          class="btn btn-ghost justify-start w-full gap-2 p-2"
-          onclick={handleNewTab}
-        >
-          <PlusIcon size={24} />
-          <span class="flex-1 text-left">New Tab</span>
-          <kbd class="kbd kbd-sm">⌘T</kbd>
-        </button>
+      <div class="flex flex-col flex-1 pb-12 mt-2">
+        {#if searchQuery.length === 0}
+          <button
+            class="btn btn-ghost justify-start w-full gap-2 p-2"
+            onclick={handleNewTab}
+          >
+            <PlusIcon size={20} class="ml-1" />
+            <span class="flex-1 text-left ml-1">New Tab</span>
+            <kbd class="kbd kbd-sm">⌘T</kbd>
+          </button>
+        {/if}
         {#each spaceTabsFiltered as tab, index}
           <SidebarTab
             {tab}
@@ -393,6 +403,20 @@
             }}
           />
         {/each}
+        {#if aiChatsFiltered.length > 0}
+          <div class="flex flex-col mt-2">
+            <h2 class="text-sm font-semibold mb-2">AI Chats</h2>
+            {#each aiChatsFiltered as chat}
+              <button
+                onclick={() => router?.navigate("/chats/" + chat.id)}
+                class="btn btn-ghost justify-start w-full gap-3"
+              >
+                <SparklesIcon size={20} />
+                <span class="font-medium">{chat.title}</span>
+              </button>
+            {/each}
+          </div>
+        {/if}
       </div>
     </div>
   </div>

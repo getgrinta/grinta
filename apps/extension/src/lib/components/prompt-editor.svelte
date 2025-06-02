@@ -26,14 +26,19 @@
     tabsStore.currentTab?.url?.startsWith("chrome://"),
   );
 
-  let { handleSubmit, chat, pageContexts, attachPage, removePageContext } =
-    $props<{
-      handleSubmit: (event: SubmitEvent) => void;
-      chat: Chat;
-      pageContexts: PageContext[];
-      attachPage: (pageContext: PageContext) => void;
-      removePageContext: (index: number) => void;
-    }>();
+  let {
+    handleSubmit,
+    chat,
+    pageContexts,
+    attachPage,
+    removePageContext,
+  }: {
+    handleSubmit: (event: SubmitEvent) => void;
+    chat: Chat;
+    pageContexts: PageContext[];
+    attachPage: (pageContext: PageContext) => void;
+    removePageContext: (index: number) => void;
+  } = $props();
 
   const { form } = createForm({
     onSubmit: handleSubmit,
@@ -45,7 +50,8 @@
     pageContexts.length === 0
       ? urlTabs
       : urlTabs.filter(
-          (tab) => !pageContexts.map((pc) => pc.url).includes(tab.url),
+          (tab) =>
+            !pageContexts.map((pc: PageContext) => pc.url).includes(tab.url),
         ),
   );
 

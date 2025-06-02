@@ -14,6 +14,17 @@ import { load } from "cheerio";
 import sanitizeHtml from "sanitize-html";
 import html2md from "html-to-md";
 import { htmlToMarkdownTree } from "$lib/dom";
+import { env } from "$lib/env";
+import { decrypt, encrypt } from "$lib/encryption";
+import z from "zod";
+
+export const TransportableTabSchema = z.object({
+  url: z.string(),
+  title: z.string(),
+  favIconUrl: z.string().optional(),
+})
+
+const TransportableTabsSchema = z.array(TransportableTabSchema)
 
 async function _getTabs(groupId?: number) {
   const allTabs = await tabs.query(groupId ? ({ groupId } as never) : {});
@@ -25,6 +36,14 @@ async function getTabs(message: BridgeMessage<{ groupId?: number }>) {
 }
 
 async function _activateTab(tabId: number) {
+  const tab = await tabs.get(tabId);
+  if (!tab) return;
+  const lastSpaceTabs = await sessionStorage.get("lastSpaceTabs");
+  const parsedLastSpaceTabs = lastSpaceTabs ? JSON.parse(lastSpaceTabs) : {};
+  if (parsedLastSpaceTabs && tab.groupId) {
+    parsedLastSpaceTabs[tab.groupId] = tabId;
+    await sessionStorage.setItem("lastSpaceTabs", JSON.stringify(parsedLastSpaceTabs));
+  }
   await tabs.update(tabId, { active: true });
 }
 
@@ -195,6 +214,8 @@ async function getGroups() {
 
 async function _activateGroup(groupId: number) {
   if (__BROWSER__ === "firefox") return;
+  const lastSpaceTabs = await sessionStorage.get("lastSpaceTabs");
+  const parsedLastSpaceTabs = lastSpaceTabs ? JSON.parse(lastSpaceTabs) : {};
   const currentGroupId = await sessionStorage.get("currentSpaceId");
   if (currentGroupId === groupId.toString()) return;
   await sessionStorage.set("currentSpaceId", groupId.toString());
@@ -203,10 +224,15 @@ async function _activateGroup(groupId: number) {
     await chrome.tabGroups.update(group.id, { collapsed: true });
   }
   await chrome.tabGroups.update(groupId, { collapsed: false });
+  const lastSpaceTabId = parsedLastSpaceTabs[groupId]
+  const lastSpaceOpenedTab = lastSpaceTabId ? await tabs.get(lastSpaceTabId) : undefined;
+  if (lastSpaceOpenedTab?.id) {
+    return tabs.update(lastSpaceOpenedTab.id, { active: true });
+  }
   const groupTabs = await chrome.tabs.query({ groupId });
   const firstTabId = groupTabs[0]?.id;
   if (!firstTabId) return;
-  await tabs.update(firstTabId, { active: true });
+  return tabs.update(firstTabId, { active: true });
 }
 
 async function activateGroup(message: BridgeMessage<{ groupId: number }>) {
@@ -413,6 +439,22 @@ async function stateUpdate() {
       essentials,
     }),
   );
+  const encryptedTabs = await encrypt(JSON.stringify(TransportableTabsSchema.parse(updatedTabs)));
+  try {
+    await fetch(`${env.VITE_API_URL}/api/realtime/sync`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        type: "tabs",
+        data: encryptedTabs,
+      }),
+    });
+  } catch (error) {
+    console.error('[Wave] Tab Sync Error', error);
+  }
 }
 
 const debouncedStateUpdate = pDebounce(stateUpdate, 50);

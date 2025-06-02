@@ -3,7 +3,7 @@
   "type": "module",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -17,6 +17,7 @@
     "dev": "bun run --hot src/index.ts",
     "build": "tsup",
     "start": "node dist/index.js",
+    "cleanup": "rimraf node_modules .turbo dist",
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
@@ -28,6 +29,7 @@
     "@better-auth/stripe": "1.2.8",
     "@getgrinta/core": "workspace:*",
     "@hono/node-server": "^1.14.2",
+    "@hono/node-ws": "^1.1.4",
     "@hono/zod-openapi": "0.19.2",
     "@open-draft/until": "2.1.0",
     "@rlimit/http": "0.0.5",
@@ -45,8 +47,7 @@
     "postgres": "3.4.5",
     "resend": "4.2.0",
     "stripe": "17.7.0",
-    "ts-pattern": "5.7.0",
-    "zod": "3.25.16"
+    "ts-pattern": "5.7.0"
   },
   "devDependencies": {
     "drizzle-kit": "0.30.6"

@@ -1,14 +1,5 @@
 <script lang="ts">
-  import packageJson from "../../../app/package.json";
   import { onMount } from "svelte";
-
-  let version = $state(packageJson.version);
-  const downloadUrlAarch64 = $derived(
-    `https://github.com/getgrinta/grinta/releases/download/v${version}/Grinta_${version}_aarch64.dmg`,
-  );
-  const downloadUrlX64 = $derived(
-    `https://github.com/getgrinta/grinta/releases/download/v${version}/Grinta_${version}_x64.dmg`,
-  );
 
   onMount(() => {
     if (typeof window === "undefined") return;
@@ -30,10 +21,10 @@
     <img src="/download.png" alt="Grinta Download" class="w-16 h-16" />
     <h2 class="font-[Cal_Sans] text-5xl">Download Grinta<br />for macOS</h2>
     <div class="flex flex-col gap-4">
-      <a class="btn btn-primary btn-xl" href={downloadUrlAarch64}
+      <a class="btn btn-primary btn-xl" href="https://grnt.me/grinta_silicon"
         >Download for Apple Silicon</a
       >
-      <a class="btn btn-ghost btn-xl" href={downloadUrlX64}
+      <a class="btn btn-ghost btn-xl" href="https://grnt.me/grinta_intel"
         >Download for Intel</a
       >
     </div>

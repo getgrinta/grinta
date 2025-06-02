@@ -31,6 +31,32 @@ export class TabsStore {
     });
   }
 
+  async nextSpace() {
+    if (!this.currentSpaceId) return;
+    const index = this.groups.findIndex(
+      (group) => group.id === this.currentSpaceId,
+    );
+    const nextIndex = index + 1;
+    const nextSpaceId = this.groups[nextIndex]?.id;
+    if (!nextSpaceId) {
+      await sendMessage("grinta_activateGroup", { groupId: this.groups[0].id }, "background");
+    }
+    return sendMessage("grinta_activateGroup", { groupId: nextSpaceId }, "background");
+  }
+
+  async prevSpace() {
+    if (!this.currentSpaceId) return;
+    const index = this.groups.findIndex(
+      (group) => group.id === this.currentSpaceId,
+    );
+    const prevIndex = index - 1;
+    const prevSpaceId = this.groups[prevIndex]?.id;
+    if (!prevSpaceId) {
+      await sendMessage("grinta_activateGroup", { groupId: this.groups[this.groups.length - 1].id }, "background");
+    }
+    return sendMessage("grinta_activateGroup", { groupId: prevSpaceId }, "background");
+  }
+
   async syncState(newState: {
     tabs: chrome.tabs.Tab[];
     groups: chrome.tabGroups.TabGroup[];

@@ -87,15 +87,36 @@ export const aiUsage = pgTable("ai_usage", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+export const syncData = pgTable("sync_data", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  data: text("data").notNull(),
+  type: text("type", { enum: ["tabs"] })
+    .notNull()
+    .default("tabs"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 // Relations
 
 export const userRelations = relations(user, ({ many }) => ({
   aiUsages: many(aiUsage),
+  syncData: many(syncData),
 }));
 
 export const aiUsageRelations = relations(aiUsage, ({ one }) => ({
   user: one(user, {
     fields: [aiUsage.userId],
+    references: [user.id],
+  }),
+}));
+
+export const syncDataRelations = relations(syncData, ({ one }) => ({
+  user: one(user, {
+    fields: [syncData.userId],
     references: [user.id],
   }),
 }));
@@ -109,4 +130,5 @@ export const schema = {
   verification,
   subscription,
   aiUsage,
+  syncData,
 };

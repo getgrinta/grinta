@@ -34,13 +34,13 @@ onMessage(
 
 onMessage(
   "grinta_fillElement",
-  (message: BridgeMessage<{ selector: string; value: string }>) => {
+  async (message: BridgeMessage<{ selector: string; value: string }>) => {
     if (message.sender.context !== "content-script") return;
     const element = document.querySelector(
       message.data.selector,
     ) as HTMLElement;
     element.scrollIntoView();
-    user.type(element, message.data.value);
+    await user.type(element, message.data.value);
     return true;
   },
 );
@@ -51,7 +51,8 @@ onMessage(
     if (message.sender.context !== "content-script") return;
     const element = document.querySelector(
       message.data.selector,
-    ) as HTMLElement;
+    ) as HTMLElement | null;
+    if (!element) return { error: "Element not found" };
     element.scrollIntoView();
     return true;
   },

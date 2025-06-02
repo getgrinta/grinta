@@ -20,8 +20,7 @@
     "cleanup": "rimraf node_modules .turbo dist"
   },
   "dependencies": {
-    "@getgrinta/core": "workspace:*",
-    "zod": "3.25.16"
+    "@getgrinta/core": "workspace:*"
   },
   "devDependencies": {
     "@tauri-apps/plugin-http": "2.3.0"
