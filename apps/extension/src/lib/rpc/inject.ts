@@ -8,9 +8,12 @@ import { runtime } from "webextension-polyfill";
 
 allowWindowMessaging("grinta");
 
+let injected = false
+
 async function clickElement(
   message: BridgeMessage<{ selector: string; tabId: number }>,
 ) {
+  if (!injected) inject();
   return sendMessage(
     "grinta_clickElement",
     { selector: message.data.selector, tabId: message.data.tabId },
@@ -23,6 +26,7 @@ onMessage("grinta_clickElement", clickElement);
 async function fillElement(
   message: BridgeMessage<{ selector: string; value: string; tabId: number }>,
 ) {
+  if (!injected) inject();
   return sendMessage(
     "grinta_fillElement",
     {
@@ -39,6 +43,7 @@ onMessage("grinta_fillElement", fillElement);
 async function scrollToElement(
   message: BridgeMessage<{ selector: string; tabId: number }>,
 ) {
+  if (!injected) inject();
   return sendMessage(
     "grinta_scrollToElement",
     { selector: message.data.selector, tabId: message.data.tabId },
@@ -51,6 +56,7 @@ onMessage("grinta_scrollToElement", scrollToElement);
 async function getElement(
   message: BridgeMessage<{ selector: string; tabId: number }>,
 ) {
+  if (!injected) inject();
   return sendMessage(
     "grinta_getElement",
     { selector: message.data.selector, tabId: message.data.tabId },
@@ -61,6 +67,7 @@ async function getElement(
 onMessage("grinta_getElement", getElement);
 
 async function startRecording(message: BridgeMessage<{ tabId: number }>) {
+  if (!injected) inject();
   return sendMessage(
     "grinta_startRecording",
     { tabId: message.data.tabId },
@@ -71,6 +78,7 @@ async function startRecording(message: BridgeMessage<{ tabId: number }>) {
 onMessage("grinta_startRecording", startRecording);
 
 async function stopRecording(message: BridgeMessage<{ tabId: number }>) {
+  if (!injected) inject();
   return sendMessage(
     "grinta_stopRecording",
     { tabId: message.data.tabId },
@@ -92,6 +100,7 @@ const inject = () => {
   script.src = runtime.getURL("/provider.js");
   script.type = "module";
   document.documentElement.appendChild(script);
+  injected = true;
 };
 
-inject();
+onMessage("grinta_inject", inject)

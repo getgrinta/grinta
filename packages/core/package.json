@@ -17,8 +17,5 @@
   "scripts": {
     "build": "tsup",
     "cleanup": "rimraf node_modules .turbo dist"
-  },
-  "dependencies": {
-    "zod": "3.25.16"
   }
 }

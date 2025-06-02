@@ -10,7 +10,7 @@
     "test": "turbo test",
     "lint": "oxlint",
     "format": "bunx --bun oxlint --fix --fix-suggestions && bunx --bun prettier --write \"**/*.svelte\"",
-    "cleanup": "turbo cleanup && rimraf node_modules bun.lock",
+    "cleanup": "turbo cleanup && rimraf node_modules bun.lock .turbo",
     "prepare": "husky"
   },
   "devDependencies": {
@@ -41,6 +41,6 @@
     ]
   },
   "dependencies": {
-    "uuidv7": "^1.0.2"
+    "zod": "3.25.32"
   }
 }

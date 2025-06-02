@@ -1,7 +1,7 @@
 <h1 align="center" border="0">Grinta</h1>
 
 <p align="center">
-  <img src="./apps/website/public/favicon.svg" alt="Grinta Logo" width="604">
+  <img src="./apps/website/public/apps.jpg" alt="Grinta Logo" width="604">
 </p>
 
 <p align="center">

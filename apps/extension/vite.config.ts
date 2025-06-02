@@ -19,6 +19,9 @@ function generateManifest() {
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  build: {
+    minify: false
+  },
   plugins: [
     tailwindcss(),
     svelte(),

@@ -6,10 +6,10 @@
   import { sendMessage } from "webext-bridge/popup";
   import SpaceEssentialContextMenu from "./space-essential-context-menu.svelte";
   import { draggable, droppable, type DragDropState } from "@thisux/sveltednd";
+  import { FastAverageColor } from "fast-average-color";
 
-  let { essentials } = $props<{
-    essentials: chrome.bookmarks.BookmarkTreeNode[];
-  }>();
+  let { essentials }: { essentials: chrome.bookmarks.BookmarkTreeNode[] } =
+    $props();
 
   const currentTab = $derived(tabsStore.tabs.find((tab) => tab.active));
   const currentOrigin = $derived(
@@ -58,10 +58,18 @@
       return new URL(tab.url).origin === origin;
     });
   }
+
+  function getFaviconMode(index: number) {
+    const fac = new FastAverageColor();
+    const element = document.querySelector(`[data-essential-index="${index}"]`);
+    if (!element) return;
+    const result = fac.getColor(element as never);
+    return result;
+  }
 </script>
 
 <div
-  class="grid grid-cols-6 sm:grid-cols-8 gap-1 mb-2 place-items-stretch"
+  class="grid grid-cols-6 sm:grid-cols-8 gap-1 place-items-stretch mt-2"
   transition:slide
 >
   {#each essentials as essential, index}
@@ -71,6 +79,7 @@
     {@const src =
       essentialTab?.favIconUrl ??
       `https://www.google.com/s2/favicons?domain=${url.hostname}`}
+    {@const faviconMode = getFaviconMode(index)}
     <SpaceEssentialContextMenu
       groupName={tabsStore.currentSpace?.title ?? ""}
       {index}
@@ -93,16 +102,20 @@
           callbacks: { onDrop: handleDrop as never },
         }}
       >
-        <img
-          {src}
-          class="absolute inset-2 blur-lg w-8 h-8 rounded-full pointer-events-none transition-opacity opacity-40 group-hover:opacity-100"
-          alt="Essential blur"
-        />
-        <img
-          {src}
-          class="w-6 h-6 aspect-square rounded-full pointer-events-none z-10"
-          alt="Essential icon"
-        />
+        <div
+          class={clsx(
+            "relative avatar bg-transparent w-6 h-6 rounded-full flex justify-center items-center",
+          )}
+        >
+          <img
+            {src}
+            class={clsx(
+              "w-6 h-6 aspect-square rounded-full pointer-events-none",
+            )}
+            alt="Essential icon"
+            data-essential-index={index}
+          />
+        </div>
       </button>
     </SpaceEssentialContextMenu>
   {/each}

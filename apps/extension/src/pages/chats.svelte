@@ -28,7 +28,9 @@
   const chatProperties = $derived(
     chatsStore.data.chats.find((chat) => chat.id === chatId),
   );
-  const initialInput = $derived(router?.getQueryParam("input"));
+  const initialInput = $derived(
+    decodeURIComponent(router?.getQueryParam("input") ?? ""),
+  );
   let initialMessages = $state<any[]>([]);
   let pageContexts = $state<PageContext[]>([]);
   const chromiumWebsite = $derived(
@@ -233,18 +235,24 @@
     await debouncedSubmit();
   }
 
+  // On chatId assign.
   $effect(() => {
     if (router?.path === "/chats") return;
     if (!chatId) return;
     if (!initialInput) return;
     if (chat.messages.length !== 0) return;
     if (chat.status !== "ready") return;
-    sessionStorage.getItem("pageContexts").then((persistedPageContexts) => {
-      if (persistedPageContexts) {
-        pageContexts = JSON.parse(persistedPageContexts);
-        return sessionStorage.removeItem("pageContexts");
-      }
-    });
+    debouncedSubmit();
+  });
+
+  // On tab search Tab key.
+  $effect(() => {
+    if (chromiumWebsite) return;
+    if (router?.path !== "/chats") return;
+    if (chatId) return;
+    if (!initialInput) return;
+    if (chat.messages.length !== 0) return;
+    if (chat.status !== "ready") return;
     debouncedSubmit();
   });
 
@@ -276,6 +284,12 @@
 
   onMount(() => {
     authStore.fetchSession();
+    sessionStorage.getItem("pageContexts").then((persistedPageContexts) => {
+      if (persistedPageContexts) {
+        pageContexts = JSON.parse(persistedPageContexts);
+        return sessionStorage.removeItem("pageContexts");
+      }
+    });
   });
 </script>
 

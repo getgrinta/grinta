@@ -5,6 +5,15 @@ import { db, type Database } from "../db/index.js";
 import { and, count, eq, gte, or } from "drizzle-orm";
 import { schema } from "../db/schema.js";
 import { env } from "./env.utils.ts";
+import type { WSContext } from "hono/ws";
+
+const wsClients = new Map<string, WSContext>();
+
+export type WSContextType = {
+  addClient: (id: string, ws: WSContext) => void;
+  removeClient: (id: string) => void;
+  clients: Map<string, WSContext>;
+};
 
 export function createRouter() {
   return new OpenAPIHono<{
@@ -13,6 +22,7 @@ export function createRouter() {
       session: typeof auth.$Infer.Session.session | null;
       subscriptions: (typeof schema.subscription)[];
       db: typeof db;
+      ws: WSContextType
     };
   }>();
 }
@@ -48,6 +58,17 @@ export const authSession = createMiddleware(async (c, next) => {
 
 export const databaseContext = createMiddleware(async (c, next) => {
   c.set("db", db);
+  return next();
+});
+
+export const wsContext = createMiddleware(async (c, next) => {
+  const addClient = (id: string, ws: WSContext) => {
+    return wsClients.set(id, ws);
+  };
+  const removeClient = (id: string) => {
+    return wsClients.delete(id);
+  };
+  c.set("ws", { addClient, removeClient, clients: wsClients })
   return next();
 });
 

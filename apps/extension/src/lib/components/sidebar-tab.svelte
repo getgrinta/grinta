@@ -13,8 +13,9 @@
   } from "@thisux/sveltednd";
   import SidebarTabContextMenu from "./sidebar-tab-context-menu.svelte";
   import clsx from "clsx";
-  import { colorVariant } from "$lib/const";
+  import { colorVariant, faviconVariant } from "$lib/const";
   import type { DraggableOptions } from "$lib/types";
+  import { FastAverageColor } from "fast-average-color";
 
   let {
     color,
@@ -27,6 +28,11 @@
     draggableConfig: DraggableOptions<{ index: number; type: string }>;
     droppableConfig: DragDropOptions<{ index: number; type: string }>;
   } = $props();
+
+  let faviconElement = $state<HTMLImageElement>();
+  const faviconMode = $derived(
+    faviconElement ? getFaviconMode(faviconElement) : undefined,
+  );
 
   let showFaviconFallback = $state(false);
 
@@ -45,6 +51,12 @@
   function toggleMute() {
     return sendMessage("grinta_toggleMuteTab", { tabId: tab.id }, "background");
   }
+
+  function getFaviconMode(element: HTMLImageElement) {
+    const fac = new FastAverageColor();
+    const result = fac.getColor(element as never);
+    return result;
+  }
 </script>
 
 <SidebarTabContextMenu {tab}>
@@ -54,7 +66,7 @@
     class={clsx(
       "flex btn w-full flex-1 flex-row items-center group border-2 flex-nowrap border-transparent cursor-pointer p-0",
       tab.active
-        ? `shadow-xs ${colorVariant[color as chrome.tabGroups.Color]}`
+        ? ["shadow-xs", colorVariant[color as chrome.tabGroups.Color]]
         : "btn-ghost",
     )}
     use:draggable={draggableConfig}
@@ -76,16 +88,35 @@
           {/if}
         </button>
       {/if}
-      {#if !tab.favIconUrl || showFaviconFallback}
-        <PanelLeftIcon size={24} class="w-6 h-6" />
-      {:else}
-        <img
-          src={tab.favIconUrl}
-          alt={tab.title}
-          class="w-6 h-6 rounded-full bg-white"
-          onerror={handleFaviconError}
-        />
-      {/if}
+      <div
+        class={clsx(
+          "btn btn-square btn-sm shadow-none relative rounded-[12px] flex justify-center items-center p-[2px]",
+          tab.active
+            ? "bg-transparent outline-none border-transparent"
+            : "bg-zinc-100 dark:bg-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-600",
+        )}
+      >
+        {#if !tab.favIconUrl || showFaviconFallback}
+          <PanelLeftIcon
+            data-active={tab.active}
+            size={20}
+            class={clsx(
+              "w-5 h-5",
+              faviconVariant[color as chrome.tabGroups.Color],
+            )}
+          />
+        {:else}
+          <img
+            bind:this={faviconElement}
+            class={clsx(
+              "rounded-[10px] aspect-square pointer-events-none overflow-hidden",
+            )}
+            src={tab.favIconUrl}
+            alt={tab.title}
+            onerror={handleFaviconError}
+          />
+        {/if}
+      </div>
       <span class="truncate text-left flex-1 min-w-0 h-full font-[400]"
         >{tab.title}</span
       >

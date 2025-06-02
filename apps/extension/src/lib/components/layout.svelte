@@ -1,19 +1,12 @@
 <script lang="ts">
-  import { authClient } from "$lib/auth";
   import { useRsv } from "@ryuz/rsv";
   import clsx from "clsx";
-  import {
-    ListIcon,
-    SettingsIcon,
-    SparklesIcon,
-    UserIcon,
-  } from "lucide-svelte";
+  import { ListIcon, SettingsIcon, SparklesIcon } from "lucide-svelte";
   import type { Snippet } from "svelte";
   import { sendMessage } from "webext-bridge/popup";
 
   const { children } = $props<{ children: Snippet }>();
   const router = useRsv();
-  const session = authClient.useSession();
 
   function requestStateUpdate() {
     return sendMessage("grinta_updateState", {}, "background");

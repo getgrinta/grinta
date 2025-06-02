@@ -1,7 +1,7 @@
 {
   "name": "@getgrinta/website",
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
@@ -27,8 +27,7 @@
     "sharp": "0.34.2",
     "svelte-sonner": "1.0.1",
     "tailwindcss": "4.1.7",
-    "ts-pattern": "5.7.1",
-    "zod": "3.25.16"
+    "ts-pattern": "5.7.1"
   },
   "devDependencies": {
     "@astrojs/svelte": "7.0.13",
