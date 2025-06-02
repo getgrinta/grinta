@@ -377,7 +377,11 @@
     {#if !chatId && !chromiumWebsite}
       <div class="flex gap-2">
         <div class="tooltip tooltip-right" data-tip="Summarize content">
-          <button class="btn btn-sm" onclick={summarize}>Summarize</button>
+          <button
+            class="btn btn-sm"
+            onclick={summarize}
+            disabled={!authStore.user}>Summarize</button
+          >
         </div>
       </div>
     {/if}
