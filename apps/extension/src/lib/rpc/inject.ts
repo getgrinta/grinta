@@ -8,7 +8,7 @@ import { runtime } from "webextension-polyfill";
 
 allowWindowMessaging("grinta");
 
-let injected = false
+let injected = false;
 
 async function clickElement(
   message: BridgeMessage<{ selector: string; tabId: number }>,
@@ -103,4 +103,8 @@ const inject = () => {
   injected = true;
 };
 
-onMessage("grinta_inject", inject)
+onMessage("grinta_inject", inject);
+
+if (location.hostname === "getgrinta.com") {
+  inject();
+}

@@ -22,9 +22,9 @@ export const TransportableTabSchema = z.object({
   url: z.string(),
   title: z.string(),
   favIconUrl: z.string().optional(),
-})
+});
 
-const TransportableTabsSchema = z.array(TransportableTabSchema)
+const TransportableTabsSchema = z.array(TransportableTabSchema);
 
 async function _getTabs(groupId?: number) {
   const allTabs = await tabs.query(groupId ? ({ groupId } as never) : {});
@@ -42,7 +42,10 @@ async function _activateTab(tabId: number) {
   const parsedLastSpaceTabs = lastSpaceTabs ? JSON.parse(lastSpaceTabs) : {};
   if (parsedLastSpaceTabs && tab.groupId) {
     parsedLastSpaceTabs[tab.groupId] = tabId;
-    await sessionStorage.setItem("lastSpaceTabs", JSON.stringify(parsedLastSpaceTabs));
+    await sessionStorage.setItem(
+      "lastSpaceTabs",
+      JSON.stringify(parsedLastSpaceTabs),
+    );
   }
   await tabs.update(tabId, { active: true });
 }
@@ -217,15 +220,17 @@ async function _activateGroup(groupId: number) {
   const lastSpaceTabs = await sessionStorage.get("lastSpaceTabs");
   const parsedLastSpaceTabs = lastSpaceTabs ? JSON.parse(lastSpaceTabs) : {};
   const currentGroupId = await sessionStorage.get("currentSpaceId");
-  if (currentGroupId === groupId.toString()) return;
+  if (currentGroupId === groupId?.toString()) return;
   await sessionStorage.set("currentSpaceId", groupId.toString());
   const allGroups = await getGroups();
   for (const group of allGroups) {
     await chrome.tabGroups.update(group.id, { collapsed: true });
   }
   await chrome.tabGroups.update(groupId, { collapsed: false });
-  const lastSpaceTabId = parsedLastSpaceTabs[groupId]
-  const lastSpaceOpenedTab = lastSpaceTabId ? await tabs.get(lastSpaceTabId) : undefined;
+  const lastSpaceTabId = parsedLastSpaceTabs[groupId];
+  const lastSpaceOpenedTab = lastSpaceTabId
+    ? await tabs.get(lastSpaceTabId)
+    : undefined;
   if (lastSpaceOpenedTab?.id) {
     return tabs.update(lastSpaceOpenedTab.id, { active: true });
   }
@@ -439,21 +444,23 @@ async function stateUpdate() {
       essentials,
     }),
   );
-  const encryptedTabs = await encrypt(JSON.stringify(TransportableTabsSchema.parse(updatedTabs)));
+  const encryptedTabs = await encrypt(
+    JSON.stringify(TransportableTabsSchema.parse(updatedTabs)),
+  );
   try {
     await fetch(`${env.VITE_API_URL}/api/realtime/sync`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      credentials: 'include',
+      credentials: "include",
       body: JSON.stringify({
         type: "tabs",
         data: encryptedTabs,
       }),
     });
   } catch (error) {
-    console.error('[Wave] Tab Sync Error', error);
+    console.error("[Wave] Tab Sync Error", error);
   }
 }
 

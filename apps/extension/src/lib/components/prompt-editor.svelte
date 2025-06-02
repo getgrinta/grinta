@@ -17,6 +17,7 @@
   import { createForm } from "felte";
   import { tabsStore } from "$lib/store/tabs.svelte";
   import { env } from "$lib/env";
+  import { authStore } from "$lib/store/auth.svelte";
 
   let recording = $state(false);
   let contextMenuOpen = $state(false);
@@ -181,7 +182,7 @@
         placeholder={recording
           ? "Listening..."
           : "Ask anything or attach context (⌘/)"}
-        disabled={chromiumWebsite}
+        disabled={!authStore.user || chromiumWebsite}
         autofocus
       ></textarea>
       <div class="flex items-center absolute bottom-2 left-2">
@@ -190,7 +191,7 @@
             type="button"
             class="btn btn-sm btn-outline border-[var(--input-color)] btn-square"
             onclick={forceContextMenuOpen}
-            disabled={chromiumWebsite}
+            disabled={!authStore.user || chromiumWebsite}
           >
             <PaperclipIcon size={16} />
           </button>
@@ -232,14 +233,14 @@
             type="button"
             class="btn btn-sm btn-outline border-[var(--input-color)] btn-square"
             onclick={startRecording}
-            disabled={chromiumWebsite}
+            disabled={!authStore.user || chromiumWebsite}
           >
             <MicIcon size={16} />
           </button>
           <button
             type="submit"
             class="btn btn-sm btn-primary btn-square"
-            disabled={chromiumWebsite}
+            disabled={!authStore.user || chromiumWebsite}
           >
             <CornerDownLeftIcon size={16} />
           </button>

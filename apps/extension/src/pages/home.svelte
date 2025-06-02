@@ -133,6 +133,7 @@
     }
     if (event.key === "Tab") {
       if (searchQuery.length === 0) return;
+      if (!authStore.user) return;
       mode = "tabs";
       if (chromiumWebsite) return;
       return router?.navigate(
@@ -364,7 +365,7 @@
           bind:value={searchQuery}
           onkeydown={searchKeyDown}
         />
-        {#if !chromiumWebsite}
+        {#if authStore.user && !chromiumWebsite}
           <kbd class="kbd kbd-sm gap-1">
             <ArrowRightToLineIcon size={16} class="w-6 h-6" />
             <span class="text-xs font-semibold">AI</span>
