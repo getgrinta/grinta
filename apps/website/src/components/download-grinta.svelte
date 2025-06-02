@@ -21,11 +21,17 @@
     <img src="/download.png" alt="Grinta Download" class="w-16 h-16" />
     <h2 class="font-[Cal_Sans] text-5xl">Download Grinta<br />for macOS</h2>
     <div class="flex flex-col gap-4">
-      <a class="btn btn-primary btn-xl" href="https://grnt.me/grinta_silicon"
-        >Download for Apple Silicon</a
+      <a
+        class="btn btn-primary btn-xl"
+        href="https://grnt.me/grinta_silicon"
+        rel="noopener noreferrer"
+        target="_blank">Download for Apple Silicon</a
       >
-      <a class="btn btn-ghost btn-xl" href="https://grnt.me/grinta_intel"
-        >Download for Intel</a
+      <a
+        class="btn btn-ghost btn-xl"
+        href="https://grnt.me/grinta_intel"
+        rel="noopener noreferrer"
+        target="_blank">Download for Intel</a
       >
     </div>
   </div>
