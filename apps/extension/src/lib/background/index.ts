@@ -228,8 +228,9 @@ async function _activateGroup(groupId: number) {
   }
   await chrome.tabGroups.update(groupId, { collapsed: false });
   const lastSpaceTabId = parsedLastSpaceTabs[groupId];
+  const allTabs = await _getTabs();
   const lastSpaceOpenedTab = lastSpaceTabId
-    ? await tabs.get(lastSpaceTabId)
+    ? allTabs.find((tab) => tab.id === lastSpaceTabId)
     : undefined;
   if (lastSpaceOpenedTab?.id) {
     return tabs.update(lastSpaceOpenedTab.id, { active: true });
