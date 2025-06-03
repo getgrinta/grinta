@@ -270,7 +270,8 @@
     "settings": "Ustawienia",
     "help": "Pomoc",
     "profile": "Profil",
-    "calendar": "Kalendarz"
+    "calendar": "Kalendarz",
+    "notes": "Notatki"
   },
   "update": {
     "checking": "Sprawdzanie aktualizacji...",

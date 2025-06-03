@@ -10,6 +10,7 @@
     HelpCircleIcon,
     LogOutIcon,
     UserIcon,
+    StickyNoteIcon,
   } from "lucide-svelte";
   import { shortcut } from "@svelte-put/shortcut";
   import { goto } from "$app/navigation";
@@ -41,6 +42,12 @@
     closeMenu();
     await goto("/commands/CLIPBOARD");
     appStore.switchMode(APP_MODE.CLIPBOARD);
+  }
+
+  async function handleNotes() {
+    closeMenu();
+    await goto("/commands/NOTES");
+    appStore.switchMode(APP_MODE.NOTES);
   }
 
   async function handleCalendar() {
@@ -99,6 +106,7 @@
 {#if appStore.menuOpen}
   <Shortcut keys={["k"]} callback={handleCalendar} />
   <Shortcut keys={["c"]} callback={handleClipboard} />
+  <Shortcut keys={["n"]} callback={handleNotes} />
   <Shortcut keys={["h"]} callback={handleHelp} />
   <Shortcut keys={["s"]} callback={handleSettings} />
   <Shortcut keys={["q"]} callback={handleExit} />
@@ -145,6 +153,13 @@
           </button>
         </li>
       {/if}
+      <li>
+        <button onclick={handleNotes} class="gap-4 items-center">
+          <StickyNoteIcon size={20} />
+          <span>{$_("menu.notes")}</span>
+          <kbd class="kbd">n</kbd>
+        </button>
+      </li>
       <li>
         <button onclick={handleClipboard} class="gap-4 items-center">
           <ClipboardIcon size={20} />

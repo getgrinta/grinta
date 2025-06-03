@@ -277,7 +277,8 @@
     "settings": "Einstellungen",
     "help": "Hilfe",
     "profile": "Profile",
-    "calendar": "Kalender"
+    "calendar": "Kalender",
+    "notes": "Notizen"
   },
   "update": {
     "checking": "Auf Updates prüfen...",

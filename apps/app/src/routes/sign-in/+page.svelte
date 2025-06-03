@@ -6,7 +6,7 @@
   import { vaultStore } from "$lib/store/vault.svelte";
   import { createForm } from "felte";
   import { toast } from "svelte-sonner";
-  import { ZodError, z } from "zod/v3";
+  import { z } from "zod/v3";
   import { _ } from "$lib/i18n";
   import { onMount } from "svelte";
 
@@ -124,7 +124,7 @@
     },
     onError: (error) => {
       interactionDisabled = false;
-      if (error instanceof ZodError) {
+      if (error instanceof Error && "issues" in error) {
         const validationObject = JSON.parse(error?.message)[0];
 
         let errorMessage = validationObject.message;

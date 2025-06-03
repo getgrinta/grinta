@@ -272,7 +272,8 @@
     "exit": "Exit",
     "settings": "Settings",
     "help": "Help",
-    "profile": "Profile"
+    "profile": "Profile",
+    "notes": "Notes"
   },
   "update": {
     "checking": "Checking for updates...",

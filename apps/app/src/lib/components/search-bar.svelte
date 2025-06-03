@@ -91,32 +91,7 @@
     return goto(`/notes/${filename}`);
   }
 
-  const INDICATOR_MODES = [
-    {
-      value: APP_MODE.INITIAL,
-      icon: SearchIcon,
-      shortcut: "⌘1",
-      hotkey: "Mod+1",
-    },
-    {
-      value: APP_MODE.NOTES,
-      icon: StickyNoteIcon,
-      shortcut: "⌘2",
-      hotkey: "Mod+2",
-    },
-  ];
-
   let baseShortcuts: ShortcutTrigger[] = [
-    {
-      key: "1",
-      modifier: ["meta"],
-      callback: () => switchMode(APP_MODE.INITIAL),
-    },
-    {
-      key: "2",
-      modifier: ["meta"],
-      callback: () => switchMode(APP_MODE.NOTES),
-    },
     {
       key: "p",
       modifier: ["meta"],
@@ -445,18 +420,6 @@
     <div slot="addon" class="flex items-center gap-1">
       {#if !appStore.quickSearchMode && appStore.appMode === APP_MODE.INITIAL && appStore.query.length >= 3 && appStore.user?.id}
         <ViewActions actions={searchViewActions} size="sm" />
-      {:else}
-        <SegmentedControl
-          items={INDICATOR_MODES.map((mode) => ({
-            text: $_(`barMode.${mode.value.toLowerCase()}`),
-            icon: mode.icon,
-            active: mode.value === appStore.appMode,
-            shortcut: mode.shortcut,
-            hotkey: mode.hotkey,
-            testId: `search-bar-mode-${mode.value.toLowerCase()}`,
-            onClick: () => switchMode(mode.value),
-          }))}
-        />
       {/if}
       <SidebarMenuButton />
     </div>
