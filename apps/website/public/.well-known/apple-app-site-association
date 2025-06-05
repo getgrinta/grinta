@@ -1,0 +1,19 @@
+{
+  "applinks": {
+      "details": [
+           {
+             "appIDs": [ "R2CTR74H64.com.wave.iosapp"],
+             "components": [
+             ]
+           }
+       ]
+   },
+   "webcredentials": {
+      "apps": [ "R2CTR74H64.com.wave.iosapp" ]
+   },
+
+
+    "appclips": {
+        "apps": []
+    }
+}
