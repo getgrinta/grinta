@@ -196,7 +196,8 @@
       "search": "Szukaj...",
       "translate": "Przetłumacz",
       "hideEvent": "Ukryj to wydarzenie",
-      "hideCalendar": "Ukryj ten kalendarz"
+      "hideCalendar": "Ukryj ten kalendarz",
+      "delete": "Usuń"
     },
     "menuItems": {
       "clearNotes": "Wyczyść notatki",
@@ -254,6 +255,7 @@
     "subscription": "Subskrypcja",
     "grintaPro": "Grinta Pro",
     "upgrade": "Przejdź na Pro",
+    "manageAccount": "Zarządzaj kontem",
     "cancel": "Anuluj",
     "signOut": "Wyloguj się",
     "subscriptionModal": {

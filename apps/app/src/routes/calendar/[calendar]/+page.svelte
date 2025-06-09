@@ -241,34 +241,36 @@
 
 <div class="flex flex-col h-full">
   <TopBar>
-    <div slot="input" class="flex items-center gap-2 grow h-8">
-      {#if event}
-        <CalendarIcon size={20} class="text-base-content/70" />
-        <span class="font-semibold text-lg truncate py-1"
-          >{event?.title || $_("settings.calendar.untitledEvent")}</span
-        >
-      {:else}
-        <!-- Keep the span for loading text, adjusted styling if needed -->
-        <span class="font-semibold text-lg py-1 grow"
-          >{$_("settings.calendar.loadingEvent")}</span
-        >
-      {/if}
-    </div>
-
-    <div slot="addon">
-      {#if meeting}
-        <button
-          class="btn btn-sm btn-primary mr-2"
-          onclick={async () => {
-            if (meeting?.link) {
-              await openUrl(meeting.link);
-            }
-          }}
-        >
-          {$_("common.join")}
-        </button>
-      {/if}
-    </div>
+    {#snippet input()}
+      <div class="flex items-center gap-2 grow h-8">
+        {#if event}
+          <CalendarIcon size={20} class="text-base-content/70" />
+          <span class="font-semibold text-lg truncate py-1"
+            >{event?.title || $_("settings.calendar.untitledEvent")}</span
+          >
+        {:else}
+          <span class="font-semibold text-lg py-1 grow"
+            >{$_("settings.calendar.loadingEvent")}</span
+          >
+        {/if}
+      </div>
+    {/snippet}
+    {#snippet addon()}
+      <div>
+        {#if meeting}
+          <button
+            class="btn btn-sm btn-primary mr-2"
+            onclick={async () => {
+              if (meeting?.link) {
+                await openUrl(meeting.link);
+              }
+            }}
+          >
+            {$_("common.join")}
+          </button>
+        {/if}
+      </div>
+    {/snippet}
   </TopBar>
 
   <div class="mt-16 px-6 pb-8 pt-4 flex-grow overflow-y-auto">

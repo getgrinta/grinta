@@ -15,7 +15,6 @@
     XIcon,
     TrashIcon,
   } from "lucide-svelte";
-  import colors from "tailwindcss/colors";
   import { sendMessage } from "webext-bridge/popup";
   import { onClickOutside } from "runed";
   import type { DraggableOptions } from "$lib/types";

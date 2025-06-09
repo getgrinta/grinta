@@ -25,7 +25,6 @@ import {
 import { type PluginContext } from "@getgrinta/plugin";
 import {
   PluginWebSearch,
-  PluginNotes,
   PluginNlp,
   PluginExactUrl,
 } from "@getgrinta/plugin-search";
@@ -55,7 +54,6 @@ nlp.extend(numbers);
 export const SYSTEM_COMMAND = {
   SIGN_IN: "SIGN_IN",
   PROFILE: "PROFILE",
-  CLEAR_NOTES: "CLEAR_NOTES",
   CLEAR_HISTORY: "CLEAR_HISTORY",
   HELP: "HELP",
   SETTINGS: "SETTINGS",
@@ -244,12 +242,19 @@ export class CommandsStore extends SecureStore<Commands> {
         return this.getClipboardCommands();
       })
       .with(APP_MODE.NOTES, async () => {
-        await notesStore.fetchNotes();
-        const noteCommands =
-          (await PluginNotes(this.buildPluginContext())?.addSearchResults?.(
-            appStore.query,
-          )) ?? [];
-        return noteCommands;
+        return notesStore.notes.map((note) => {
+          return ExecutableCommandSchema.parse({
+            label: note.title,
+            localizedLabel: note.title,
+            value: note.id,
+            handler: COMMAND_HANDLER.OPEN_NOTE,
+            appModes: [APP_MODE.NOTES],
+            metadata: {
+              path: note.folder,
+              updatedAt: new Date(note.updatedAt),
+            },
+          });
+        });
       })
       .with(APP_MODE.CALENDAR, async () => {
         const events = calendarStore.events.filter((event) => {
@@ -324,7 +329,9 @@ export class CommandsStore extends SecureStore<Commands> {
         )(filteredCommands).reverse(),
       );
       return;
-    } else if (appStore.appMode === APP_MODE.CALENDAR) {
+    }
+
+    if (appStore.appMode === APP_MODE.CALENDAR) {
       this.commands = sortBy(
         (command: ExecutableCommand) =>
           command.metadata?.calendarSchema?.startTime ?? new Date(),
@@ -537,12 +544,6 @@ export class CommandsStore extends SecureStore<Commands> {
       )
       .with({ handler: COMMAND_HANDLER.SYSTEM }, async ({ value }) => {
         return match(value as SystemCommand)
-          .with(SYSTEM_COMMAND.CLEAR_NOTES, async () => {
-            await notesStore.clearNotes();
-            this.removeHistoryOfType(COMMAND_HANDLER.OPEN_NOTE);
-            appStore.switchMode(APP_MODE.INITIAL);
-            return goto("/");
-          })
           .with(SYSTEM_COMMAND.HELP, async () => {
             toggleVisibility();
             return openUrl("https://getgrinta.com/guides");
@@ -570,15 +571,12 @@ export class CommandsStore extends SecureStore<Commands> {
           .exhaustive();
       })
       .with({ handler: COMMAND_HANDLER.OPEN_NOTE }, async ({ value }) => {
-        const filename = encodeURIComponent(value);
-        return goto(`/notes/${filename}`);
+        await notesStore.openNote(value);
+        appStore.switchMode(APP_MODE.INITIAL);
+        return goto("/");
       })
-      .with({ handler: COMMAND_HANDLER.CREATE_NOTE }, async () => {
-        const filename = await notesStore.createNote(
-          appStore.query.length > 0 ? appStore.query : undefined,
-        );
-        const encodedFilename = encodeURIComponent(filename);
-        return goto(`/notes/${encodedFilename}`);
+      .with({ handler: COMMAND_HANDLER.CREATE_NOTE }, async ({ value }) => {
+        console.log(">>>CREATE NOTE", value);
       })
       .with({ handler: COMMAND_HANDLER.RUN_SHORTCUT }, async ({ value }) => {
         toggleVisibility();
@@ -611,7 +609,6 @@ export class CommandsStore extends SecureStore<Commands> {
         appMode: appStore.appMode,
       },
       settings: settingsStore.data,
-      notes: notesStore.notes,
     };
   }
 

@@ -2,7 +2,7 @@
   import { commandsStore } from "$lib/store/commands.svelte";
   import { widgetsStore } from "$lib/store/widgets.svelte";
   import { Command } from "@tauri-apps/plugin-shell";
-  import { CopyIcon, PinIcon, XIcon } from "lucide-svelte";
+  import { CopyIcon, PinIcon, Trash2Icon, XIcon } from "lucide-svelte";
   import { EyeIcon, FolderIcon, TextIcon } from "lucide-svelte";
   import { _ } from "svelte-i18n";
   import { get } from "svelte/store";
@@ -92,7 +92,7 @@
 
     if (command.metadata?.ranAt) {
       menuItems.push({
-        label: t("commands.contextMenu.remove"),
+        label: t("commands.contextMenu.remove_from_history"),
         icon: XIcon as any,
         onClick: async () => {
           if (
@@ -107,20 +107,18 @@
       });
     }
 
-    if (command.handler === COMMAND_HANDLER.OPEN_NOTE) {
-      // Show in finder
+    if (
+      appStore.appMode === APP_MODE.NOTES &&
+      command.handler === COMMAND_HANDLER.OPEN_NOTE
+    ) {
       menuItems.push({
-        label: t("commands.contextMenu.showInFinder"),
-        icon: EyeIcon as any,
+        label: t("commands.contextMenu.delete"),
+        icon: Trash2Icon as any,
         onClick: async () => {
-          const homePath = await PathApi.homeDir();
-          const fullPath = await PathApi.join(
-            homePath,
-            ...settingsStore.data.notesDir,
-            command.value,
-          );
-
-          Command.create("open", ["-R", fullPath]).execute();
+          await notesStore.deleteNote(command.value);
+          notesStore.fetchNotes().then(() => {
+            commandsStore.buildCommands({ isRefresh: true });
+          });
         },
       });
     }

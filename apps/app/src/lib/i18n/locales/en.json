@@ -33,6 +33,7 @@
     "subscription": "Subscription",
     "grintaPro": "Grinta Pro",
     "upgrade": "Upgrade to Pro",
+    "manageAccount": "Manage Account",
     "cancel": "Cancel",
     "signOut": "Sign out",
     "subscriptionModal": {
@@ -209,7 +210,8 @@
       "copyPath": "Copy Path",
       "search": "Search...",
       "hideEvent": "Hide this event",
-      "hideCalendar": "Hide this calendar"
+      "hideCalendar": "Hide this calendar",
+      "delete": "Delete"
     },
     "menuItems": {
       "clearNotes": "Clear notes",

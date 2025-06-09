@@ -1,6 +1,5 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import SegmentedControl from "$lib/components/segmented-control.svelte";
   import TopBar from "$lib/components/top-bar.svelte";
   import { appMetadataStore } from "$lib/store/app-metadata.svelte";
   import { appStore } from "$lib/store/app.svelte";
@@ -8,7 +7,6 @@
   import { notesStore } from "$lib/store/notes.svelte";
   import { settingsStore } from "$lib/store/settings.svelte";
   import { accessoryStore } from "$lib/store/accessory.svelte";
-  import AccessoryView from "./accessory-view/accessory-view.svelte"; // Add this import
   import {
     APP_MODE,
     type AppMode,
@@ -22,8 +20,6 @@
     CalendarIcon,
     ChevronLeftIcon,
     ClipboardIcon,
-    EyeIcon,
-    EyeOffIcon,
     SearchIcon,
     StickyNoteIcon,
     XIcon,
@@ -40,8 +36,26 @@
     defaultQuickSearchModes,
     type QuickSearchMode,
   } from "$lib/constants/quick-search";
+  import { blur, crossfade, fade, fly, slide } from "svelte/transition";
+  import { sineOut } from "svelte/easing";
+
+  const INPUT_PLACEHOLDERS = [
+    "Start browsing the web",
+    "Find files on your computer",
+    "Type anything and click Tab to ask the AI",
+    "See upcoming events in Calendar",
+    "Need to write things down? Open Notes",
+  ];
 
   let queryInput: HTMLInputElement;
+  let placeholder = $state(getRandomPlaceholder());
+  let placeholderInterval = $state<NodeJS.Timeout | number>();
+
+  function getRandomPlaceholder() {
+    return INPUT_PLACEHOLDERS[
+      Math.floor(Math.random() * INPUT_PLACEHOLDERS.length)
+    ];
+  }
 
   // Combine default and custom quick links, overriding defaults with customs
   const combinedQuickSearchModes = $derived(() => {
@@ -85,10 +99,11 @@
   }
 
   async function createNote() {
-    const filename = await notesStore.createNote(
-      appStore.query.length > 0 ? appStore.query : undefined,
-    );
-    return goto(`/notes/${filename}`);
+    const id = await notesStore.createNote(appStore.query);
+    await notesStore.openNote(id);
+    await switchMode(APP_MODE.INITIAL);
+    appStore.setQuery("");
+    return goto("/");
   }
 
   let baseShortcuts: ShortcutTrigger[] = [
@@ -128,9 +143,8 @@
 
   const notesViewActions = [
     {
-      label: $_("notes.createNote"),
+      label: "⌘N " + $_("notes.createNote"),
       onclick: createNote,
-      icon: ArrowRightToLineIcon,
     },
   ];
 
@@ -342,21 +356,7 @@
               tooltip: $_("common.clear"),
               onClick: () => appStore.setQuery(""),
             }
-          : settingsStore.data.incognitoEnabled
-            ? {
-                icon: EyeOffIcon,
-                tooltip: $_("common.incognito"),
-                onClick: () => settingsStore.toggleIncognito(),
-                active: true,
-                hotkey: "Mod+p",
-              }
-            : {
-                icon: EyeIcon,
-                tooltip: $_("common.incognito"),
-                onClick: () => settingsStore.toggleIncognito(),
-                active: false,
-                hotkey: "Mod+p",
-              },
+          : undefined,
       )
       .otherwise(() => ({
         icon: ChevronLeftIcon,
@@ -365,6 +365,36 @@
         active: false,
         hotkey: "Mod+p",
       })),
+  );
+
+  async function sleep(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  watch(
+    () => appStore.visible,
+    () => {
+      const clearPlaceholderInterval = () => {
+        clearInterval(placeholderInterval);
+        placeholderInterval = undefined;
+        placeholder = "";
+      };
+      const setPlaceholder = async () => {
+        placeholder = "";
+        await sleep(1000);
+        placeholder = getRandomPlaceholder();
+      };
+      if (appStore.visible) {
+        clearPlaceholderInterval();
+        setPlaceholder();
+        placeholderInterval = setInterval(setPlaceholder, 7000);
+      } else {
+        clearPlaceholderInterval();
+      }
+      return () => {
+        clearPlaceholderInterval();
+      };
+    },
   );
 </script>
 
@@ -376,52 +406,75 @@
 
 <form use:form>
   <TopBar>
-    <div
-      class="tooltip tooltip-bottom tooltip-primary"
-      data-tip={indicatorButton.tooltip}
-      slot="indicator"
-    >
-      <button
-        type="button"
-        class={clsx("btn btn-sm", indicatorButton.active && "btn-primary")}
-        onclick={indicatorButton.onClick}
-      >
-        <indicatorButton.icon size={16} class={clsx("pointer-events-none")} />
-      </button>
-    </div>
-    <div class="relative flex grow items-center" slot="input">
-      <input
-        bind:this={queryInput}
-        id="searchBar"
-        class={clsx("grow font-semibold text-lg !outline-none")}
-        style="padding-left: {leftPadding}px;"
-        name="query"
-        bind:value={appStore.query}
-        onkeydown={handleNavigation}
-        placeholder={inputProps.placeholder}
-        autocomplete="off"
-        spellcheck="false"
-        data-testid="search-bar"
-      />
-      {#if appStore.quickSearchMode && appStore.appMode === APP_MODE.INITIAL}
-        <div
-          bind:this={quickSearchBadge}
-          class={clsx(
-            "badge absolute left-0 top-1/2 -translate-y-1/2 z-10 pointer-events-none",
-            `bg-${appStore.quickSearchMode.bgColorClass}`,
-            appStore.quickSearchMode.textColorClass,
-            `shadow-${appStore.quickSearchMode.bgColorClass}/50 border-0 shadow-lg`,
-          )}
-        >
-          {appStore.quickSearchMode.name}
+    {#snippet indicator()}
+      {#if indicatorButton}
+        <div class="tooltip tooltip-bottom" data-tip={indicatorButton.tooltip}>
+          <button
+            type="button"
+            class={clsx("btn btn-sm btn-square border-gradient")}
+            onclick={indicatorButton.onClick}
+          >
+            <indicatorButton.icon
+              size={16}
+              class={clsx("pointer-events-none")}
+            />
+          </button>
         </div>
       {/if}
-    </div>
-    <div slot="addon" class="flex items-center gap-1">
-      {#if !appStore.quickSearchMode && appStore.appMode === APP_MODE.INITIAL && appStore.query.length >= 3 && appStore.user?.id}
-        <ViewActions actions={searchViewActions} size="sm" />
-      {/if}
-      <SidebarMenuButton />
-    </div>
+    {/snippet}
+    {#snippet input()}
+      <div class="relative flex grow items-center">
+        <input
+          bind:this={queryInput}
+          id="searchBar"
+          class={clsx("grow font-semibold text-lg !outline-none")}
+          style="padding-left: {leftPadding}px;"
+          name="query"
+          bind:value={appStore.query}
+          onkeydown={handleNavigation}
+          placeholder={appStore.appMode !== APP_MODE.INITIAL
+            ? inputProps.placeholder
+            : ""}
+          autocomplete="off"
+          spellcheck="false"
+          data-testid="search-bar"
+        />
+        {#if appStore.visible && appStore.appMode === APP_MODE.INITIAL && appStore.query.length === 0}
+          <div
+            class="absolute flex left-0 top-0 text-lg gap-1 pointer-events-none text-base-content/50"
+          >
+            {#each placeholder.split(" ") as word, index}
+              <span
+                in:blur={{ delay: index * 150, easing: sineOut }}
+                out:blur={{ easing: sineOut }}>{word}</span
+              >
+            {/each}
+          </div>
+        {/if}
+        {#if appStore.quickSearchMode && appStore.appMode === APP_MODE.INITIAL}
+          <div
+            bind:this={quickSearchBadge}
+            class={clsx(
+              "badge absolute left-0 top-1/2 -translate-y-1/2 z-10 pointer-events-none",
+              `bg-${appStore.quickSearchMode.bgColorClass}`,
+              appStore.quickSearchMode.textColorClass,
+              `shadow-${appStore.quickSearchMode.bgColorClass}/50 border-0 shadow-lg`,
+            )}
+          >
+            {appStore.quickSearchMode.name}
+          </div>
+        {/if}
+      </div>
+    {/snippet}
+    {#snippet addon()}
+      <div class="flex items-center gap-1">
+        {#if !appStore.quickSearchMode && appStore.appMode === APP_MODE.INITIAL && appStore.query.length >= 3 && appStore.user?.id}
+          <ViewActions actions={searchViewActions} size="sm" />
+        {:else if appStore.appMode === APP_MODE.NOTES}
+          <ViewActions actions={notesViewActions} size="sm" />
+        {/if}
+        <SidebarMenuButton />
+      </div>
+    {/snippet}
   </TopBar>
 </form>

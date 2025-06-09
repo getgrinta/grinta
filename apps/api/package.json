@@ -21,6 +21,7 @@
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
     "script:notify": "bun ./scripts/notify-deployed.ts"
   },
   "dependencies": {

@@ -101,9 +101,8 @@
   <div
     role="menuitem"
     class={clsx(
-      "flex justify-between gap-4 border border-transparent hover:bg-primary/40 !shadow-none",
-      active &&
-        "menu-active !bg-primary/50 text-primary-content !border-primary-content/20",
+      "flex justify-between gap-4 border border-transparent hover:bg-base-200 !shadow-none",
+      active && "menu-active !bg-base-200 text-primary-content border-gradient",
     )}
   >
     <button

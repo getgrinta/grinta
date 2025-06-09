@@ -7,7 +7,6 @@
   import humanizeString from "humanize-string";
   import { PressedKeys, watch } from "runed";
   import { _ } from "svelte-i18n";
-  import { writable } from "svelte/store";
 
   import packageJson from "../../../package.json" with { type: "json" };
   import { SUPPORTED_FILE_INDEXING_FILE_EXTENSIONS } from "$lib/grinta-invoke";
@@ -32,10 +31,9 @@
   } from "@getgrinta/core";
   import { commandsStore } from "$lib/store/commands.svelte";
   import Shortcut from "$lib/components/shortcut.svelte";
-  import { calendarStore } from "$lib/store/calendar.svelte";
   import CalendarSettings from "$lib/components/settings/calendar-settings.svelte"; // Import the new component
   import { createForm } from "felte";
-  import { CustomQuickLinkSchema, type CustomQuickLink } from "@getgrinta/core";
+  import { type CustomQuickLink } from "@getgrinta/core";
   import { defaultQuickSearchModes } from "$lib/constants/quick-search";
   import { Trash2 } from "lucide-svelte";
 
@@ -89,22 +87,9 @@
     currentTab = tab;
   }
 
-  function updateNotesDir(event: Event) {
-    const notesDirSplit = (event.target as HTMLInputElement).value.split("/");
-    return settingsStore.setNotesDir(notesDirSplit);
-  }
-
-  const notesDirString = $derived(settingsStore.data.notesDir.join("/"));
-
   async function clearCommandHistory() {
     await commandsStore.clearHistory();
     return toast.success($_("settings.commandHistoryCleared"));
-  }
-
-  async function wipeLocalData() {
-    await settingsStore.wipeLocalData();
-    toast.success($_("settings.fields.localDataWiped"));
-    return goto("/");
   }
 
   async function requestAccessibilityPermissions() {
@@ -259,12 +244,16 @@
 <Shortcut keys={["meta", "4"]} callback={() => changeTab("calendar")} />
 
 <TopBar>
-  <div slot="input" class="grow flex-1 truncate text-lg font-semibold">
-    {$_("settings.title")}
-  </div>
-  <div slot="addon" role="tablist">
-    <SegmentedControl items={controls} alwaysShowLabels />
-  </div>
+  {#snippet input()}
+    <div class="grow flex-1 truncate text-lg font-semibold">
+      {$_("settings.title")}
+    </div>
+  {/snippet}
+  {#snippet addon()}
+    <div role="tablist">
+      <SegmentedControl items={controls} alwaysShowLabels />
+    </div>
+  {/snippet}
 </TopBar>
 
 <div class="flex flex-1 flex-col gap-4 p-4">
@@ -355,27 +344,12 @@
           type="checkbox"
           bind:checked={settingsStore.data.showWidgetLabels}
         />
-        <label class="text-sm" for="notesDirInput"
-          >{$_("settings.fields.notesDirectory")}</label
-        >
-        <input
-          id="notesDirInput"
-          class="input w-full"
-          name="notesDir"
-          value={notesDirString}
-          onchange={updateNotesDir}
-        />
         <label for="dangerZone" class="text-sm"
           >{$_("settings.fields.dangerZone")}</label
         >
-        <div id="dangerZone" class="flex gap-2">
-          <button type="button" class="btn" onclick={clearCommandHistory}
-            >{$_("settings.fields.clearCommandHistory")}</button
-          >
-          <button type="button" class="btn btn-warning" onclick={wipeLocalData}
-            >{$_("settings.fields.wipeAllLocalData")}</button
-          >
-        </div>
+        <button type="button" class="btn" onclick={clearCommandHistory}
+          >{$_("settings.fields.clearCommandHistory")}</button
+        >
       </form>
     {:else if currentTab === "search"}
       <div class="grid grid-cols-[1fr_2fr] gap-4 justify-center items-center">

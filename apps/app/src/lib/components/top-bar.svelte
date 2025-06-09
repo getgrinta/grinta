@@ -1,8 +1,12 @@
 <script lang="ts">
   import { ChevronLeftIcon } from "lucide-svelte";
+  import type { Snippet } from "svelte";
 
-  const { goBack } = $props<{
+  const { goBack, indicator, input, addon } = $props<{
     goBack?: () => void;
+    indicator?: Snippet;
+    input?: Snippet;
+    addon?: Snippet;
   }>();
 
   function defaultGoBack() {
@@ -10,21 +14,23 @@
   }
 </script>
 
-<div class="fixed flex flex-row left-0 top-0 right-0 z-20 items-center gap-2">
+<div class="fixed flex flex-row left-0 top-0 right-0 z-20 items-center">
   <label
     for="nothing"
-    class="input px-6 h-14 !outline-none bg-base-100/80 border-b backdrop-blur border-x-transparent border-t-transparent border-base-300 !shadow-none rounded-none flex-1 flex items-center gap-4 w-full"
+    class="input px-6 h-14 !outline-none bg-transparent border-none !shadow-none rounded-none flex-1 flex items-center gap-4 w-full"
   >
-    <slot name="indicator">
+    {#if indicator}
+      {@render indicator?.()}
+    {:else}
       <button
         type="button"
-        class="btn btn-sm"
+        class="btn btn-sm btn-square border-gradient"
         onclick={goBack ?? defaultGoBack}
       >
         <ChevronLeftIcon size={16} />
       </button>
-    </slot>
-    <slot name="input"></slot>
-    <slot name="addon"></slot>
+    {/if}
+    {@render input?.()}
+    {@render addon?.()}
   </label>
 </div>

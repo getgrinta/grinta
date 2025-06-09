@@ -18,6 +18,7 @@
     type MetadataSchema,
   } from "@getgrinta/core";
   import DOMPurify from "dompurify";
+  import dayjs from "dayjs";
 
   const props = $props();
 
@@ -57,6 +58,10 @@
       .otherwise(() => value);
   }
 
+  function timeFromNow(date: Date) {
+    return dayjs(date).fromNow();
+  }
+
   const currentLabel = $derived(props.item.localizedLabel ?? props.item.label);
 
   const highlightedText = $derived(
@@ -89,9 +94,9 @@
 >
   <div
     class={clsx(
-      "flex justify-between gap-4 border border-transparent hover:bg-primary/40 !shadow-none",
+      "flex justify-between gap-4 border-none hover:bg-base-200 !shadow-none",
       props.active &&
-        "menu-active !bg-primary/50 text-primary-content !border-primary-content/20",
+        "menu-active !bg-base-200 border-gradient text-primary-content",
     )}
   >
     <button
@@ -119,7 +124,7 @@
             )}
             <span
               class={clsx(
-                "whitespace-pre",
+                "whitespace-pre font-medium",
                 chunk.highlight ? "text-base-content" : "text-primary-content",
                 last && "truncate",
                 props.active && "!text-primary-content",
@@ -137,7 +142,7 @@
           type="button"
           onclick={() => commandsStore.handleCommand({ command: props.item })}
           class={clsx(
-            "btn btn-ghost hover:bg-transparent border-0 shadow-none",
+            "btn btn-ghost hover:bg-transparent border-0 shadow-none font-medium",
             props.active && "!text-primary-content !border-primary-content/50",
           )}
         >
@@ -163,6 +168,20 @@
           style="background-color: {props.item.metadata?.calendarSchema
             ?.backgroundColor ?? '#808080'};"
         ></span>
+      {:else if props.item.handler === COMMAND_HANDLER.OPEN_NOTE}
+        <button
+          type="button"
+          onclick={() => commandsStore.handleCommand({ command: props.item })}
+          class={clsx(
+            "btn btn-ghost hover:bg-transparent border-0 shadow-none flex flex-col gap-0 items-end",
+            props.active && "!text-primary-content !border-primary-content/50",
+          )}
+        >
+          <span>{props.item.metadata?.path}</span>
+          <span class="text-xs font-medium"
+            >{timeFromNow(props.item.metadata?.updatedAt)}</span
+          >
+        </button>
       {/if}
     </div>
   </div>

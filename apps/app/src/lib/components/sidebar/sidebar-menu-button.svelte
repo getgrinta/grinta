@@ -9,10 +9,7 @@
   const userId = $derived(appStore.user?.id);
 </script>
 
-<div
-  class="tooltip tooltip-bottom tooltip-primary"
-  data-tip={$_("common.menu")}
->
+<div class="tooltip tooltip-bottom" data-tip={$_("common.menu")}>
   <label class="btn btn-square btn-sm relative" for="menuSidebar">
     {#if isCmdPressed}
       <div

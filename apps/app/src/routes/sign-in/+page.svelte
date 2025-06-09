@@ -142,14 +142,17 @@
 
 <div class="flex flex-1 flex-col">
   <TopBar>
-    <h1 slot="input" class="text-lg font-semibold flex-1">{header}</h1>
-    <a
-      href="https://getgrinta.com/guides"
-      slot="addon"
-      target="_blank"
-      rel="noopener noreferrer"
-      class="btn btn-sm">{$_("auth.help")}</a
-    >
+    {#snippet input()}
+      <h1 class="text-lg font-semibold flex-1">{header}</h1>
+    {/snippet}
+    {#snippet addon()}
+      <a
+        href="https://getgrinta.com/guides"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn btn-sm">{$_("auth.help")}</a
+      >
+    {/snippet}
   </TopBar>
   <div class="flex flex-col flex-1 mt-20 gap-4 items-center justify-center">
     <form use:form class="flex flex-col w-full max-w-[28rem] gap-4">

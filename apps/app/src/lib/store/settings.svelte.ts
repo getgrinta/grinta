@@ -5,8 +5,6 @@ import {
 } from "@tauri-apps/plugin-global-shortcut";
 import { activateWindow } from "../utils.svelte";
 import { appStore } from "./app.svelte";
-import { commandsStore } from "./commands.svelte";
-import { notesStore } from "./notes.svelte";
 import { SecureStore } from "./secure.svelte";
 import {
   checkAccessibilityPermission,
@@ -30,12 +28,14 @@ async function toggleShortcutHandler(event: ShortcutEvent) {
     appStore.setLastFocusedWindowName(name);
     await activateWindow();
     const searchBar = document.getElementById("searchBar");
+    appStore.visible = true;
     return searchBar?.focus();
   }
 
   if (appStore.lastFocusedWindowName) {
     await activateAppByName(appStore.lastFocusedWindowName);
   }
+  appStore.visible = false;
   return appStore.appWindow?.hide();
 }
 
@@ -83,15 +83,6 @@ export class SettingsStore extends SecureStore<Settings> {
     await this.unregisterShortcuts();
     this.updateData({ toggleShortcut });
     await this.registerShortcuts();
-  }
-
-  async setNotesDir(notesDir: string[]) {
-    this.updateData({ notesDir });
-  }
-
-  async wipeLocalData() {
-    await notesStore.clearNotes();
-    await commandsStore.clearHistory();
   }
 
   addCustomQuickLink(link: CustomQuickLink) {

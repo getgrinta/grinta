@@ -1,5 +1,6 @@
 <script lang="ts">
   import dayjs from "dayjs";
+  import RelativeTime from "dayjs/plugin/relativeTime";
   import LocalizedFormat from "dayjs/plugin/localizedFormat";
   import "@fontsource-variable/dm-sans";
   import "../app.css";
@@ -44,12 +45,15 @@
   import PngDevIconUrl from "$lib/assets/tray-dev.png?arraybuffer";
   import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
   import type { UnlistenFn } from "@tauri-apps/api/event";
-  import { APP_MODE, COMMAND_HANDLER } from "@getgrinta/core";
+  import { APP_MODE } from "@getgrinta/core";
   import SidebarMenu from "$lib/components/sidebar/sidebar-menu.svelte";
   import { shortcut } from "@svelte-put/shortcut";
   import { calendarStore } from "$lib/store/calendar.svelte";
+  import { notesStore } from "$lib/store/notes.svelte";
+  import { openUrl } from "@tauri-apps/plugin-opener";
   const { children } = $props();
 
+  dayjs.extend(RelativeTime);
   dayjs.extend(LocalizedFormat);
 
   let initializing = $state<boolean>(true);
@@ -110,16 +114,7 @@
             id: "development",
             text: "🧑‍💻 Development",
             action() {
-              return commandsStore.handleCommand({
-                handler: COMMAND_HANDLER.URL,
-                value: "https://www.youtube.com/watch?v=AGsjA1pXajk",
-                label: "Development",
-                appModes: [APP_MODE.INITIAL],
-                localizedLabel: "Development",
-                metadata: {},
-                smartMatch: false,
-                priority: 0,
-              });
+              return openUrl("https://www.youtube.com/watch?v=AGsjA1pXajk");
             },
           }
         : {
@@ -288,6 +283,7 @@
     lastMonitorScreenSize = monitor?.size ?? null;
     await appStore.positionWindow();
     await appStore.appWindow?.show();
+    await notesStore.fetchNotes();
 
     initializing = false;
     console.info("[Grinta] App initialized");
@@ -342,7 +338,6 @@
     onOpenUrl(deepLinkHandler).then((unlisten) => {
       deepLinkUnlisten = unlisten;
     });
-
     return () => {
       settingsStore.unregisterShortcuts();
       systemThemeWatcher.removeEventListner();

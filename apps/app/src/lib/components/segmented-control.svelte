@@ -30,10 +30,7 @@
 <div class={clsx("join shadow-sm rounded-full border-0 ring-0")}>
   {#each items as item}
     <div
-      class={clsx(
-        "tooltip-primary tooltip-bottom",
-        !alwaysShowLabels && "tooltip",
-      )}
+      class={clsx("tooltip tooltip-bottom", !alwaysShowLabels && "tooltip")}
       data-tip={item.text}
     >
       <button

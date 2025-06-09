@@ -60,7 +60,11 @@
       >
         <button
           type="button"
-          class={clsx("btn !shadow-none", first && "ml-4", last && "mr-4")}
+          class={clsx(
+            "btn font-medium !shadow-none border-gradient",
+            first && "ml-4",
+            last && "mr-4",
+          )}
           onclick={() =>
             commandsStore.handleCommand({
               command: widget.data,

@@ -24,6 +24,7 @@ import type { QuickSearchMode } from "$lib/constants/quick-search";
 export class AppStore {
   query = $state("");
   appMode = $state<AppMode>(APP_MODE.INITIAL);
+  visible = $state<boolean>(true);
   quickSearchMode = $state<QuickSearchMode | null>(null);
   appWindow = $state<Window>();
   lastFocusedWindowName = $state<string>();

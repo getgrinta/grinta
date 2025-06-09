@@ -12,8 +12,8 @@ export const EnvSchema = z.object({
   STRIPE_WEBHOOK_SECRET: z.string(),
   STRIPE_PRICE_ID: z.string(),
   LOGS_WEBHOOK_URL: z.string().url().optional(),
-  AI_DAILY_LIMIT: z.coerce.number().default(100),
-  AI_DAILY_LIMIT_PRO: z.coerce.number().default(1000),
+  AI_DAILY_LIMIT: z.coerce.number().default(50),
+  AI_DAILY_LIMIT_PRO: z.coerce.number().default(250),
 });
 
 export const env = EnvSchema.parse(process.env);

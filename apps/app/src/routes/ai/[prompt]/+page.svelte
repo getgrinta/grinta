@@ -18,12 +18,12 @@
   }
 
   async function createNote() {
-    const filename = await notesStore.createNote(
+    const noteId = await notesStore.createNote(
       appStore.query,
       aiStore.grintAiResult ?? "",
     );
-    const encodedFilename = encodeURIComponent(filename);
-    return goto(`/notes/${encodedFilename}`, { replaceState: true });
+    console.log("NID", noteId);
+    return notesStore.openNote(noteId);
   }
 
   const viewControls = [
@@ -64,12 +64,16 @@
 
 <div class="flex flex-1 flex-col gap-4 p-4">
   <TopBar>
-    <div slot="input" class="grow flex-1 truncate text-lg font-semibold">
-      {appStore.query}
-    </div>
-    <div slot="addon">
-      <SegmentedControl items={viewControls} />
-    </div>
+    {#snippet input()}
+      <div class="grow flex-1 truncate text-lg font-semibold">
+        {appStore.query}
+      </div>
+    {/snippet}
+    {#snippet addon()}
+      <div>
+        <SegmentedControl items={viewControls} />
+      </div>
+    {/snippet}
   </TopBar>
   <div class="mt-16">
     {#if loading}

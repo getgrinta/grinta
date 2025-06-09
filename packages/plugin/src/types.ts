@@ -1,4 +1,4 @@
-import type { ExecutableCommand, Note, Settings } from "@getgrinta/core";
+import type { ExecutableCommand, Settings } from "@getgrinta/core";
 import type { fetch } from "@tauri-apps/plugin-http";
 import type { z } from "zod/v3";
 import { AppStateContextSchema } from "./schema";
@@ -12,7 +12,6 @@ export type PluginContext = {
   fail: (reason: string) => void;
   app: AppStateContext;
   settings: Settings;
-  notes: Note[];
 };
 
 export type PluginInit = {

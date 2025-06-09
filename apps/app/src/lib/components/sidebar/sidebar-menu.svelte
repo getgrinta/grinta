@@ -2,7 +2,6 @@
   import { appStore } from "$lib/store/app.svelte";
   import Sidebar from "./sidebar.svelte";
   import {
-    ArrowRightIcon,
     CalendarIcon,
     ChevronRightIcon,
     ClipboardIcon,
@@ -18,8 +17,9 @@
   import { exit } from "@tauri-apps/plugin-process";
   import { _ } from "svelte-i18n";
   import Shortcut from "../shortcut.svelte";
-  import { calendarStore } from "$lib/store/calendar.svelte"; // Import calendarStore instance
-  import { CalendarAuthorizationStatus } from "$lib/types/calendar"; // Import Enum
+  import { calendarStore } from "$lib/store/calendar.svelte";
+  import { CalendarAuthorizationStatus } from "$lib/types/calendar";
+  import { openUrl } from "@tauri-apps/plugin-opener";
 
   let { children } = $props<{
     children: () => void;
@@ -82,6 +82,22 @@
     closeMenu();
     exit(0);
   }
+
+  function handleSignIn() {
+    closeMenu();
+    setTimeout(() => {
+      appStore.setQuery("");
+    }, 100);
+    return goto("/sign-in");
+  }
+
+  function handleUpgrade() {
+    closeMenu();
+    setTimeout(() => {
+      appStore.setQuery("");
+    }, 100);
+    return openUrl("https://getgrinta.com/account");
+  }
 </script>
 
 <a
@@ -111,25 +127,21 @@
   <Shortcut keys={["s"]} callback={handleSettings} />
   <Shortcut keys={["q"]} callback={handleExit} />
   <Shortcut keys={["p"]} callback={handleProfile} />
+  <Shortcut keys={["l"]} callback={handleSignIn} />
+  <Shortcut keys={["u"]} callback={handleUpgrade} />
 {/if}
 
 <Sidebar id="menuSidebar" bind:sidebarOpened={appStore.menuOpen}>
   {@render children()}
   {#snippet sidebar()}
     <div class="flex justify-between items-center mb-4">
-      <div
-        class="tooltip tooltip-right tooltip-primary"
-        data-tip={$_("common.back")}
-      >
+      <div class="tooltip tooltip-right" data-tip={$_("common.back")}>
         <label for="menuSidebar" class="btn btn-sm btn-square">
           <ChevronRightIcon size={16} />
         </label>
       </div>
       {#if userId}
-        <div
-          class="tooltip tooltip-primary tooltip-left"
-          data-tip={$_("menu.profile")}
-        >
+        <div class="tooltip tooltip-left" data-tip={$_("menu.profile")}>
           <a href="/profile" onclick={closeMenu} class="gap-4">
             <div class="avatar">
               <div class="w-8 rounded-full">
@@ -199,7 +211,7 @@
           <UserIcon size={16} />
           <div class="flex gap-2 items-center">
             <span>{$_("menu.signIn")}</span>
-            <ArrowRightIcon size={16} />
+            <kbd class="kbd kbd-sm">l</kbd>
           </div>
         </a>
       {:else if !appStore.hasPro}
@@ -211,7 +223,7 @@
           <img src="/pro.svg" width="32" height="32" alt="Get Pro" />
           <div class="flex gap-2 items-center">
             <span>{$_("menu.upgrade")}</span>
-            <ArrowRightIcon size={16} />
+            <kbd class="kbd kbd-sm">u</kbd>
           </div>
         </a>
       {/if}
